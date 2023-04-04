@@ -238,13 +238,18 @@ class BIP
     for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
       if (f.type.is(Folder.type) && !f.name.equals("service")) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-           log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
+           ** log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
            if (r.type.is(BacReadPropertyVar.type)) {
-              log.message("BBB r.propertyProperty=${((BacReadPropertyVar)r).propertyProperty} and propertyProperty=$propertyProperty")
+           
+              log.message("BBB r.propertyProperty=0x").printHex(
+              			((BacReadPropertyVar)r).propertyProperty).print(
+              			" and propertyProperty= 0x").printHex(propertyProperty).print(". ").nl()
            }
            if (r.type.is(BacReadPropertyVar.type) 
            		&& ((BacReadPropertyVar)r).propertyProperty == propertyProperty) {
-              log.message("CCC r.propertyProperty=${((BacReadPropertyVar)r).propertyProperty} and propertyProperty=$propertyProperty")
+              log.message("CCC r.propertyProperty=0x").printHex(
+              			((BacReadPropertyVar)r).propertyProperty).print(
+              			" and propertyProperty= 0x").printHex(propertyProperty).print(". ").nl()
               ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data)
           }
         }
@@ -579,6 +584,10 @@ class BIP
 	else 
 	{
 	   log.message("Service Choice: not read Property and Service Choice =${bacnetPacket[serviceChoicePos]} ")
+		for(int i =0 ; i < iPacketLen; i++)
+		{
+	        log.message("checkReadPropertyData read 0x").printHex(bacnetRecvPacket[i]).print(". ").nl()
+		}
 	   return -1
 	}
 	serviceChoicePos++
@@ -591,13 +600,19 @@ class BIP
 	serviceChoicePos++
 	// Property Identifier : Length Value Type: 1
     int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
-	log.message("LengthValueType = ${PropertyLengthValue} ")
+	log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+	
+	// int  propertyProperty = 0x00
+	// Include SD Context Tag
+	int  propertyProperty = bacnetRecvPacket[serviceChoicePos]
 	serviceChoicePos++
-	int  propertyProperty = 0x00
+	
 	for(int i = 0 ; i < PropertyLengthValue; i++)
 	{
 	   propertyProperty = propertyProperty * 0x100
 	   					+ bacnetRecvPacket[serviceChoicePos + i]
+       log.message("propertyProperty = 0x").printHex(
+              			bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
 	}
 	serviceChoicePos += PropertyLengthValue
 	// .... .110 = Named Tag: Opening Tag (6)
