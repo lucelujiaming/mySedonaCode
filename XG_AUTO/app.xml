@@ -1,0 +1,23 @@
+<sedonaCode
+   endian="little"
+   blockSize="4"
+   refSize="4"
+   main="sys::Sys.main"
+   debug="false"
+   test="true"
+>
+
+  <!-- Kits -->
+  <depend on="sys 0.1" />
+  <depend on="platform 0.1" />
+  <depend on="inet 0.1" />
+  <depend on="sox 0.1" />
+
+  <!-- These replace control kit as of 0.1 -->
+  <depend on="BasicFunc 0.1"   />
+  <depend on="OperFunc 0.1"    />
+  <depend on="FieldBusDevice 0.1"   />
+  <depend on="FieldBusNode 0.1"   />
+
+</sedonaCode>
+

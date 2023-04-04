@@ -1,0 +1,61 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class VarOutput
+  extends FieldBusIO
+{
+  @readonly
+  property float out = 0.0f
+
+  property float in = 0.0f
+
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == VarOutput.in) {
+      if (cache != 0 && bus != null && status <= STATUSOK) {
+        buf[0] = in
+        bus.writeReg(cache, regId, typeId, buf)
+      }
+    } else if (slot == VarOutput.url) {
+      update()
+      needUpdate = true
+    }
+  }
+  virtual override void execute()
+  {
+    if (cache != 0 && bus != null && status <= STATUSREADY) {
+      if (bus.readReg(cache, regId, typeId, buf) == dataLen) {
+        out := buf[0]
+        status := STATUSOK
+      } else {
+        out := 0.0f
+        status := STATUSOFFLINE
+      }
+    }
+    if (needUpdate && isSlotLinkToIN() && cache != 0 && bus != null && status <= STATUSOK) {
+      buf[0] = in
+      bus.writeReg(cache, regId, typeId, buf)
+      needUpdate = false
+    }
+    if (!isSlotLinkToIN() || cache == 0) {
+      needUpdate = true
+    }
+  }
+  private bool isSlotLinkToIN()
+  {
+    for (Link link = linksTo; link != null; link = link.nextTo) {
+      Slot slot = type.slot(link.toSlot)
+      if (slot == VarOutput.in) {
+        return true
+      }
+    }
+    return false
+  }
+
+  private inline float[1] buf
+  private bool needUpdate = true
+}

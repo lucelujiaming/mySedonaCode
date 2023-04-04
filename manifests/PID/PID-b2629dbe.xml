@@ -1,0 +1,68 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="PID"
+   checksum="b2629dbe"
+   hasNatives="true"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="PID function block library"
+   buildHost="ubuntu"
+   buildTime="2023-03-28T10:31:41.979+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- PID::Pid -->
+<type id="0" name="Pid" sizeof="88" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="enable" type="float" default="1.0"/>
+  <slot id="2" name="v" type="float"/>
+  <slot id="3" name="sp" type="float"/>
+  <slot id="4" name="Direct" type="float"/>
+  <slot id="5" name="reset" type="float"/>
+  <slot id="6" name="kp" type="float" flags="c">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="precision" val="2"/>
+    </facets>
+  </slot>
+  <slot id="7" name="ki" type="float" flags="c">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="precision" val="2"/>
+    </facets>
+  </slot>
+  <slot id="8" name="kd" type="float" flags="c">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="precision" val="2"/>
+    </facets>
+  </slot>
+  <slot id="9" name="db" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="10" name="eepDirect" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+</kitManifest>

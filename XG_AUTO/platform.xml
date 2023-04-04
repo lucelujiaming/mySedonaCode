@@ -1,0 +1,38 @@
+<sedonaPlatform vendor="XunGaoAuto" id="xungaoauto-${sedona.env.version}">
+
+  <compile endian="little" blockSize="4" refSize="4" debug="true" test="true">
+
+    <!-- Native Kits -->
+    <nativeKit depend="sys 0.1+"    />
+    <nativeKit depend="inet 0.1+"   />
+    <nativeKit depend="platform 0.1+" />
+ 
+    <nativeKit depend="ModBus 0.1+" />
+    <nativeKit depend="BacNet 0.1+" />
+    <nativeKit depend="Timer 0.1+" />
+    <nativeKit depend="PID 0.1+" />
+    <!-- Sources -->
+    <nativeSource path="/src/vm" />
+    <nativeSource path="/src/sys/native" />
+    <nativeSource path="/src/sys/native/std" />
+    <nativeSource path="/src/sys/native/unix" />
+    <nativeSource path="/src/inet/native" />
+    <nativeSource path="/src/inet/native/std" />
+    <nativeSource path="/src/inet/native/sha1" />
+
+    <nativeSource path="/src/ModBus/native/" />
+    <nativeSource path="/src/BacNet/native/" />
+    <nativeSource path="/src/Timer/native/" />
+    <nativeSource path="/src/PID/native/" />
+  </compile>    
+  
+  <manifestInclude>
+    <schemes>
+      <!-- unix supports manifest transfer -->
+      <scheme id="m"/>
+    </schemes>
+  </manifestInclude>
+  
+</sedonaPlatform>
+
+

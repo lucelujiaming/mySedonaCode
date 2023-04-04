@@ -1,0 +1,26 @@
+//
+// Mul Two Input Multiplication object
+//
+// out = in1 * in2
+//
+@niagaraIcon="module://icons/x16/control/math/multiply.png"
+class Mul
+  extends Component
+{
+  // out = in1 * in2
+  @readonly property float out
+
+  // input 1
+  property float in1
+
+  //input 2
+  property float in2
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    out := in1 * in2
+  }
+}

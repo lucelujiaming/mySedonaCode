@@ -1,0 +1,130 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Schedule"
+   checksum="f1dcee26"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Date Schedule Management"
+   buildHost="ubuntu"
+   buildTime="2023-03-28T10:31:52.523+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Schedule::DateTime -->
+<type id="0" name="DateTime" sizeof="80" base="sys::Service">
+  <slot id="0" name="hour" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+  <slot id="1" name="minute" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+  <slot id="2" name="second" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+  <slot id="3" name="year" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+  <slot id="4" name="month" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+  <slot id="5" name="day" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+  <slot id="6" name="week" type="int" default="7">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <str name="range" val="Sun, Mon, Tue, Wed, Thu, Fri, Sat, UNKNOWN"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="7" name="setSysDate" type="long" flags="a"/>
+  <slot id="8" name="setSysTime" type="long" flags="a"/>
+</type>
+
+<!-- Schedule::Week -->
+<type id="1" name="Week" sizeof="72" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/clock.png"/>
+  </facets>
+  <slot id="0" name="on" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="Sun" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="5"/>
+      <str name="range" val="Off, On"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="Mon" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="5"/>
+      <str name="range" val="Off, On"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="Tue" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="5"/>
+      <str name="range" val="Off, On"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="Wed" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="5"/>
+      <str name="range" val="Off, On"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="Thu" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="5"/>
+      <str name="range" val="Off, On"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="Fri" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="5"/>
+      <str name="range" val="Off, On"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="7" name="Sat" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="5"/>
+      <str name="range" val="Off, On"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+</kitManifest>

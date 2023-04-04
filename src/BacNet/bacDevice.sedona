@@ -1,0 +1,115 @@
+@niagaraIcon="module://icons/x16/device.png"
+class bacDevice
+  extends FieldBusDevice
+{
+  @config
+  property int deviceInstance = 0
+
+  @config
+  @defaultOnClone
+  @unit = Units.millisecond
+  @min = 100
+  property int refreshTime = 500
+
+  @readonly
+  @unit = Units.millisecond
+  property int elapsedTime = -1
+
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void loaded()
+  {
+    update()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == bacDevice.deviceName || slot == bacDevice.deviceInstance || slot == bacDevice.refreshTime) {
+      update()
+    }
+  }
+  override void stop()
+  {
+    status := STATUSEND
+    Component n = Sys.app.lookup(parent)
+    if (n.type.is(FieldBusNet.type)) {
+      ((FieldBusNet)n).update()
+      ((FieldBusNet)n).notifyFlush()
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  void update()
+  {
+    Component n = Sys.app.lookup(parent)
+    if (n != null && n.type.is(FieldBusNet.type)) {
+      bus = (FieldBusNet)Sys.app.lookup(parent)
+      ((FieldBusNet)n).update()
+      ((FieldBusNet)n).notifyFlush()
+      for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d == this) {
+          continue
+        }
+        if (d.type.is(bacDevice.type) && ((bacDevice)d).deviceInstance == deviceInstance) {
+          status := STATUSEADDR
+          return
+        }
+      }
+      if (deviceName.toStr().length() > 0) {
+        Component s = Sys.app.lookup(n.parent)
+        if (s != null && s.type.is(Folder.type) && s.name.equals("service")) {
+          for (Component n1 = Sys.app.lookup(s.children); n1 != null; n1 = Sys.app.lookup(n1.nextSibling)) {
+            if (n1.type.is(FieldBusNet.type)) {
+              for (Component d = Sys.app.lookup(n1.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                if (d == this) {
+                  continue
+                }
+                if (d.type.is(bacDevice.type) && ((bacDevice)d).deviceName.toStr().equals(deviceName.toStr())) {
+                  status := STATUSENAME
+                  return
+                }
+              }
+            }
+          }
+        }
+      } else {
+        status := STATUSENAME
+        return
+      }
+      status := STATUSNOREG
+    } else {
+      status := STATUSNONET
+    }
+  }
+
+  override void execute()
+  {
+    if (bus != null) {
+        dataLength = bus.readReg(0, 0, 255, buf)
+        if(dataLength > 0)
+        {
+            log.message("We readReg and return $dataLength ")
+        	for(int i =0 ; i < dataLength; i++)
+	    	{
+        //        log.message(
+        //        		"execute readReg (0x").printHex(
+        //        			(byte)buf[i]).print(") .").nl()
+	    	    bacnetPacket[i] = (byte)buf[i]
+	    	}
+            bus.checkReadPropertyData(bacnetPacket, dataLength)
+        }
+    }
+  }
+  
+  define Log log
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  FieldBusNet bus = null
+  private inline float[1024] buf
+  static inline byte[1024] bacnetPacket
+  int dataLength
+}

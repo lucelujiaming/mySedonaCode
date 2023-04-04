@@ -1,0 +1,27 @@
+//
+// Not logic object
+//
+// if in == null, out = null else
+// out = !in
+//
+@niagaraIcon="module://icons/x16/control/logic/not.png"
+class Not
+  extends Component
+{
+  // output is !input
+  @readonly property float out
+
+  // input
+  property float in
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    if (in == null)
+      out := null
+    else
+      out := in == 0.0 ? 1.0 : 0.0
+  }
+}

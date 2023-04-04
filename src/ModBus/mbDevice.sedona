@@ -1,0 +1,105 @@
+@niagaraIcon="module://icons/x16/device.png"
+class mbDevice
+  extends FieldBusDevice
+{
+  @config
+  @min = 1
+  @max = 250
+  property int address = 1
+
+  @config
+  @defaultOnClone
+  @unit = Units.millisecond
+  @min = 100
+  property int refreshTime = 500
+
+  @config
+  @unit = Units.millisecond
+  property int pointDelay = 5
+
+  define Str ENDIANRANGE = "LittleEndian, BigEndian"
+  define int LITTLEENDIAN = 0
+  define int BIGENDIAN = 1
+  @config
+  @range = ENDIANRANGE
+  property int endian = 0
+
+  @readonly
+  @unit = Units.millisecond
+  property int elapsedTime = -1
+
+  @readonly
+  property int packetsTotal = -1
+
+  @readonly
+  property int packetsError = -1
+
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void loaded()
+  {
+    update()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == mbDevice.deviceName || slot == mbDevice.address || slot == mbDevice.refreshTime || slot == mbDevice.pointDelay || slot == mbDevice.endian) {
+      update()
+    }
+  }
+  override void stop()
+  {
+    status := STATUSEND
+    Component n = Sys.app.lookup(parent)
+    if (n.type.is(FieldBusNet.type)) {
+      ((FieldBusNet)n).update()
+      ((FieldBusNet)n).notifyFlush()
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  void update()
+  {
+    Component n = Sys.app.lookup(parent)
+    if (n != null && n.type.is(FieldBusNet.type)) {
+      ((FieldBusNet)n).update()
+      ((FieldBusNet)n).notifyFlush()
+      for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d == this) {
+          continue
+        }
+        if (d.type.is(mbDevice.type) && ((mbDevice)d).address == address) {
+          status := STATUSEADDR
+          return
+        }
+      }
+      if (deviceName.toStr().length() > 0) {
+        Component s = Sys.app.lookup(n.parent)
+        if (s != null && s.type.is(Folder.type) && s.name.equals("service")) {
+          for (Component n1 = Sys.app.lookup(s.children); n1 != null; n1 = Sys.app.lookup(n1.nextSibling)) {
+            if (n1.type.is(FieldBusNet.type)) {
+              for (Component d = Sys.app.lookup(n1.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                if (d == this) {
+                  continue
+                }
+                if (d.type.is(mbDevice.type) && ((mbDevice)d).deviceName.toStr().equals(deviceName.toStr())) {
+                  status := STATUSENAME
+                  return
+                }
+              }
+            }
+          }
+        }
+      } else {
+        status := STATUSENAME
+        return
+      }
+      status := STATUSNOREG
+    } else {
+      status := STATUSNONET
+    }
+  }
+}

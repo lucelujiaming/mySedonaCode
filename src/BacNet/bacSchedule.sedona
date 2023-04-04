@@ -1,0 +1,778 @@
+@niagaraIcon="module://icons/x16/clock.png"
+class bacSchedule
+  extends FieldBusSchedule
+{
+  @min=0
+  @config
+  property int scheduleInstance = 0
+
+  @config
+  property float defaultValue = 0.0f
+
+  @min=0
+  @max=21000000
+  @config
+  property int startDate = 0
+
+  @min=0
+  @max=21000000
+  @config
+  property int endDate = 0
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime1 = 0
+
+  @config
+  property float monValue1 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime2 = 0
+
+  @config
+  property float monValue2 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime3 = 0
+
+  @config
+  property float monValue3 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime4 = 0
+
+  @config
+  property float monValue4 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime5 = 0
+
+  @config
+  property float monValue5 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime6 = 0
+
+  @config
+  property float monValue6 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime7 = 0
+
+  @config
+  property float monValue7 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int monTime8 = 0
+
+  @config
+  property float monValue8 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime1 = 0
+
+  @config
+  property float tueValue1 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime2 = 0
+
+  @config
+  property float tueValue2 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime3 = 0
+
+  @config
+  property float tueValue3 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime4 = 0
+
+  @config
+  property float tueValue4 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime5 = 0
+
+  @config
+  property float tueValue5 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime6 = 0
+
+  @config
+  property float tueValue6 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime7 = 0
+
+  @config
+  property float tueValue7 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int tueTime8 = 0
+
+  @config
+  property float tueValue8 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime1 = 0
+
+  @config
+  property float wedValue1 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime2 = 0
+
+  @config
+  property float wedValue2 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime3 = 0
+
+  @config
+  property float wedValue3 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime4 = 0
+
+  @config
+  property float wedValue4 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime5 = 0
+
+  @config
+  property float wedValue5 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime6 = 0
+
+  @config
+  property float wedValue6 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime7 = 0
+
+  @config
+  property float wedValue7 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int wedTime8 = 0
+
+  @config
+  property float wedValue8 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime1 = 0
+
+  @config
+  property float thuValue1 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime2 = 0
+
+  @config
+  property float thuValue2 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime3 = 0
+
+  @config
+  property float thuValue3 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime4 = 0
+
+  @config
+  property float thuValue4 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime5 = 0
+
+  @config
+  property float thuValue5 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime6 = 0
+
+  @config
+  property float thuValue6 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime7 = 0
+
+  @config
+  property float thuValue7 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int thuTime8 = 0
+
+  @config
+  property float thuValue8 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime1 = 0
+
+  @config
+  property float friValue1 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime2 = 0
+
+  @config
+  property float friValue2 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime3 = 0
+
+  @config
+  property float friValue3 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime4 = 0
+
+  @config
+  property float friValue4 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime5 = 0
+
+  @config
+  property float friValue5 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime6 = 0
+
+  @config
+  property float friValue6 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime7 = 0
+
+  @config
+  property float friValue7 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int friTime8 = 0
+
+  @config
+  property float friValue8 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime1 = 0
+
+  @config
+  property float satValue1 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime2 = 0
+
+  @config
+  property float satValue2 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime3 = 0
+
+  @config
+  property float satValue3 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime4 = 0
+
+  @config
+  property float satValue4 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime5 = 0
+
+  @config
+  property float satValue5 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime6 = 0
+
+  @config
+  property float satValue6 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime7 = 0
+
+  @config
+  property float satValue7 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int satTime8 = 0
+
+  @config
+  property float satValue8 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime1 = 0
+
+  @config
+  property float sunValue1 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime2 = 0
+
+  @config
+  property float sunValue2 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime3 = 0
+
+  @config
+  property float sunValue3 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime4 = 0
+
+  @config
+  property float sunValue4 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime5 = 0
+
+  @config
+  property float sunValue5 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime6 = 0
+
+  @config
+  property float sunValue6 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime7 = 0
+
+  @config
+  property float sunValue7 = 0.0f
+
+  @min=0
+  @max=235959
+  @config
+  property int sunTime8 = 0
+
+  @config
+  property float sunValue8 = 0.0f
+
+  bool configToBuf()
+  {
+      int index = 0
+
+      Str data = url.toStr()
+      int len = data.length()
+      if (len > 0) {
+        urlBuf.set(index++, len)
+        for (int i=0; i<len; i++) {
+            urlBuf.set(index++, data.get(i))
+        }
+      } else {
+          return false
+      }
+
+      // timeBuf
+      index = 0
+
+      timeBuf[index++] = scheduleInstance
+
+      timeBuf[index++] = startDate
+      timeBuf[index++] = endDate
+
+      timeBuf[index++] = monTime1
+      timeBuf[index++] = monTime2
+      timeBuf[index++] = monTime3
+      timeBuf[index++] = monTime4
+      timeBuf[index++] = monTime5
+      timeBuf[index++] = monTime6
+      timeBuf[index++] = monTime7
+      timeBuf[index++] = monTime8
+
+      timeBuf[index++] = tueTime1
+      timeBuf[index++] = tueTime2
+      timeBuf[index++] = tueTime3
+      timeBuf[index++] = tueTime4
+      timeBuf[index++] = tueTime5
+      timeBuf[index++] = tueTime6
+      timeBuf[index++] = tueTime7
+      timeBuf[index++] = tueTime8
+
+      timeBuf[index++] = wedTime1
+      timeBuf[index++] = wedTime2
+      timeBuf[index++] = wedTime3
+      timeBuf[index++] = wedTime4
+      timeBuf[index++] = wedTime5
+      timeBuf[index++] = wedTime6
+      timeBuf[index++] = wedTime7
+      timeBuf[index++] = wedTime8
+
+      timeBuf[index++] = thuTime1
+      timeBuf[index++] = thuTime2
+      timeBuf[index++] = thuTime3
+      timeBuf[index++] = thuTime4
+      timeBuf[index++] = thuTime5
+      timeBuf[index++] = thuTime6
+      timeBuf[index++] = thuTime7
+      timeBuf[index++] = thuTime8
+
+      timeBuf[index++] = friTime1
+      timeBuf[index++] = friTime2
+      timeBuf[index++] = friTime3
+      timeBuf[index++] = friTime4
+      timeBuf[index++] = friTime5
+      timeBuf[index++] = friTime6
+      timeBuf[index++] = friTime7
+      timeBuf[index++] = friTime8
+
+      timeBuf[index++] = satTime1
+      timeBuf[index++] = satTime2
+      timeBuf[index++] = satTime3
+      timeBuf[index++] = satTime4
+      timeBuf[index++] = satTime5
+      timeBuf[index++] = satTime6
+      timeBuf[index++] = satTime7
+      timeBuf[index++] = satTime8
+
+      timeBuf[index++] = sunTime1
+      timeBuf[index++] = sunTime2
+      timeBuf[index++] = sunTime3
+      timeBuf[index++] = sunTime4
+      timeBuf[index++] = sunTime5
+      timeBuf[index++] = sunTime6
+      timeBuf[index++] = sunTime7
+      timeBuf[index++] = sunTime8
+
+      // valueBuf
+      index = 0
+      valueBuf[index++] = presentValue
+      valueBuf[index++] = defaultValue
+
+      valueBuf[index++] = monValue1
+      valueBuf[index++] = monValue2
+      valueBuf[index++] = monValue3
+      valueBuf[index++] = monValue4
+      valueBuf[index++] = monValue5
+      valueBuf[index++] = monValue6
+      valueBuf[index++] = monValue7
+      valueBuf[index++] = monValue8
+
+      valueBuf[index++] = tueValue1
+      valueBuf[index++] = tueValue2
+      valueBuf[index++] = tueValue3
+      valueBuf[index++] = tueValue4
+      valueBuf[index++] = tueValue5
+      valueBuf[index++] = tueValue6
+      valueBuf[index++] = tueValue7
+      valueBuf[index++] = tueValue8
+
+      valueBuf[index++] = wedValue1
+      valueBuf[index++] = wedValue2
+      valueBuf[index++] = wedValue3
+      valueBuf[index++] = wedValue4
+      valueBuf[index++] = wedValue5
+      valueBuf[index++] = wedValue6
+      valueBuf[index++] = wedValue7
+      valueBuf[index++] = wedValue8
+
+      valueBuf[index++] = thuValue1
+      valueBuf[index++] = thuValue2
+      valueBuf[index++] = thuValue3
+      valueBuf[index++] = thuValue4
+      valueBuf[index++] = thuValue5
+      valueBuf[index++] = thuValue6
+      valueBuf[index++] = thuValue7
+      valueBuf[index++] = thuValue8
+
+      valueBuf[index++] = friValue1
+      valueBuf[index++] = friValue2
+      valueBuf[index++] = friValue3
+      valueBuf[index++] = friValue4
+      valueBuf[index++] = friValue5
+      valueBuf[index++] = friValue6
+      valueBuf[index++] = friValue7
+      valueBuf[index++] = friValue8
+
+      valueBuf[index++] = satValue1
+      valueBuf[index++] = satValue2
+      valueBuf[index++] = satValue3
+      valueBuf[index++] = satValue4
+      valueBuf[index++] = satValue5
+      valueBuf[index++] = satValue6
+      valueBuf[index++] = satValue7
+      valueBuf[index++] = satValue8
+
+      valueBuf[index++] = sunValue1
+      valueBuf[index++] = sunValue2
+      valueBuf[index++] = sunValue3
+      valueBuf[index++] = sunValue4
+      valueBuf[index++] = sunValue5
+      valueBuf[index++] = sunValue6
+      valueBuf[index++] = sunValue7
+      valueBuf[index++] = sunValue8
+
+      return true
+  }
+
+  void bufToConfig()
+  {
+      int index = 0
+
+      // timeBuf
+      index = 1
+      startDate := timeBuf[index++]
+      endDate := timeBuf[index++]
+
+      monTime1 := timeBuf[index++]
+      monTime2 := timeBuf[index++]
+      monTime3 := timeBuf[index++]
+      monTime4 := timeBuf[index++]
+      monTime5 := timeBuf[index++]
+      monTime6 := timeBuf[index++]
+      monTime7 := timeBuf[index++]
+      monTime8 := timeBuf[index++]
+
+      tueTime1 := timeBuf[index++]
+      tueTime2 := timeBuf[index++]
+      tueTime3 := timeBuf[index++]
+      tueTime4 := timeBuf[index++]
+      tueTime5 := timeBuf[index++]
+      tueTime6 := timeBuf[index++]
+      tueTime7 := timeBuf[index++]
+      tueTime8 := timeBuf[index++]
+
+      wedTime1 := timeBuf[index++]
+      wedTime2 := timeBuf[index++]
+      wedTime3 := timeBuf[index++]
+      wedTime4 := timeBuf[index++]
+      wedTime5 := timeBuf[index++]
+      wedTime6 := timeBuf[index++]
+      wedTime7 := timeBuf[index++]
+      wedTime8 := timeBuf[index++]
+
+      thuTime1 := timeBuf[index++]
+      thuTime2 := timeBuf[index++]
+      thuTime3 := timeBuf[index++]
+      thuTime4 := timeBuf[index++]
+      thuTime5 := timeBuf[index++]
+      thuTime6 := timeBuf[index++]
+      thuTime7 := timeBuf[index++]
+      thuTime8 := timeBuf[index++]
+
+      friTime1 := timeBuf[index++]
+      friTime2 := timeBuf[index++]
+      friTime3 := timeBuf[index++]
+      friTime4 := timeBuf[index++]
+      friTime5 := timeBuf[index++]
+      friTime6 := timeBuf[index++]
+      friTime7 := timeBuf[index++]
+      friTime8 := timeBuf[index++]
+
+      satTime1 := timeBuf[index++]
+      satTime2 := timeBuf[index++]
+      satTime3 := timeBuf[index++]
+      satTime4 := timeBuf[index++]
+      satTime5 := timeBuf[index++]
+      satTime6 := timeBuf[index++]
+      satTime7 := timeBuf[index++]
+      satTime8 := timeBuf[index++]
+
+      sunTime1 := timeBuf[index++]
+      sunTime2 := timeBuf[index++]
+      sunTime3 := timeBuf[index++]
+      sunTime4 := timeBuf[index++]
+      sunTime5 := timeBuf[index++]
+      sunTime6 := timeBuf[index++]
+      sunTime7 := timeBuf[index++]
+      sunTime8 := timeBuf[index++]
+
+      // valueBuf
+      index = 0
+
+      presentValue := valueBuf[index++]
+      defaultValue := valueBuf[index++]
+
+      monValue1 := valueBuf[index++]
+      monValue2 := valueBuf[index++]
+      monValue3 := valueBuf[index++]
+      monValue4 := valueBuf[index++]
+      monValue5 := valueBuf[index++]
+      monValue6 := valueBuf[index++]
+      monValue7 := valueBuf[index++]
+      monValue8 := valueBuf[index++]
+
+      tueValue1 := valueBuf[index++]
+      tueValue2 := valueBuf[index++]
+      tueValue3 := valueBuf[index++]
+      tueValue4 := valueBuf[index++]
+      tueValue5 := valueBuf[index++]
+      tueValue6 := valueBuf[index++]
+      tueValue7 := valueBuf[index++]
+      tueValue8 := valueBuf[index++]
+
+      wedValue1 := valueBuf[index++]
+      wedValue2 := valueBuf[index++]
+      wedValue3 := valueBuf[index++]
+      wedValue4 := valueBuf[index++]
+      wedValue5 := valueBuf[index++]
+      wedValue6 := valueBuf[index++]
+      wedValue7 := valueBuf[index++]
+      wedValue8 := valueBuf[index++]
+
+      thuValue1 := valueBuf[index++]
+      thuValue2 := valueBuf[index++]
+      thuValue3 := valueBuf[index++]
+      thuValue4 := valueBuf[index++]
+      thuValue5 := valueBuf[index++]
+      thuValue6 := valueBuf[index++]
+      thuValue7 := valueBuf[index++]
+      thuValue8 := valueBuf[index++]
+
+      friValue1 := valueBuf[index++]
+      friValue2 := valueBuf[index++]
+      friValue3 := valueBuf[index++]
+      friValue4 := valueBuf[index++]
+      friValue5 := valueBuf[index++]
+      friValue6 := valueBuf[index++]
+      friValue7 := valueBuf[index++]
+      friValue8 := valueBuf[index++]
+
+      satValue1 := valueBuf[index++]
+      satValue2 := valueBuf[index++]
+      satValue3 := valueBuf[index++]
+      satValue4 := valueBuf[index++]
+      satValue5 := valueBuf[index++]
+      satValue6 := valueBuf[index++]
+      satValue7 := valueBuf[index++]
+      satValue8 := valueBuf[index++]
+
+      sunValue1 := valueBuf[index++]
+      sunValue2 := valueBuf[index++]
+      sunValue3 := valueBuf[index++]
+      sunValue4 := valueBuf[index++]
+      sunValue5 := valueBuf[index++]
+      sunValue6 := valueBuf[index++]
+      sunValue7 := valueBuf[index++]
+      sunValue8 := valueBuf[index++]
+  }
+
+  int index = -1
+  // urlBuf: url.len, url
+  inline Str(32) urlBuf
+  // timeBuf: instance,
+  //          startYear, endYear,
+  //          weekTime[56]
+  inline int[59] timeBuf
+  // valueBuf: present_value, default_value, weekValue[56]
+  inline float[58] valueBuf
+}

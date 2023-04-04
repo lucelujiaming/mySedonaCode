@@ -1,0 +1,58 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class DelaySwitch
+  extends Component
+{
+  property
+  float in
+
+  @readonly
+  property
+  float out
+
+  @config
+  @unit=Units.millisecond
+  property
+  float delay = 1000.0f
+
+  virtual override void start()
+  {
+      ctx = a(in)
+  }
+
+  virtual override void stop()
+  {
+      int ret = d(ctx)
+      if (ret == 0) {
+          ctx = 0
+      }
+  }
+
+  virtual override void changed(Slot slot)
+  {
+      super.changed(slot)
+      if (slot.name.equals("delay")) {
+          d(ctx)
+          ctx = a(in)
+      }
+      if (slot.name.equals("in")) {
+          if (ctx != 0) {
+              c(ctx, in, delay)
+          }
+      }
+  }
+
+  virtual override void execute()
+  {
+      out := e(ctx)
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  private int ctx = 0
+
+  native int a(float in)
+  native float c(int ctx, float in, float delay)
+  native float e(int ctx)
+  native int d(int ctx)
+}

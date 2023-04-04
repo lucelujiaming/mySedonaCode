@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="inet"
+   checksum="25648ba7"
+   hasNatives="true"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="IP and UDP/TCP Socket APIs"
+   buildHost="ubuntu"
+   buildTime="2023-03-28T10:31:34.868+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+</kitManifest>

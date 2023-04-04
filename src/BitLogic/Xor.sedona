@@ -1,0 +1,33 @@
+//
+// Xor Exclusive Or logic object
+//
+// if either input null output is null
+// out = in1 xor in2
+//
+@niagaraIcon="module://icons/x16/control/logic/xor.png"
+class Xor
+  extends Component
+{
+  // output value
+  @readonly property float out
+
+  // input 1
+  property float in1
+
+  // input 2
+  property float in2
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    if ((in1 == null) || (in2 == null))
+      out := null
+    else {
+      bool i1 = in1 != 0.0 ? true : false
+      bool i2 = in2 != 0.0 ? true : false
+      out := (i1 ^ i2) ? 1.0 : 0.0
+    }
+  }
+}

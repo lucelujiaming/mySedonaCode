@@ -1,0 +1,41 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class DeMux
+  extends Component
+{
+  @readonly property float out0
+
+  @readonly property float out1
+
+  @readonly property float out2
+
+  @readonly property float out3
+
+  @readonly property float outn
+
+  property float in
+
+  property int k
+
+  virtual override void execute()
+  {
+    int c = k
+    switch (c)
+    {
+      case 0:
+        out0 := in
+        break
+      case 1:
+        out1 := in
+        break
+      case 2:
+        out2 := in
+        break
+      case 3:
+        out3 := in
+        break
+      default:
+        outn := in
+        break;
+    }
+  }
+}

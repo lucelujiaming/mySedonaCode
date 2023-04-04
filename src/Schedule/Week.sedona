@@ -1,0 +1,148 @@
+@niagaraIcon="module://icons/x16/clock.png"
+class Week
+  extends Component
+{
+  @readonly
+  property
+  float on = 0.0f
+
+  define Str STRONOFF = "Off, On"
+  define Str STRWEEK = "Sun, Mon, Tue, Wed, Thu, Fri, Sat, UNKNOWN"
+
+  @config
+  @range = STRONOFF
+  @fieldWidth = 5
+  property int Sun = 0
+
+  @config
+  @range = STRONOFF
+  @fieldWidth = 5
+  property int Mon = 0
+
+  @config
+  @range = STRONOFF
+  @fieldWidth = 5
+  property int Tue = 0
+
+  @config
+  @range = STRONOFF
+  @fieldWidth = 5
+  property int Wed = 0
+
+  @config
+  @range = STRONOFF
+  @fieldWidth = 5
+  property int Thu = 0
+
+  @config
+  @range = STRONOFF
+  @fieldWidth = 5
+  property int Fri = 0
+
+  @config
+  @range = STRONOFF
+  @fieldWidth = 5
+  property int Sat = 0
+
+  override void execute()
+  {
+    refresh()
+  }
+
+  void refresh()
+  {
+    Component p = this
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+    if (p.type.is(App.type)) {
+      long n = ((App)p).dateTime
+      long d = (n >> 40) & 0xFFFL
+
+      int year = (int)d
+      d = (n >> 32) & 0xFFL
+      int month = (int)d
+      d = (n >> 24) & 0xFFL
+      int day = (int)d
+      int week = getWeek(year, month, day)
+      int isOn = 0
+      switch (week)
+      {
+        case 0:  if (Sun != 0) isOn = 1
+                 break
+        case 1:  if (Mon != 0) isOn = 1
+                 break
+        case 2:  if (Tue != 0) isOn = 1
+                 break
+        case 3:  if (Wed != 0) isOn = 1
+                 break
+        case 4:  if (Thu != 0) isOn = 1
+                 break
+        case 5:  if (Fri != 0) isOn = 1
+                 break
+        case 6:  if (Sat != 0) isOn = 1
+                 break
+        default: isOn = 1
+                 break
+      }
+      if (isOn == 1) {
+        on := 1.0f
+      } else {
+        on := 0.0f
+      }
+    }
+  }
+
+  int getWeek(int y, int m, int d)
+  {
+    int i
+    int mday = 0
+    if (y<2000 || y>2099) {
+      return 7
+    }
+    for (i=2000; i<=2099; i++) {
+      if (i>=y) {
+        break
+      }
+      mday += daysInYear(i)
+    }
+    mday += getYDay(y, m, d)
+    // 20000101 is Sat
+    mday += 6;
+    return (mday % 7)
+  }
+
+  // begin with 0
+  int getYDay(int y, int m, int d)
+  {
+    int yday = 0
+    for (int i=1; i<=12; i++) {
+      if (i >= m) {
+        break
+      }
+      yday += daysInMonth(y, i)
+    }
+    yday += d
+    return (yday - 1)
+  }
+
+  int daysInYear(int year)
+  {
+    return isLeapYear(year) ? 366 : 365
+  }
+
+  int daysInMonth(int year, int month)
+  {
+    if (isLeapYear(year) && month == 2) {
+      return 29
+    }
+    return (int)daysPerMonth[month-1]
+  }
+
+  bool isLeapYear(int year)
+  {
+    return (((year) % 4) == 0 && (((year) % 100) != 0 || (((year) % 400) == 0)))
+  }
+
+  define byte[] daysPerMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+}

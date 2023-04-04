@@ -1,0 +1,26 @@
+//
+// Sub Two Input Subtract object
+//
+// out = in1 - in2
+//
+@niagaraIcon="module://icons/x16/control/math/subtract.png"
+class Sub
+  extends Component
+{
+  // result o subracting in1 - in2
+  @readonly property float out
+
+  // in1
+  property float in1
+
+  // in2
+  property float in2
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    out := in1 - in2
+  }
+}

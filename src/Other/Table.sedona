@@ -1,0 +1,253 @@
+@niagaraIcon="module://icons/x16/control/util/xy.png"
+class Table
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  @config property float x1
+  @config property float y1
+  @config property float x2
+  @config property float y2
+  @config property float x3
+  @config property float y3
+  @config property float x4
+  @config property float y4
+  @config property float x5
+  @config property float y5
+  @config property float x6
+  @config property float y6
+  @config property float x7
+  @config property float y7
+  @config property float x8
+  @config property float y8
+  @config property float x9
+  @config property float y9
+  @config property float x10
+  @config property float y10
+  @config property float x11
+  @config property float y11
+  @config property float x12
+  @config property float y12
+  @config property float x13
+  @config property float y13
+  @config property float x14
+  @config property float y14
+  @config property float x15
+  @config property float y15
+  @config property float x16
+  @config property float y16
+  @config property float x17
+  @config property float y17
+  @config property float x18
+  @config property float y18
+  @config property float x19
+  @config property float y19
+  @config property float x20
+  @config property float y20
+  @config property float x21
+  @config property float y21
+  @config property float x22
+  @config property float y22
+  @config property float x23
+  @config property float y23
+  @config property float x24
+  @config property float y24
+  @config property float x25
+  @config property float y25
+  @config property float x26
+  @config property float y26
+  @config property float x27
+  @config property float y27
+  @config property float x28
+  @config property float y28
+  @config property float x29
+  @config property float y29
+  @config property float x30
+  @config property float y30
+  @config property float x31
+  @config property float y31
+  @config property float x32
+  @config property float y32
+  @config property float x33
+  @config property float y33
+  @config property float x34
+  @config property float y34
+  @config property float x35
+  @config property float y35
+  @config property float x36
+  @config property float y36
+  @config property float x37
+  @config property float y37
+  @config property float x38
+  @config property float y38
+  @config property float x39
+  @config property float y39
+  @config property float x40
+  @config property float y40
+  @config property float x41
+  @config property float y41
+  @config property float x42
+  @config property float y42
+  @config property float x43
+  @config property float y43
+  @config property float x44
+  @config property float y44
+  @config property float x45
+  @config property float y45
+  @config property float x46
+  @config property float y46
+  @config property float x47
+  @config property float y47
+  @config property float x48
+  @config property float y48
+  @config property float x49
+  @config property float y49
+  @config property float x50
+  @config property float y50
+
+  override void start()
+  {
+    tableInit()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot != Table.in && slot != Table.out) {
+      if (ctx != -1) {
+        Runtime.tableD(ctx)
+        ctx = -1
+      }
+      tableInit()
+    }
+  }
+  override void stop()
+  {
+    if (ctx != -1) {
+      Runtime.tableD(ctx)
+      ctx = -1
+    }
+  }
+  override void execute()
+  {
+    if (ctx != -1) {
+      out := Runtime.tableE(ctx, in)
+    }
+  }
+
+  private void tableInit()
+  {
+    x[0] = x1
+    x[1] = x2
+    x[2] = x3
+    x[3] = x4
+    x[4] = x5
+    x[5] = x6
+    x[6] = x7
+    x[7] = x8
+    x[8] = x9
+    x[9] = x10
+    x[10] = x11
+    x[11] = x12
+    x[12] = x13
+    x[13] = x14
+    x[14] = x15
+    x[15] = x16
+    x[16] = x17
+    x[17] = x18
+    x[18] = x19
+    x[19] = x20
+    x[20] = x21
+    x[21] = x22
+    x[22] = x23
+    x[23] = x24
+    x[24] = x25
+    x[25] = x26
+    x[26] = x27
+    x[27] = x28
+    x[28] = x29
+    x[29] = x30
+    x[30] = x31
+    x[31] = x32
+    x[32] = x33
+    x[33] = x34
+    x[34] = x35
+    x[35] = x36
+    x[36] = x37
+    x[37] = x38
+    x[38] = x39
+    x[39] = x40
+    x[40] = x41
+    x[41] = x42
+    x[42] = x43
+    x[43] = x44
+    x[44] = x45
+    x[45] = x46
+    x[46] = x47
+    x[47] = x48
+    x[48] = x49
+    x[49] = x50
+    y[0] = y1
+    y[1] = y2
+    y[2] = y3
+    y[3] = y4
+    y[4] = y5
+    y[5] = y6
+    y[6] = y7
+    y[7] = y8
+    y[8] = y9
+    y[9] = y10
+    y[10] = y11
+    y[11] = y12
+    y[12] = y13
+    y[13] = y14
+    y[14] = y15
+    y[15] = y16
+    y[16] = y17
+    y[17] = y18
+    y[18] = y19
+    y[19] = y20
+    y[20] = y21
+    y[21] = y22
+    y[22] = y23
+    y[23] = y24
+    y[24] = y25
+    y[25] = y26
+    y[26] = y27
+    y[27] = y28
+    y[28] = y29
+    y[29] = y30
+    y[30] = y31
+    y[31] = y32
+    y[32] = y33
+    y[33] = y34
+    y[34] = y35
+    y[35] = y36
+    y[36] = y37
+    y[37] = y38
+    y[38] = y39
+    y[39] = y40
+    y[40] = y41
+    y[41] = y42
+    y[42] = y43
+    y[43] = y44
+    y[44] = y45
+    y[45] = y46
+    y[46] = y47
+    y[47] = y48
+    y[48] = y49
+    y[49] = y50
+
+    if (ctx == -1) {
+      ctx = Runtime.tableA()
+    }
+    if (ctx != -1) {
+      Runtime.tableC(ctx, x, y)
+    }
+  }
+
+  private int ctx = -1
+  static inline float[50] x
+  static inline float[50] y
+}

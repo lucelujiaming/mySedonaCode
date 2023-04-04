@@ -1,0 +1,21 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Select
+  extends Component
+{
+  @readonly property float out
+  
+  property float k
+
+  property float in0
+
+  property float in1
+
+  virtual override void execute()
+  {
+    if (k == 0.0f) {
+      out := in0
+    } else {
+      out := in1
+    }
+  }
+}

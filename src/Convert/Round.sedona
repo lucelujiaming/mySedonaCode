@@ -1,0 +1,13 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Round
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  virtual override void execute()
+  {
+      out := (float)((int)in)
+  }
+}

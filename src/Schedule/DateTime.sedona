@@ -1,0 +1,186 @@
+class DateTime
+  extends Service
+{
+  @readonly
+  @precision = 0
+  property float hour
+
+  @readonly
+  @precision = 0
+  property float minute
+
+  @readonly
+  @precision = 0
+  property float second
+
+  @readonly
+  @precision = 0
+  property float year
+
+  @readonly
+  @precision = 0
+  property float month
+
+  @readonly
+  @precision = 0
+  property float day
+
+  define Str STRWEEK = "Sun, Mon, Tue, Wed, Thu, Fri, Sat, UNKNOWN"
+
+  @readonly
+  @range = STRWEEK
+  @fieldWidth = 10
+  property int week = 7
+
+  override void start()
+  {
+    refresh()
+  }
+
+  override bool work()
+  {
+    long ticks = Sys.ticks()
+    if ((ticks - lastRefreshTicks) > 1sec)  //  only update once per second
+    {
+      lastRefreshTicks = ticks;
+      refresh()
+    }
+    return false
+  }
+
+  void refresh()
+  {
+    Component p = this
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+    if (p.type.is(App.type)) {
+      long n = ((App)p).dateTime
+      long d = (n >> 40) & 0xFFFL
+
+      year := (float)d
+      d = (n >> 32) & 0xFFL
+      month := (float)d
+      d = (n >> 24) & 0xFFL
+      day := (float)d
+      d = (n >> 16) & 0xFFL
+      hour := (float)d
+      d = (n >> 8) & 0xFFL
+      minute := (float)d
+      d = n & 0xFFL
+      second := (float)d
+      week := getWeek((int)year, (int)month, (int)day)
+    }
+  }
+
+  action void setSysDate(long date)
+  {
+    int y = (int)(date / 10000L)
+    int m = (int)((date / 100L) % 100L)
+    int d = (int)(date % 100L)
+    if (y<2000 || y>2099) {
+      return
+    }
+    if (m<1 || m>12) {
+      return
+    }
+    if (d<1 || d>31) {
+      return
+    }
+    if (d>daysInMonth(y, m)) {
+      return
+    }
+    Component p = this
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+    if (p.type.is(App.type)) {
+      long n = ((App)p).dateTime
+      long t = (long)(y << 8) + (long)m
+      t = t << 32
+      t = t + (long)(d << 24) + (n & 0xFFFFFFL)
+      Runtime.setTime(t)
+    }
+  }
+
+  action void setSysTime(long time)
+  {
+    int h = (int)(time / 10000L)
+    int m = (int)((time / 100L) % 100L)
+    int s = (int)(time % 100L)
+    if (h<0 || h>23) {
+      return
+    }
+    if (m<0 || m>59) {
+      return
+    }
+    if (s<0 || s>59) {
+      return
+    }
+    Component p = this
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+    if (p.type.is(App.type)) {
+      long n = ((App)p).dateTime
+      long t = n & 0xFFFFFFFFFF000000L
+      t = t + (long)(h << 16) + (long)(m << 8) + (long)s
+      Runtime.setTime(t)
+    }
+  }
+
+  int getWeek(int y, int m, int d)
+  {
+    int i
+    int mday = 0
+    if (y<2000 || y>2099) {
+      return 7
+    }
+    for (i=2000; i<=2099; i++) {
+      if (i>=y) {
+        break
+      }
+      mday += daysInYear(i)
+    }
+    mday += getYDay(y, m, d)
+    // 20000101 is Sat
+    mday += 6;
+    return (mday % 7)
+  }
+
+  bool isLeapYear(int year)
+  {
+    return (((year) % 4) == 0 && (((year) % 100) != 0 || (((year) % 400) == 0)))
+  }
+
+  // begin with 0
+  int getYDay(int y, int m, int d)
+  {
+    int yday = 0
+    for (int i=1; i<=12; i++) {
+      if (i >= m) {
+        break
+      }
+      yday += daysInMonth(y, i)
+    }
+    yday += d
+    return (yday - 1)
+  }
+
+  int daysInYear(int year)
+  {
+    return isLeapYear(year) ? 366 : 365
+  }
+
+  int daysInMonth(int year, int month)
+  {
+    if (isLeapYear(year) && month == 2) {
+      return 29
+    }
+    return (int)daysPerMonth[month-1]
+  }
+
+  long lastRefreshTicks
+
+  define byte[] daysPerMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+}

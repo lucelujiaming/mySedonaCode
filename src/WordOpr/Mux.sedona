@@ -1,0 +1,41 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Mux
+  extends Component
+{
+  @readonly property float out
+  
+  property int k
+
+  property float in0
+
+  property float in1
+
+  property float in2
+
+  property float in3
+
+  property float inn
+
+  virtual override void execute()
+  {
+    int c = k
+    switch (c)
+    {
+      case 0:
+        out := in0
+        break
+      case 1:
+        out := in1
+        break
+      case 2:
+        out := in2
+        break
+      case 3:
+        out := in3
+        break
+      default:
+        out := inn
+        break
+    }
+  }
+}

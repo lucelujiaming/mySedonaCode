@@ -1,0 +1,31 @@
+<sedonaCode
+   endian="little"
+   blockSize="4"
+   refSize="4"
+   main="sys::Sys.main"
+   debug="false"
+   test="true"
+>
+
+  <!-- Kits -->
+  <depend on="sys 0.1" />
+  <depend on="platform 0.1" />
+  <depend on="inet 0.1" />
+  <depend on="sox 0.1" />
+
+  <!-- These replace control kit as of 0.1 -->
+  <depend on="Schedule 0.1"   />
+  <depend on="Variable 0.1"   />
+  <depend on="ModBus 0.1"   />
+  <depend on="BacNet 0.1"   />
+  <depend on="PID 0.1"   />
+  <depend on="Timer 0.1"   />
+  <depend on="Math 0.1"   />
+  <depend on="BitLogic 0.1"   />
+  <depend on="Compare 0.1"   />
+  <depend on="Convert 0.1"   />
+  <depend on="WordOpr 0.1"   />
+  <depend on="Other 0.1"   />
+
+</sedonaCode>
+

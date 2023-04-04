@@ -1,0 +1,23 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Hold
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  @config
+  property int enable
+
+  @config
+  property float value
+
+  virtual override void execute()
+  {
+    if (enable != 0) {
+      out := value
+    } else {
+      out := in
+    }
+  }
+}

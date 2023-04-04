@@ -1,0 +1,29 @@
+//
+// Div Two Input Division object
+//
+// out = in1 / in2
+//
+@niagaraIcon="module://icons/x16/control/math/divide.png"
+public class Div
+  extends Component
+{
+  // output value
+  @readonly property float out
+
+  // numerator value
+  property float in1
+
+  // denominator value
+  property float in2
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    if (in2 == 0.0)
+      out := 0.0
+    else
+      out := in1 / in2
+  }
+}

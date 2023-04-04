@@ -1,0 +1,16 @@
+<sedonaKit
+ name = "Timer"
+ vendor="XunGaoAuto"
+ description = "Timer function block library"
+ includeSource = "false"
+ doc = "false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+
+  <!-- Source Directories -->
+  <source dir="." />
+
+</sedonaKit>
+

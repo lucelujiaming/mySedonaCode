@@ -1,0 +1,71 @@
+//
+// Copyright (c) 2007 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//   17 May 07  Andy Sunders  Creation
+//
+
+**
+** UpDnTest
+**
+class UpDnTest
+  extends Test
+{
+  static inline UpDn counter
+
+  static void test()
+  {
+    // test count up
+    pulseCounter(true, 10)
+    assert(counter.out == 10.0)
+
+    // test count down
+    pulseCounter(false, 10)
+    assert(counter.out == 0.0)
+
+    // test reset
+    pulseCounter(true, 10)
+    assert(counter.out == 10.0)
+    counter.rst := 1.0
+    counter.execute()
+    counter.rst := 0.0
+    assert(counter.out == 0.0)
+
+    // test limit
+    counter.limit := 15.0
+    pulseCounter(true, 14)
+    assert(counter.out == 14.0)
+    assert(counter.ovr == 0.0)
+    pulseCounter(true, 1)
+    assert(counter.out == 15.0)
+    assert(counter.ovr == 1.0)
+    pulseCounter(true, 1)
+    assert(counter.out == 16.0)
+    assert(counter.ovr == 1.0)
+
+    // test hold at limit
+    counter.rst := 1.0
+    counter.execute()
+    counter.rst := 0.0
+    assert(counter.out == 0.0)
+    counter.holdAtLimit := 1.0
+    pulseCounter(true, 17)
+    assert(counter.out == 15.0)
+    assert(counter.ovr == 1.0)
+  }
+
+  static void pulseCounter(bool up, int count)
+  {
+    counter.cDwn := up ? 0.0 : 1.0
+    for(int i = 0; i < count; i++)
+    {
+      counter.in := 1.0
+      counter.execute()
+      counter.in := 0.0
+      counter.execute()
+    }
+  }
+
+
+}

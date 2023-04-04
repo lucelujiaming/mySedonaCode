@@ -1,0 +1,17 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class SHL
+  extends Component
+{
+  @readonly property int out
+
+  property int in
+
+  @precision=0
+  @max=15.0
+  property float num
+
+  virtual override void execute()
+  {
+    out := (in << (int)num) & 0xFFFF
+  }
+}

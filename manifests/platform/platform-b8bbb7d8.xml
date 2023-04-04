@@ -1,0 +1,24 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="platform"
+   checksum="b8bbb7d8"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Platform support for Unix based devices"
+   buildHost="ubuntu"
+   buildTime="2023-03-28T10:31:33.496+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- platform::UnixPlatformService -->
+<type id="0" name="UnixPlatformService" sizeof="208" base="sys::PlatformService">
+</type>
+
+</kitManifest>

@@ -1,0 +1,18 @@
+<sedonaKit
+ name = "platform"
+ vendor = "XunGaoAuto"
+ description = "Platform support for Unix based devices"
+ includeSource = "false"
+ doc = "false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+"  />
+
+  <!-- Source Directories -->
+  <source dir="."/>
+
+  <!-- Natives -->
+
+</sedonaKit>
+

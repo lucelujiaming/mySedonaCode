@@ -1,0 +1,26 @@
+//
+// Add adds two float inputs and writes the results to a float output
+//
+// out = in1 + in2
+//
+@niagaraIcon="module://icons/x16/control/math/add.png"
+class Add
+  extends Component
+{
+  // out is the sum of all inputs
+  @readonly property float out
+
+  // input 1
+  property float in1
+
+  // input 2
+  property float in2
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    out := in1 + in2
+  }
+}

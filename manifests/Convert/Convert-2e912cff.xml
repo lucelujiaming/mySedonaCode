@@ -1,0 +1,109 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Convert"
+   checksum="2e912cff"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Convert function block library"
+   buildHost="ubuntu"
+   buildTime="2023-03-28T10:31:48.490+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Convert::Norm -->
+<type id="0" name="Norm" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="min" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="max" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Convert::Round -->
+<type id="1" name="Round" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+</type>
+
+<!-- Convert::Scale -->
+<type id="2" name="Scale" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="min" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="max" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Convert::ToReal -->
+<type id="3" name="ToReal" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="int"/>
+</type>
+
+<!-- Convert::ToWord -->
+<type id="4" name="ToWord" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="int">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+</type>
+
+</kitManifest>

@@ -1,0 +1,55 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class DelayOff
+  extends Component
+{
+  property
+  float in
+
+  @readonly
+  property
+  float out
+
+  @readonly
+  property
+  float tm = 0.0f
+
+  @config
+  @unit=Units.second
+  property
+  float delay = 1.0f
+
+  virtual override void start()
+  {
+    lastIn = in
+  }
+
+  virtual override void execute()
+  {
+    long now = Sys.ticks() / 1000000L
+    if (in == 0.0f && lastIn != 0.0f) {
+      delayEnd = now + (long)(delay * 1000.0f )
+    }
+    if (in != 0.0f) {
+      delayEnd = 0L
+      out := 1.0f
+    } else {
+      if (delayEnd > now) {
+        out := 1.0f
+      } else {
+        out := 0.0f
+      }
+      if (out == 0.0f) {
+        delayEnd = 0L
+      }
+    }
+    if (delayEnd == 0L) {
+      tm := 0.0f
+    } else {
+      tm := (float)((delayEnd - now)/1000L)
+    }
+    lastIn = in
+  }
+
+  private long delayEnd = 0L
+  private float lastIn
+}

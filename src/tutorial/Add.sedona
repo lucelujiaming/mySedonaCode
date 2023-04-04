@@ -1,0 +1,9 @@
+public class Add extends Component
+{
+  property float out
+  property float in1
+  property float in2
+
+  override void execute() { out := in1 + in2 }
+}
+

@@ -1,0 +1,180 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="WordOpr"
+   checksum="1bfc4cc9"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="WordOpr function block library"
+   buildHost="ubuntu"
+   buildTime="2023-03-28T10:31:49.767+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- WordOpr::DeMux -->
+<type id="0" name="DeMux" sizeof="68" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out0" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="out1" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="out2" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="out3" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="outn" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="in" type="float"/>
+  <slot id="6" name="k" type="int"/>
+</type>
+
+<!-- WordOpr::Invert -->
+<type id="1" name="Invert" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/not.png"/>
+  </facets>
+  <slot id="0" name="out" type="int">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="int"/>
+</type>
+
+<!-- WordOpr::Mux -->
+<type id="2" name="Mux" sizeof="68" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="k" type="int"/>
+  <slot id="2" name="in0" type="float"/>
+  <slot id="3" name="in1" type="float"/>
+  <slot id="4" name="in2" type="float"/>
+  <slot id="5" name="in3" type="float"/>
+  <slot id="6" name="inn" type="float"/>
+</type>
+
+<!-- WordOpr::SHL -->
+<type id="3" name="SHL" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="int">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="int"/>
+  <slot id="2" name="num" type="float">
+    <facets>
+      <float name="max" val="15.0"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- WordOpr::SHR -->
+<type id="4" name="SHR" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="int">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="int"/>
+  <slot id="2" name="num" type="float">
+    <facets>
+      <float name="max" val="15.0"/>
+      <int name="precision" val="0"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- WordOpr::Select -->
+<type id="5" name="Select" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="k" type="float"/>
+  <slot id="2" name="in0" type="float"/>
+  <slot id="3" name="in1" type="float"/>
+</type>
+
+<!-- WordOpr::WAnd -->
+<type id="6" name="WAnd" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/and.png"/>
+  </facets>
+  <slot id="0" name="out" type="int">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="int"/>
+  <slot id="2" name="in2" type="int"/>
+</type>
+
+<!-- WordOpr::WOr -->
+<type id="7" name="WOr" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/or.png"/>
+  </facets>
+  <slot id="0" name="out" type="int">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="int"/>
+  <slot id="2" name="in2" type="int"/>
+</type>
+
+<!-- WordOpr::WXor -->
+<type id="8" name="WXor" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/xor.png"/>
+  </facets>
+  <slot id="0" name="out" type="int">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="int"/>
+  <slot id="2" name="in2" type="int"/>
+</type>
+
+</kitManifest>

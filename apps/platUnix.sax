@@ -1,0 +1,156 @@
+<?xml version='1.0'?>
+<!-- This SAX file contains a platUnix::UnixPlatformService -->
+
+<sedonaApp>
+<schema>
+  <kit name='sys'/>
+  <kit name='sox'/>
+  <kit name='inet'/>
+  <kit name='web'/>
+  <kit name='pstore'/>
+  <kit name='datetime'/>
+  <kit name='datetimeStd'/>
+  <kit name='basicSchedule' />
+  <kit name='platUnix' />
+
+  <!-- These replace control kit as of 1.2 -->
+  <kit name='func' />
+  <kit name='hvac' />
+  <kit name='logic' />
+  <kit name='math' />
+  <kit name='timing' />
+  <kit name='types' />
+
+  <kit name='modbus' />
+  <kit name='typeconversion' />
+</schema>
+<app>
+  <prop name="appName" val="demo"/>
+  <!-- /service -->
+  <comp name="service" type="sys::Folder">
+    <prop name="meta" val="33685505"/>
+    <!-- /service/plat -->
+    <comp name="plat" type="platUnix::UnixPlatformService"/>
+    <!-- /service/users -->
+    <comp name="users" type="sys::UserService">
+      <prop name="meta" val="17367041"/>
+      <!-- /service/users/admin -->
+      <comp name="admin" type="sys::User">
+        <prop name="cred" val="hE49ksThgAeLkWB3NUU1NWeDO54="/>
+        <prop name="perm" val="2147483647"/>
+        <prop name="prov" val="255"/>
+      </comp>
+    </comp>
+    <!-- /service/sox -->
+    <comp name="sox" type="sox::SoxService">
+      <prop name="meta" val="17104897"/>
+    </comp>
+    <!-- /service/web -->
+    <comp name="web" type="web::WebService">
+      <prop name="meta" val="16842753"/>
+      <prop name="port" val="8080"/>
+    </comp>
+    <!-- /service/pstore -->
+    <comp name="pstore" type="pstore::PstoreService">
+    </comp>
+    <!-- /service/time -->
+    <comp name="time" type="datetimeStd::DateTimeServiceStd">
+      <prop name="osUtcOffset" val="true"/>
+    </comp>
+    <!-- /service/Local -->
+    <comp name="Local" type="modbus::ModbusNetworkTCP">
+      <prop name="enable" val="true"/>
+      <!-- /service/Local/AT128 -->
+      <comp name="AT128" type="modbus::ModbusDevice">
+        <prop name="enable" val="true"/>
+        <!-- /service/Local/AT128/DI0 -->
+        <comp name="DI0" type="modbus::ModbusIOMap">
+          <prop name="address" val="10001"/>
+        </comp>
+        <!-- /service/Local/AT128/DI1 -->
+        <comp name="DI1" type="modbus::ModbusIOMap">
+          <prop name="address" val="10002"/>
+        </comp>
+        <!-- /service/Local/AT128/DI2 -->
+        <comp name="DI2" type="modbus::ModbusIOMap">
+          <prop name="address" val="10003"/>
+        </comp>
+        <!-- /service/Local/AT128/DI3 -->
+        <comp name="DI3" type="modbus::ModbusIOMap">
+          <prop name="address" val="10004"/>
+        </comp>
+        <!-- /service/Local/AT128/DI4 -->
+        <comp name="DI4" type="modbus::ModbusIOMap">
+          <prop name="address" val="10005"/>
+        </comp>
+        <!-- /service/Local/AT128/DI5 -->
+        <comp name="DI5" type="modbus::ModbusIOMap">
+          <prop name="address" val="10006"/>
+        </comp>
+        <!-- /service/Local/AT128/DI6 -->
+        <comp name="DI6" type="modbus::ModbusIOMap">
+          <prop name="address" val="10007"/>
+        </comp>
+        <!-- /service/Local/AT128/DI7 -->
+        <comp name="DI7" type="modbus::ModbusIOMap">
+          <prop name="address" val="10008"/>
+        </comp>
+        <!-- /service/Local/AT128/DO0 -->
+        <comp name="DO0" type="modbus::ModbusIOMap">
+          <prop name="address" val="1"/>
+        </comp>
+        <!-- /service/Local/AT128/DO1 -->
+        <comp name="DO1" type="modbus::ModbusIOMap">
+          <prop name="address" val="2"/>
+        </comp>
+        <!-- /service/Local/AT128/DO2 -->
+        <comp name="DO2" type="modbus::ModbusIOMap">
+          <prop name="address" val="3"/>
+        </comp>
+        <!-- /service/Local/AT128/DO3 -->
+        <comp name="DO3" type="modbus::ModbusIOMap">
+          <prop name="address" val="4"/>
+        </comp>
+        <!-- /service/Local/AT128/DO4 -->
+        <comp name="DO4" type="modbus::ModbusIOMap">
+          <prop name="address" val="5"/>
+        </comp>
+        <!-- /service/Local/AT128/DO5 -->
+        <comp name="DO5" type="modbus::ModbusIOMap">
+          <prop name="address" val="6"/>
+        </comp>
+        <!-- /service/Local/AT128/DO6 -->
+        <comp name="DO6" type="modbus::ModbusIOMap">
+          <prop name="address" val="7"/>
+        </comp>
+        <!-- /service/Local/AT128/DO7 -->
+        <comp name="DO7" type="modbus::ModbusIOMap">
+          <prop name="address" val="8"/>
+        </comp>
+      </comp>
+    </comp>
+  </comp>
+  <!-- /play -->
+  <comp name="play" type="sys::Folder">
+    <prop name="meta" val="34013185"/>
+    <!-- /play/rampA -->
+    <comp name="rampA" type="func::Ramp">
+      <prop name="meta" val="67371009"/>
+      <prop name="min" val="20.00000"/>
+      <prop name="max" val="80.00000"/>
+    </comp>
+    <!-- /play/rampB -->
+    <comp name="rampB" type="func::Ramp">
+      <prop name="meta" val="68288513"/>
+    </comp>
+    <!-- /play/adder -->
+    <comp name="adder" type="math::Add2">
+      <prop name="meta" val="386662401"/>
+    </comp>
+  </comp>
+</app>
+<links>
+  <link from="/play/rampA.out" to="/play/adder.in1"/>
+  <link from="/play/rampB.out" to="/play/adder.in2"/>
+</links>
+</sedonaApp>

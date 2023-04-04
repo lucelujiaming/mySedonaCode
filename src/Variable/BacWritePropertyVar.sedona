@@ -1,0 +1,321 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class BacWritePropertyVar
+  extends BacNetFieldBusIO
+{
+  // Lujiaming add these at 23/02/24
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str MAXSEGMENTS = "Unspecified, Segments2, Segments4, Segments8, Segments16, Segments32, Segments64, GreaterThan64, END"
+  define int MAXSEGMENTUNDEFED = 0
+  define int MAXSEGMENT2 = 1
+  define int MAXSEGMENT4 = 2
+  define int MAXSEGMENT8 = 3
+  define int MAXSEGMENT16 = 4
+  define int MAXSEGMENT32 = 5
+  define int MAXSEGMENT64 = 6
+  define int MAXSEGMENTGREATERTHAN64 = 7
+  define int MAXSEGMENTEND = 8
+
+  define Str MAXAPDULENGTHS = "50, 128, 206(LonTalk), 480, 1024, 1476(ISO8802), Reserved(6), Reserved(7), Reserved(8), Reserved(9), Reserved(10), Reserved(11), Reserved(12), Reserved(13), Reserved(14), Reserved(15), END"
+  define int MAXAPDULENGTH50 = 0
+  define int MAXAPDULENGTH128 = 1
+  define int MAXAPDULENGTH206 = 2
+  define int MAXAPDULENGTH480 = 3
+  define int MAXAPDULENGTH1024 = 4
+  define int MAXAPDULENGTH1476 = 5
+  define int MAXAPDULENGTHReserved6 = 6
+  define int MAXAPDULENGTHReserved7 = 7
+  define int MAXAPDULENGTHReserved8 = 8
+  define int MAXAPDULENGTHReserved9 = 9
+  define int MAXAPDULENGTHReserved10 = 10
+  define int MAXAPDULENGTHReserved11 = 11
+  define int MAXAPDULENGTHReserved12 = 12
+  define int MAXAPDULENGTHReserved13 = 13
+  define int MAXAPDULENGTHReserved14 = 14
+  define int MAXAPDULENGTHReserved15 = 15
+  define int MAXAPDULENGTHEND = 16
+  
+  define Str CONFIRMEDREQUESTRANGE = "Disable, Enable, END"
+  define int SEGMENTEDMSGDISABLE = 0
+  define int SEGMENTEDMSGENABLE = 1
+  
+  define int SEGMENTEDRESPONSEACCEPTEDDISABLE = 0
+  define int SEGMENTEDRESPONSEACCEPTEDENABLE = 1
+  
+  define int CONFIRMEDREQUESTEND = 3
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @asStr
+  // @config
+  property Buf(64) errorInfo = ""
+  
+  @asStr
+  // @config
+  @fieldWidth = 100
+  property Buf(1024) packet_output = ""
+    
+  @config
+  property int deviceInstance = 0
+
+  @config
+  @defaultOnClone
+  @unit = Units.millisecond
+  @min = 100
+  property int refreshTime = 500
+
+  @readonly
+  @unit = Units.millisecond
+  property int elapsedTime = -1
+
+  ////////////////////////////////////////////////////////////////
+  // config Properties
+  ////////////////////////////////////////////////////////////////
+  // Confirmed-Request
+  @config
+  @readonly
+  property int segmentSize = 0
+
+  // Confirmed-Request::Segmented message
+  @config
+  @range = CONFIRMEDREQUESTRANGE
+  property int segmentedMsg = SEGMENTEDMSGDISABLE
+  
+  @config
+  property int moreFllows = 0
+
+  @config
+  property int sequenceNumber = 0 
+  
+  @config
+  property int proposedWindowSize = 0
+  
+  // Confirmed-Request::Segmented response accepted
+  @config
+  @range = CONFIRMEDREQUESTRANGE
+  property int segmentedResponseAccepted = SEGMENTEDRESPONSEACCEPTEDDISABLE
+  
+  @config
+  @range = MAXSEGMENTS
+  property int maxSegments = MAXSEGMENTUNDEFED
+
+  @config
+  property int maxAPDULength = 3 // 480
+  
+  @config
+  property int invokeID = 9
+
+  // Read Property
+  @config
+  property int objectReserveType = 32
+  
+  @config
+  property int objectInstanceType = 0
+
+// Move to BacNetFieldBusIO.sedona
+//  @config
+//  property int propertyProperty = 0x1A0176
+  
+  @config
+  property int arrayProperty = 5
+  // Lujiaming add these end at 23/02/24
+
+  // 
+  // @readonly
+  property float in = 0.0f
+  // property float out = 0.0f
+
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+
+  override void start()
+  {
+    super.start()
+    link_type = Component.LINK_TYPE_WRITE
+  }
+  
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == VarInput.url) {
+      log.message("changed slot.name=$slot.name")
+      update()
+    }
+  }
+
+  void makePacket()
+  {
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    if(segmentedMsg == SEGMENTEDMSGENABLE)
+       bacnetPacket[0] = 0x08
+    // .... 0100 = PDU Flags: 0x4
+    if(moreFllows == 0x00)
+      bacnetPacket[0] += 0x04
+    if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
+       bacnetPacket[0] += 0x02
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0011 = Size of Maximum ADPU accepted: Up to 480 octets (fits in an ARCNET frame) (3)
+    if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
+       // maxSegments and maxAPDULength
+       bacnetPacket[1] = maxSegments * 0x10 + maxAPDULength
+    else 
+       // maxSegments and maxAPDULength
+       bacnetPacket[1] = maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = invokeID
+	dataLength = 3
+    if(segmentedMsg == SEGMENTEDMSGENABLE)
+    {
+	    bacnetPacket[3] = sequenceNumber
+	    bacnetPacket[4] = proposedWindowSize
+	    dataLength = 5
+    }
+    // Service Choice: writeProperty (15)
+	bacnetPacket[dataLength++] = 0x0F
+	// Context Tag: 0, Length/Value/Type: 4
+	// .... 1... = Tag Class: Context Specific Tag
+	// 0000 .... = Context Tag Number: 0
+	// Length Value Type: 4
+	bacnetPacket[dataLength++] = 0x0C
+    // 0000 1000 00.. .... .... .... .... .... = Object Type: access-credential (32)
+    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)/256
+    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)%256
+
+	bacnetPacket[dataLength++] = 0x00
+	bacnetPacket[dataLength++] = 0x0A
+	// Property Identifier: (374) Reserved for Use by ASHRAE (374)
+    // Property Type: access-credential (32)
+	if(propertyProperty/0x1000000 > 0)
+	{
+		bacnetPacket[dataLength++] = propertyProperty/(0x01000000)
+		bacnetPacket[dataLength++] = (propertyProperty /(0x010000))%0x0100
+		bacnetPacket[dataLength++] = (propertyProperty /   0x0100)%0x0100
+		bacnetPacket[dataLength++] = (propertyProperty)%0x0100
+    }
+    else 
+	{
+		bacnetPacket[dataLength++] = propertyProperty/(0x010000)
+		bacnetPacket[dataLength++] = (propertyProperty/0x0100)%0x0100
+		bacnetPacket[dataLength++] = (propertyProperty)%0x0100
+    }
+/*
+    // property Array Index (Unsigned) 5
+    // Array Information
+	bacnetPacket[dataLength++] = 0x29
+	bacnetPacket[dataLength++] = arrayProperty
+ */
+    // Start of value
+    bacnetPacket[dataLength++] = 0x3E
+    if(object_type == BANET_PROPVAR_BOOLEANAPPTAG)
+	{
+	    // action-text: TRUE
+	    if(in != 0.0)
+	       bacnetPacket[dataLength++] = 0x11
+	    else 
+	       bacnetPacket[dataLength++] = 0x10
+	}
+	else if(object_type == BANET_PROPVAR_UNSIGNEDINTAPPTAG)
+	{
+	    // action-text: (Unsigned) 33
+	    bufInteger[0] = (int)in
+	    int iLen = bus.encodeUnsigned(bufInteger, bufData)
+	    bacnetPacket[dataLength++] = 0x20 + iLen
+	    for(int i = 0; i < iLen; i++)
+	    {
+	       bacnetPacket[dataLength++] = bufData[i]
+	    }
+	}
+	else if(object_type == BANET_PROPVAR_INTEGERAPPTAG)
+	{
+	    // action-text: (Unsigned) 33
+	    bufInteger[0] = (int)in
+	    int iLen = bus.encodeInteger(bufInteger, bufData)
+	    bacnetPacket[dataLength++] = 0x30 + iLen
+	    for(int i = 0; i < iLen; i++)
+	    {
+	       bacnetPacket[dataLength++] = bufData[i]
+	    }
+	}
+	else if(object_type == BANET_PROPVAR_REALAPPTAG)
+	{
+	    // action-text: 1234.560059 (Real)
+	    bufFloat[0] = in
+	    int iLen = bus.encodeFloat(bufFloat, bufData)
+	    bacnetPacket[dataLength++] = 0x40 + iLen
+	    for(int i = 0; i < iLen; i++)
+	    {
+	       bacnetPacket[dataLength++] = bufData[i]
+	    }
+	}
+	else if(object_type == BANET_PROPVAR_DOUBLEAPPTAG)
+	{
+	    // action-text: 1234.560000 (Double)
+	    bufDouble[0] = (double)in
+	    int iLen = bus.encodeDouble(bufDouble, bufData)
+	    bacnetPacket[dataLength++] = 0x55
+	    bacnetPacket[dataLength++] = iLen
+	    for(int i = 0; i < iLen; i++)
+	    {
+	       bacnetPacket[dataLength++] = bufData[i]
+	    }
+	}
+	else 
+	{
+	    log.message("Error object_type=object_type")
+	}
+    // End of value
+    bacnetPacket[dataLength++] = 0x3F
+    ** log.message("22222 bacnetPacket[$dataLength]")
+	for(int i =0 ; i < dataLength; i++)
+	    buf[i] = (float)bacnetPacket[i]
+  }
+  
+  virtual override void execute()
+  {
+    int iDelayCount = 0
+    if (bus != null) {
+        ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
+    }
+    if (cache != 0 && bus != null && status <= STATUSREADY) {
+      if(sendInterval < SEND_INTERVAL) {
+         sendInterval++
+      }
+      else { 
+	      makePacket()
+	      if (bus.writeReg(cache, regId, dataLength, buf) == dataLength) {
+	        ** log.message("bus.readReg")
+	        ** log.message("We readReg and return $dataLength ")
+	        // if(dataLength > 0)
+	      } else {
+	        log.message("writeReg Error")
+	        status := STATUSOFFLINE
+	      }
+	      sendInterval = 0
+	  }
+    }
+  }
+
+  int checkWritePropertyData()
+  {
+	return 0
+  }
+  define int SEND_INTERVAL = 30
+  private inline float[1024] buf
+  static inline byte[1024] bacnetPacket
+  int dataLength
+
+  private inline int[2]    bufInteger
+  private inline float[2]  bufFloat
+  private inline double[2] bufDouble
+  static inline byte[8]    bufData
+  // Send interval counter
+  int sendInterval = 0
+  
+}

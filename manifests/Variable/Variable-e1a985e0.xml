@@ -1,0 +1,354 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Variable"
+   checksum="e1a985e0"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Variable"
+   buildHost="ubuntu"
+   buildTime="2023-03-06T13:20:16.073+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Variable::AliasVariable -->
+<type id="0" name="AliasVariable" sizeof="180" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="url" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="32"/>
+    </facets>
+  </slot>
+  <slot id="1" name="alias" type="sys::Buf" default="">
+    <facets>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+  <slot id="2" name="value" type="float" default="0.0"/>
+</type>
+
+<!-- Variable::BacNetFieldBusIO -->
+<type id="1" name="BacNetFieldBusIO" sizeof="188" flags="a" base="sys::Component">
+  <slot id="0" name="status" type="int" default="4">
+    <facets>
+      <bool name="summary" val="false"/>
+      <int name="fieldWidth" val="20"/>
+      <str name="range" val="OK, OffLine, Ready, NoNet, NoDev, AddrErr, UrlErr, END"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="url" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::BacReadPropertyVar -->
+<type id="2" name="BacReadPropertyVar" sizeof="4564" base="Variable::BacNetFieldBusIO">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="errorInfo" type="sys::Buf" flags="s" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+  <slot id="1" name="packet_output" type="sys::Buf" flags="s" default="">
+    <facets>
+      <int name="fieldWidth" val="100"/>
+      <bool name="asStr" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+  <slot id="2" name="deviceInstance" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="refreshTime" type="int" flags="c" default="500">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <int name="min" val="100"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="elapsedTime" type="int" default="-1">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="segmentSize" type="int" flags="c" default="0">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="segmentedMsg" type="int" flags="c" default="0">
+    <facets>
+      <str name="range" val="Disable, Enable, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="7" name="moreFllows" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="8" name="sequenceNumber" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="9" name="proposedWindowSize" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="10" name="segmentedResponseAccepted" type="int" flags="c" default="0">
+    <facets>
+      <str name="range" val="Disable, Enable, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="11" name="maxSegments" type="int" flags="c" default="0">
+    <facets>
+      <str name="range" val="Unspecified, Segments2, Segments4, Segments8, Segments16, Segments32, Segments64, GreaterThan64, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="12" name="maxAPDULength" type="int" flags="c" default="3">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="13" name="invokeID" type="int" flags="c" default="9">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="14" name="objectReserveType" type="int" flags="c" default="32">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="15" name="objectInstanceType" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="16" name="propertyProperty" type="int" flags="c" default="1704310">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="17" name="arrayProperty" type="int" flags="c" default="5">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="18" name="out" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="19" name="alias" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::Const -->
+<type id="3" name="Const" sizeof="44" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="value" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::FieldBusDevice -->
+<type id="4" name="FieldBusDevice" sizeof="108" flags="a" base="sys::Component">
+  <slot id="0" name="status" type="int" default="4">
+    <facets>
+      <int name="fieldWidth" val="20"/>
+      <str name="range" val="OK, OffLine, Ready, NoNet, NoReg, InnerErr, AddrErr, NameErr, END"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="deviceName" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::FieldBusIO -->
+<type id="5" name="FieldBusIO" sizeof="196" flags="a" base="sys::Component">
+  <slot id="0" name="status" type="int" default="4">
+    <facets>
+      <bool name="summary" val="false"/>
+      <int name="fieldWidth" val="20"/>
+      <str name="range" val="OK, OffLine, Ready, NoNet, NoDev, AddrErr, UrlErr, END"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="url" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::FieldBusNet -->
+<type id="6" name="FieldBusNet" sizeof="4144" flags="a" base="sys::Component">
+  <slot id="0" name="status" type="int" default="0">
+    <facets>
+      <int name="fieldWidth" val="20"/>
+      <str name="range" val="OK, Busy, Ready, NoDev, NoReg, END"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::FieldBusSchedule -->
+<type id="7" name="FieldBusSchedule" sizeof="60" flags="a" base="sys::Component">
+  <slot id="0" name="url" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="16"/>
+    </facets>
+  </slot>
+  <slot id="1" name="presentValue" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::Setpoint -->
+<type id="8" name="Setpoint" sizeof="132" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="url" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="32"/>
+    </facets>
+  </slot>
+  <slot id="1" name="pointName" type="sys::Buf" flags="s" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="readonly" val="true"/>
+      <int name="max" val="32"/>
+    </facets>
+  </slot>
+  <slot id="2" name="out" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="in" type="float" default="0.0"/>
+</type>
+
+<!-- Variable::VarInput -->
+<type id="9" name="VarInput" sizeof="272" base="Variable::FieldBusIO">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="out" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="alias" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::VarOutput -->
+<type id="10" name="VarOutput" sizeof="280" base="Variable::FieldBusIO">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="out" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float" default="0.0"/>
+  <slot id="2" name="alias" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::Variable -->
+<type id="11" name="Variable" sizeof="180" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="url" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="32"/>
+    </facets>
+  </slot>
+  <slot id="1" name="alias" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+  <slot id="2" name="value" type="float" default="0.0"/>
+</type>
+
+</kitManifest>

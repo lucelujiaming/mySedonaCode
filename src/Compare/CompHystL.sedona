@@ -1,0 +1,39 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class CompHystL
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  property float set
+
+  property float hyst
+
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == CompHystL.set || slot == CompHystL.hyst) {
+      opened = false
+    }
+  }
+
+  virtual override void execute()
+  {
+    if (in < set) {
+      out := 1.0f
+      opened = true
+    } else if (in < set + hyst) {
+      if (opened) {
+        out := 1.0f
+      } else {
+        out := 0.0f
+      }
+    } else {
+      out := 0.0f
+      opened = false
+    }
+  }
+
+  private bool opened = false
+}

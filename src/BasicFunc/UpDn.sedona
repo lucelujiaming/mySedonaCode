@@ -1,0 +1,89 @@
+//
+// Copyright (c) 2007-2011 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//   11 Jan 2007  Andy Saunders  Creation
+//   27 Apr 2007  Brian Frank    Port from Java to Sedona
+//   22 Apr 2009  Elizabeth McKenney   Updated
+//
+
+**
+** UpDn Up/down counter object
+**
+@niagaraIcon="module://icons/x16/control/control.png"
+class UpDn
+  extends Component
+{
+  ** Current count 
+  @readonly property float out
+  
+  ** Overflow indicator
+  @readonly property float ovr
+  
+  ** Increment/decrement counter on positive edge 
+  property float in
+  
+  ** Reset count
+  property float rst
+  
+  ** Count down if true; o/w count up
+  @config @summary property float cDwn
+  
+  ** Overflow limit
+  @config property float limit
+  
+  ** Stop counting when limit reached if true
+  @config property float holdAtLimit
+  
+
+  **
+  ** Callback when component is first started in an app.
+  **
+  virtual override void start()
+  {
+    lastIn = in
+  }
+
+
+  **
+  ** Execute is called once every scan.
+  **
+  virtual override void execute()
+  {
+    // Clear count & overflow if reset input is true
+    if (rst != 0.0)
+    {
+      ovr := 0.0
+      out := 0.0
+      return
+    }
+
+    float tmp = out
+
+    if ( (in != 0.0) && (lastIn == 0.0))      // detect positive edge
+    {
+      // Adjust count by one
+      if (cDwn != 0.0)
+        tmp--
+      else
+        tmp++
+
+      // Don't allow count to go negative
+      if (tmp < 0.0f) tmp = 0.0f
+
+      // If enabled, hold count at given max value
+      if ((holdAtLimit != 0.0) && (tmp > limit))
+         tmp = limit
+
+      // Flag overflow
+      ovr := ( tmp >= limit ) ? 1.0 : 0.0
+    }
+
+    lastIn = in
+
+    out := tmp
+  }
+
+  private float lastIn
+}

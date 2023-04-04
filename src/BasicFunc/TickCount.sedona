@@ -1,0 +1,58 @@
+@niagaraIcon="module://icons/x16/control/util/step.png"
+class TickCount
+  extends Component
+{
+    @readonly property float out
+
+    @trueText = "up"
+    @falseText = "down"
+    @defaultOnClone
+    @config
+    property float dir = 1.0
+
+    @defaultOnClone
+    @min = 0
+    @config
+    property float preset = 0.0
+
+    @min=1
+    @max=10
+    //@unit=Units.per_second
+    @config
+    property float ticksPerSec = 1.0
+
+    @config
+    property float enable = 1.0
+
+    virtual override void start()
+    {
+      nextUpTime = Sys.ticks() + 1ms * 1000L / (long)ticksPerSec
+      out := preset
+    }
+
+    virtual override void execute()
+    {
+      if(enable == 0.0){
+        return
+      }
+
+      long now = Sys.ticks()
+      if(now > nextUpTime || nextUpTime - now > 1sec)
+      {
+        float tcnt = out
+        nextUpTime = now + 1ms * 1000L / (long)ticksPerSec
+        if(dir != 0.0){
+          tcnt++
+          if(tcnt > preset && preset != 0.0)
+            tcnt = 0.0
+        }else{
+          tcnt--
+          if(tcnt < 0.0 && preset != 0.0)
+            tcnt = preset
+        }
+        out := tcnt
+      }
+    }
+
+    long nextUpTime = 0L
+}

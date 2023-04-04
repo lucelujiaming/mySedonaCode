@@ -1,0 +1,174 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class AliasVariable
+  extends Component
+{
+  @summary=true
+  @config
+  @asStr
+  property Buf(32) url = ""
+  property Buf(64) alias = ""
+
+  property float value = 0.0f
+
+  override void start()
+  {
+    checkURLforStatus()
+    checkURLforSchedule()
+  }
+
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == AliasVariable.value) {
+      if (url.toStr().length() > 0) {
+        if (isStatus) {
+          return
+        }
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+          root = p
+          p = Sys.app.lookup(p.parent)
+        }
+        if (root != null) {
+          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if (f.type.is(Folder.type) && !f.name.equals("service")) {
+              for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                if (r.type.is(AliasVariable.type) && r != this && ((AliasVariable)r).url.toStr().equals(url.toStr())) {
+                  ((AliasVariable)r).value := value
+                }
+              }
+            }
+          }
+        }
+      }
+    } else if (slot == AliasVariable.url) {
+      if (url.toStr().length() > 0) {
+        value := 0.0f
+        isStatus = false
+        checkURLforStatus()
+        checkURLforSchedule()
+        if (isStatus) {
+          return
+        }
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+          root = p
+          p = Sys.app.lookup(p.parent)
+        }
+        if (root != null) {
+          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if (f.type.is(Folder.type) && !f.name.equals("service")) {
+              for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                if (r.type.is(AliasVariable.type) && r != this && ((AliasVariable)r).url.toStr().equals(url.toStr())) {
+                  value := ((AliasVariable)r).value
+                  return
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  override void execute()
+  {
+    if (isStatus) {
+      Str urlStr = url.toStr()
+      Str devStr = ""
+
+      devStr.copyFromStr(urlStr, 64)
+      devStr.set(urlStr.length() - 7, 0)
+
+      // find bus and dev
+      Component p = Sys.app.lookup(this.parent)
+      Component root = null
+      while (p != null) {
+        root = p
+        p = Sys.app.lookup(p.parent)
+      }
+      if (root != null) {
+        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+          if (f.type.is(Folder.type) && f.name.equals("service")) {
+            for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+              if (n.type.is(FieldBusNet.type)) {
+                for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                  if (d.type.is(FieldBusDevice.type) && ((FieldBusDevice)d).deviceName.toStr().equals(devStr)) {
+                    if (((FieldBusDevice)d).status == FieldBusDevice.STATUSOK) {
+                      value := 1.0f
+                      return
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      value := 0.0f
+    } else if (isSchedule) {
+      Str urlStr = url.toStr()
+      Str scheduleStr = ""
+
+      int len = urlStr.length()
+      for (int i=0; i<len-9; i++) {
+          scheduleStr.set(i, urlStr.get(i+9))
+          scheduleStr.set(i+1, 0)
+      }
+
+      // find bus and dev
+      Component p = Sys.app.lookup(this.parent)
+      Component root = null
+      while (p != null) {
+        root = p
+        p = Sys.app.lookup(p.parent)
+      }
+      if (root != null) {
+        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+          if (f.type.is(Folder.type) && f.name.equals("service")) {
+            for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+              if (n.type.is(FieldBusNet.type)) {
+                for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                  if (d.type.is(FieldBusDevice.type)) {
+                      for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
+                          if (s.type.is(FieldBusSchedule.type) && ((FieldBusSchedule)s).url.toStr().equals(scheduleStr)) {
+                              value := ((FieldBusSchedule)s).presentValue
+                              return
+                          }
+                      }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      value := 0.0f
+    }
+  }
+
+  private void checkURLforStatus()
+  {
+    Str urlStr = url.toStr()
+    Str statusStr = ".status"
+    if (urlStr.length() >= 7) {
+      if (statusStr.equalsRegion(urlStr, urlStr.length() - 7, urlStr.length())) {
+        isStatus = true
+      }
+    }
+  }
+
+  private void checkURLforSchedule()
+  {
+      Str urlStr = url.toStr()
+      if (urlStr.startsWith("schedule.")) {
+          isSchedule = true
+      }
+  }
+
+  bool isStatus = false
+  bool isSchedule = false
+  inline float[8] buffer
+}

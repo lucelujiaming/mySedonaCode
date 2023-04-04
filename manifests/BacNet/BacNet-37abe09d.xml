@@ -1,0 +1,893 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="BacNet"
+   checksum="37abe09d"
+   hasNatives="true"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="BacNet Management"
+   buildHost="ubuntu"
+   buildTime="2023-02-27T13:23:16.143+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+  <depend on="Variable 0.1+"/>
+</depends>
+
+<!-- BacNet::BIP -->
+<type id="0" name="BIP" sizeof="340" base="Variable::FieldBusNet">
+  <slot id="0" name="bacpacketStatus" type="int" default="0">
+    <facets>
+      <int name="fieldWidth" val="20"/>
+      <str name="range" val="INIT, OK, NG, END"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="ipAddress" type="sys::Buf" flags="cs" default="192.168.188.9:47808">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+  <slot id="2" name="typeBVLCI" type="int" flags="c" default="2">
+    <facets>
+      <int name="fieldWidth" val="200"/>
+      <str name="range" val="NoBVLCI, DistributeBroadcastToNetWork, Unicast, Broadcast, ForardNPDU_WT, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="versionNPCI" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="dnetPresentNPCI" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="200"/>
+      <str name="range" val="Disable, Enable, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="dnetNPCI" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="dadrNPCI" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+  <slot id="7" name="hopCountNPCI" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="8" name="snetPresentNPCI" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="200"/>
+      <str name="range" val="Disable, Enable, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="9" name="snetNPCI" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="10" name="sadrNPCI" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+  <slot id="11" name="dataExpectingReplyNPCI" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="200"/>
+      <str name="range" val="Disable, Enable, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="12" name="priorityNPCI" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="13" name="port" type="int" flags="c" default="47808">
+    <facets>
+      <bool name="config" val="true"/>
+      <int name="max" val="65535"/>
+    </facets>
+  </slot>
+  <slot id="14" name="deviceInstance" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="15" name="retryDelay" type="int" flags="c" default="60">
+    <facets>
+      <str name="unit" val="second"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- BacNet::MSTP -->
+<type id="1" name="MSTP" sizeof="104" base="Variable::FieldBusNet">
+  <slot id="0" name="port" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <str name="range" val="Port1, Port2"/>
+      <int name="min" val="0"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="1"/>
+    </facets>
+  </slot>
+  <slot id="1" name="band" type="int" flags="c" default="38400">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <int name="min" val="1200"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="115200"/>
+    </facets>
+  </slot>
+  <slot id="2" name="deviceInstance" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="macAddress" type="int" flags="c" default="1">
+    <facets>
+      <int name="min" val="1"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="254"/>
+    </facets>
+  </slot>
+  <slot id="4" name="retryDelay" type="int" flags="c" default="60">
+    <facets>
+      <str name="unit" val="second"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- BacNet::bacDevice -->
+<type id="2" name="bacDevice" sizeof="120" base="Variable::FieldBusDevice">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/device.png"/>
+  </facets>
+  <slot id="0" name="deviceInstance" type="int" flags="c" default="0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="refreshTime" type="int" flags="c" default="500">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <int name="min" val="100"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="elapsedTime" type="int" default="-1">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- BacNet::bacSchedule -->
+<type id="3" name="bacSchedule" sizeof="1028" base="Variable::FieldBusSchedule">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/clock.png"/>
+  </facets>
+  <slot id="0" name="scheduleInstance" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="defaultValue" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="startDate" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="21000000"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="endDate" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="21000000"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="monTime1" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="monValue1" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="monTime2" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="7" name="monValue2" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="8" name="monTime3" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="9" name="monValue3" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="10" name="monTime4" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="11" name="monValue4" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="12" name="monTime5" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="13" name="monValue5" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="14" name="monTime6" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="15" name="monValue6" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="16" name="monTime7" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="17" name="monValue7" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="18" name="monTime8" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="19" name="monValue8" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="20" name="tueTime1" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="21" name="tueValue1" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="22" name="tueTime2" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="23" name="tueValue2" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="24" name="tueTime3" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="25" name="tueValue3" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="26" name="tueTime4" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="27" name="tueValue4" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="28" name="tueTime5" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="29" name="tueValue5" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="30" name="tueTime6" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="31" name="tueValue6" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="32" name="tueTime7" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="33" name="tueValue7" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="34" name="tueTime8" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="35" name="tueValue8" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="36" name="wedTime1" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="37" name="wedValue1" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="38" name="wedTime2" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="39" name="wedValue2" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="40" name="wedTime3" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="41" name="wedValue3" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="42" name="wedTime4" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="43" name="wedValue4" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="44" name="wedTime5" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="45" name="wedValue5" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="46" name="wedTime6" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="47" name="wedValue6" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="48" name="wedTime7" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="49" name="wedValue7" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="50" name="wedTime8" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="51" name="wedValue8" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="52" name="thuTime1" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="53" name="thuValue1" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="54" name="thuTime2" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="55" name="thuValue2" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="56" name="thuTime3" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="57" name="thuValue3" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="58" name="thuTime4" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="59" name="thuValue4" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="60" name="thuTime5" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="61" name="thuValue5" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="62" name="thuTime6" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="63" name="thuValue6" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="64" name="thuTime7" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="65" name="thuValue7" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="66" name="thuTime8" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="67" name="thuValue8" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="68" name="friTime1" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="69" name="friValue1" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="70" name="friTime2" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="71" name="friValue2" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="72" name="friTime3" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="73" name="friValue3" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="74" name="friTime4" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="75" name="friValue4" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="76" name="friTime5" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="77" name="friValue5" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="78" name="friTime6" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="79" name="friValue6" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="80" name="friTime7" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="81" name="friValue7" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="82" name="friTime8" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="83" name="friValue8" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="84" name="satTime1" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="85" name="satValue1" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="86" name="satTime2" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="87" name="satValue2" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="88" name="satTime3" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="89" name="satValue3" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="90" name="satTime4" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="91" name="satValue4" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="92" name="satTime5" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="93" name="satValue5" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="94" name="satTime6" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="95" name="satValue6" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="96" name="satTime7" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="97" name="satValue7" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="98" name="satTime8" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="99" name="satValue8" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="100" name="sunTime1" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="101" name="sunValue1" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="102" name="sunTime2" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="103" name="sunValue2" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="104" name="sunTime3" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="105" name="sunValue3" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="106" name="sunTime4" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="107" name="sunValue4" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="108" name="sunTime5" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="109" name="sunValue5" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="110" name="sunTime6" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="111" name="sunValue6" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="112" name="sunTime7" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="113" name="sunValue7" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="114" name="sunTime8" type="int" flags="c" default="0">
+    <facets>
+      <int name="min" val="0"/>
+      <int name="max" val="235959"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="115" name="sunValue8" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+</kitManifest>

@@ -1,0 +1,871 @@
+class BIP
+  extends FieldBusNet
+{
+  // Lujiaming add these at 23/02/24
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str BACPACKETSTATUSRANGE = "INIT, OK, NG, END"
+  define int BACPACKETSTATUSINIT = 0
+  define int BACPACKETSTATUSOK = 1
+  define int BACPACKETSTATUSNG = 2
+  define int BACPACKETSTATUSEND = 3
+  
+  define Str BVLCISTATUSRANGE = "NoBVLCI, DistributeBroadcastToNetWork, Unicast, Broadcast, ForardNPDU_WT, END"
+  define int BVLCISTATUSNOBVLCI = 0
+  define int BVLCISTATUSDISTRIBUTEBROADCAST = 1
+  define int BVLCISTATUSUNICAST = 2
+  define int BVLCISTATUSBROADCAST = 3
+  define int BVLCISTATUSFORARDNPDU = 4
+  define int BVLCISTATUSEND = 5
+
+  define Str NPCIRANGE = "Disable, Enable, END"
+  define int DNETDISABLE = 0
+  define int DNETENABLE = 1
+  
+  define int SNETDISABLE = 0
+  define int SNETENABLE = 1
+  
+  define int DATAREPLYDISABLE = 0
+  define int DATAREPLYENABLE = 1
+  
+  define int NPCIEND = 3
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @asStr
+  // @config
+  property Buf(64) errorInfo = ""
+  
+  @asStr
+  // @config
+  @fieldWidth = 100
+  property Buf(64) packet_output = ""
+  
+  @readonly
+  @range = BACPACKETSTATUSRANGE
+  @fieldWidth = 20
+  property int bacpacketStatus = BACPACKETSTATUSINIT
+  
+  @config
+  property int deviceInstance = 0
+
+  @config
+  @unit = Units.second
+  property int retryDelay = 60
+
+  @asStr
+  @config
+  property Buf(64) ipAddress = "192.168.168.180"
+  
+  // 
+  @config
+  @max = 65535
+  property int port = 47808
+
+  @config
+  @range = BVLCISTATUSRANGE
+  @fieldWidth = 200
+  property int typeBVLCI = BVLCISTATUSUNICAST
+
+  // NPCI
+  @config
+  property int versionNPCI = 1
+
+  // DNET/DLEN/DADR Present
+  @readonly
+  @range = NPCIRANGE
+  @fieldWidth = 200
+  property int dnetPresentNPCI = DNETENABLE
+  
+  @config
+  property int dnetNPCI = 2401
+
+/* 
+  @asStr
+  @config
+  property Buf(64) dadrNPCI = ""
+ */ 
+  
+  @config
+  property int hopCountNPCI = 255
+  
+  // SNET/SLEN/SADR Present
+  @readonly
+  @range = NPCIRANGE
+  @fieldWidth = 200
+  property int snetPresentNPCI = SNETDISABLE
+/* 
+  @config
+  property int snetNPCI = 0
+
+  @asStr
+  @config
+  property Buf(64) sadrNPCI = ""
+ */ 
+  // Data Expecting Reply
+  @config
+  @range = NPCIRANGE
+  @fieldWidth = 200
+  property int dataExpectingReplyNPCI = DATAREPLYDISABLE
+  
+  @config
+  property int priorityNPCI = 1
+  // Lujiaming add these end at 23/02/24
+  
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void loaded()
+  {
+    update()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == BIP.port || slot == BIP.deviceInstance || slot == BIP.retryDelay) {
+      update()
+    }
+  }
+  override void stop()
+  {
+    if (ctx != -1) {
+      cleanCache()
+      bacnet_close(ctx)
+      ctx = -1
+      busId = 0
+    }
+  }
+  override void execute()
+  {
+    if (status != STATUSNODEV && needFlush) {
+      flush()
+      needFlush = false
+    }
+
+    if (status != STATUSNODEV) {
+	    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+	       d.execute()
+	    }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  private void flush()
+  {
+    if (ctx != -1) {
+      cleanCache()
+      bacnet_close(ctx)
+      ctx = -1
+      busId = 0
+    }
+    ctx = bacnet_open(port, deviceInstance, retryDelay)
+    log.message("bacnet_open flush")
+    if (ctx != -1) {
+      log.message("Call updateCache flush")
+      if (updateCache()) {
+        // ÁªìÊùüÊ∑ªÂä†Ê†áËÆ∞„ÄÇ
+        log.message("Call bacnet_add")
+        bacnet_add(ctx, 0, 0, 0, 0, 1)
+        status := STATUSOK
+      } else {
+        status := STATUSNOREG
+      }
+    } else {
+      status := STATUSBUSY
+    }
+  }
+  private void cleanCache()
+  {
+    Component root
+    Component p = this
+    int id = 0
+    if (ctx == 0) {
+      id = 21
+    }
+
+    if (id == 0) {
+      return
+    }
+
+      log.message("clean schedule")
+    // clean schedule
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR && ((bacDevice)d).deviceInstance == deviceInstance) {
+          for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
+              if (s.type.is(bacSchedule.type)) {
+                ((bacSchedule)s).index = -1
+              }
+          }
+      }
+    }
+
+      log.message("Sys.app.lookup(p.parent)")
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+        log.message("11111 cleanCache f.name=$f.name and type.name=$f.type.name");
+      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+           log.message("22222 cleanCache r.name=$r.name and r.type.name=$r.type.name");
+           if (r.type.is(BacNetFieldBusIO.type) && ((BacNetFieldBusIO)r).busId == id) {
+            ((BacNetFieldBusIO)r).bus = null
+            ((BacNetFieldBusIO)r).cache = 0
+            ((BacNetFieldBusIO)r).busId = 0
+            ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSNODEV
+          }
+        }
+      }
+    }
+  }
+
+  private void setBacReadPropertyVarByProperty(int propertyProperty,int tagNumber, byte[] data)
+  {
+    Component root
+    Component p = this
+    log.message("Sys.app.lookup(p.parent)")
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+    
+    root = p
+    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+           log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
+           if (r.type.is(BacReadPropertyVar.type)) {
+              log.message("BBB r.propertyProperty=${((BacReadPropertyVar)r).propertyProperty} and propertyProperty=$propertyProperty")
+           }
+           if (r.type.is(BacReadPropertyVar.type) 
+           		&& ((BacReadPropertyVar)r).propertyProperty == propertyProperty) {
+              log.message("CCC r.propertyProperty=${((BacReadPropertyVar)r).propertyProperty} and propertyProperty=$propertyProperty")
+              ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data)
+          }
+        }
+      }
+    }
+  }
+  
+  private bool updateCache()
+  {
+    Component root
+    Component p = this
+    bool result = false
+
+    // add device node.
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR) {
+        if (bacnet_add(ctx, ((bacDevice)d).deviceInstance, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
+          ** log.message("11111 updateCache d.status=bacDevice.STATUSEINNER");
+          ((bacDevice)d).status := bacDevice.STATUSEINNER
+        } else {
+          ((bacDevice)d).status := bacDevice.STATUSNOREG
+        }
+      }
+    }
+
+    // add register node in play.
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+          ** log.message("22222 cleanCache r.name=$r.name and r.type.name=$r.type.name");
+          if (r.type.is(BacNetFieldBusIO.type) && 
+          		((BacNetFieldBusIO)r).status < BacNetFieldBusIO.STATUSEURL 
+          		 && ((BacNetFieldBusIO)r).busId == 0) {
+            bacDevice dev = null
+            ** log.message("3333 updateCache f.name=$f.name and type.name=$f.type.name");
+            for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+              ** log.message("4444 updateCache d.name=$d.name and type.name=$d.type.name");
+              Str strSrc = ((BacNetFieldBusIO)r).devStr
+              Str strDst = ((bacDevice)d).deviceName.toStr()
+              ** log.message("4444 updateCache strSrc=$strSrc and strDst=$strDst");
+              if (d.type.is(bacDevice.type) && ((BacNetFieldBusIO)r).devStr.equals(((bacDevice)d).deviceName.toStr())) {
+                log.message("5555 updateCache d.name=$f.name and type.name=$d.type.name");
+                dev = (bacDevice)d
+                break
+              }
+            }
+            if (dev != null) {
+              ** log.message("66666 cleanCache dev.name=$dev.name and dev.type.name=$dev.type.name");
+              ((BacNetFieldBusIO)r).cache = bacnet_add(ctx, dev.deviceInstance, 
+                       0, // ((BacNetFieldBusIO)r).regId, 
+                       0, // ((BacNetFieldBusIO)r).typeId, 
+                       85, 0)
+              if (((BacNetFieldBusIO)r).cache >= 0) {
+                if (((BacNetFieldBusIO)r).bus == null) {
+                  ((BacNetFieldBusIO)r).bus = this
+                }
+                ** log.message("7777 cleanCache dev.status=$dev.status");
+                ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSREADY
+                dev.status := bacDevice.STATUSREADY
+                result = true
+              } else {
+                ** log.message("8888 cleanCache dev.status=$dev.status");
+                ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSEADDR
+              }
+            } else {
+              //((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+            }
+          }
+        }
+      }
+    }
+
+    ** log.message("9999 add schedule");
+    // add schedule
+    //
+
+    return result
+  }
+  
+  override void update()
+  {
+    bool isDevFound = false
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+           log.message("d.type  = $d.type.name")
+      if (d.type.is(bacDevice.type) && ((bacDevice)d).status != bacDevice.STATUSEND) {
+        isDevFound = true
+        break
+      }
+    }
+    if (isDevFound) {
+           log.message("status := STATUSNOREG")
+      status := STATUSNOREG
+    } else {
+           log.message("status := STATUSNODEV")
+      status := STATUSNODEV
+    }
+    needFlush = true
+  }
+
+  int checkBacnetHead()
+  {
+    int packetLength = 0
+    if(dataRecvGram.buf[0] != 0x81)
+      return -1
+    packetLength = dataRecvGram.buf[2] * 256 + dataRecvGram.buf[3]
+    
+    if(packetLength != dataRecvGram.len)
+      return -1
+    return 0
+  }
+
+  override int readReg(int deviceAddr, int addr, int iLen, float[] buf)
+  {
+    int headLength = 0
+    dataRecvGram.len = iLen
+	dataRecvGram.buf = packetRecv.bytes
+	if (socket.isClosed())
+    { 
+      if (socket.open() == false)
+	  { 
+	     log.warning("cannot open socket")
+	     return -1
+	  }
+    }
+    bool bRet = socket.receive(dataRecvGram)
+    if (bRet == false) 
+    {
+	   ** log.message("readReg failed with len=${dataRecvGram.len} and port=${dataRecvGram.port} ")
+       return -1
+    }
+	log.message("socket.receive($iLen) ${dataRecvGram.len} bytes")
+
+	headLength = checkBacnetHead()
+	if(headLength < 0)
+    {
+	   log.message("checkBacnetHead failed")
+       return -1
+    }
+
+	
+    for(int i =headLength; i < dataRecvGram.len; i++)
+    {
+       buf[i] = (float)dataRecvGram.buf[i]
+    }
+    return dataRecvGram.len
+  }
+
+  int fillHead()
+  {
+    // BACnet Virtual Link Control
+    // Type: BACnet/IP (Annex J) (0x81)
+    bacnetPacket[0] = 0x81
+    if(typeBVLCI == BVLCISTATUSDISTRIBUTEBROADCAST)
+    {   
+      bacnetPacket[1] = 0x9
+    }
+    else if(typeBVLCI == BVLCISTATUSUNICAST)
+    {   
+      // Function: Original-Unicast-NPDU (0x0a)
+      bacnetPacket[1] = 0xA
+    }
+    else if(typeBVLCI == BVLCISTATUSBROADCAST)
+    {   
+      bacnetPacket[1] = 0xB
+    }
+    else 
+    {   
+      return -1
+    }
+    // Skip BVLC-Length: 4 of 18 bytes BACnet packet length
+    bacnetPacket[2] = 0x00
+    bacnetPacket[3] = 0x00
+    // Building Automation and Control Network NPDU
+    // NPCI Version: 0x01 (ASHRAE 135-1995)
+    bacnetPacket[4] = versionNPCI
+    // Control: 0x04, Expecting Reply
+    if(dataExpectingReplyNPCI == DATAREPLYDISABLE)
+    {   
+      bacnetPacket[5] = 0x20
+    }
+    else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
+    {   
+      bacnetPacket[5] = 0x00
+    }
+    else 
+    {   
+      return -1
+    }
+    // Building Automation and Control Network APDU
+    bacnetPacket[5] += 0x04
+    bacnetPacket[5] += priorityNPCI
+    // dnetNPCI
+    bacnetPacket[6] = dnetNPCI/256
+    bacnetPacket[7] = dnetNPCI%256
+    // hopCountNPCI
+    bacnetPacket[8] = 0x00
+    bacnetPacket[9] = hopCountNPCI
+    return 10
+  }
+
+  void output_hex(byte[] bytePacket, int iPacketLen)
+  {
+     Str strHexByte;
+     for(int i =0 ; i < iPacketLen; i++)
+     {
+       strHexByte = Sys.hexStr(bytePacket[i])
+       ** log.message("output_hex strHexByte='$strHexByte' with $iPacketLen ")
+     }
+  }
+
+  override int writeReg(int deviceAddr, int addr, int iLen, float[] buf)
+  { 
+    int headLength = 0
+    ** log.message("22222 writeReg")
+    headLength = fillHead()
+    bacnetPacket[2] = (headLength + iLen)/256
+    bacnetPacket[3] = (headLength + iLen)%256
+    
+    for(int i =0; i < iLen; i++)
+    {
+       bacnetPacket[i + headLength] = (byte)buf[i]
+    }
+
+    errorInfo.copyFromStr("OK")
+    output_hex(bacnetPacket, headLength + iLen)
+	// Copy head
+	packetSend.copyFromBytes(bacnetPacket, 0, headLength + iLen)
+    ** log.message("Copy body ${headLength + iLen}")
+	dataSendGram.len = headLength + iLen
+    ** log.message("send dataSendGram.len =${dataSendGram.len}")
+	dataSendGram.buf = packetSend.bytes
+	return socket.send(dataSendGram)?iLen:0
+  }
+
+  int checkAPNUData(int apduType)
+  {
+    if(apduType == 0x00)
+	{
+	   log.message("BACnet-Confirmed-Request-PDU")
+	   return 0
+	}
+	else if(apduType == 0x01)
+	{
+	   log.message("BACnet-Unconfirmed-Request-PDU")
+	   return 1
+	}
+	else if(apduType == 0x02)
+	{
+	   log.message("BACnet-SimpleACK-PDU")
+	   return 0
+	}
+	else if(apduType == 0x03)
+	{
+	   log.message("BACnet-ComplexACK-PDU")
+	   return 0
+	}
+	else if(apduType == 0x04)
+	{
+	   log.message("BACnet-SegmentACK-PDU")
+	   return 0
+	}
+	else if(apduType == 0x05)
+	{
+	   log.message("BACnet-Error-PDU")
+	   return 0
+	}
+	else if(apduType == 0x06)
+	{
+	   log.message("BACnet-Reject-PDU")
+	   return 0
+	}
+	else if(apduType == 0x07)
+	{
+	   log.message("BACnet-Abort-PDU")
+	   return 0
+	}
+	else 
+	{
+	   log.message("Unknown apduType ")
+	   return 0
+	}
+  }
+  
+  override int checkReadPropertyData(byte[] bacnetRecvPacket, int iPacketLen)
+  {
+    // ex: Control: 0x25, Destination Specifier, Expecting Reply, Priority
+    int serviceChoicePos = 8
+    // DNET£¨ DLEN£¨ DAD R&Hop Count Present
+    int dnetSupport = bacnetRecvPacket[5] & 0x20
+	if(dnetSupport == 0x20)
+	  serviceChoicePos += 4
+	  
+    // SNET£¨ SLEN£¨ &SADR Present 
+    int snetSupport = bacnetRecvPacket[5] & 0x08
+	if(dnetSupport == 0x08)
+	  serviceChoicePos += 4
+	  
+    log.message("Service Choice is ${bacnetPacket[serviceChoicePos]} ")
+    // APDU Type
+    int apduType = bacnetRecvPacket[serviceChoicePos - 2] & 0x70
+    apduType = apduType / 0x10
+    log.message("apduType is $apduType ")
+    // readProperty have Max Response Segments accepted: Unspecified (0)
+    int apduTypeExtraLength = checkAPNUData(apduType)
+    serviceChoicePos += apduTypeExtraLength
+    
+    // ex: Service Choice: read Property (12)
+    // ex: Service Choice: read Property ACK (12)
+    if(bacnetRecvPacket[serviceChoicePos] == 0x0C)
+	{
+	    if (apduTypeExtraLength == 0)
+		{
+		   log.message("Service Choice: read Property ")
+		}
+		else if (apduTypeExtraLength == 1)
+		{
+		   log.message("Service Choice: read Property ACK")
+		}
+		else 
+		{
+		   log.message("Service Choice: Illegal read Property and apduTypeExtraLength =${apduTypeExtraLength}")
+		   return -1
+		}
+	    // log.message("Service Choice: read Property ")
+	    // return 0
+	}
+	else 
+	{
+	   log.message("Service Choice: not read Property and Service Choice =${bacnetPacket[serviceChoicePos]} ")
+	   return -1
+	}
+	serviceChoicePos++
+	// Context Tag: 0, Length/Value/Type: 4
+    int LengthValueType = bacnetRecvPacket[serviceChoicePos] & 0x07
+	log.message("LengthValueType = ${LengthValueType} ")
+	serviceChoicePos += 4
+	// Instance Number: 99
+	log.message("Instance Number = ${bacnetPacket[serviceChoicePos]} ")
+	serviceChoicePos++
+	// Property Identifier : Length Value Type: 1
+    int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
+	log.message("LengthValueType = ${PropertyLengthValue} ")
+	serviceChoicePos++
+	int  propertyProperty = 0x00
+	for(int i = 0 ; i < PropertyLengthValue; i++)
+	{
+	   propertyProperty = propertyProperty * 0x100
+	   					+ bacnetRecvPacket[serviceChoicePos + i]
+	}
+	serviceChoicePos += PropertyLengthValue
+	// .... .110 = Named Tag: Opening Tag (6)
+	log.message("Opening Tag = ${bacnetPacket[serviceChoicePos]} ")
+	serviceChoicePos++
+	int tagNumber = bacnetRecvPacket[serviceChoicePos]
+	while (tagNumber != 0x3F)
+	{
+		tagNumber = tagNumber/0x10
+	    int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+		log.message("iLen = ${iLen} and ")
+		serviceChoicePos++
+		link_type = Component.LINK_TYPE_READ + tagNumber
+		switch (tagNumber)
+	    {
+			case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+			    bufData[0] = iLen
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+				break
+			case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+			    for (int i = 0; i < iLen; i++)
+			    {
+			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+			    }
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+				serviceChoicePos += iLen
+				break
+			case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+			    for (int i = 0; i < iLen; i++)
+			    {
+			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+			    }
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+				serviceChoicePos += iLen
+				break
+			case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+			    for (int i = 0; i < iLen; i++)
+			    {
+			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+			    }
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+				serviceChoicePos += iLen
+				break
+			case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+	    		iLen = bacnetRecvPacket[serviceChoicePos] 
+		        log.message("iLen fix to ${iLen} ")
+		        serviceChoicePos++
+			    for (int i = 0; i < iLen; i++)
+			    {
+			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+			    }
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+				serviceChoicePos += iLen
+				break
+			// case BANET_PROPVAR_NULLAPPTAG:
+			// case BANET_PROPVAR_OCTETSTRINGAPPTAG:
+			// case BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+			// case BANET_PROPVAR_BITSTRINGAPPTAG:
+			// case BANET_PROPVAR_ENUMERATEDAPPTAG:
+			// case BANET_PROPVAR_DATEAPPTAG:
+			// case BANET_PROPVAR_TIMEAPPTAG:
+			// case BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+			// case BANET_PROPVAR_RESERVEDAPPTAG13:
+			// case BANET_PROPVAR_RESERVEDAPPTAG14:
+			// case BANET_PROPVAR_RESERVEDAPPTAG15:
+			default:
+				// log.message("Not support $tagNumber ")
+				break
+	    }
+		tagNumber = bacnetRecvPacket[serviceChoicePos]
+	}
+    log.message("End of checkReadPropertyData .")
+	return serviceChoicePos
+  }
+
+  int bacnet_open(int port, int device_instance, int retry_delay)
+  {
+	bool bRet = openPort(true)
+	return bRet?1:0;
+  }
+
+  **
+  ** Open the UDP port using the configured port field.
+  ** Return true on success.
+  **
+  private bool openPort(bool logError)
+  {
+    log.message("openPorts")
+    if (socket.isClosed() && !socket.open())
+    {
+      if (logError) log.warning("cannot open socket")
+      return false
+    }
+    log.message("socket.open")
+
+    if (!socket.bind(port))
+    {
+      if (logError) log.error("cannot bind to port=$port")
+      return false
+    }
+
+    log.message("started port=$port")
+
+    if (socket.join())
+      log.message("DASP Discovery enabled")
+    else
+      log.message("DASP Discovery not enabled")
+
+    Sys.app.platform.notify("BIP", Sys.intStr(port))
+
+    addrSendLocal.addr.parse(ipAddress.toStr())
+    addrSendLocal.port = port
+    dataSendGram.setSocketAddr(addrSendLocal)
+    
+    addrRecvLocal.addr.parse("192.168.168.2")
+    addrRecvLocal.port = port
+    dataRecvGram.setSocketAddr(addrRecvLocal)
+    return isPortOpen = true
+  }
+
+  int bacnet_close(int ctx)
+  {
+	socket.close()
+	isPortOpen = false
+	return 1;
+  }
+  
+  int bacnet_add(int ctx, int device_instance, int object_type, int object_instance, int object_property, int refreshms)
+  {
+      return 1;
+  }
+
+  
+  override int decodeDouble(byte[] data, double[] value)
+  {
+      int ctxDouble = dD(data, value)
+      log.message("decodeDouble return ${value[0]} and ${value[1]} .")
+      return ctxDouble
+  }
+
+  override int decodeFloat(byte[] data, float[] value)
+  {
+      int ctxFloat = dF(data, value)
+      log.message("decodeFloat return ${value[0]} and ${value[1]} .")
+      return ctxFloat
+  }
+
+  override int decodeUnsigned(byte[] data, int iLen, int[] value)
+  {
+      value[0] = 0
+	  for (int i = 0; i < iLen; i++)
+	  {
+	     value[0] = value[0] * 0x100 + data[i]
+	  }
+      log.message("decodeUnsigned($iLen) return ${value[0]} and ${value[1]} .")
+      return iLen
+  }
+
+  override int decodeInteger(byte[] data, int iLen, int[] value)
+  {
+      value[0] = 0
+	  for (int i = 0; i < iLen; i++)
+	  {
+	     value[0] = value[0] * 0x100 + data[i]
+	  }
+      log.message("decodeInteger($iLen) return ${value[0]} and ${value[1]} .")
+      return iLen
+  }
+
+  override int encodeDouble(double[] data, byte[] value)
+  {
+      int ctxDouble = eD(data, value)
+      if(data[0] != (double)0.0)
+	  {
+	      log.message("encodeDouble return ${value[0]}, ${value[1]} , ${value[2]} and ${value[3]} .")
+	      log.message("encodeDouble return ${value[4]}, ${value[5]} , ${value[6]} and ${value[7]} .")
+	  }
+      return ctxDouble
+  }
+
+  override int encodeFloat(float[] data, byte[] value)
+  {
+      int ctxFloat = eF(data, value)
+      if(data[0] != 0.0)
+	  {
+	      log.message("encodeFloat return ${value[0]}, ${value[1]} , ${value[2]} and ${value[3]} .")
+	      log.message("encodeFloat return ${value[4]}, ${value[5]} , ${value[6]} and ${value[7]} .")
+	  }
+      return ctxFloat
+  }
+
+  override int encodeUnsigned(int[] data, byte[] value)
+  {
+      int iSeq = 0
+      int iTmp = data[0]
+	  do
+	  {
+	     value[iSeq++] = iTmp % 0x100
+	     iTmp = iTmp / 0x100
+	  } while(iTmp > 0)
+      if(data[0] != 0)
+      	log.message("encodeUnsigned return ${value[0]}, ${value[1]} , ${value[2]} and ${value[3]} .")
+      return iSeq
+  }
+
+  override int encodeInteger(int[] data, byte[] value)
+  {
+      int iSeq = 0
+      int iTmp = data[0]
+	  do
+	  {
+	     value[iSeq++] = iTmp % 0x100
+	     iTmp = iTmp / 0x100
+	  } while(iTmp > 0)
+      if(data[0] != 0)
+      	log.message("encodeInteger return ${value[0]}, ${value[1]} , ${value[2]} and ${value[3]} .")
+      return iSeq
+  }
+  
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  define Log log
+  private int ctx = -1
+
+  ////////////////////////////////////////////////////////////////
+  // Socket Fields
+  ////////////////////////////////////////////////////////////////
+
+  inline UdpSocket socket           // socket used for send/receive
+
+  inline SocketAddr addrSendLocal             // remote endpoint address
+  static inline UdpDatagram dataSendGram
+  inline SocketAddr addrRecvLocal             // remote endpoint address
+  static inline UdpDatagram dataRecvGram
+  
+  bool isPortOpen                   // have we successfully opened the port
+  ** static inline byte[256] bacnetHead
+  static inline byte[512] bacnetPacket
+  inline Buf(512) packetSend
+  inline Buf(512) packetRecv
+
+  private inline int[2]    bufInteger
+  private inline float[2]  bufFloat
+  private inline double[2] bufDouble
+  static inline byte[8]    bufData
+
+
+  native int dO(int port, int device_instance, int retry_delay)
+
+  native int dC(int ctx)
+
+  native int dA(int ctx, int device_instance, int object_type, int object_instance, int object_property, int refreshms)
+
+  native int dR(int ctx, int cache_ptr, int object_instance, int type, float[] buf)
+
+  native int dW(int ctx, int cache_ptr, int object_instance, int type, float[] buf)
+
+  // set sche
+  native int dS(int ctx, byte[] url, int[] time, float[] value)
+
+  // get sche, return 1 if update needed.
+  native int dT(int ctx, int idx, int[] time, float[] value)
+
+  // data -> value
+  native int eD(double[] data, byte[] value)
+  native int eF(float[] data, byte[] value)
+  
+  native int dD(byte[] data, double[] value)
+  native int dF(byte[] data, float[] value)
+}

@@ -1,0 +1,131 @@
+<?xml version='1.0'?>
+<sedonaApp>
+<schema>
+  <kit name="sys" />
+  <kit name="BasicFunc" />
+  <kit name="FieldBusDevice" />
+  <kit name="FieldBusNode" />
+  <kit name="OperFunc" />
+  <kit name="datetime" />
+  <kit name="datetimeStd" />
+  <kit name="inet" />
+  <kit name="platUnix" />
+  <kit name="sox" />
+</schema>
+<app>
+  <prop name="appName" val="demo"/>
+  <!-- /service -->
+  <comp name="service" type="sys::Folder">
+    <prop name="meta" val="33685505"/>
+    <!-- /service/plat -->
+    <comp name="plat" type="platUnix::UnixPlatformService"/>
+    <!-- /service/users -->
+    <comp name="users" type="sys::UserService">
+      <prop name="meta" val="17367041"/>
+      <!-- /service/users/admin -->
+      <comp name="admin" type="sys::User">
+        <prop name="cred" val="hE49ksThgAeLkWB3NUU1NWeDO54="/>
+        <prop name="perm" val="2147483647"/>
+        <prop name="prov" val="255"/>
+      </comp>
+    </comp>
+    <!-- /service/sox -->
+    <comp name="sox" type="sox::SoxService">
+      <prop name="meta" val="17104897"/>
+    </comp>
+    <!-- /service/time -->
+    <comp name="time" type="datetimeStd::DateTimeServiceStd">
+      <prop name="utcOffset" val="28800"/>
+      <prop name="osUtcOffset" val="false"/>
+    </comp>
+    <!-- /service/BusRtu -->
+    <comp name="BusRtu" type="FieldBusDevice::ModBusRtuSlave">
+      <prop name="meta" val="101908481"/>
+      <prop name="enable" val="true"/>
+      <!-- /service/BusRtu/DEV0 -->
+      <comp name="DEV0" type="FieldBusDevice::ModBusDevice">
+        <prop name="enable" val="true"/>
+        <prop name="address" val="7"/>
+        <prop name="refreshms" val="1000"/>
+        <!-- /service/BusRtu/DEV0/REG -->
+        <comp name="REG" type="FieldBusDevice::DataPoint">
+          <prop name="address" val="40001"/>
+        </comp>
+      </comp>
+      <!-- /service/BusRtu/DEV1 -->
+      <comp name="DEV1" type="FieldBusDevice::ModBusDevice">
+        <prop name="address" val="8"/>
+        <!-- /service/BusRtu/DEV1/REG -->
+        <comp name="REG" type="FieldBusDevice::DataPoint">
+          <prop name="address" val="40001"/>
+        </comp>
+      </comp>
+    </comp>
+    <!-- /service/TcpMst -->
+    <comp name="TcpMst" type="FieldBusDevice::ModBusTcpMaster">
+      <prop name="meta" val="102236161"/>
+      <!-- /service/TcpMst/DEV -->
+      <comp name="DEV" type="FieldBusDevice::ModBusDevice">
+        <prop name="enable" val="true"/>
+        <!-- /service/TcpMst/DEV/REG -->
+        <comp name="REG" type="FieldBusDevice::DataPoint">
+          <prop name="address" val="40000"/>
+        </comp>
+      </comp>
+    </comp>
+    <!-- /service/TcpSlv -->
+    <comp name="TcpSlv" type="FieldBusDevice::ModBusTcpSlave">
+      <prop name="meta" val="102563841"/>
+      <!-- /service/TcpSlv/DEV -->
+      <comp name="DEV" type="FieldBusDevice::ModBusDevice">
+        <prop name="enable" val="true"/>
+        <!-- /service/TcpSlv/DEV/REG -->
+        <comp name="REG" type="FieldBusDevice::DataPoint">
+          <prop name="address" val="40000"/>
+        </comp>
+      </comp>
+    </comp>
+    <!-- /service/IpSlv -->
+    <comp name="IpSlv" type="FieldBusDevice::BacNetIpSlave">
+      <prop name="meta" val="102957057"/>
+      <!-- /service/IpSlv/DEV -->
+      <comp name="DEV" type="FieldBusDevice::BacNetDevice">
+        <prop name="enable" val="true"/>
+        <prop name="refreshms" val="1000"/>
+        <!-- /service/IpSlv/DEV/REG -->
+        <comp name="REG" type="FieldBusDevice::DataPoint">
+          <prop name="objecttype" val="5"/>
+        </comp>
+      </comp>
+    </comp>
+  </comp>
+  <!-- /play -->
+  <comp name="play" type="sys::Folder">
+    <prop name="meta" val="34013185"/>
+    <!-- /play/TickCou -->
+    <comp name="TickCou" type="BasicFunc::TickCount">
+      <prop name="meta" val="101318657"/>
+      <prop name="preset" val="255.0"/>
+      <prop name="ticksPerSec" val="10.0"/>
+    </comp>
+    <!-- /play/Node4Wr -->
+    <comp name="Node4Wr" type="FieldBusNode::Node4Wr">
+      <prop name="meta" val="403243009"/>
+      <prop name="name0" val="BusRtu/DEV0/REG"/>
+      <prop name="name1" val="TcpMst/DEV/REG"/>
+      <prop name="name2" val="TCPSlv/DEV/REG"/>
+      <prop name="name3" val="IpSlv/DEV/REG"/>
+    </comp>
+    <!-- /play/TickCo1 -->
+    <comp name="TickCo1" type="BasicFunc::TickCount">
+      <prop name="meta" val="101646337"/>
+      <prop name="preset" val="255.0"/>
+    </comp>
+  </comp>
+</app>
+<links>
+  <link from="/play/TickCo1.out" to="/play/Node4Wr.in3"/>
+  <link from="/play/TickCou.out" to="/play/Node4Wr.in1"/>
+  <link from="/play/TickCou.out" to="/play/Node4Wr.in0"/>
+</links>
+</sedonaApp>

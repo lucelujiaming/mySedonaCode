@@ -1,0 +1,55 @@
+<?xml version='1.0'?>
+<sedonaApp>
+<schema>
+  <kit name="sys" />
+  <kit name="platform" />
+  <kit name="inet" />
+  <kit name="sox" />
+  <kit name="Schedule" />
+  <kit name="Variable" />
+  <kit name="ModBus" />
+  <kit name="PID" />
+  <kit name="Timer" />
+  <kit name="Math" />
+  <kit name="BitLogic" />
+  <kit name="Compare" />
+  <kit name="Convert" />
+  <kit name="WordOpr" />
+  <kit name="Other" />
+</schema>
+<app>
+  <prop name="appName" val="CMP500"/>
+  <!-- /service -->
+  <comp name="service" id="1" type="sys::Folder">
+    <prop name="meta" val="33685505"/>
+    <!-- /service/plat -->
+    <comp name="plat" id="2" type="platform::UnixPlatformService">
+      <prop name="meta" val="16842753"/>
+    </comp>
+    <!-- /service/users -->
+    <comp name="users" id="3" type="sys::UserService">
+      <prop name="meta" val="268500993"/>
+      <!-- /service/users/admin -->
+      <comp name="admin" id="4" type="sys::User">
+        <prop name="cred" val="hE49ksThgAeLkWB3NUU1NWeDO54="/>
+        <prop name="perm" val="2147483647"/>
+        <prop name="prov" val="255"/>
+      </comp>
+    </comp>
+    <!-- /service/datetime -->
+    <comp name="datetim" id="5" type="Schedule::DateTime">
+      <prop name="meta" val="17170433"/>
+    </comp>
+    <!-- /service/sox -->
+    <comp name="sox" id="6" type="sox::SoxService">
+      <prop name="meta" val="436273153"/>
+    </comp>
+  </comp>
+  <!-- /play -->
+  <comp name="play" id="7" type="sys::Folder">
+    <prop name="meta" val="34013185"/>
+  </comp>
+</app>
+<links>
+</links>
+</sedonaApp>

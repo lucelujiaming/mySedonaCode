@@ -1,0 +1,29 @@
+abstract class FieldBusDevice
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, OffLine, Ready, NoNet, NoReg, InnerErr, AddrErr, NameErr, END"
+  define int STATUSOK = 0
+  define int STATUSOFFLINE = 1
+  define int STATUSREADY = 2
+  define int STATUSNONET = 3
+  define int STATUSNOREG = 4
+  define int STATUSEINNER = 5 // set by net
+  define int STATUSEADDR = 6 // config err
+  define int STATUSENAME = 7
+  define int STATUSEND = 8
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSNOREG
+
+  @asStr
+  @config
+  property Buf(64) deviceName = ""
+}

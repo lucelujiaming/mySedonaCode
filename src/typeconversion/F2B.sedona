@@ -1,0 +1,38 @@
+@niagaraIcon="module://icons/x16/control/util/switch.png"
+class F2B
+  extends Component
+{
+  property float in
+
+  @readonly property bool out1
+  @readonly property bool out2
+  @readonly property bool out3
+  @readonly property bool out4
+  @readonly property bool out5
+  @readonly property bool out6
+  @readonly property bool out7
+  @readonly property bool out8
+  @readonly property bool out9
+  @readonly property bool out10
+  @readonly property bool out11
+  @readonly property bool out12
+  @readonly property bool out13
+  @readonly property bool out14
+  @readonly property bool out15
+  @readonly property bool out16
+  @readonly property bool ovrf
+
+  virtual override void execute()
+  {
+    int value = (int)in
+    int mask = 1
+    ovrf := value > 0xffff
+
+    for(int i = F2B.out1.id; i <= F2B.out16.id; i++)
+    {
+      setBool(type.slots[i], (value & mask) != 0)
+      mask = mask << 1
+    }
+  }
+
+}

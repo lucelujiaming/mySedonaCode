@@ -1,0 +1,169 @@
+<?xml version='1.0'?>
+<platformManifest
+    platformId="xungaoauto-0.1.0"
+    vendor="XunGaoAuto"
+    endian="little"
+    blockSize="4"
+    refSize="4"
+    armDouble="false"
+    debug="true"
+    test="true"
+>
+
+<!-- Natives -->
+<natives>
+  <nativeKit depend="sys 0.1+" />
+  <nativeKit depend="inet 0.1+" />
+  <nativeKit depend="platform 0.1+" />
+  <nativeKit depend="ModBus 0.1+" />
+  <nativeKit depend="BacNet 0.1+" />
+  <nativeKit depend="Timer 0.1+" />
+  <nativeKit depend="PID 0.1+" />
+
+  <nativeMethod qname="sys::Sys.platformType" id="0::0" />
+  <nativeMethod qname="sys::Sys.copy" id="0::1" />
+  <nativeMethod qname="sys::Sys.malloc" id="0::2" />
+  <nativeMethod qname="sys::Sys.free" id="0::3" />
+  <nativeMethod qname="sys::Sys.intStr" id="0::4" />
+  <nativeMethod qname="sys::Sys.hexStr" id="0::5" />
+  <nativeMethod qname="sys::Sys.longStr" id="0::6" />
+  <nativeMethod qname="sys::Sys.longHexStr" id="0::7" />
+  <nativeMethod qname="sys::Sys.floatStr" id="0::8" />
+  <nativeMethod qname="sys::Sys.doubleStr" id="0::9" />
+  <nativeMethod qname="sys::Sys.floatToBits" id="0::10" />
+  <nativeMethod qname="sys::Sys.doubleToBits" id="0::11" />
+  <nativeMethod qname="sys::Sys.bitsToFloat" id="0::12" />
+  <nativeMethod qname="sys::Sys.bitsToDouble" id="0::13" />
+  <nativeMethod qname="sys::Sys.ticks" id="0::14" />
+  <nativeMethod qname="sys::Sys.sleep" id="0::15" />
+  <nativeMethod qname="sys::Sys.compareBytes" id="0::16" />
+  <nativeMethod qname="sys::Sys.setBytes" id="0::17" />
+  <nativeMethod qname="sys::Sys.andBytes" id="0::18" />
+  <nativeMethod qname="sys::Sys.orBytes" id="0::19" />
+  <nativeMethod qname="sys::Sys.scodeAddr" id="0::20" />
+  <nativeMethod qname="sys::Sys.rand" id="0::21" />
+  <nativeMethod qname="sys::Component.invokeVoid" id="0::22" />
+  <nativeMethod qname="sys::Component.invokeBool" id="0::23" />
+  <nativeMethod qname="sys::Component.invokeInt" id="0::24" />
+  <nativeMethod qname="sys::Component.invokeLong" id="0::25" />
+  <nativeMethod qname="sys::Component.invokeFloat" id="0::26" />
+  <nativeMethod qname="sys::Component.invokeDouble" id="0::27" />
+  <nativeMethod qname="sys::Component.invokeBuf" id="0::28" />
+  <nativeMethod qname="sys::Component.getBool" id="0::29" />
+  <nativeMethod qname="sys::Component.getInt" id="0::30" />
+  <nativeMethod qname="sys::Component.getLong" id="0::31" />
+  <nativeMethod qname="sys::Component.getFloat" id="0::32" />
+  <nativeMethod qname="sys::Component.getDouble" id="0::33" />
+  <nativeMethod qname="sys::Component.getBuf" id="0::34" />
+  <nativeMethod qname="sys::Component.doSetBool" id="0::35" />
+  <nativeMethod qname="sys::Component.doSetInt" id="0::36" />
+  <nativeMethod qname="sys::Component.doSetLong" id="0::37" />
+  <nativeMethod qname="sys::Component.doSetFloat" id="0::38" />
+  <nativeMethod qname="sys::Component.doSetDouble" id="0::39" />
+  <nativeMethod qname="sys::Type.malloc" id="0::40" />
+  <nativeMethod qname="sys::StdOutStream.doWrite" id="0::41" />
+  <nativeMethod qname="sys::StdOutStream.doWriteBytes" id="0::42" />
+  <nativeMethod qname="sys::StdOutStream.doFlush" id="0::43" />
+  <nativeMethod qname="sys::FileStore.doSize" id="0::44" />
+  <nativeMethod qname="sys::FileStore.doOpen" id="0::45" />
+  <nativeMethod qname="sys::FileStore.doRead" id="0::46" />
+  <nativeMethod qname="sys::FileStore.doReadBytes" id="0::47" />
+  <nativeMethod qname="sys::FileStore.doWrite" id="0::48" />
+  <nativeMethod qname="sys::FileStore.doWriteBytes" id="0::49" />
+  <nativeMethod qname="sys::FileStore.doTell" id="0::50" />
+  <nativeMethod qname="sys::FileStore.doSeek" id="0::51" />
+  <nativeMethod qname="sys::FileStore.doFlush" id="0::52" />
+  <nativeMethod qname="sys::FileStore.doClose" id="0::53" />
+  <nativeMethod qname="sys::FileStore.rename" id="0::54" />
+  <nativeMethod qname="sys::Test.doMain" id="0::55" />
+  <nativeMethod qname="sys::Str.fromBytes" id="0::56" />
+  <nativeMethod qname="sys::PlatformService.doPlatformId" id="0::57" />
+  <nativeMethod qname="sys::PlatformService.getPlatVersion" id="0::58" />
+  <nativeMethod qname="sys::PlatformService.getNativeMemAvailable" id="0::59" />
+  <nativeMethod qname="sys::PlatformService.doReboot" id="0::60" />
+  <nativeMethod qname="sys::Runtime.load" id="0::61" />
+  <nativeMethod qname="sys::Runtime.save" id="0::62" />
+  <nativeMethod qname="sys::Runtime.timeOpen" id="0::63" />
+  <nativeMethod qname="sys::Runtime.timeClose" id="0::64" />
+  <nativeMethod qname="sys::Runtime.timeRead" id="0::65" />
+  <nativeMethod qname="sys::Runtime.timeWrite" id="0::66" />
+  <nativeMethod qname="sys::Runtime.dataOpen" id="0::67" />
+  <nativeMethod qname="sys::Runtime.dataClose" id="0::68" />
+  <nativeMethod qname="sys::Runtime.dataRead" id="0::69" />
+  <nativeMethod qname="sys::Runtime.dataWrite" id="0::70" />
+  <nativeMethod qname="sys::Runtime.tableA" id="0::71" />
+  <nativeMethod qname="sys::Runtime.tableD" id="0::72" />
+  <nativeMethod qname="sys::Runtime.tableC" id="0::73" />
+  <nativeMethod qname="sys::Runtime.tableE" id="0::74" />
+  <nativeMethod qname="sys::Runtime.mathSq" id="0::75" />
+  <nativeMethod qname="sys::Runtime.mathSqrt" id="0::76" />
+  <nativeMethod qname="sys::Runtime.mathLn" id="0::77" />
+  <nativeMethod qname="sys::Runtime.mathExp" id="0::78" />
+  <nativeMethod qname="sys::Runtime.mathExpt" id="0::79" />
+  <nativeMethod qname="sys::Runtime.now" id="0::80" />
+  <nativeMethod qname="sys::Runtime.setTime" id="0::81" />
+  <nativeMethod qname="inet::TcpSocket.connect" id="2::0" />
+  <nativeMethod qname="inet::TcpSocket.finishConnect" id="2::1" />
+  <nativeMethod qname="inet::TcpSocket.write" id="2::2" />
+  <nativeMethod qname="inet::TcpSocket.read" id="2::3" />
+  <nativeMethod qname="inet::TcpSocket.close" id="2::4" />
+  <nativeMethod qname="inet::TcpServerSocket.bind" id="2::5" />
+  <nativeMethod qname="inet::TcpServerSocket.accept" id="2::6" />
+  <nativeMethod qname="inet::TcpServerSocket.close" id="2::7" />
+  <nativeMethod qname="inet::UdpSocket.open" id="2::8" />
+  <nativeMethod qname="inet::UdpSocket.bind" id="2::9" />
+  <nativeMethod qname="inet::UdpSocket.send" id="2::10" />
+  <nativeMethod qname="inet::UdpSocket.receive" id="2::11" />
+  <nativeMethod qname="inet::UdpSocket.close" id="2::12" />
+  <nativeMethod qname="inet::UdpSocket.maxPacketSize" id="2::13" />
+  <nativeMethod qname="inet::UdpSocket.idealPacketSize" id="2::14" />
+  <nativeMethod qname="inet::Crypto.sha1" id="2::15" />
+  <nativeMethod qname="inet::UdpSocket.join" id="2::16" />
+  <nativeMethod qname="ModBus::rtuMaster.dO" id="3::0" />
+  <nativeMethod qname="ModBus::rtuMaster.dC" id="3::1" />
+  <nativeMethod qname="ModBus::rtuMaster.dA" id="3::2" />
+  <nativeMethod qname="ModBus::rtuMaster.dR" id="3::3" />
+  <nativeMethod qname="ModBus::rtuMaster.dW" id="3::4" />
+  <nativeMethod qname="ModBus::rtuSlave.dO" id="3::5" />
+  <nativeMethod qname="ModBus::rtuSlave.dC" id="3::6" />
+  <nativeMethod qname="ModBus::rtuSlave.dA" id="3::7" />
+  <nativeMethod qname="ModBus::rtuSlave.dR" id="3::8" />
+  <nativeMethod qname="ModBus::rtuSlave.dW" id="3::9" />
+  <nativeMethod qname="ModBus::tcpClient.dO" id="3::10" />
+  <nativeMethod qname="ModBus::tcpClient.dC" id="3::11" />
+  <nativeMethod qname="ModBus::tcpClient.dA" id="3::12" />
+  <nativeMethod qname="ModBus::tcpClient.dR" id="3::13" />
+  <nativeMethod qname="ModBus::tcpClient.dW" id="3::14" />
+  <nativeMethod qname="ModBus::tcpServer.dO" id="3::15" />
+  <nativeMethod qname="ModBus::tcpServer.dC" id="3::16" />
+  <nativeMethod qname="ModBus::tcpServer.dA" id="3::17" />
+  <nativeMethod qname="ModBus::tcpServer.dR" id="3::18" />
+  <nativeMethod qname="ModBus::tcpServer.dW" id="3::19" />
+  <nativeMethod qname="BacNet::BIP.dO" id="4::0" />
+  <nativeMethod qname="BacNet::BIP.dC" id="4::1" />
+  <nativeMethod qname="BacNet::BIP.dA" id="4::2" />
+  <nativeMethod qname="BacNet::BIP.dR" id="4::3" />
+  <nativeMethod qname="BacNet::BIP.dW" id="4::4" />
+  <nativeMethod qname="BacNet::MSTP.dO" id="4::5" />
+  <nativeMethod qname="BacNet::MSTP.dC" id="4::6" />
+  <nativeMethod qname="BacNet::MSTP.dA" id="4::7" />
+  <nativeMethod qname="BacNet::MSTP.dR" id="4::8" />
+  <nativeMethod qname="BacNet::MSTP.dW" id="4::9" />
+  <nativeMethod qname="BacNet::BIP.dS" id="4::10" />
+  <nativeMethod qname="BacNet::BIP.dT" id="4::11" />
+  <nativeMethod qname="BacNet::MSTP.dS" id="4::12" />
+  <nativeMethod qname="BacNet::MSTP.dT" id="4::13" />
+  <nativeMethod qname="BacNet::BIP.cD" id="4::14" />
+  <nativeMethod qname="BacNet::BIP.cF" id="4::15" />
+  <nativeMethod qname="PID::Pid.a" id="10::3" />
+  <nativeMethod qname="PID::Pid.f" id="10::4" />
+  <nativeMethod qname="PID::Pid.d" id="10::5" />
+</natives>
+
+<manifestIncludes>
+ <schemes>
+  <scheme id="m"/>
+ </schemes>
+</manifestIncludes>
+
+</platformManifest>

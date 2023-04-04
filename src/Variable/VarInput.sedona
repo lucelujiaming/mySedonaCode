@@ -1,0 +1,42 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class VarInput
+  extends FieldBusIO
+{
+  @readonly
+  property float out = 0.0f
+
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == VarInput.url) {
+      log.message("changed slot.name=$slot.name")
+      update()
+    }
+  }
+  virtual override void execute()
+  {
+    ** log.message("11111 name=$name")
+    if (bus != null) {
+        ** log.message("11111 bus.busId=$busId ")
+    }
+    if (cache != 0 && bus != null && status <= STATUSREADY) {
+        ** log.message("22222 name=$name")
+      if (bus.readReg(cache, regId, typeId, buf) == dataLen) {
+        ** log.message("33333 out=$out")
+        out := buf[0]
+        status := STATUSOK
+      } else {
+        ** log.message("44444 name=$name")
+        out := 0.0f
+        status := STATUSOFFLINE
+      }
+    }
+  }
+
+  private inline float[1] buf
+}

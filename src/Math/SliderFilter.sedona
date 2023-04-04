@@ -1,0 +1,71 @@
+@niagaraIcon="module://icons/x16/control/math/average.png"
+class SliderFilter
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+  
+  @min=1
+  @config property float N = 5.0
+
+  @unit=Units.second
+  @config property float Samples = 0.1
+
+  @readonly property float reset = 0.0
+
+  virtual override void start()
+  {
+    first = true
+    if (Samples < 0.1) {
+      Samples := 0.1
+    }
+    nextCompute = Sys.ticks() + (long)(Samples * (float)1sec)
+  }
+
+  virtual override void changed(Slot slot)
+  {
+    if (slot == SliderFilter.N) {
+      first = true
+    } else if (slot == SliderFilter.reset) {
+      if(reset != 0.0)
+        first = true
+    } else if (slot == SliderFilter.Samples) {
+      if (Samples < 0.1) {
+        Samples := 0.1
+      }
+    }
+    super.changed(slot)
+  }
+
+  virtual override void execute()
+  {
+    if (Sys.ticks() > nextCompute) {
+      computeAverage()
+      nextCompute += (long)(Samples * (float)1sec)
+    }
+    out := avg
+  }
+
+  void computeAverage()
+  {
+    if(first)
+    {
+      avg = in
+      total = (in * N)
+      first = false
+    }
+    else
+    {
+      total = total + in - avg
+      avg   = total/N
+    }
+  }
+
+
+  private float  total
+  private float  avg
+  private bool   first
+  private long   nextCompute
+
+}

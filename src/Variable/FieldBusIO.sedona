@@ -1,0 +1,249 @@
+abstract class FieldBusIO
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, OffLine, Ready, NoNet, NoDev, AddrErr, UrlErr, END"
+  define int STATUSOK = 0
+  define int STATUSOFFLINE = 1
+  define int STATUSREADY = 2
+  define int STATUSNONET = 3
+  define int STATUSNODEV = 4
+  define int STATUSEADDR = 5 // set by net
+  define int STATUSEURL = 6
+  define int STATUSEND = 7
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @summary=false
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSNODEV
+
+  @asStr
+  @config
+  property Buf(64) url = ""
+
+  override void loaded()
+  {
+    update()
+  }
+  override void stop()
+  {
+    if (bus != null) {
+      bus.notifyFlush()
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  void update()
+  {
+    if (bus != null) {
+      bus.notifyFlush()
+    }
+    status := STATUSNODEV
+    bus = null
+    cache = 0
+    busId = 0
+    devStr.set(0, 0)
+    regId = 0
+    typeId = 0
+    dataLen = 0
+    Str tmp = url.toStr()
+    log.message("11111 url=$tmp")
+    if (url.toStr().length() > 0) {
+      int findState = 0
+      int findIdx = 0
+      Str urlStr = url.toStr()
+      Str tmpBuf = ""
+      int aLen = 0
+      bool isModBus = false
+      for (int i=0; i<urlStr.length(); i++) {
+        int c = urlStr.get(i)
+        if (c == "/".get(0)) {
+          if (tmpBuf.length() > 0) {
+            if (findState == 0) {
+              // dev name
+              aLen = i
+            } else if (findState == 1) {
+              if (tmpBuf.equals("int")) {
+                typeId = 1
+                dataLen = 1
+                isModBus = true
+              } else if (tmpBuf.equals("word")) {
+                typeId = 2
+                dataLen = 1
+                isModBus = true
+              } else if (tmpBuf.equals("dint")) {
+                typeId = 3
+                dataLen = 2
+                isModBus = true
+              } else if (tmpBuf.equals("dword")) {
+                typeId = 4
+                dataLen = 2
+                isModBus = true
+              } else if (tmpBuf.equals("real")) {
+                typeId = 5
+                dataLen = 2
+                isModBus = true
+              } else if (tmpBuf.equals("ai")) {
+                typeId = 0
+                dataLen = 1
+              } else if (tmpBuf.equals("ao")) {
+                typeId = 1
+                dataLen = 1
+              } else if (tmpBuf.equals("av")) {
+                typeId = 2
+                dataLen = 1
+              } else if (tmpBuf.equals("bi")) {
+                typeId = 3
+                dataLen = 1
+              } else if (tmpBuf.equals("bo")) {
+                typeId = 4
+                dataLen = 1
+              } else if (tmpBuf.equals("bv")) {
+                typeId = 5
+                dataLen = 1
+              }
+            }
+          }
+          findState ++
+          findIdx = 0
+          tmpBuf.set(findIdx, 0)
+          continue
+        }
+        tmpBuf.set(findIdx, c)
+        findIdx ++
+        tmpBuf.set(findIdx, 0)
+      }
+      ** log.message("222222 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+      if (aLen > 0 && findState == 2 && tmpBuf.length() > 0) {
+        int tmpInt = tmpBuf.parseInt()
+        if (tmpInt != -1) {
+          if (isModBus) {
+            if ((tmpInt == 0) ||
+                (tmpInt == 10000) ||
+                (20000 <= tmpInt && tmpInt <= 30000) ||
+                (tmpInt == 40000) ||
+                (50000 <= tmpInt) ||
+                (tmpInt < 20000 && dataLen != 1))
+            {
+              busId = 0
+              typeId = 0
+              dataLen = 0
+              status := STATUSEURL
+              return
+            }
+          }
+          ** log.message("33333 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+          for (int i=0; i<aLen; i++) {
+            int c = urlStr.get(i)
+            tmpBuf.set(i, c)
+            tmpBuf.set(i+1, 0)
+          }
+          // find device and bus id.
+          FieldBusNet tmpBus = lookupNetByDeviceName(tmpBuf)
+          if (tmpBus != null) {
+            ** log.message("444444 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+            busId = tmpBus.busId
+            // trigger notify flush.
+            if (busId != 0) {
+              log.message("55555 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+              bus = lookupNetById(busId)
+              if (bus != null) {
+                bus.notifyFlush()
+              }
+            } else {
+              tmpBus.notifyFlush()
+            }
+            devStr.copyFromStr(tmpBuf, 64)
+            devStr.set(aLen, 0)
+            regId = tmpInt
+          }
+        } else {
+          log.message("10101010 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+          status := STATUSEURL
+        }
+      } else {
+        log.message("123123123 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+        status := STATUSEURL
+      }
+    }
+    if(bus != null)
+    {
+       log.message("987654321 dataLen=$dataLen ")
+    } else {
+       log.message("123456789 dataLen=$dataLen ") 
+    }
+  }
+  private FieldBusNet lookupNetById(int id)
+  {
+    Component root
+    Component f
+    Component n
+    Component p = this
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && f.name.equals("service")) {
+        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+          if (n.type.is(FieldBusNet.type) && ((FieldBusNet)n).busId == id) {
+            return (FieldBusNet)n
+          }
+        }
+      }
+    }
+
+    return null
+  }
+  private FieldBusNet lookupNetByDeviceName(Str devName)
+  {
+    Component root
+    Component f
+    Component n
+    Component p = this
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && f.name.equals("service")) {
+        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+          if (n.type.is(FieldBusNet.type)) {
+            for (p = Sys.app.lookup(n.children); p != null; p = Sys.app.lookup(p.nextSibling)) {
+              if (p.type.is(FieldBusDevice.type) && devName.equals(((FieldBusDevice)p).deviceName.toStr())) {
+                return (FieldBusNet)n
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return null
+  }
+
+  define Log log
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  FieldBusNet bus = null
+  int cache = 0
+
+  int busId = 0
+  inline Str(64) devStr
+  int regId = 0
+  int typeId = 0
+  int dataLen = 0
+}

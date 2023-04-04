@@ -1,0 +1,165 @@
+//
+// Copyright (c) 2007 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//   16 May 07  Andy Sunders  Creation
+//
+
+**
+** LogicTest
+**
+class LogicTest
+  extends Test
+{
+  static inline Or2 or2
+  static inline Or4 or4
+  static inline And2 and2
+  static inline And4 and4
+  static inline Not not
+  static inline Xor xor1
+
+  static void test()
+  {
+    or2.in1 := 0.0
+    or2.in2 := 0.0
+    or2.execute()
+    assert(or2.out == 0.0)
+    or2.in1 := 1.0
+    or2.in2 := 0.0
+    or2.execute()
+    assert(or2.out == 1.0)
+    or2.in1 := 0.0
+    or2.in2 := 1.0
+    or2.execute()
+    assert(or2.out == 1.0)
+    or2.in1 := 1.0
+    or2.in2 := 1.0
+    or2.execute()
+    assert(or2.out == 1.0)
+
+    or4.in1 := 0.0
+    or4.in2 := 0.0
+    or4.in3 := 0.0
+    or4.in4 := 0.0
+    or4.execute()
+    assert(or4.out == 0.0)
+    or4.in1 := 1.0
+    or4.in2 := 0.0
+    or4.in3 := 0.0
+    or4.in4 := 0.0
+    or4.execute()
+    assert(or4.out == 1.0)
+    or4.in1 := 0.0
+    or4.in2 := 1.0
+    or4.in3 := 0.0
+    or4.in4 := 0.0
+    or4.execute()
+    assert(or4.out == 1.0)
+    or4.in1 := 0.0
+    or4.in2 := 0.0
+    or4.in3 := 1.0
+    or4.in4 := 0.0
+    or4.execute()
+    assert(or4.out == 1.0)
+    or4.in1 := 0.0
+    or4.in2 := 0.0
+    or4.in3 := 0.0
+    or4.in4 := 1.0
+    or4.execute()
+    assert(or4.out == 1.0)
+
+    and2.in1 := 0.0
+    and2.in2 := 0.0
+    and2.execute()
+    assert(and2.out == 0.0)
+    and2.in1 := 1.0
+    and2.in2 := 0.0
+    and2.execute()
+    assert(and2.out == 0.0)
+    and2.in1 := 0.0
+    and2.in2 := 1.0
+    and2.execute()
+    assert(and2.out == 0.0)
+    and2.in1 := 1.0
+    and2.in2 := 1.0
+    and2.execute()
+    assert(and2.out == 1.0)
+
+    and4.in1 := 0.0
+    and4.in2 := 0.0
+    and4.in3 := 0.0
+    and4.in4 := 0.0
+    and4.execute()
+    assert(and4.out == 0.0)
+    and4.in1 := 1.0
+    and4.in2 := 0.0
+    and4.in3 := 0.0
+    and4.in4 := 0.0
+    and4.execute()
+    assert(and4.out == 0.0)
+    and4.in1 := 0.0
+    and4.in2 := 1.0
+    and4.in3 := 0.0
+    and4.in4 := 0.0
+    and4.execute()
+    assert(and4.out == 0.0)
+    and4.in1 := 0.0
+    and4.in2 := 0.0
+    and4.in3 := 1.0
+    and4.in4 := 0.0
+    and4.execute()
+    assert(and4.out == 0.0)
+    and4.in1 := 0.0
+    and4.in2 := 0.0
+    and4.in3 := 0.0
+    and4.in4 := 1.0
+    and4.execute()
+    assert(and4.out == 0.0)
+    and4.in1 := 1.0
+    and4.in2 := 1.0
+    and4.in3 := 1.0
+    and4.in4 := 1.0
+    and4.execute()
+    assert(and4.out == 1.0)
+
+    not.in := 1.0
+    not.execute()
+    assert(not.out == 0.0)
+    not.in := 0.0
+    not.execute()
+    assert(not.out == 1.0)
+
+    xor1.in1 := 0.0
+    xor1.in2 := 0.0
+    xor1.execute()
+    assert(xor1.out == 0.0)
+    xor1.in1 := 1.0
+    xor1.execute()
+    assert(xor1.out == 1.0)
+    xor1.in2 := 1.0
+    xor1.execute()
+    assert(xor1.out == 0.0)
+    xor1.in1 := 0.0
+    xor1.execute()
+    assert(xor1.out == 1.0)
+    
+    xor1.in1 := null
+    xor1.in2 := 1.0
+    xor1.execute()
+    assert(xor1.out == null)
+    xor1.in1 := null
+    xor1.in2 := 0.0
+    xor1.execute()
+    assert(xor1.out == null)    
+    xor1.in1 := 1.0
+    xor1.in2 := null
+    xor1.execute()
+    assert(xor1.out == null)
+    xor1.in1 := 0.0
+    xor1.in2 := null
+    xor1.execute()
+    assert(xor1.out == null)
+
+  }
+}

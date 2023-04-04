@@ -1,0 +1,15 @@
+<sedonaKit
+  name="Variable"
+  vendor="XunGaoAuto"
+  description="Variable"
+  includeSource="false"
+  doc="false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+
+  <!-- Source Directories  -->
+  <source dir="." />
+
+</sedonaKit>
