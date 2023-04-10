@@ -31,7 +31,7 @@ class UdpSocket
   ** UDP implementation.  This is typically driven by the 
   ** lower levels of the IP stack - for instance when running 
   ** 6LoWPAN over 802.15.4, this is the max UDP packet size 
-  ** which doesn't require fragmenting across multiple 
+  ** which doesn't' require fragmenting across multiple 
   ** 802.15.4 frames.
   **
   static native int idealPacketSize()
@@ -93,6 +93,8 @@ class UdpSocket
   ** Shutdown and close this socket.
   **
   native void close()
+
+  native bool getBacnetDeviceList(byte[] ipAddress, int[] ipArrayList, int[] objIDList, int[] iListLenPtr)
 
 ////////////////////////////////////////////////////////////////
 // Fields

@@ -397,6 +397,9 @@ Cell inet_Crypto_sha1(SedonaVM* vm, Cell* params);
 // bool UdpSocket.join()
 Cell inet_UdpSocket_join(SedonaVM* vm, Cell* params);
 
+// bool UdpSocket.join()
+Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params);
+
 // native table for kit 2
 NativeMethod kitNatives2[] = 
 {
@@ -417,6 +420,7 @@ NativeMethod kitNatives2[] =
   inet_UdpSocket_idealPacketSize,  // 2::14
   inet_Crypto_sha1,               // 2::15
   inet_UdpSocket_join,            // 2::16
+  inet_UdpSocket_getBacnetDeviceList,            // 2::17
 };
 
 ////////////////////////////////////////////////////////////////
@@ -645,7 +649,7 @@ int isNativeIdValid(int kitId, int methodId)
       if (methodId >= 82) return 0;
       else return kitNatives0[methodId] != NULL;
     case 2:
-      if (methodId >= 17) return 0;
+      if (methodId >= 18) return 0;
       else return kitNatives2[methodId] != NULL;
     case 3:
       if (methodId >= 20) return 0;

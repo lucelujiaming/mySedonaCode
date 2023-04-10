@@ -88,19 +88,25 @@ class bacDevice
   override void execute()
   {
     if (bus != null) {
-        dataLength = bus.readReg(0, 0, 255, buf)
-        if(dataLength > 0)
-        {
-            log.message("We readReg and return $dataLength ")
-        	for(int i =0 ; i < dataLength; i++)
-	    	{
-        //        log.message(
-        //        		"execute readReg (0x").printHex(
-        //        			(byte)buf[i]).print(") .").nl()
-	    	    bacnetPacket[i] = (byte)buf[i]
-	    	}
-            bus.checkReadPropertyData(bacnetPacket, dataLength)
+    	if (bus.needFlush == false) {
+	        dataLength = bus.readReg(0, 0, 255, buf)
+	        if(dataLength > 0)
+	        {
+	            log.message("We readReg and return $dataLength ")
+	        	for(int i =0 ; i < dataLength; i++)
+		    	{
+	        //        log.message(
+	        //        		"execute readReg (0x").printHex(
+	        //        			(byte)buf[i]).print(") .").nl()
+		    	    bacnetPacket[i] = (byte)buf[i]
+		    	}
+	            bus.checkReadPropertyData(bacnetPacket, dataLength)
+	        }
         }
+        else 
+	    {
+	        log.message("We needFlush ")
+    	}
     }
   }
   

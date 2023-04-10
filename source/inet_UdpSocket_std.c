@@ -8,9 +8,8 @@
 //   09 Jul 12  Elizabeth McKenney/Clif Turman IPV6 support
 //   09 Aug 12  Clif Turman  Add QNX Specific variant
 //
-
-#include "inet_util_std.h"
 #include <arpa/inet.h>
+#include "inet_util_std.h"
 
 //
 // Define the multicast group address for Discover
@@ -407,6 +406,311 @@ Cell inet_UdpSocket_close(SedonaVM* vm, Cell* params)
     setSocket(self, -1);
   }
   return nullCell;
+}
+
+// Bacbet device list searching
+#define PORT 47808
+#define MAXDATASIZE 256
+
+#define WHOIS_PACKET "\x81\x0a\x00\x0c\x01\x20\xff\xff\x00\xff\x10\x08"
+#define WHOIS_LENGTH 12
+
+#pragma pack(1)
+// BACnet Virtual Link Control
+typedef struct bacnet_head_t {
+	unsigned char type;
+	unsigned char function;
+	unsigned short bvlcLength;
+} bacnet_head;
+
+typedef struct bacnet_NPDU_DstSpec_t {
+	unsigned char  version;
+	unsigned char  control;
+	unsigned short dstAddr;
+	unsigned char  dstAddrLen;
+	unsigned char  hopCount;
+} bacnet_NPDU_DstSpec;
+
+typedef struct bacnet_NPDU_SrcSpec_t {
+	unsigned char  version;
+	unsigned char  control;
+	unsigned short dstAddr;
+	unsigned char  dstAddrLen;
+	unsigned short srcAddr;
+	unsigned char  srcAddrLen;
+	unsigned char  sadr;
+	unsigned char  hopCount;
+} bacnet_NPDU_SrcSpec;
+
+typedef struct bacnet_APDU_t {
+	unsigned char  apnuType;
+	unsigned char  serviceChoice;
+	unsigned char  objectIdentifierLen;
+	unsigned int   objectIdentifierAndType;
+	unsigned char  apnuLenLen;
+	unsigned short apnuLen;
+	unsigned short segment;
+	unsigned char  vendorIDLen;
+	unsigned short vendorID;
+} bacnet_APDU;
+
+typedef struct bacnet_iam_dstSpec_t {
+	bacnet_head         headObject;
+	bacnet_NPDU_DstSpec npduDstObject;
+	bacnet_APDU         apnuObject;
+} bacnet_iam_dstSpec;
+
+typedef struct bacnet_iam_srcSpec_t {
+	bacnet_head         headObject;
+	bacnet_NPDU_SrcSpec npduSrcObject;
+	bacnet_APDU         apnuObject;
+} bacnet_iam_srcSpec;
+#pragma pack()
+
+socket_t initializeSocket(char * networkIP, 
+					struct sockaddr_in* my_addr, 
+					struct sockaddr_in* user_addr)
+{
+	socket_t clientSocket;
+	
+	int so_broadcast=1;
+#ifdef _WIN32
+	WSADATA wsadata;
+	if (0 == WSAStartup(MAKEWORD(2, 2), &wsadata))
+	{
+		printf("Socket opened r\n");
+	}
+	else
+	{
+		printf("Socket open failed \r\n");
+		return -1;
+	}
+#endif
+	clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+
+	my_addr->sin_family=AF_INET;
+	my_addr->sin_port=htons(PORT);
+	my_addr->sin_addr.s_addr=inet_addr("255.255.255.255");
+	memset(&(my_addr->sin_zero), 0x00, 8);
+
+	setsockopt(clientSocket, SOL_SOCKET, SO_BROADCAST, 
+		(char *)&so_broadcast, sizeof(so_broadcast));
+
+	inet_setNonBlocking(clientSocket);
+	
+	user_addr->sin_family=AF_INET;
+	user_addr->sin_port=htons(PORT);
+	// user_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+	user_addr->sin_addr.s_addr=inet_addr(networkIP);
+	memset(&(user_addr->sin_zero), 0x00, 8);
+	
+	if((bind(clientSocket, (struct sockaddr *)user_addr,
+									sizeof(struct sockaddr)))==-1)
+	{
+		return -1;
+	}
+	return clientSocket;
+}
+
+#ifdef _WIN32
+void revertShort(unsigned short &sValue)
+{
+	unsigned char * ptrValue = (unsigned char *)(&sValue);
+	unsigned char cTmp;
+	cTmp = ptrValue[0];
+	ptrValue[0] = ptrValue[1];
+	ptrValue[1] = cTmp;
+}
+
+void revertInt(unsigned int &uValue)
+{
+	unsigned char * ptrValue = (unsigned char *)(&uValue);
+	unsigned char cTmp;
+
+	cTmp = ptrValue[0];
+	ptrValue[0] = ptrValue[3];
+	ptrValue[3] = cTmp;
+	
+	cTmp = ptrValue[1];
+	ptrValue[1] = ptrValue[2];
+	ptrValue[2] = cTmp;
+}
+#endif
+
+void copyBacnetIamDstSpec(bacnet_iam_dstSpec * objIAMDstPtr, unsigned char * buffer, int iLen)
+{
+	memcpy(objIAMDstPtr, buffer, iLen);
+#ifdef _WIN32
+	revertShort(objIAMDstPtr->headObject.bvlcLength);
+	revertShort(objIAMDstPtr->npduDstObject.dstAddr);
+	revertInt(objIAMDstPtr->apnuObject.objectIdentifierAndType);
+	revertShort(objIAMDstPtr->apnuObject.apnuLen);
+	revertShort(objIAMDstPtr->apnuObject.segment);
+	revertShort(objIAMDstPtr->apnuObject.vendorID);
+#endif
+}
+
+
+void copyBacnetIamSrcSpec(bacnet_iam_srcSpec * objIAMSrcPtr, unsigned char * buffer, int iLen)
+{
+	memcpy(objIAMSrcPtr, buffer, iLen);
+#ifdef _WIN32
+	revertShort(objIAMSrcPtr->headObject.bvlcLength);
+	revertShort(objIAMSrcPtr->npduSrcObject.dstAddr);
+	revertShort(objIAMSrcPtr->npduSrcObject.srcAddr);
+	revertInt(objIAMSrcPtr->apnuObject.objectIdentifierAndType);
+	revertShort(objIAMSrcPtr->apnuObject.apnuLen);
+	revertShort(objIAMSrcPtr->apnuObject.segment);
+	revertShort(objIAMSrcPtr->apnuObject.vendorID);
+#endif
+}
+
+int dealResponse(struct sockaddr_in user_addr, unsigned char * buffer, int iLen, 
+				 unsigned int * ipArrayList, unsigned int * objIDList, unsigned int iListLen)
+{
+	unsigned char control;
+	bacnet_iam_dstSpec objIAMDst ;
+	bacnet_iam_srcSpec objIAMSrc ;
+	printf("IP = %s. we Receive %d .\r\n", inet_ntoa(user_addr.sin_addr), iLen);
+	if(iLen == sizeof(objIAMDst))
+	{
+		copyBacnetIamDstSpec(&objIAMDst, buffer, iLen);
+		control = objIAMDst.npduDstObject.control;
+		printf("Receive bacnet_iam_dstSpec(%02X) with %d \r\n", control, iLen);
+		printf("objectIdentifierType = %d \r\n", 
+			objIAMDst.apnuObject.objectIdentifierAndType >> 22);
+		printf("objectIdentifier = %d \r\n", 
+			objIAMDst.apnuObject.objectIdentifierAndType & 0x3FFFFF);
+		
+	}
+	else if(iLen == sizeof(objIAMSrc))
+	{
+		copyBacnetIamSrcSpec(&objIAMSrc, buffer, iLen);
+		control = objIAMSrc.npduSrcObject.control;
+		printf("Receive bacnet_iam_srcSpec(%02X) with %d \r\n", control, iLen);
+		printf("Source Network Address: %d \r\n", objIAMSrc.npduSrcObject.srcAddr);
+		printf("objectIdentifierType: %d \r\n", 
+			objIAMSrc.apnuObject.objectIdentifierAndType >> 22);
+		printf("objectIdentifier: %d \r\n", 
+			objIAMSrc.apnuObject.objectIdentifierAndType & 0x3FFFFF);
+
+		memcpy(&(ipArrayList[iListLen]), &(user_addr.sin_addr), sizeof(int));
+		objIDList[iListLen] = objIAMSrc.apnuObject.objectIdentifierAndType & 0x3FFFFF;
+		iListLen++;
+	}
+	
+	return iListLen;
+}
+
+void recvSleep(float fMilliSeconds)
+{
+	if(fMilliSeconds > 0)
+	{
+#ifdef _WIN32
+		if(fMilliSeconds < 1)
+			Sleep(1);
+		else
+			Sleep(1 * fMilliSeconds);
+#else
+		usleep(1000 * fMilliSeconds);
+#endif
+	}
+}
+
+int sendBroadcast(int iRetryCount, socket_t clientSocket, 
+					struct sockaddr_in my_addr, 
+					struct sockaddr_in user_addr, 
+					unsigned int * ipArrayList, unsigned int * objIDList)
+{
+    int i = 0;
+	int iSendCount = 0;
+	int iRecvCount = 0;
+	unsigned char buf[MAXDATASIZE];
+	unsigned int size;
+	int iListLen = 0;
+	
+		printf("Enter sendBroadcast \r\n");
+	for(i=0; i<iRetryCount; i++)
+	{
+		memset(buf, 0x00, MAXDATASIZE);
+		memcpy(buf, WHOIS_PACKET, WHOIS_LENGTH);
+		iSendCount = sendto(clientSocket, (char *)buf, WHOIS_LENGTH, 0, 
+			(struct sockaddr *)&my_addr, sizeof(my_addr));
+#ifdef _WIN32
+		recvSleep(1);
+#else
+		recvSleep(20);
+#endif
+		printf("send %d OK \r\n", iSendCount);
+		size = sizeof(user_addr);
+		while(1)
+		{
+			memset(buf, 0x00, MAXDATASIZE);
+			printf("try to  recvfrom \r\n");
+			iRecvCount = recvfrom(clientSocket, (char *)buf, 
+				MAXDATASIZE, 0, (struct sockaddr *)&user_addr, &size);
+			if (iRecvCount == -1)
+			{
+				printf("recvfrom over \r\n");
+				break;
+			}
+			if((iRecvCount == iSendCount)
+				&& (memcmp(buf, WHOIS_PACKET, WHOIS_LENGTH) == 0))
+			{
+				printf("Omit broadcast sent to me \r\n");
+				continue;
+			}
+			else if (iRecvCount > 0)
+			{
+				printf("we Receive %d .\r\n", iRecvCount);
+				iListLen = dealResponse(user_addr, buf, iRecvCount, ipArrayList, objIDList, iListLen);
+				recvSleep(1);
+			}
+		}
+		printf("-------------------%d----------------------- \r\n", i + 1);
+	}
+	return iListLen;
+}
+
+#define  SEND_BROADCAST_TIMES    1
+Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
+{
+  // void* self              = params[0].aval;
+  char*     ipAddress      = params[1].aval;
+  uint32_t* ipArrayList    = params[2].aval;
+  uint32_t* objIDList      = params[3].aval;
+  int32_t* iListLenPtr     = params[4].aval;
+  
+  
+	printf("Enter inet_UdpSocket_getBacnetDeviceList(%s) \r\n", ipAddress);
+	// unsigned int iListLen = 0;
+	// unsigned int ipArrayList[10];
+	// unsigned int objIDList[10];
+	memset(ipArrayList, 0x00, sizeof(int) * 10);
+	memset(objIDList, 0x00, sizeof(int) * 10);
+	memset(iListLenPtr, 0x00, sizeof(int) * 1);
+
+
+	socket_t clientSocket;
+	struct sockaddr_in  my_addr;
+	struct sockaddr_in  user_addr;
+	clientSocket = initializeSocket(ipAddress, &my_addr, &user_addr);
+	if (clientSocket > 0)
+	{
+		printf("Call sendBroadcast \r\n");
+		*iListLenPtr = sendBroadcast(SEND_BROADCAST_TIMES, 
+			clientSocket, my_addr, user_addr, 
+			ipArrayList, objIDList);
+	}
+	closesocket(clientSocket);
+	if (*iListLenPtr <= 0)
+	{
+    	return falseCell;
+	}
+	else
+	{
+    	return trueCell;
+	}
 }
 
 

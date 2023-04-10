@@ -35,6 +35,8 @@
   <native qname="inet::Crypto.sha1"               id="2::15"  />
 
   <native qname="inet::UdpSocket.join"            id="2::16" />
+  <native qname="inet::UdpSocket.getBacnetDeviceList"
+                                                  id="2::17" />
 
 </sedonaKit>
 

@@ -11,7 +11,7 @@ class BIP
   define int BACPACKETSTATUSNG = 2
   define int BACPACKETSTATUSEND = 3
   
-  define Str BVLCISTATUSRANGE = "NoBVLCI, DistributeBroadcastToNetWork, Unicast, Broadcast, ForardNPDU_WT, END"
+  define Str BVLCISTATUSRANGE = "NoBVLCI, DistributeBroadcastToNetWork, Unicast, Broadcast, ForwardNPDU_WT, END"
   define int BVLCISTATUSNOBVLCI = 0
   define int BVLCISTATUSDISTRIBUTEBROADCAST = 1
   define int BVLCISTATUSUNICAST = 2
@@ -168,7 +168,7 @@ class BIP
       log.message("Call updateCache flush")
       if (updateCache()) {
         // 结束添加标记。
-        log.message("Call bacnet_add")
+        log.message("Call bacnet_add and set status := STATUSOK")
         bacnet_add(ctx, 0, 0, 0, 0, 1)
         status := STATUSOK
       } else {
@@ -690,6 +690,10 @@ class BIP
 
   int bacnet_open(int port, int device_instance, int retry_delay)
   {
+    iListLenPtr[0] = 0
+    socket.getBacnetDeviceList("192.168.168.2".toBytes(), 
+    		ipArrayList, objIDList, iListLenPtr)
+    log.message("iListLenPtr[0] = ${iListLenPtr[0]} .")
 	bool bRet = openPort(true)
 	return bRet?1:0;
   }
@@ -860,6 +864,9 @@ class BIP
   private inline double[2] bufDouble
   static inline byte[8]    bufData
 
+  private inline int[10]    ipArrayList
+  private inline int[10]    objIDList
+  private inline int[1]     iListLenPtr
 
   native int dO(int port, int device_instance, int retry_delay)
 
