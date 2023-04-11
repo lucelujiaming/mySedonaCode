@@ -92,7 +92,7 @@ class bacDevice
 	        dataLength = bus.readReg(0, 0, 255, buf)
 	        if(dataLength > 0)
 	        {
-	            log.message("We readReg and return $dataLength ")
+	            log.message("We readReg and return $dataLength from ${bus.dataRecvGramAddr}")
 	        	for(int i =0 ; i < dataLength; i++)
 		    	{
 	        //        log.message(
@@ -100,7 +100,13 @@ class bacDevice
 	        //        			(byte)buf[i]).print(") .").nl()
 		    	    bacnetPacket[i] = (byte)buf[i]
 		    	}
-	            bus.checkReadData(bacnetPacket, dataLength)
+		    	bus.objectIdentifier = bus.sourceNetworkAddress = -1
+	            int iRet = bus.checkReadData(bacnetPacket, dataLength)
+	            if(iRet == 0)
+	            {
+	               log.message("We readReg and return (${bus.objectIdentifier}, ${bus.sourceNetworkAddress})")
+	               log.message("          from ${bus.dataRecvGramAddr}")
+	            }
 	        }
         }
         else 

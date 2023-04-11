@@ -386,7 +386,7 @@ class BIP
        return -1
     }
 	log.message("socket.receive($iLen) ${dataRecvGram.len} bytes from ${dataRecvGram.addr.toStr()}")
-
+    dataRecvGramAddr = dataRecvGram.addr.toStr()
 	headLength = checkBacnetHead()
 	if(headLength < 0)
     {
@@ -557,8 +557,7 @@ class BIP
 	{
 	  serviceChoicePos += 4
 	}
-	  
-    int sourceNetworkAddress = 0
+	
     // SNET£¬ SLEN£¬ &SADR Present 
     int snetSupport = bacnetRecvPacket[5] & 0x08
 	if(snetSupport == 0x08)
@@ -632,7 +631,7 @@ class BIP
 							          bacnetRecvPacket[serviceChoicePos + 5]
 		}
 		log.message("objectIdentifierAndType = ${objectIdentifierAndType}")
-    	int objectIdentifier = objectIdentifierAndType % 0x400000
+    	objectIdentifier = objectIdentifierAndType % 0x400000
 		log.message("objectIdentifier = ${objectIdentifier}")
 		return 0
 	}
@@ -909,6 +908,7 @@ class BIP
   static inline UdpDatagram dataRecvGram
   
   bool isPortOpen                   // have we successfully opened the port
+  
   ** static inline byte[256] bacnetHead
   static inline byte[512] bacnetPacket
   inline Buf(512) packetSend

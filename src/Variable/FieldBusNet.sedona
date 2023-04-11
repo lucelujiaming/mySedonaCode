@@ -101,4 +101,8 @@ abstract class FieldBusNet
   // 21    bip
   // 22    mstp
   int busId = 0
+  
+  Str dataRecvGramAddr
+  int objectIdentifier
+  int sourceNetworkAddress
 }
