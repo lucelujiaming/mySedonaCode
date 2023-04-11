@@ -467,6 +467,14 @@ class BIP
 
   override int writeReg(int deviceAddr, int addr, int iLen, float[] buf)
   { 
+    sockReadAddr.addr.parse("0.0.0.0")
+	sockReadAddr.port = 0
+    dataSendGram.getSocketAddr(sockReadAddr)
+    if(sockReadAddr.port == 0)
+    {
+       log.message("111111 writeReg")
+       return -1;
+    }
     int headLength = 0
     ** log.message("22222 writeReg")
     headLength = fillHead()
@@ -488,6 +496,18 @@ class BIP
 	dataSendGram.buf = packetSend.bytes
 	return socket.send(dataSendGram)?iLen:0
   }
+
+  int forwardToVTS(byte[] bacnetRecvPacket, int iPacketLen)
+  {
+    addrSendVTS.addr.parse("192.168.168.180")
+    addrSendVTS.port = port
+    dataVTSForwardSendGram.setSocketAddr(addrSendVTS)
+	dataVTSForwardSendGram.len = iPacketLen
+    log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
+	dataVTSForwardSendGram.buf = bacnetRecvPacket
+	return socket.send(dataVTSForwardSendGram)?iPacketLen:0
+  }
+  
 
   int checkAPNUData(int apduType)
   {
@@ -642,6 +662,7 @@ class BIP
 		{
 	        log.message("checkReadData read 0x").printHex(bacnetRecvPacket[i]).print(". ").nl()
 		}
+		forwardToVTS(bacnetRecvPacket, iPacketLen)
 	   return -1
 	}
 	serviceChoicePos++
@@ -742,6 +763,15 @@ class BIP
 	return serviceChoicePos
   }
 
+  
+  override int setClientAddress(Str ipAddress)
+  {
+    addrSendLocal.addr.parse(ipAddress)
+    addrSendLocal.port = port
+    dataSendGram.setSocketAddr(addrSendLocal)
+    return 0
+  }
+
   int bacnet_open(int port, int device_instance, int retry_delay)
   {
     iListLenPtr[0] = 0
@@ -781,8 +811,8 @@ class BIP
 
     Sys.app.platform.notify("BIP", Sys.intStr(port))
 
-    addrSendLocal.addr.parse(ipAddress.toStr())
-    addrSendLocal.port = port
+    addrSendLocal.addr.parse("0.0.0.0")
+    addrSendLocal.port = 0
     dataSendGram.setSocketAddr(addrSendLocal)
     
     addrRecvLocal.addr.parse("192.168.168.2")
@@ -906,6 +936,11 @@ class BIP
   static inline UdpDatagram dataSendGram
   inline SocketAddr addrRecvLocal             // remote endpoint address
   static inline UdpDatagram dataRecvGram
+  
+  inline SocketAddr addrSendVTS  
+  static inline UdpDatagram dataVTSForwardSendGram
+  
+  inline SocketAddr sockReadAddr
   
   bool isPortOpen                   // have we successfully opened the port
   

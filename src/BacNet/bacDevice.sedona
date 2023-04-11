@@ -106,6 +106,7 @@ class bacDevice
 	            {
 	               log.message("We readReg and return (${bus.objectIdentifier}, ${bus.sourceNetworkAddress})")
 	               log.message("          from ${bus.dataRecvGramAddr}")
+	               bus.setClientAddress(bus.dataRecvGramAddr)
 	            }
 	        }
         }

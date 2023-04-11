@@ -90,6 +90,11 @@ abstract class FieldBusNet
     return 0
   }
   
+  virtual int setClientAddress(Str ipAddress)
+  {
+    return 0
+  }
+  
   // inline float[8] buffer
   // bacNet buffer is larger.
   inline float[1024] buffer
