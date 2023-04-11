@@ -85,7 +85,7 @@ abstract class FieldBusNet
       return -1;
   }
   
-  virtual int checkReadPropertyData(byte[] bacnetRecvPacket, int iLen)
+  virtual int checkReadData(byte[] bacnetRecvPacket, int iLen)
   {
     return 0
   }

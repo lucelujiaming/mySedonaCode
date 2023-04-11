@@ -1,0 +1,1508 @@
+git config core.filemode false 
+
+cp -r _install/* ../rootfs/
+cd ..
+
+uk.cambridge.org/titles/052182060X.html
+ 
+grep -Rns  --binary-files=without-match "53" .
+
+	s = (Symbol*)stack_get_top(&local_sym_stack);
+	s = (Symbol*)stack_get_top(&local_sym_stack);
+	s = (Symbol*)stack_get_top(&local_sym_stack);
+	s = (Symbol*)stack_get_top(&local_sym_stack);
+
+svmresult=`ps | grep 'telnetd' | grep -v grep`
+if [ -z "$svmresult" ]; then
+     echo "Lujiaming starting telnetd... " > /dev/ttyS4
+     # /etc/start_telnetd.sh --daemon 
+     /bin/telnetd  > /dev/ttyS4
+     echo "Lujiaming starting telnetd over ... " > /dev/ttyS4
+fi
+
+// iOutLen = 20;
+// memset(m_csha1Output, 0x00, SHA1OUTPUT_BUFFER_LEN);
+// sprintf(m_csha1Output, "\x7a\x71\xd1\x5e\x42\xb6\xe7\x0d\x01\xdc\x22\x3a\x89\xc0\x0c\xfc\xc1\xf1\xd3\xf8");
+
+
+
+List list = new ArrayList(); 
+list.add(20); 
+List<String> ls = list; 
+System.out.println(ls.get(0)); 
+则会抛出堆污染异常
+Exception in thread "main" java.lang.ClassCastException: 
+  java.lang.Integer cannot be cast to java.lang.String at Test.Test1.main(Test1.java:29)
+
+第一部分 编译基础
+第1章 概述
+第2章 词法分析
+第3章 语法分析
+第4章 抽象语法
+第5章 语义分析
+第6章 活动纪录
+第7章 翻译成中间代码
+第8章 基本块和轨迹
+第9章 指令选择
+第10章 活性分析
+第11章 寄存器分配
+第12章 使之成为整体
+第二部分 高级课题
+第13章 无用信息收集
+第14章 面向对象语言
+第15章 函数式编程语言
+第16章 多态类型
+第17章 数据流分析
+第18章 循环优化
+第19章 静态单赋值表
+第20章 流水线和调度
+第21章 分级存储器体系
+附录 MiniJava语言参考手册
+参考文献
+
+[root@ez9260 /]# find . -name "*.so"
+./lib/ld-2.4.90.so
+./lib/libBrokenLocale-2.4.90.so
+./lib/libSegFault.so
+./lib/libanl-2.4.90.so
+./lib/libc-2.4.90.so
+./lib/libcidn-2.4.90.so
+./lib/libcrypt-2.4.90.so
+./lib/libdl-2.4.90.so
+./lib/libgcc_s.so
+./lib/libm-2.4.90.so
+./lib/libncurses.so
+./lib/libnsl-2.4.90.so
+./lib/libnss_compat-2.4.90.so
+./lib/libnss_dns-2.4.90.so
+./lib/libnss_files-2.4.90.so
+./lib/libnss_hesiod-2.4.90.so
+./lib/libnss_nis-2.4.90.so
+./lib/libnss_nisplus-2.4.90.so
+./lib/libpthread-2.4.90.so
+./lib/libresolv-2.4.90.so
+./lib/librt-2.4.90.so
+./lib/libstdc++.so
+./lib/libthread_db-1.0.so
+./lib/libutil-2.4.90.so
+./usr/lib/libmodbus.so
+[root@ez9260 /]# 
+[root@ez9260 /]# 
+[root@ez9260 /]# 
+[root@ez9260 /]#  find . -name "*.so" | sed "s/.*lib\/lib//"
+./lib/ld-2.4.90.so
+BrokenLocale-2.4.90.so
+SegFault.so
+anl-2.4.90.so
+c-2.4.90.so
+cidn-2.4.90.so
+crypt-2.4.90.so
+dl-2.4.90.so
+gcc_s.so
+m-2.4.90.so
+ncurses.so
+nsl-2.4.90.so
+nss_compat-2.4.90.so
+nss_dns-2.4.90.so
+nss_files-2.4.90.so
+nss_hesiod-2.4.90.so
+nss_nis-2.4.90.so
+nss_nisplus-2.4.90.so
+pthread-2.4.90.so
+resolv-2.4.90.so
+rt-2.4.90.so
+stdc++.so
+thread_db-1.0.so
+util-2.4.90.so
+modbus.so
+[root@ez9260 /]# 
+
+        boolean errorStatus;
+        boolean moreToDo;
+        do {
+            // Run processors for round n
+            round.run(false, false);
+
+            // Processors for round n have run to completion.
+            // Check for errors and whether there is more work to do.
+            errorStatus = round.unrecoverableError();
+            moreToDo = moreToDo();
+
+            round.showDiagnostics(errorStatus || showResolveErrors);
+
+            // Set up next round.
+            // Copy mutable collections returned from filer.
+            round = round.next(
+                    new LinkedHashSet<JavaFileObject>(filer.getGeneratedSourceFileObjects()),
+                    new LinkedHashMap<String,JavaFileObject>(filer.getGeneratedClasses()));
+
+             // Check for errors during setup.
+            if (round.unrecoverableError())
+                errorStatus = true;
+
+        } while (moreToDo && !errorStatus);
+
+		
+上界 <? extend Fruit> ，表示所有继承Fruit的子类。
+但是具体是哪个子类，无法确定，所以调用add的时候，要add什么类型，谁也不知道。
+但是get的时候，不管是什么子类，不管追溯多少辈，肯定有个父类是Fruit。
+所以，我都可以用最大的父类Fruit接着，也就是把所有的子类向上转型为Fruit。
+
+下界 <? super Apple>，表示Apple的所有父类，包括Fruit，一直可以追溯到老祖宗Object 。那么当我add的时候，我不能add Apple的父类，因为不能确定List里面存放的到底是哪个父类。但是我可以add Apple及其子类。因为不管我的子类是什么类型，它都可以向上转型为Apple及其所有的父类甚至转型为Object 。但是当我get的时候，Apple的父类这么多，我用什么接着呢，除了Object，其他的都接不住。
+所以，归根结底可以用一句话表示，那就是编译器可以支持向上转型，但不支持向下转型。具体来讲，我可以把Apple对象赋值给Fruit的引用，但是如果把Fruit对象赋值给Apple的引用就必须得用cast。
+		
+据上海闵行警方通报，3月26日傍晚6时许，上海一辆公交车滑入闵行区高虹路近七莘路河道内。驾驶员邓某某（男，47岁）已被救出并送医救治，车内无其他乘客。
+
+cod 鳕鱼 
+salmon 三文鱼
+mullet 梭鱼
+mackerel 鲭鱼
+tuna 金枪鱼
+sardine 沙丁鱼 
+haddock 黑线鳕
+anchovy 凤尾鱼
+sea bass 鲈鱼
+halibut 比目鱼
+skate 鳐鱼 
+plaice 高眼鲽
+monkfish 安康鱼
+pomfret 鲳鱼
+arctic char 北极红点鲑鱼
+catfish 鲶鱼
+
+
+class SaltwaterFish    extends Fish  { ... }
+class Salmon   extends SaltwaterFish { ... }
+class Tuna     extends SaltwaterFish { ... }
+class Sardine  extends SaltwaterFish { ... }
+
+Plate<Salmon>  objSalmon;  // Upper bound is Fish
+Plate<Tuna>    objTuna;    // Upper bound is Fish
+Plate<Sardine> objSardine; // Upper bound is Fish
+
+// 1. 
+Plate<?> objStar = new Object();
+Plate<S1> objS1 = objStar;
+S1 = [Fish, null]
+
+// 2. 
+Plate<? extends Salmon> objStar = new Object();
+Plate<S1> objS1 = objStar;
+S1 = [glb(Fish, Salmon), null] = [Salmon, null]
+
+Plate<? extends SaltwaterFish> objStar = new Object();
+Plate<S1> objS1 = objStar;
+S1 = [glb(Fish, SaltwaterFish), null] = [SaltwaterFish, null]
+
+// 3. 
+Plate<? super Salmon> objStar = new Object();
+Plate<S1> objS1 = objStar;
+S1 = [Fish, Salmon]
+
+Plate<? super SaltwaterFish> objStar = new Object();
+Plate<S1> objS1 = objStar;
+S1 = [Fish, SaltwaterFish]
+
+蛮谷怪的
+谷惑人心
+人心不谷
+山河日下，人心不谷
+博谷通今，文采前无谷人
+谷i0
+稀奇谷怪
+拐玲
+
+
+
+
+xungao@ubuntu:~/linux/sedona$ grep -Rns --binary-files=without-match "maxChildren" .
+./src/sedona/src/sedona/offline/OfflineApp.java:192:    if (parent.kids != null && parent.kids.size() >= Component.maxChildren)
+./src/sedona/src/sedona/Component.java:318:  public static final int maxChildren = 200;
+./src/sedona/src/sedona/sox/SoxClient.java:797:    if (parent.children.length >= Component.maxChildren)
+xungao@ubuntu:~/linux/sedona$ 
+xungao@ubuntu:~/linux/sedona$ 
+xungao@ubuntu:~/linux/sedona$ 
+manifests
+
+
+
+
+int APIENTRY WinMain(HINSTANCE hInstance,
+                     HINSTANCE hPrevInstance,
+                     LPSTR     lpCmdLine,
+                     int       nCmdShow)
+
+但是解出来的文件是如何升级的？？这个
+
+tftp -g -r app.scode 192.168.168.180
+tftp -g -r app.sab 192.168.168.180
+
+这个域一直被设置为0，直到映像被绑定。当映像被绑定之后， 这个域被设置为这个DLL的日期/时间戳
+第一个转发项的索引
+
+			// 因为我们在coffreloc_add中，根据符号关联值是否为零，
+			// 决定是否添加一个IMAGE_SYM_UNDEFINED的符号。
+			// 这会导致对于一个值为0的变量，也会添加一个UNDEFINED的符号。
+
+
+(ip.src==192.168.168.2 && ip.dst==192.168.168.180  && udp) || (ip.src==192.168.168.180 && ip.dst==192.168.168.2 && udp) 
+
+	recv(clientSocket, receiveBuf, 1024, 0);
+	cout << "收到：" << receiveBuf << endl;
+	/*printf_s("%s\n", receiveBuf);*/
+	cout << "发出:";
+	gets_s(sendBuf, 1024);
+
+181   **
+182   ** If authenticated, then update user field and
+183   ** return true, or return false if rejected.
+184   **
+185   bool authenticate(SoxService service, Str username, byte[] digest, int digestOff, int digestLen)
+186   {
+187     log.message("digest -------")
+188     for(int i =0 ; i < 20; i++)
+189     {
+190         Str s = Sys.hexStr(digest[i]);
+191         log.message("$s ")
+192     }
+193     log.message("-------- digest")
+194 
+195   // lookup user by name
+196     user = (User)service.userService?.lookupByName(username)
+197     if (user == null || user.type != User.type) return false
+198 
+199     log.message("welcome username=$username")
+200     // create the digest of the actual credentials - we reuse
+201     // the packet buffer itself for the result by assuming
+202     // the digest leaves plenty of room afterwards
+203     authTemp.size = 0
+204     authTempOut.writeBytes(user.cred.bytes, 0, user.cred.size)
+205     authTempOut.writeI8(nonce)
+206 
+207     log.message("user.cred -------")
+208     for(int j =0 ; j < user.cred.size; j++)
+209     {
+210         Str s = Sys.hexStr(user.cred.get(j));
+211         log.message("$s ")
+212     }
+213     log.message("-------- user.cred")
+214 
+215     Crypto.sha1(authTemp.bytes, 0, authTemp.size, authDigest, 0)
+216 
+217     log.message("authDigest -------")
+218     for(int k =0 ; k < 20; k++)
+219     {
+220         Str s = Sys.hexStr(authDigest[k]);
+221         log.message("$s ")
+222     }
+223     log.message("-------- authDigest")
+224 
+225    // verify if digests are equal
+226     return Sys.compareBytes(authDigest, 0, digest, digestOff, digestLen) == 0
+227   }
+228 
+
+440     foreach (Slot slot : type.slots, type.slotsLen)
+441     {
+442         complog.message("slot.name=$slot.name and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+443     }
+
+
+507   define Log complog
+508 
+
+发布于 2023-02-06 00:46
+
+double dVal = 0;
+char *ptr = (char *)&dVal;
+dVal = 1234.5678;
+0019FF28  AD FA 5C 6D 45 4A 93 40 
+
+55 08 40 93 4A 45 6D 5C FA AD
+
+
+float fVal = 0;
+ptr = (char *)&fVal;
+fVal = 1234.5678;
+
+0019FF20  2B 52 9A 44 
+
+44 + 44 9A 52 2B 
+
+
+31 42
+
+10
+
+C0A8A802 BAC0810A 00240100 30020C0C 00000000 
+194D3E10 31425508 40934A45 6D5CFAAD 44449A52 2B3F
+
+
+BE = 10111110
+
+
+
+Enumerated 93 + 
++	cBuffer	0x0019fe30 "烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫烫"
+
+	
+本周工作：
+学习BACnet。。
+调查BACnet Stack的使用方法。
+
+  native int eD(byte[] url, double[] value)
+  native int eF(byte[] url, float[] value)
+  
+  native int dD(double[] url, byte[] value)
+  native int dF(float[] url, byte[] value)
+		
+./bin/sedonac.sh src/sox/
+cd source
+../bin/sedonac.sh app.xml
+../bin/sedonac.sh app.sax
+cd ..
+
+tftp -p -l app.sab 192.168.168.180
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
+
+cd linux/sedona
+
+./bin/sedonac.sh src/ModBus/
+./bin/sedonac.sh src/sys/
+./bin/sedonac.sh src/Variable/
+
+
+./bin/sedonac.sh src/inet/
+./bin/sedonac.sh src/BacNet/
+
+cd source
+../bin/sedonac.sh app.xml
+cd -
+
+
+cd source
+export PATH=$PATH:/opt/timesys/toolchains/armv5l-linux/bin/
+make
+
+810A 0015 0100 3001 0C0C 00000000 1A01763E 217B3F
+
+./bin/sedonac.sh src/sys/
+cd source
+../bin/sedonac.sh app.xml
+../bin/sedonac.sh app.sax
+cd ..
+	new_app/
+ps | grep svm
+cd /data/svm/
+
+ps | grep svm | sed "s/ root.*//" | sed "s/^/kill -9/" | sh
+
+Vp(VO)-Vp(VI)
+
+810A 00150124 096100FF 0003950C 0C000000 001916
+
+	./bin/sedonac.sh src/math/
+
+	tftp -p -l app.sab 192.168.168.180
+
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
+
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
+
+tftp -g -r app.scode 192.168.168.180
+tftp -g -r svm 192.168.168.180
+
+
+tftp -g -r test_arm51 192.168.168.180
+诸军事
+
+
+
+tftp -g -r app.sab 192.168.168.180
+tftp -g -r app.scode 192.168.168.180
+
+./svm app.scode  app.sab
+
+
+/tools/svm /data/svm/app.scode /data/svm/app.sab 
+
+
+本周工作：
+测试并修改Sedona调研用代码。编写读取到的属性值的解析部分代码。调查naive接口的使用方法。用于属性值解析。
+
+本周工作：
+测试并修改Sedona调研用代码。数据发送和接收正常。编写读取到的属性值的解析部分代码。
+
+
+本周工作：
+编写使用广播包发现设备的代码。在PC侧调试通过。准备下周移植到Sedona中，进行测试。
+
+
+
+
+C0A8A802 BAC0810A 00270100 30010C0C 00000000 
+191C3E11 217B3230 3944449A 51EC5508 40934A3D 
+70A3D70A 3F
+
+
+https://www.zhihu.com/question/566033232
+https://www.zhihu.com/question/273943936
+https://zhuanlan.zhihu.com/p/526374353
+https://www.zhihu.com/question/568394563/answer/2776676187
+
+
+
+
+冬瓜: white gourd
+南瓜: pumpkin
+
+
+0x0019fe3a
+0019FE3A  40 93 4A 47 AE 14 7A E1 CC CC CC CC CC CC  @揓G..z崽烫烫.
+
+
+.000 .... = Max Response Segments accepted: Unspecified (0)
+-- MESSAGE [sox::SoxService] Jiaming.lu :: session.receiveWindow msgType=6
+-- MESSAGE [sox::SoxCommands] process = (cmd=115, replyNum=0) with 14bytes
+-- MESSAGE [sox::SoxService] Jiaming.lu :: session.receiveWindow msgType=6
+-- MESSAGE [sox::SoxCommands] process = (cmd=115, replyNum=0) with 14bytes
+-- MESSAGE [sox::SoxService] Jiaming.lu :: session.receiveWindow msgType=6
+-- MESSAGE [sox::SoxCommands] process = (cmd=115, replyNum=0) with 14bytes
+
+
+
+请用  modulate , fortitude , seedling , trite , platitude , reorient , scrupulous , scupulous , dormant , strife , unbridled , rankle , makeshift 写个短文。 
+John had a strong sense of fortitude and scrupulousness which allowed him to reorient his life after a difficult period of strife. He made a makeshift plan and planted a seedling of hope, unbridled by trite platitudes. With a newfound sense of determination, he worked hard to modulate his life and soon his efforts began to bear fruit. Though his success was not without its difficulties, he never allowed them to rankle his spirit. In the end, he graduated at the top of his class, AB.
+
+-	&doubleValue	0x0019fdec
+0019FDEC  E1 7A 14 AE 47 4A 93 40 
+
++	&x.src	0x0019fcd8
+0019FCD8  47 4A 93 40 E1 7A 14 AE 00 00 00 00 05 00  GJ揁醶........
+
+
+-	&doubleValue	0x0019fd74
+0019FD74  47 4A 93 40 E1 7A 14 AE CC CC CC CC CC CC  GJ揁醶.烫烫.
+
+0019FD74  40 93 4A 47 AE 14 7A E1 CC CC CC CC CC CC  @揓G..z崽烫烫.
+
+
+           bufData[0] = 0x44 
+           bufData[1] = 0x9A 
+           bufData[2] = 0x52 
+           bufData[3] = 0x3D
+           bus.convertFloat(bufData, bufFloat)
+           log.message("Try bus.convertFloat with ${bufFloat[0]} and ${bufFloat[1]} .")
+           bufData[0] = 0x40 
+           bufData[1] = 0x93 
+           bufData[2] = 0x4A 
+           bufData[3] = 0x47 
+           bufData[4] = 0xAE 
+           bufData[5] = 0x14 
+           bufData[6] = 0x7A 
+           bufData[7] = 0xE1
+           bus.convertDouble(bufData, bufDouble)
+           log.message("Try bus.convertDouble with ${bufDouble[0]} and ${bufDouble[1]} .")
+
+tftp -g -r test_sha1_armv5l 192.168.168.180
+./test_sha1_armv5l
+
+ls /bin
+
+ifconfig
+
+No Value
+C0A8A802 BAC0810A 00120107 30090C0C 00800000 19003E3F
+Unsigned 33
+C0A8A802 BAC0810A 00140107 30090C0C 00800000 19003E21 213F
+Signed 33
+C0A8A802 BAC0810A 00140107 30090C0C 00800000 19003E31 213F
+Signed 33 & Double 25.0000
+C0A8A802 BAC0810A 001E0107 30090C0C 00800000 19003E31 21550840 39000000 0000003F
+Signed 33 & Double 2.10000
+C0A8A802 BAC0810A 001E0107 30090C0C 00800000 19003E31 21550840 00CCCCCC CCCCCD3F
+Signed 33 & Double 2.20000
+C0A8A802 BAC0810A 001E0107 30090C0C 00800000 19003E31 21550840 01999999 99999A3F
+Signed 33 & Double 3.20000
+C0A8A802 BAC0810A 001E0107 30090C0C 00800000 19003E31 21550840 09999999 99999A3F
+Signed 33 & Double 4.20000
+C0A8A802 BAC0810A 001E0107 30090C0C 00800000 19003E31 21550840 10CCCCCC CCCCCD3F
+
+
+0000   81 0a 00 12                                      ....            --- 4
+0000   01 04                                            ..              --- 2
+0000   00 03 09 0c 0c 00 00 00 00 1a 01 63              ...........c    --- 12
+
+
+C0A8A802 BAC0810A 00120101 30090C0C 00800000 19003E3F
+C0A8A802 BAC0810A 00160121 096100FF 30090C0C 00800000 19003E3F
+C0A8A802 BAC0810A 001A0129 09610000 010111FF 30090C0C 00800000 19003E3F
+
+
+
+BIP.sedona (bacnet):    if(dataRecvGram.buf[0] != 0x81)
+BIP.sedona (bacnet):    packetLength = dataRecvGram.buf[2] * 256 + dataRecvGram.buf[3]
+BIP.sedona (bacnet):    if(packetLength != dataRecvGram.len)
+BIP.sedona (bacnet):    // static UdpDatagram dataRecvGram
+BIP.sedona (bacnet):    dataRecvGram.len = iLen
+BIP.sedona (bacnet):    if (!socket.receive(dataRecvGram)) 
+BIP.sedona (bacnet):	log.message("socket.receive ${dataRecvGram.len} bytes")
+BIP.sedona (bacnet):    for(int i =headLength; i < dataRecvGram.len; i++)
+BIP.sedona (bacnet):       buf[i] = (float)dataRecvGram.buf[i]
+BIP.sedona (bacnet):    return dataRecvGram.len
+BIP.sedona (bacnet):    dataRecvGram.setSocketAddr(addrLocal)
+BIP.sedona (bacnet):  ** static inline UdpDatagram dataRecvGram
+
+
+
+datagram.buf = packet.bytes
+inline Buf(512) packet
+
+
+  // You must call copyFromStr("", 1) before use it
+  bool appendFromStr(Str from)
+  {
+    int i=0
+    int iLen = this.length()
+    int iFromLen = from.length()
+    log.message("this='${this}', from='$from', iLen = $iLen and iFromLen=$iFromLen")
+    
+    for (i=0; i<=from.length(); ++i)
+    {
+      int ch = from.get(i)
+      log.message("i = $i, ch = $ch")
+      this.buf[i + iLen] = ch
+      if (ch == 0) 
+         return true
+    }
+    return false
+  }  
+
+
+    iLen = this.length()
+    log.message("i = $i, iLen = $iLen ")
+    this.buf[iLen+1] = 0
+    log.message("this=${this} ")
+
+cd www
+cd ..
+
+09620125 FF000303 
+
+0C0C
+
+0040 00001919 290C
+
+
+
+.tran 30m
+.options plotwinsize=0
+
+C0A8BC09 BAC0810A 00180124 09610125 FF000303 
+0C0C0000 00001919 290C
+
+
+07040223030C0C02000000191E
+
+0011   13 : 0704          0223030C 0C020000 00191E
+0015   17 : 0724 00010001 0223030C 0C020000 00191E
+
+
+
+
+C0A8BC09 BABF810A 00170227 
+
+000B0001 0227090C 0C06C000 0619F329 0C
+000B0001 0E270905 0907
+C0A8BC09 BABF810A 00180227 000B0001 0227090C 
+0C06C000 07195D2A 0309
+
+IP: C0A8BC09 BAC0
+BVLCI: 810A 
+
+length: 0009
+version: 01
+
+04 20
+
+Invoke: 07
+Service: 1D
+
+C0A8BC09 BABF810A 00100227 
+000B0001 0E270907 075D
+
+C0A8BC09 BABF810A 00180227 
+000B0001 0227090C 0C06C000 07195D2A 0309
+000B0001 0007090C 0C06C000 07195D2A 0309
+
+  native int dO(int port, int device_instance, int retry_delay)
+
+  native int dC(int ctx)
+
+  native int dA(int ctx, int device_instance, int object_type, int object_instance, int object_property, int refreshms)
+
+  native int dR(int ctx, int cache_ptr, int object_instance, int type, float[] buf)
+
+  native int dW(int ctx, int cache_ptr, int object_instance, int type, float[] buf)
+
+  // set sche
+  native int dS(int ctx, byte[] url, int[] time, float[] value)
+
+  // get sche, return 1 if update needed.
+  native int dT(int ctx, int idx, int[] time, float[] value)
+
+  // Send Bacnet Packet
+  native int dE(int ctx, int iLen, byte[] data)
+  // Recieve Bacnet Packet
+  native int dD(int ctx, byte[] data)
+
+  电路与电子学LTspice分析与仿真
+                                    | 
+C0A8BC09 BAC08109 001A0226 03E70043 | 0800062C 2C0C0C00 0000021A 016D2901
+C0A8BC09 BAC08109 00180226 03E70043 | 0000060C 0C000000     021A 016D2901
+                                    | 
+C0A8BC09 BAC08109 001A0226 03E70043 | 0C000707 070C0C00 8000031A 016D2901
+C0A8BC09 BAC08109 00180226 03E70043 | 040007     0C0C00 8000031A016D 2901
+                                    | 
+C0A8BC09 BAC08109 001A0226 03E70042 | 0E100905 080C0C00 8000031A 016D2901
+C0A8BC09 BAC08109 00180226 03E70042 | 061009     0C0C00 8000031A 016D2901
+                                    | 
+                                    | 
+C0A8BC09 BAC08109 001A0226 03E70042 | 0E100905 080C0C00 8000031A 016D2901
+C0A8BC09 BAC08109 00180226 03E70042 | 061009     0C0C00 8000031A 016D2901
+
+C0A8BC09 BAC08109 00190226 03E70043 0E1A0905 080C0C01 C0000A19 BC2908
+0x19 = 25
+C0A8BC09 BAC08109 001A0226 03E70043 0E1A0905 080C0C01 C0000A1A 014E2908
+0x19 = 26
+sel64: C0A8BC09BAC08109001A022603E700430E1A0905080C0C01C0000A1A014E2908
+64/2 = 32 - 26 = 6
+
+城通网盘
+https://url81.ctfile.com/d/16968781-53050915-e24ccd?p=9455 (访问密码: 9455)
+
+天翼云盘
+https://cloud.189.cn/t/fUFZfaFFV7zy (访问码:fkq5)
+
+阿里云盘
+https://www.aliyundrive.com/s/R84vK3tYTR7
+
+
+还有从测试可以看出。作为一个网络协议，同时只可能有一个对象操作网络套接字进行收发。这就意味着，我是无法拖动多个bacReadVar和bacWriteVar收发不同的属性数据的。
+因此上，和Modbus相比，
+
+
+0000   12 34 5c ff 62 25 0e 87 2b 01 09 59 38 78 75 6e  .4\.b%..+..Y8xun
+0010   67 61 6f 61 75 74 6f 2d 30 2e 31 2e 30 00 02 30  gaoauto-0.1.0..0
+0020   2e 31 2e 30 00 30 2e 31 2e 30 00 30 2e 31 2e 30  .1.0.0.1.0.0.1.0
+0030   00 30 2e 31 2e 30 00 30 2e 31 2e 30 00 30 2e 31  .0.1.0.0.1.0.0.1
+0040   2e 30 00 30 2e 31 2e 30 00 30 2e 31 2e 30 00 30  .0.0.1.0.0.1.0.0
+0050   2e 31 2e 30 00 30 2e 31 2e 30 00 30 2e 31 2e 30  .1.0.0.1.0.0.1.0
+0060   00 30 2e 31 2e 30 00 30 2e 31 2e 30 00 30 2e 31  .0.1.0.0.1.0.0.1
+0070   2e 30 00 30 2e 31 2e 30 00 30 2e 31 2e 30 00 01  .0.0.1.0.0.1.0..
+0080   73 6f 78 56 65 72 00 31 2e 31 00                 soxVer.1.1.
+
+
+    // Fill IP
+    if (addrLocal.addr.isIPv4())
+    {   
+      Str strIpAddress = ipAddress.toStr()
+      int idx = strIpAddress.index('.')
+      strIpAddress.set(idx, '\0')
+      bacnetHead[0] = strIpAddress.parseInt()
+      
+      strIpAddress = strIpAddress.suffix(idx + 1)
+      idx = strIpAddress.index('.')
+      strIpAddress.set(idx, '\0')
+      bacnetHead[1] = strIpAddress.parseInt()
+      
+      strIpAddress = strIpAddress.suffix(idx + 1)
+      idx = strIpAddress.index('.')
+      strIpAddress.set(idx, '\0')
+      bacnetHead[2] = strIpAddress.parseInt()
+      
+      strIpAddress = strIpAddress.suffix(idx + 1)
+      bacnetHead[3] = strIpAddress.parseInt()
+    }
+    else 
+    {   
+      return -1
+    }
+    // Fill port
+    bacnetHead[5] = addrLocal.port/256
+    bacnetHead[6] = addrLocal.port%256
+
+445   void loadProps(InStream in, int filter)
+446   {
+447     complog.message("type.name=$type.name and type.slotsLen=$type.slotsLen")
+448     complog.message("--------------------------------------------------------------- ")
+449     foreach (Slot slot : type.slots, type.slotsLen)
+450     {
+451         complog.message("    slot.name=$slot.name slot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+452     }
+453     complog.message("--------------------------------------------------------------- ")
+454     foreach (Slot slot : type.slots, type.slotsLen)
+455     {
+456         complog.message("    slot.name=$slot.name slot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+457        if (slot.matchProp(filter))
+458        {
+459           complog.message("  AAAAAAAAAAAAAAAAAAAA      [$filter]  slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+460           loadProp(in, slot)
+461        }
+462     }
+463     complog.message("--------------------------------------------------------------- ")
+464   }
+
+	for (int i=0; i< numberOfKits; i++) 
+    {
+		for (int j=0; j < objKitsList[i].typesLen; j++)
+		{
+			if (stricmp(objKitsList[i].kit_type_list[j].cName, objSabCompInfo.cName) == 0)
+			{
+				objSCodeKitType = &objKitsList[i].kit_type_list[j];
+				break;
+			}
+		}
+		if (objSCodeKitType)
+		{
+			break;
+		}
+	}
+
+	
+159     else {
+160       Str aliasStr = alias.toStr()
+161       // find bus and dev
+162       Component p = Sys.app.lookup(this.parent)
+163       Component root = null
+164       while (p != null) {
+165         root = p
+166         p = Sys.app.lookup(p.parent)
+167       }
+168       if (root != null) {
+169         // log.message("root:: aliasStr=$aliasStr")
+170         for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+171           if (f.type.is(Folder.type) && !f.name.equals("service")) {
+172              for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+173                 Str aliasComponentStr = ((Variable)n).alias.toStr()
+174                 Str nameComponentStr = ((Variable)n).name
+175                 Str typenameComponentStr = ((Variable)n).type.name
+176                 log.message("nameComponentStr=$nameComponentStr and typenameComponentStr=$typenameComponentStr and aliasComponentStr=$aliasComponentStr and aliasStr=$aliasStr")
+177                 if (n.type.is(Variable.type) && ((Variable)n).alias.toStr().equals(aliasStr))  {
+178                    log.message("       nameComponentStr=$nameComponentStr and typenameComponentStr=$typenameComponentStr and aliasComponentStr=$aliasComponentStr and aliasStr=$aliasStr")
+179                    value := ((Variable)n).value
+180                    log.message("root:: value=$value")
+181                    return
+182                 }
+183              }
+184           }
+185         }
+186       }
+187     }
+188   }
+189   
+	
+	
+//  printf(" context->Intermediate_Hash[0] = %d \r\n", cx.Intermediate_Hash[0]);
+//  printf(" context->Intermediate_Hash[1] = %d \r\n", cx.Intermediate_Hash[1]);
+//  printf(" context->Intermediate_Hash[2] = %d \r\n", cx.Intermediate_Hash[2]);
+//  printf(" context->Intermediate_Hash[3] = %d \r\n", cx.Intermediate_Hash[3]);
+//  printf(" context->Intermediate_Hash[4] = %d \r\n", cx.Intermediate_Hash[4]);
+
+
+extern int rsym;						// 记录return指令位置
+extern int ind = 0;						// 指令在代码节位置
+extern int loc = 0;						// 局部变量在栈中位置
+extern int func_begin_ind;				// 函数开始指令
+extern int func_ret_sub;				// 函数返回释放栈空间大小
+extern Symbol *sym_sec_rdata;			// 只读节符号
+extern Operand opstack[OPSTACK_SIZE];   // 操作数栈
+extern Operand *g_operand_top;			// 操作数栈栈顶
+
+曾经有一位在湖南伟人，在他的晚年，对这个腐朽封建传统社会发动了攻击。。但是随着他的去世。他的努力失败了。 
+		sprintf(cDigest, "\x84\x4e\x3d\x92\xc4\xe1\x80\x07\x8b\x91\x60\x77\x77\x77\x35\x45\x35\x35\x67\x83\x3b\x9e")
+mac电路模拟软件
+
+苏联是一个次生文明，当获得来自更高级文明的的技术流入时，其便能发展到接近对方的高度；而一旦失去技术流入，其物质水平不便会渐渐回归到低级文明应有的水平。
+次生文明并不具备从自然界大规模挖掘新技术的能力；如果欧美突然从这个世界消失了，类似中国苏联这样的国家便会在半个周期后，重回大清或大明。
+原生文明是发源于雪山奔行在星球上的河流；而次生文明则是依靠河流注入形成的湖泊；
+它的枯竭丰沛完全取决于外部水位的高低，一旦河流改道或进入枯水季，湖泊就会很快变得臭不可闻，最终又变成虫蚁横生的有毒水塘。
+
+通往天堂的路往往是用地狱铺就的。
+【徐志摩评苏共：有血海才有天堂 他们先搞血海】
+徐志摩这样评论苏俄人散布到中国来的那个主义：
+“我觉得这世界的罪孽实在太深了，枝叶的改变，是要不到的，
+人们不根本悔悟的时候，不免遭大劫，
+但执行大劫的使者，不是安琪儿，也不是魔鬼，还是人类自己。莫斯科就仿佛负有那样的使命。
+他们相信天堂是有的，可以实现的，但在现世界与那天堂的中间隔着一座海，一座血污海。
+人类泅得过这血海，才能登彼岸，他们决定先实现那血海。
+当然在苏俄治下，你可以得到不少的自由。正如在中世纪教皇治下，你也得到不少的自由。但你的唯一的自由——思想自由——不再是你的了。
+正如中世纪有“异端”这个巧妙的观念，现代的苏俄也发明了一个巧妙不相让的名儿——“反革命”。
+收拾异端的方法是用火烧，对付反革命的手段也是同样的不含糊——你们都听见过苏俄的“欠夹”不是？这是一个“不容时期”的复活。
+
+
+不错，他们不说莫斯科，他们口口声声说国际，因此他们的就是我们的。
+那是骗人，我说：讲和平，讲人道主义，许可以加上国际的字样，那也待考，至于杀人流血有什么国际？
+你们要是躲懒，不去自己发明流自己血的方法，却只贪图现成，
+听人家的话，我说你们就不配，你们辜负你们骨里的髓，辜负你们管里的血！
+为什么自己革命自己做不了军师，还得运外国主意来筹划流血？那也是一种可耻的堕落。
+革英国命的是克郎威尔；革法国命的是卢骚、丹当、罗佩士披亚、罗兰夫人；
+革意大利命的是马志尼、加利包尔提；革俄国命的是列宁——
+你们要记着，假如革中国命的是孙中山，你们要小心了，不要让外国来的野鬼钻进了中山先生的棺材里去！
+
+
+typedef struct _SOX_FILEOPEN_MESSAGE
+{
+	SOX_MESSAGE     header;
+	char            seqNum;
+	char            method;
+	char *          uri_ptr;
+	unsigned int    fileSize;
+	short			suggestedChunkSize;
+	char *          headers_name_ptr;
+	char *          value_ptr;
+} SOX_FILEOPEN_MESSAGE, *PSOX_FILEOPEN_MESSAGE;
+
+
+
+extern std::vector<Symbol> global_sym_stack;  //全局符号栈
+extern std::vector<Symbol> local_sym_stack;   //局部符号栈
+extern std::vector<TkWord> tktable;
+
+说一下如何理解sym_struct和sym_identifier这两个成员变量。
+这里比较麻烦就是普通变量和结构体。因为这两种单词是有类型。因此上：
+如果是结构体变量，例如strcut AA aa;。那么：aa的sym_struct就指向strcut AA。
+如果是普通的变量，例如int bb;。那么：bb的sym_identifier就指向int。
+
+
+* 至于，单词TkWord包含很多种可能。既有可能是运算符及分隔符，常量，也有可能是普通变量和结构体。
+* 比方说，对于下面这个程序：
+```
+struct point
+{
+	short x;
+	short y;
+};
+
+void main(){
+    int a[5];
+	struct point pt;
+	char *pstr;
+	char * test = "AA";
+	return 1;
+}
+```
+* 他的单词表结果如下：
+```
+tktable[0].spelling = +
+......
+tktable[42].spelling = __stdcall
+tktable[43].spelling = point
+tktable[44].spelling = x
+tktable[45].spelling = y
+tktable[46].spelling = main
+tktable[47].spelling = a
+tktable[48].spelling = pt
+tktable[49].spelling = pstr
+tktable[50].spelling = test
+```
+
+我就这么跟你说吧。首先镇元大仙抓不住猴子。猴子只要每天在镇元大仙睡觉的时候，给他一棒子。镇元大仙一个月不到就会疯。。[捂脸]
+只有蒋介石的兵才可靠……”，“蒋介石的兵是很好的，他们只需要一些政治教育……前来进犯的军队中有世世代代受压迫的中国农民，他们不是死心塌地的敌人，必须把他们争取过来”。
+
+
+以这句为例：
+    char * str1 = "AAA";
+首先这句话包含两个符号。
+	左值是一个是.data节分配存储空间的初始化全局变量。或者是一个定义在栈上的局部变量。
+	右值是在.rdata节分配存储空间的字符串常量。
+这句话的处理逻辑如下：
+我们首先调用type_specifier读取char发现Type是一个T_CHAR。
+之后我们调用declarator，发现了*，我们会把Type改为T_PTR。
+之后我们读取左值。之后再读一个符号。这里存在一个技巧。就是：
+	如果是等号。说明是赋值操作。需要再读一个符号，把右值也读进来。
+	此时，当前的token是右值字符串"AAA"。
+之后我们继续处理左值。调用allocate_storage分配空间。
+	如果是全局变量。就分配在节上。如果是局部变量，就分配在栈上。
+	因为是指针，因此上分配四个字节。
+如果没有赋值操作，这里处理就已经结束了。
+
+但是如果存在赋值操作。我们会调用initializer函数。这时，前面的操作就有意义了。
+	1. 这个函数的主分支是else部分。首先调用assignment_expression进行表达式分析。
+	   因为右值，也有可能是一个表达式。但是我们这里因为是字符串。
+	   因此上，在会进入primary_expression中处理。走TK_CSTR分支。
+	   整个操作分为三步：
+	   1.1. 生成一个字符串指针符号。
+	   1.2. 调用allocate_storage分配空间。在这个函数中：	
+	    	首先我们调用type_size计算需要分配的存储空间，这里有一个技巧。就是：
+	    		如果是字符串"AAA"，他的长度是不固定的。这种情况下返回-1。
+	    	之后，allocate_storage发现type_size返回-1.就会使用前面读到的右值计算数据长度。
+	    	之后我们就可以利用前面计算出来的长度分配空间了。
+	   1.3. 调用var_sym_put把变量放入符号表。
+	   1.4. 嵌套调用initializer完成变量初始化。
+	        因为前面调用allocate_storage分配空间的时候，是分配的全局空间。
+	        因此上，allocate_storage的返回值sec不是空。同时我们强制指定了T_ARRAY类型标志。
+	        这导致我们进入initializer函数的if部分。把字符串memcpy到节的指定位置。
+	2. 之后，我们调用init_variable完成赋值操作。
+	   因为此时右值已经压栈，我们只需要把左值压栈。之后swap左值和右值。
+	   之后生成机器码即可。
+		
+但是对于这句为例：
+char * str1 = "AAAAAAAAAAAA";
+定义为全局变量和局部变量，对应的处理是不同的。
+
+
+
+/*   首先我们调用type_size计算需要分配的存储空间。这里有一个技巧。就是：      
+/*       如果是char * str1且为全局变量的时候，返回-1。            
+/*   如果type_size返回-1.就会使用前面读到的右值计算数据长度。                 
+/*   之后我们就可以利用前面计算出来的长度分配空间了。                         
+/*   如果是全局变量。就分配在节上。如果是局部变量，就分配在栈上。             
+
+
+平时袖手谈心性，临危却道“水太凉”
+
+
+加入mk_pointer函数。
+
+
+#pragma pack(1)
+
+
+//	item
+//	{
+//	  vtable | kit | type | int | float | long | double | str | 
+//	  slot | log | method | tests | qnameType | qnameSlot
+//	}
+
+typedef struct _SCODE_VTABLE_ELEMENT
+{
+    unsigned short      blockIndex;   // block indexes to each virtual method
+} SCODE_VTABLE_ELEMENT, *PSCODE_VTABLE_ELEMENT;
+
+//	kit
+//	{
+//	  // see sys::Kit field memory layout
+//	}
+//
+//	type
+//	{
+//	  // see sys::Type field memory layout
+//	}
+//
+//	slot
+//	{
+//	  // see sys::Slot field memory layout
+//	}
+//
+//	log
+//	{
+//	  // see sys::Log field memory layout
+//	}
+
+typedef struct _SCODE_METHOD
+{
+	unsigned char       numParams;  // (including implicit this)
+	unsigned char       numLocals;
+	unsigned char       opcodes;
+} SCODE_METHOD, *PSCODE_METHOD;
+
+typedef struct _SCODE_TEST
+{
+	unsigned short      qnameSlot;
+	unsigned short      testMethod;
+} SCODE_TEST, *PSCODE_TEST;
+
+typedef struct _SCODE_TESTS
+{
+	unsigned short      count;
+    SCODE_TEST *        table;
+} SCODE_TESTS, *PSCODE_TESTS;
+
+typedef struct _SCODE_QNAMETYPE
+{
+  unsigned short      kitNameStrIndex;
+  unsigned short      typeNameStrIndex;
+} SCODE_QNAMETYPE, *PSCODE_QNAMETYPE;
+
+typedef struct _SCODE_QNAMESLOT
+{
+	unsigned short      qnameTypeIndex; 
+	unsigned short      slotNameStrIndex;
+} SCODE_QNAMESLOT, *PSCODE_QNAMESLOT;
+
+ > out_put.txt
+
+/bin/telnetd
+
+pwd
+CELLCONS 
+
+iptable
+
+make -C src -f projects/goahead-linux-static.mk ARCH=arm-none-linux SHOW=1 CC=arm-none-linux-gnueabi-gcc LD=arm-none-linux-gnueabi-ld
+
+trace(2, "pos = %s", redirect);
+trace(2, "upFile = %s", redirect);
+trace(2, "upFileName = %s", redirect);
+trace(2, "pos = %s", redirect);
+
+char *pos, *upFile, *upFileName;
+
+make -C src -f projects/goahead-linux-static.mk \
+ ARCH=armv5l-linux SHOW=1 \
+ CC=armv5l-linux-gcc LD=armv5l-linux-ld
+
+--exclude-dir
+
+export PATH=${PATH}:~/bin/timesys/toolchains/armv5l-linux/bin/
+
+本周工作：
+学习ModBus协议。。
+调查Variable/VariableIn/Out模块的逻辑。调查VariableIn/Out如何传到Workbanch中。
+发现逻辑位于ModBus模块中。
+下周工作：
+调查ModBus模块的逻辑。
+
+陈云反对在上海建经济特区，不仅因为这有可能给国家既有的重工业和税收基础造成风险，还因为作为一个在1920和1930年代在那里工作过的人，他深知资本主义的罪恶和上海商人那种在他看来对洋人过分卑躬屈膝的“买办习气”。因此，陈云担心外国租界死灰复燃。
+
+rm -rf src/linux-armv5l-linux-static
+ls src
+make -C src -f projects/goahead-linux-static.mk  ARCH=armv5l-linux SHOW=1  CC=armv5l-linux-gcc LD=armv5l-linux-ld
+
+busybox tftp -g -r goahead 192.168.168.170
+
+./goahead --home www/ --verbose &
+
+killall httpdd
+
+cd /data/svm/www/root
+busybox tftp -g -r index.html 192.168.168.170
+
+cd pages
+busybox tftp -g -r system_setting.html 192.168.168.170
+
+busybox tftp -g -r app.sab 192.168.168.170
+
+
+busybox tftp -g -r change_ip_address.sh 192.168.168.170
+
+grep -Rns --exclude-dir doc  --binary-files=without-match "setTimeout" .
+
+grep -Rns --exclude-dir doc  --binary-files=without-match "UPLOAD" .
+
+grep -Rns --exclude-dir doc  --binary-files=without-match "uploadTmp" .
+
+grep -Rns --exclude-dir doc  --binary-files=without-match "tmp-" .
+
+busybox tftp -g -r index.html 192.168.168.170
+
+busybox tftp -g -r test_upload.html 192.168.168.170
+test_upload.html
+
+busybox tftp -g -r system_upgrade.html 192.168.168.170
+
+busybox tftp -p -l tmp-2.tmp 192.168.168.170
+busybox tftp -p -l index.html 192.168.168.170
+
+
+busybox tftp -p -l system_upgrade.html 192.168.168.170
+
+trace(2, "[%s:%s:%d] log output: %s ", clientFilename);
+
+trace(2, "[%s:%s:%d] log output ");
+
+trace(2, "[%s:%s:%d] log output: %d ", __FILE__, __FUNCTION__, __LINE__, len);
+
+trace(2, "[%s:%s:%d] log output: %d ",
+         __FILE__, __FUNCTION__, __LINE__, len);
+
+		 
+		 
+typedef struct debugSectionInfo
+{
+    char sectionName[128];
+	Section * sectionptr ;
+} debugSectionInfo;
+
+std::vector<debugSectionInfo> vectorDebugSectionInfo ;
+
+蒸汽机车没有过夜。 正常工作是“连轴转 ‘’歇人不歇马。蒸汽机车一旦点火运转起来，就黑天白日的一汽跑下去，直到三个月“小修”（”洗罐”锅炉酸洗）停火检修。
+我干那时 是两班倒，乘务员一班12小时，歇一天一宿。
+有时，火车头不跑大列，倒站，没活时，短时间就停车“压火”，多填湿煤，关闭送风器和炉灰箱进气口，开水泵，向锅炉注入适当的水......这叫待机。一旦接到调度命令，马上就得开送风器，快速把火焰调好，气压烧上来，开车干活。
+有时，机车出了机械故障，需要停车修理，也需要压火。
+临时没有活儿的机车，也得入库，但不灭火 ，机务段专门有个 俏活儿，叫 '压火‘’ 和‘’ 看火”的，一个人 看几台机车，定时填煤注水......保证它们都不灭火，一旦有活立即能走车。
+蒸汽机车都是卧式锅炉，火床下有活动炉箅子，下带封闭式炉灰箱。蒸汽机车燃煤都是优质煤，本身灰就少，通常炉灰自动落入炉灰箱，一个班清灰一次，届时车头开到设有专用地沟的清灰场，打开一侧炉灰箱门即可放炉灰。
+
+80年代人大研究新闻法。陈云表态：过去国民党有新闻法，凡是法律必有漏洞。所以我们能钻空子。现在我们要是立法，也会有漏洞被人钻。所以我不赞成立新闻法，怎么审查完全由我们说了算，不用被法律捆住手脚。
+
+我见过很多自学小语种的人，例如有人学法语，有人学日语，有人学德语，有人学西班牙语。他们很多人学习小语种的原因就是：
+要么是英语学到没劲了。学个小语种玩玩。要么是学不会英语，大号练废了，开小号。。
+
+
+造反三件套（不同朝代说法不同）：
+1、开府仪同三司，封大将军大司马，使持节，假节钺，都督中外诸军事，录尚书事，称相国，总百揆………
+2、封公爵，加九锡，一键三连（入朝不趋，赞拜不名，剑履上殿）………
+3、进王爵，加殊礼（冕鎏十二，乘金车，驾六马，出警入跸，用天子銮仪……）
+
+
+
+都督冀、幽、青、并、兖、豫、徐、凉、益、扬、交、荆十二州诸军事。
+
+说件大多数国人都不知道的事情，大跃进时期，亩产万斤的浮夸风在全国推行，
+而江西进行了抵制，是少数没有饿死人的省，也是唯一一个在大跃进时期将粮食外调的省，
+同时还接纳了几十万其他省逃荒到江西的饥民。而代价就是那些抵制浮夸的很多官员被撤职或降职。
+
+1对夫妻，2个打工人，带3个孩子，养4个父母，月薪5千，掏空6个钱包，7天无休，8十万买的房子，不到9十平米，生活10分困难。
+10年寒窗，通过9年义务教育，找不到8小时制工作，抛弃7情6欲，为了5斗米折腰，4季奔波，3餐无固，租个2平米床位，人生1躺平川。
+
+
+误也非常少。事实上， Icc的代码中大约不到15%是关于分析的， 并且这部分程序的错误率也可以忽略不计。尽管分析在理论上的地位非常突出， 但是在lec和其他编译器中只是相对较小的模块，语义分析和代码生成才是主要的模块，占了代码的大部分，而大部分错误也出现于此。
+
+
+首先代码即没有像书中说的那么多，也没有那么少。。
+核心代码位于lcc42\src目录下，而且如果不包括特定平台代码。例如：
+x86linux/x86/alpha/sparc/mips.c
+整个代码一共是13937行。也就是一万多行。
+
+
+请看《毛泽东选集》第三卷《在延安文艺座谈会上的讲话》：
+
+“不是立场问题；立场是对的，心是好的，意思是懂得的，只是表现不好，结果反而起了坏作用。”关于动机和效果的辩证唯物主义观点，我在前面已经讲过了。现在要问：效果问题是不是立场问题？一个人做事只凭动机，不问效果，等于一个医生只顾开药方，病人吃死了多少他是不管的。又如一个党，只顾发宣言，实行不实行是不管的。试问这种立场也是正确的吗？这样的心，也是好的吗？事前顾及事后的效果，当然可能发生错误，但是已经有了事实证明效果坏，还是照老样子做，这样的心也是好的吗？我们判断一个党、一个医生，要看实践，要看效果；判断一个作家，也是这样。真正的好心，必须顾及效果，总结经验，研究方法，在创作上就叫做表现的手法。真正的好心，必须对于自己工作的缺点错误有完全诚意的自我批评，决心改正这些缺点错误。共产党人的自我批评方法，就是这样采取的。只有这种立场，才是正确的立场。同时也只有在这种严肃的负责的实践过程中，才能一步一步地懂得正确的立场是什么东西，才能一步一步地掌握正确的立场。如果不在实践中向这个方向前进，只是自以为是，说是“懂得”，其实并没有懂得。
+好心办坏事是要承认错误，进行自我批评或者接受批评的，最后改正错误的！
+
+
+
+		for (i = 0; i <= 7; i++)
+		{
+			printf("[%s:%s:%d] pDoubleValue[%d] = %02X and bufInput[%d] = %02X\n"
+         		,__FILE__, __FUNCTION__, __LINE__
+				, i, pDoubleValue[i], i, bufInput[i]);
+		}
+		printf("[%s:%s:%d] Fill bufOutput[0] = %f\n"
+         		,__FILE__, __FUNCTION__, __LINE__, bufOutput[0]);
+		bufOutput[1] = 1234.57;
+		pDoubleValue = (char *)(&bufOutput[1]);
+		for (i = 0; i <= 7; i++)
+		{
+			printf("[%s:%s:%d] bufOutput[1] = %f and pDoubleValue[%d] = %02X\n"
+         		,__FILE__, __FUNCTION__, __LINE__
+				, bufOutput[1], i, pDoubleValue[i]);
+		}
+
+git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
+sleep 5
+git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
+sleep 5
+git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
+sleep 5
+git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
+sleep 5
+git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
+sleep 5
+
+表7.5节头成员变量说明
+
+标识目标机器类型的数字。要获取更多信息，请参考7.1.3.1节“机器类型”
+节的数目。它给出了节表的大小，而节表紧跟着文件头。注意Windows加载器限制节的最大数目为96
+从UTC时间1970年1月1日00：00起的总秒数(一个C运行时time_t类型的值) 的低32位， 它指出文件何时被创建
+符号表的文件偏移。如果不存在COFF符号表， 此值为0。对于映像文件来说， 此值应该为0， 因为已经不赞成使用COFF调试信息了
+符号表中的元素数目。由于字符串表紧跟符号表，所以可以利用这个值来定位字符串表。对于映像文件来说，此值应该为0，因为已经不赞成使用COFF调试信息了
+可选文件头的大小。可执行文件需要可选文件头而目标文件并不需要。对于目标文件来说，此值应该为0。要获取可选文件头格式的详细描述，请参考10.2.6节“可选文件头(仅适用于映像文件)”
+指示文件属性的标志。对于特定的标志，请参考7.1.3.2节“文件属性标志”
+
+这是一个8字节的UTF-8编码的字符串， 不足8字节时用NULL填充。如果它正好是8字节， 那就没有最后的NULL字符。如果名称更长， 这个域中是一个斜杠(/) 后跟一个用ASCII 码表示的十进制数，这个十进制数表示字符串表中的偏移。可执行映像不使用字符串表也不支持长度超过8字节的节名。如果目标文件中有长节名的节最后要出现在可执行文件中，那么相应的长节名会被截断
+当加载进内存时这个节的总大小。如果此值比SizeOf RawData 大，那么多出的部分用0填充。这个域仅对可执行映像是合法的，对于目标文件来说，它应该为0
+对于可执行映像来说，这个域的值是这个节被加载进内存之后它的第一个字节相对于映像基址的偏移地址。对于目标文件来说，这个域的值是没有重定位之前其第一个字节的地址；为了简单起见，编译器应该把此值设置为0；否则这个值是个任意值，但是在重定位时应该从偏移地址中减去这个值
+(对于目标文件来说)节的大小或者(对于映像文件来说)磁盘文件中已初始化数据的大小。对于可执行映像来说，它必须是可选文件头中File Alignment域的倍数。如果它小于Virtual Size 域的值， 余下的部分用0填充。由于SizeOf RawData域要向上舍人， 但是Virtual Size域并不舍人， 因此可能出现SizeOf RawData域大于Virtual Size域的情况。当节中仅包含未初始化的数据时，这个域应该为0
+
+
+需要进行重定位的代码或数据的地址。这是从节开头算起的偏移，加上节的RV A/Offset域的值， 参见7.1.4节。例如， 如果节的第一个字节的地址是0xl0，那么第三个字节的地址就是0x12
+符号表的索引(从0开始)。这个符号给出了用于重定位的地址。如果这个指定符号的存储类别为节，那么它的地址就是第一个与它同名的节的地址
+需要重定位数据的节编号
+重定位类型。合法的重定位类型依赖于机器类型，请参考7.1.9.1节“类型指示符”
+
+
+0F 85 cd JNZ rel32 D Valid Valid Jump near if not zero (ZF=0)
+0F 84 cd JZ  rel32 D Valid Valid Jump near if 0 (ZF=1)
+0F 84 cd JE  rel32 D Valid Valid Jump near if equal (ZF=1)
+
+0F 85 cw JNZ rel16 D N.S.  Valid Jump near if not zero (ZF=0). Not supported in 64-bit mode.
+0F 84 cw JE  rel16 D N.S.  Valid Jump near if equal (ZF=1). Not supported in 64-bit mode.
+0F 84 cw JZ  rel16 D N.S.  Valid Jump near if 0 (ZF=1). Not supported in 64-bit mode.
+
+
+绝对远跳转: FF 25 00 00 00 00 XX XX XX XX XX XX XX XX
+FF 25： 是jmp
+四个00: 不用管
+八个XX: 是目标绝对地址
+
+在X86下，JMP反汇编出来的FF 25加的是导入表的地址
+
+	// 反之，如果(StorageClass & SC_VALMASK)等于(f0, f1, f2, f3)，则说明未分配寄存器。
+	// 从0x2D(45)开始到0xF0(240)。保留给普通变量。例如函数参数的低8位。		 
+		 
+		 
+   printf("[%s:%s:%d]oldDft>>%s,len:%lu\n", __FILE__, __FUNCTION__, __LINE__, oldDft, (unsigned long int)strlen(oldDft));
+
+   
+   
+goahead: 2: GET /themes/neoteric/img/icons-02.png HTTP/1.1
+goahead: 2: GET /action/status HTTP/1.1
+goahead: 2: GET /action/status?mode=upload HTTP/1.1
+goahead: 2: POST /action/upgrade HTTP/1.1
+goahead: 2: GET /action/status HTTP/1.1
+goahead: 2: GET /action/status HTTP/1.1
+goahead: 2: GET /action/status HTTP/1.1
+goahead: 2: GET /action/status HTTP/1.1
+goahead: 2: GET /action/status HTTP/1.1
+goahead: 2: GET /action/status HTTP/1.1
+
+
+	
+亲您好，这是我们面包板套件的的百度网盘资料，您留意查收一下哈
+（1）面包板130例电子书 https://pan.baidu.com/s/1udR9Ka6-9HpFaXp9CAqyqA 
+（2）面包板其他电子书 https://pan.baidu.com/s/1RYRNXknldTaQvedhtsvbpw
+（3）面包板电子制作视频教程链接：https://pan.baidu.com/s/1s8onCY-XmfQR0vRqIgNK6g 
+        提取码：7191
+（4）面包板130个实验资料https://pan.baidu.com/s/1ueSQeyRJnyYmCDqRJ6Emgw 
+        提取码：o2m1
+		
+
+		
+		
+		
+在Link.sedona中的propagate方法中，注释如下：
+/* action links would currently get invoked on every scan cycle
+           right now; once we enable that functionality it will be tough
+           seamlessly integrate scan engines with event engines; so for
+           now let's keep this feature disabled  */
+因此上，我们需要有选择性的打开action links这个功能。初步的场景如下：
+?	首先我们在Workbanch中创建两个Components，一个是BacReadPropertyVar类型的输入模块。一个是BacWritePropertyVar类型的输出模块。之后将他们和其他模块连接起来。之后在Link.sedona中的propagate方法中加入逻辑。初步的设计逻辑如下：
+1.	如果是Link的from是BacReadPropertyVar就根据BacReadPropertyVar读取的数据类型，把BacReadPropertyVar中对应类型的值写入to。
+2.	如果是Link的to是BacWritePropertyVar就根据BacWritePropertyVar读取的数据类型，把from的值写入BacWritePropertyVar中对应类型的值。
+
+实现方法如下：
+在Component中添加Link类型信息属性。其中高8位表示读还是写。低8位表示数据类型。
+之后在Link的时候，传递这个值。之后，就可以根据类型信息，强转赋值了。
+
+
+
+//
+// Copyright (c) 2007 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//    1 Aug 06  Brian Frank  Creation
+//    7 Jun 07  Brian Frank  Port from Java to Sedona (it's my birthday!)
+//
+
+**
+** Link models an execution relationship between a source
+** component's slot to a target component's slot.
+**
+class Link
+{
+
+////////////////////////////////////////////////////////////////
+// Propagate
+////////////////////////////////////////////////////////////////
+
+  **
+  ** Propage the link
+  **
+  void propagate()
+  {
+    Component from = Sys.app.lookup(this.fromComp)
+    Component to = Sys.app.lookup(this.toComp)
+    if (from == null || to == null) return
+
+    Slot fromSlot  = from.type.slot(this.fromSlot)
+    Slot toSlot    = to.type.slot(this.toSlot)
+    if (fromSlot == null || toSlot == null) return
+   
+    if(from.link_type / Component.LINK_TYPE_FACTOR 
+    			== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR
+    	&& to.link_type / Component.LINK_TYPE_FACTOR 
+    			== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
+    {
+        log.message("1111 from.name=$from.name and to.name=$to.name ");
+        to.link_type = LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
+    }
+    else if(from.link_type / Component.LINK_TYPE_FACTOR 
+    		== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR)
+    {
+        log.message("33333 from.name=$from.name");
+        to.link_type = LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
+    }
+    else if(to.link_type / Component.LINK_TYPE_FACTOR
+    		== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
+    {
+        log.message("55555 to.name=$to.name");
+	    if (fromSlot.isProp())
+	    {
+	        switch (fromSlot.type.id)
+	        {
+	          case Type.boolId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + COMP_PROPVAR_BOOLEANAPPTAG
+	          	break
+	          case Type.byteId: 
+	          case Type.shortId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + COMP_PROPVAR_UNSIGNEDINTAPPTAG
+	          	break 
+	          case Type.intId:    
+	          	to.link_type = Component.LINK_TYPE_WRITE + COMP_PROPVAR_INTEGERAPPTAG
+	          	break
+	          case Type.longId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + COMP_PROPVAR_INTEGERAPPTAG
+	          	break
+	          case Type.floatId:  
+	          	to.link_type = Component.LINK_TYPE_WRITE + COMP_PROPVAR_REALAPPTAG
+	          	break
+	          case Type.doubleId: 
+	          	to.link_type = Component.LINK_TYPE_WRITE + COMP_PROPVAR_DOUBLEAPPTAG
+	          	break
+	          // TODO: buf props
+	        }
+	    }
+    }
+   
+    if (fromSlot.isProp())
+    {                    
+      if (toSlot.isProp())
+      {
+        switch (toSlot.type.id)
+        {
+          case Type.boolId:   to.setBool  (toSlot, from.getBool(fromSlot));   break
+          case Type.byteId:   to.setInt   (toSlot, from.getInt(fromSlot));    break
+          case Type.shortId:  to.setInt   (toSlot, from.getInt(fromSlot));    break
+          case Type.intId:    to.setInt   (toSlot, from.getInt(fromSlot));    break
+          case Type.longId:   to.setLong  (toSlot, from.getLong(fromSlot));   break
+          case Type.floatId:  to.setFloat (toSlot, from.getFloat(fromSlot));  break
+          case Type.doubleId: to.setDouble(toSlot, from.getDouble(fromSlot)); break
+          // TODO: buf props
+        }
+      }
+      else
+      {            
+        /* action links would currently get invoked on every scan cycle
+           right now; once we enable that functionality it will be tough
+           seamlessly integrate scan engines with event engines; so for
+           now let's keep this feature disabled
+        switch (toSlot.type.id)
+        {
+          case Type.voidId:   to.invokeVoid  (toSlot);  break
+          case Type.boolId:   to.invokeBool  (toSlot, from.getBool(fromSlot));   break
+          case Type.byteId:   to.invokeInt   (toSlot, from.getInt(fromSlot));    break
+          case Type.shortId:  to.invokeInt   (toSlot, from.getInt(fromSlot));    break
+          case Type.intId:    to.invokeInt   (toSlot, from.getInt(fromSlot));    break
+          case Type.longId:   to.invokeLong  (toSlot, from.getLong(fromSlot));   break
+          case Type.floatId:  to.invokeFloat (toSlot, from.getFloat(fromSlot));  break
+          case Type.doubleId: to.invokeDouble(toSlot, from.getDouble(fromSlot)); break
+          // TODO: buf props
+        }          
+        */
+      }
+    }
+  }
+
+  
+  
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define int LINK_TYPE_NONE = 0x0000
+  define int LINK_TYPE_READ  = 0x0100
+  define int LINK_TYPE_WRITE = 0x0200
+  define int LINK_TYPE_FACTOR  = 0x0100
+
+  define int COMP_PROPVAR_UNUSEDAPPTAG				= 0xFF
+  define int COMP_PROPVAR_NULLAPPTAG				= 0x00
+  define int COMP_PROPVAR_BOOLEANAPPTAG				= 0x01
+  define int COMP_PROPVAR_UNSIGNEDINTAPPTAG			= 0x02
+  define int COMP_PROPVAR_INTEGERAPPTAG				= 0x03
+  define int COMP_PROPVAR_REALAPPTAG				= 0x04
+  define int COMP_PROPVAR_DOUBLEAPPTAG				= 0x05
+  define int COMP_PROPVAR_OCTETSTRINGAPPTAG			= 0x06
+  define int COMP_PROPVAR_CHARACTERSTRINGAPPTAG		= 0x07
+  define int COMP_PROPVAR_BITSTRINGAPPTAG			= 0x08
+  define int COMP_PROPVAR_ENUMERATEDAPPTAG			= 0x09
+  define int COMP_PROPVAR_DATEAPPTAG				= 0x0A
+  define int COMP_PROPVAR_TIMEAPPTAG				= 0x0B
+  define int COMP_PROPVAR_OBJECTIDENTIFIERAPPTAG	= 0x0C
+  define int COMP_PROPVAR_RESERVEDAPPTAG13			= 0x0D
+  define int COMP_PROPVAR_RESERVEDAPPTAG14			= 0x0E
+  define int COMP_PROPVAR_RESERVEDAPPTAG15			= 0x0F
+  
+  
+  // define int BANET_PROPVAR_UNUSEDAPPTAG				= 0xFF
+  define int BANET_PROPVAR_NULLAPPTAG				= 0x00
+  define int BANET_PROPVAR_BOOLEANAPPTAG				= 0x01
+  define int BANET_PROPVAR_UNSIGNEDINTAPPTAG			= 0x02
+  define int BANET_PROPVAR_INTEGERAPPTAG				= 0x03
+  define int BANET_PROPVAR_REALAPPTAG				= 0x04
+  define int BANET_PROPVAR_DOUBLEAPPTAG				= 0x05
+  // define int BANET_PROPVAR_OCTETSTRINGAPPTAG			= 0x06
+  // define int BANET_PROPVAR_CHARACTERSTRINGAPPTAG		= 0x07
+  // define int BANET_PROPVAR_BITSTRINGAPPTAG			= 0x08
+  // define int BANET_PROPVAR_ENUMERATEDAPPTAG			= 0x09
+  // define int BANET_PROPVAR_DATEAPPTAG				= 0x0A
+  // define int BANET_PROPVAR_TIMEAPPTAG				= 0x0B
+  // define int BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG	= 0x0C
+  // define int BANET_PROPVAR_RESERVEDAPPTAG13			= 0x0D
+  // define int BANET_PROPVAR_RESERVEDAPPTAG14			= 0x0E
+  // define int BANET_PROPVAR_RESERVEDAPPTAG15			= 0x0F
+  
+  这个浮点数，会根据Link类型信息属性进行强制转换。为此需要为整个系统增加类型信息。
+也就是为每一个类指定输出的数据类型。
+第一种是对于BacReadPropertyVar类型的输入模块，该模块指定了读取的数据类型。
+
+1.	首先在Component中添加Link类型信息属性。其中高8位表示读还是写。低8位表示数据类型。目前高8位暂时没有使用。
+
+
+    if(from.link_type / Component.LINK_TYPE_FACTOR 
+    			== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR
+    	&& to.link_type / Component.LINK_TYPE_FACTOR 
+    			== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
+    {
+        ** log.message("1111 from.name=$from.name and to.name=$to.name ");
+        to.link_type = Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
+    }
+    else if(from.link_type / Component.LINK_TYPE_FACTOR 
+    		== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR)
+    {
+        ** log.message("33333 from.name=$from.name");
+        to.link_type =Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
+    }
+    else if(to.link_type / Component.LINK_TYPE_FACTOR
+    		== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
+    {
+        ** log.message("55555 to.name=$to.name");
+	    if (fromSlot.isProp())
+	    {
+	        switch (fromSlot.type.id)
+	        {
+	          case Type.boolId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_BOOLEANAPPTAG
+	          	break
+	          case Type.byteId: 
+	          case Type.shortId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_UNSIGNEDINTAPPTAG
+	          	break 
+	          case Type.intId:    
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
+	          	break
+	          case Type.longId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
+	          	break
+	          case Type.floatId:  
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_REALAPPTAG
+	          	break
+	          case Type.doubleId: 
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_DOUBLEAPPTAG
+	          	break
+	          // TODO: buf props
+	        }
+	    }
+    }
+   

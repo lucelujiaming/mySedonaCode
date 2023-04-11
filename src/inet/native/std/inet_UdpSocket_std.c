@@ -612,7 +612,8 @@ void recvSleep(float fMilliSeconds)
 		else
 			Sleep(1 * fMilliSeconds);
 #else
-		usleep(1000 * fMilliSeconds);
+		if(fMilliSeconds >= 1)
+			usleep(1000 * fMilliSeconds);
 #endif
 	}
 }
@@ -636,7 +637,11 @@ int sendBroadcast(int iRetryCount, socket_t clientSocket,
 		memcpy(buf, WHOIS_PACKET, WHOIS_LENGTH);
 		iSendCount = sendto(clientSocket, (char *)buf, WHOIS_LENGTH, 0, 
 			(struct sockaddr *)&my_addr, sizeof(my_addr));
+#ifdef _WIN32
 		recvSleep(1);
+#else
+		recvSleep(0);
+#endif
 		printf("send %d OK \r\n", iSendCount);
 		size = sizeof(user_addr);
 		while(1)
@@ -647,6 +652,7 @@ int sendBroadcast(int iRetryCount, socket_t clientSocket,
 				MAXDATASIZE, 0, (struct sockaddr *)&user_addr, &size);
 			if (iRecvCount == -1)
 			{
+				printf("recvfrom over \r\n");
 				break;
 			}
 			if((iRecvCount == iSendCount)
@@ -657,6 +663,7 @@ int sendBroadcast(int iRetryCount, socket_t clientSocket,
 			}
 			else if (iRecvCount > 0)
 			{
+				printf("we Receive %d .\r\n", iRecvCount);
 				iListLen = dealResponse(user_addr, buf, iRecvCount, ipArrayList, objIDList, iListLen);
 				recvSleep(1);
 			}
@@ -682,12 +689,13 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
 	// unsigned int objIDList[10];
 	memset(ipArrayList, 0x00, sizeof(int) * 10);
 	memset(objIDList, 0x00, sizeof(int) * 10);
+	memset(iListLenPtr, 0x00, sizeof(int) * 1);
 
 
 	socket_t clientSocket;
 	struct sockaddr_in  my_addr;
 	struct sockaddr_in  user_addr;
-	clientSocket = initializeSocket(ipAddresss, &my_addr, &user_addr);
+	clientSocket = initializeSocket(ipAddress, &my_addr, &user_addr);
 	if (clientSocket > 0)
 	{
 		printf("Call sendBroadcast \r\n");

@@ -385,7 +385,7 @@ class BIP
 	   ** log.message("readReg failed with len=${dataRecvGram.len} and port=${dataRecvGram.port} ")
        return -1
     }
-	log.message("socket.receive($iLen) ${dataRecvGram.len} bytes")
+	log.message("socket.receive($iLen) ${dataRecvGram.len} bytes from ${dataRecvGram.addr.toStr()}")
 
 	headLength = checkBacnetHead()
 	if(headLength < 0)
@@ -537,30 +537,55 @@ class BIP
 	   return 0
 	}
   }
-  
-  override int checkReadPropertyData(byte[] bacnetRecvPacket, int iPacketLen)
+
+  override int checkReadData(byte[] bacnetRecvPacket, int iPacketLen)
   {
+    int bacnetPacketLen = bacnetRecvPacket[2] * 256 + bacnetRecvPacket[3]
+    if(bacnetPacketLen != iPacketLen)
+	{
+	   log.message("bacnetPacketLen = ${bacnetPacketLen} and iPacketLen =${iPacketLen}")
+	   return -1
+	}
+    // BACnet Virtual Link Control
+    int serviceChoicePos = 4
     // ex: Control: 0x25, Destination Specifier, Expecting Reply, Priority
-    int serviceChoicePos = 8
+    serviceChoicePos += 2
+    
     // DNET£¬ DLEN£¬ DAD R&Hop Count Present
     int dnetSupport = bacnetRecvPacket[5] & 0x20
 	if(dnetSupport == 0x20)
+	{
 	  serviceChoicePos += 4
+	}
 	  
+    int sourceNetworkAddress = 0
     // SNET£¬ SLEN£¬ &SADR Present 
     int snetSupport = bacnetRecvPacket[5] & 0x08
-	if(dnetSupport == 0x08)
+	if(snetSupport == 0x08)
+	{
+	  sourceNetworkAddress = bacnetRecvPacket[9] * 256 + bacnetRecvPacket[10]
+      log.message("sourceNetworkAddress is ${sourceNetworkAddress} ")
 	  serviceChoicePos += 4
-	  
-    log.message("Service Choice is ${bacnetPacket[serviceChoicePos]} ")
+	}
+	
     // APDU Type
-    int apduType = bacnetRecvPacket[serviceChoicePos - 2] & 0x70
+    int apduType = bacnetRecvPacket[serviceChoicePos] & 0x70
     apduType = apduType / 0x10
     log.message("apduType is $apduType ")
+    serviceChoicePos += 1
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    if(apduType == 0)
+	{
+       serviceChoicePos += 1
+       log.message("Invoke ID is ${bacnetRecvPacket[serviceChoicePos]} ")
+       serviceChoicePos += 1
+	}
     // readProperty have Max Response Segments accepted: Unspecified (0)
     int apduTypeExtraLength = checkAPNUData(apduType)
-    serviceChoicePos += apduTypeExtraLength
-    
+    // serviceChoicePos += apduTypeExtraLength
+
+    log.message("Service Choice is ${bacnetRecvPacket[serviceChoicePos]} ")
+    int objectIdentifierAndType = 0
     // ex: Service Choice: read Property (12)
     // ex: Service Choice: read Property ACK (12)
     if(bacnetRecvPacket[serviceChoicePos] == 0x0C)
@@ -581,12 +606,42 @@ class BIP
 	    // log.message("Service Choice: read Property ")
 	    // return 0
 	}
-	else 
+	else if(bacnetRecvPacket[serviceChoicePos] == 0x00)
 	{
-	   log.message("Service Choice: not read Property and Service Choice =${bacnetPacket[serviceChoicePos]} ")
+		log.message("Service Choice: WhoAmI ")
+	    // Application Tag: BACnetObjectIdentifier, Length/Value/Type: 4
+	    // bacnetRecvPacket[serviceChoicePos + 1] 
+		if(bacnetPacketLen == 25)
+		{
+			objectIdentifierAndType = bacnetRecvPacket[serviceChoicePos + 2]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 3]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 4]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 5]
+		}
+		else if(bacnetPacketLen == 29)
+		{
+			objectIdentifierAndType = bacnetRecvPacket[serviceChoicePos + 2]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 3]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 4]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 5]
+		}
+		log.message("objectIdentifierAndType = ${objectIdentifierAndType}")
+    	int objectIdentifier = objectIdentifierAndType % 0x400000
+		log.message("objectIdentifier = ${objectIdentifier}")
+		return 0
+	}
+	else
+	{
+	   log.message("Service Choice: bacnetRecvPacket =${bacnetRecvPacket[serviceChoicePos]} ")
 		for(int i =0 ; i < iPacketLen; i++)
 		{
-	        log.message("checkReadPropertyData read 0x").printHex(bacnetRecvPacket[i]).print(". ").nl()
+	        log.message("checkReadData read 0x").printHex(bacnetRecvPacket[i]).print(". ").nl()
 		}
 	   return -1
 	}
@@ -684,7 +739,7 @@ class BIP
 	    }
 		tagNumber = bacnetRecvPacket[serviceChoicePos]
 	}
-    log.message("End of checkReadPropertyData .")
+    log.message("End of checkReadData .")
 	return serviceChoicePos
   }
 

@@ -612,7 +612,8 @@ void recvSleep(float fMilliSeconds)
 		else
 			Sleep(1 * fMilliSeconds);
 #else
-		usleep(1000 * fMilliSeconds);
+		if(fMilliSeconds >= 1)
+			usleep(1000 * fMilliSeconds);
 #endif
 	}
 }
@@ -639,7 +640,7 @@ int sendBroadcast(int iRetryCount, socket_t clientSocket,
 #ifdef _WIN32
 		recvSleep(1);
 #else
-		recvSleep(20);
+		recvSleep(5);
 #endif
 		printf("send %d OK \r\n", iSendCount);
 		size = sizeof(user_addr);

@@ -100,7 +100,7 @@ class bacDevice
 	        //        			(byte)buf[i]).print(") .").nl()
 		    	    bacnetPacket[i] = (byte)buf[i]
 		    	}
-	            bus.checkReadPropertyData(bacnetPacket, dataLength)
+	            bus.checkReadData(bacnetPacket, dataLength)
 	        }
         }
         else 
