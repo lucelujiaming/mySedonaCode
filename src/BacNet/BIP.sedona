@@ -79,8 +79,8 @@ class BIP
   @fieldWidth = 200
   property int dnetPresentNPCI = DNETENABLE
   
-  @config
-  property int dnetNPCI = 2401
+//  @config
+//  property int dnetNPCI = 2401
 
 /* 
   @asStr
@@ -242,13 +242,13 @@ class BIP
            if (r.type.is(BacReadPropertyVar.type)) {
            
               log.message("BBB r.propertyProperty=0x").printHex(
-              			((BacReadPropertyVar)r).propertyProperty).print(
+              			((BacReadPropertyVar)r).propertyIdentifier).print(
               			" and propertyProperty= 0x").printHex(propertyProperty).print(". ").nl()
            }
            if (r.type.is(BacReadPropertyVar.type) 
-           		&& ((BacReadPropertyVar)r).propertyProperty == propertyProperty) {
+           		&& ((BacReadPropertyVar)r).propertyIdentifier == propertyProperty) {
               log.message("CCC r.propertyProperty=0x").printHex(
-              			((BacReadPropertyVar)r).propertyProperty).print(
+              			((BacReadPropertyVar)r).propertyIdentifier).print(
               			" and propertyProperty= 0x").printHex(propertyProperty).print(". ").nl()
               ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data)
           }
@@ -447,12 +447,15 @@ class BIP
     bacnetPacket[5] += 0x04
     bacnetPacket[5] += priorityNPCI
     // dnetNPCI
-    bacnetPacket[6] = dnetNPCI/256
-    bacnetPacket[7] = dnetNPCI%256
+    bacnetPacket[6] = sourceNetworkAddress/256
+    bacnetPacket[7] = sourceNetworkAddress%256
+    // Destination MAC Layer Address Length: 1
+    bacnetPacket[8] = 0x01
+    // DADR: 5
+    bacnetPacket[9] = sadr
     // hopCountNPCI
-    bacnetPacket[8] = 0x00
-    bacnetPacket[9] = hopCountNPCI
-    return 10
+    bacnetPacket[10] = hopCountNPCI
+    return 11
   }
 
   void output_hex(byte[] bytePacket, int iPacketLen)
@@ -583,6 +586,8 @@ class BIP
 	if(snetSupport == 0x08)
 	{
 	  sourceNetworkAddress = bacnetRecvPacket[9] * 256 + bacnetRecvPacket[10]
+	  // bacnetRecvPacket[11] is Source MAC Layer Address Length: 1
+	  sadr                 = bacnetRecvPacket[12]
       log.message("sourceNetworkAddress is ${sourceNetworkAddress} ")
 	  serviceChoicePos += 4
 	}

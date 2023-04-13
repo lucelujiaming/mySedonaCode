@@ -110,4 +110,6 @@ abstract class FieldBusNet
   Str dataRecvGramAddr
   int objectIdentifier
   int sourceNetworkAddress
+  // SADR: 5
+  int sadr
 }

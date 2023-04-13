@@ -116,7 +116,7 @@ class BacWritePropertyVar
 
 // Move to BacNetFieldBusIO.sedona
 //  @config
-//  property int propertyProperty = 0x1A0176
+//  property int propertyIdentifier = 0x1A0176
   
   @config
   property int arrayProperty = 5
@@ -192,18 +192,18 @@ class BacWritePropertyVar
 	bacnetPacket[dataLength++] = 0x0A
 	// Property Identifier: (374) Reserved for Use by ASHRAE (374)
     // Property Type: access-credential (32)
-	if(propertyProperty/0x1000000 > 0)
+	if(propertyIdentifier/0x1000000 > 0)
 	{
-		bacnetPacket[dataLength++] = propertyProperty/(0x01000000)
-		bacnetPacket[dataLength++] = (propertyProperty /(0x010000))%0x0100
-		bacnetPacket[dataLength++] = (propertyProperty /   0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyProperty)%0x0100
+		bacnetPacket[dataLength++] = propertyIdentifier/(0x01000000)
+		bacnetPacket[dataLength++] = (propertyIdentifier /(0x010000))%0x0100
+		bacnetPacket[dataLength++] = (propertyIdentifier /   0x0100)%0x0100
+		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
     }
     else 
 	{
-		bacnetPacket[dataLength++] = propertyProperty/(0x010000)
-		bacnetPacket[dataLength++] = (propertyProperty/0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyProperty)%0x0100
+		bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
+		bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
+		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
     }
 /*
     // property Array Index (Unsigned) 5
