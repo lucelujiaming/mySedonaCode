@@ -735,6 +735,8 @@ class BIP
 			    bufData[0] = iLen
 	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
 				break
+			case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+			case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
 			case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
 			    for (int i = 0; i < iLen; i++)
 			    {
@@ -774,7 +776,7 @@ class BIP
 			case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
 			case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
 				iLen = bacnetRecvPacket[serviceChoicePos] 
-				log.message("OCTETSTRINGAPPTAG.iLen = $iLen ")
+				** log.message("OCTETSTRINGAPPTAG.iLen = $iLen ")
 		        serviceChoicePos++
 				
 			    for (int i = 0; i < iLen; i++)
@@ -786,24 +788,38 @@ class BIP
 				break
 			case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
 				iLen = bacnetRecvPacket[serviceChoicePos] 
-				log.message("CHARACTERSTRINGAPPTAG.iLen = $iLen ")
+				** log.message("CHARACTERSTRINGAPPTAG.iLen = $iLen ")
 		        serviceChoicePos++
 		        // Jump over : ASCII/UTF-8 Character Encoding = 0
 		        serviceChoicePos++
 				
 			    for (int i = 0; i < iLen; i++)
 			    {
-				   log.message("bacnetPacketLen = $bacnetPacketLen and we get ${serviceChoicePos} ")
+				   ** log.message("bacnetPacketLen = $bacnetPacketLen and we get ${serviceChoicePos} ")
 			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos])
 			       serviceChoicePos++
 			    }
 			    strInfo.set(iLen, '\0')
 				log.message("Character string = $strInfo ")
 				break
-			// case BANET_PROPVAR_ENUMERATEDAPPTAG:
-			// case BANET_PROPVAR_DATEAPPTAG:
-			// case BANET_PROPVAR_TIMEAPPTAG:
-			// case BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+			case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+				log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+		        serviceChoicePos++
+				log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+		        serviceChoicePos++
+				log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+		        serviceChoicePos++
+				log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+		        serviceChoicePos++
+			case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+				log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
+		        serviceChoicePos++
+				log.message("minute = ${bacnetRecvPacket[serviceChoicePos]} ")
+		        serviceChoicePos++
+				log.message("second = ${bacnetRecvPacket[serviceChoicePos]}  ")
+		        serviceChoicePos++
+				log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
+		        serviceChoicePos++
 			// case BANET_PROPVAR_RESERVEDAPPTAG13:
 			// case BANET_PROPVAR_RESERVEDAPPTAG14:
 			// case BANET_PROPVAR_RESERVEDAPPTAG15:
