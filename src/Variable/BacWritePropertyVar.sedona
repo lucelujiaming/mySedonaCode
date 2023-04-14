@@ -109,11 +109,14 @@ class BacWritePropertyVar
 
   // Read Property
   @config
-  property int objectReserveType = 32
+  property int objectReserveType = 8
+  // Object Type: access-credential (32)
+  // Object Type: device (8)
   
-  @config
-  property int objectInstanceType = 0
-
+//  It is replaced by bus.objectIdentifier
+//  @config
+//  property int objectInstanceType = 0
+  
 // Move to BacNetFieldBusIO.sedona
 //  @config
 //  property int propertyIdentifier = 0x1A0176
@@ -155,7 +158,7 @@ class BacWritePropertyVar
     if(segmentedMsg == SEGMENTEDMSGENABLE)
        bacnetPacket[0] = 0x08
     // .... 0100 = PDU Flags: 0x4
-    if(moreFllows == 0x00)
+    if(moreFllows != 0x00)
       bacnetPacket[0] += 0x04
     if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
        bacnetPacket[0] += 0x02

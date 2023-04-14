@@ -107,12 +107,15 @@ class BacReadPropertyVar
   @config
   property int invokeID = 9
 
-  // Read Property
+  // Read Property Object
   @config
-  property int objectReserveType = 32
-  
-  @config
-  property int objectInstanceType = 0
+  property int objectReserveType = 8
+  // Object Type: access-credential (32)
+  // Object Type: device (8)
+
+//  It is replaced by bus.objectIdentifier
+//  @config
+//  property int objectInstanceType = 0
   
 //  Move to BacNetFieldBusIO.sedona
 //  @config
@@ -149,7 +152,7 @@ class BacReadPropertyVar
     if(segmentedMsg == SEGMENTEDMSGENABLE)
        bacnetPacket[0] = 0x08
     // .... 0100 = PDU Flags: 0x4
-    if(moreFllows == 0x00)
+    if(moreFllows != 0x00)
       bacnetPacket[0] += 0x04
     if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
        bacnetPacket[0] += 0x02
@@ -184,8 +187,10 @@ class BacReadPropertyVar
 	// .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
 	bacnetPacket[dataLength++] = bus.objectIdentifier/256
 	bacnetPacket[dataLength++] = bus.objectIdentifier%256
+	log.message("BacReadPropertyVar::objectIdentifier = ${bus.objectIdentifier}")
 	// Property Identifier: (374) Reserved for Use by ASHRAE (374)
     // Property Type: access-credential (32)
+	log.message("BacReadPropertyVar::propertyIdentifier = $propertyIdentifier")
 	if(propertyIdentifier/0x1000000 > 0)
 	{
 		bacnetPacket[dataLength++] = 0x18 + 4
@@ -211,17 +216,18 @@ class BacReadPropertyVar
     else 
 	{
 		bacnetPacket[dataLength++] = 0x18 + 1
-		bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
 		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
     }
-    // property Array Index (Unsigned) 5
-    // Array Information
-	bacnetPacket[dataLength++] = 0x29
-	bacnetPacket[dataLength++] = arrayProperty
+//    // property Array Index (Unsigned) 5
+//    // Array Information
+//	bacnetPacket[dataLength++] = 0x29
+//	bacnetPacket[dataLength++] = arrayProperty
 
-    ** log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 bacnetPacket[$dataLength]")
 	for(int i =0 ; i < dataLength; i++)
+	{
 	    buf[i] = (float)bacnetPacket[i]
+	}
   }
   
   virtual override void execute()
@@ -236,6 +242,7 @@ class BacReadPropertyVar
       }
       else { 
 	      makePacket()
+          log.message("111111 makePacket($dataLength)")
 	      if (bus.writeReg(cache, regId, dataLength, buf) == dataLength) {
 	        ** log.message("bus.readReg")
 	      } else {

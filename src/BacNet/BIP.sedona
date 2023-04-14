@@ -111,7 +111,7 @@ class BIP
   property int dataExpectingReplyNPCI = DATAREPLYDISABLE
   
   @config
-  property int priorityNPCI = 1
+  property int priorityNPCI = 0
   // Lujiaming add these end at 23/02/24
   
   ////////////////////////////////////////////////////////////////
@@ -449,13 +449,17 @@ class BIP
     // dnetNPCI
     bacnetPacket[6] = sourceNetworkAddress/256
     bacnetPacket[7] = sourceNetworkAddress%256
-    // Destination MAC Layer Address Length: 1
-    bacnetPacket[8] = 0x01
-    // DADR: 5
-    bacnetPacket[9] = sadr
+    log.message("send sourceNetworkAddress =$sourceNetworkAddress")
+//   // Destination MAC Layer Address Length: 1
+//   bacnetPacket[8] = 0x01
+//   // DADR: 5
+//   log.message("send DADR =$sadr")
+//   bacnetPacket[9] = sadr
+     // Destination MAC Layer Address Length: 0
+     bacnetPacket[8] = 0x00
     // hopCountNPCI
-    bacnetPacket[10] = hopCountNPCI
-    return 11
+    bacnetPacket[9] = hopCountNPCI
+    return 10
   }
 
   void output_hex(byte[] bytePacket, int iPacketLen)
@@ -479,7 +483,8 @@ class BIP
        return -1;
     }
     int headLength = 0
-    ** log.message("22222 writeReg")
+    log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
+    log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
     headLength = fillHead()
     bacnetPacket[2] = (headLength + iLen)/256
     bacnetPacket[3] = (headLength + iLen)%256
@@ -493,13 +498,18 @@ class BIP
     output_hex(bacnetPacket, headLength + iLen)
 	// Copy head
 	packetSend.copyFromBytes(bacnetPacket, 0, headLength + iLen)
-    ** log.message("Copy body ${headLength + iLen}")
+    log.message("Copy body ${headLength + iLen}")
 	dataSendGram.len = headLength + iLen
-    ** log.message("send dataSendGram.len =${dataSendGram.len}")
+    log.message("send dataSendGram.len =${dataSendGram.len}")
 	dataSendGram.buf = packetSend.bytes
+	if(dataSendGram.len > 0)
+	{
+	   forwardToVTS(dataSendGram.buf, dataSendGram.len)
+	}
 	return socket.send(dataSendGram)?iLen:0
   }
 
+  // For debug
   int forwardToVTS(byte[] bacnetRecvPacket, int iPacketLen)
   {
     addrSendVTS.addr.parse("192.168.168.180")
@@ -569,6 +579,7 @@ class BIP
 	   log.message("bacnetPacketLen = ${bacnetPacketLen} and iPacketLen =${iPacketLen}")
 	   return -1
 	}
+	forwardToVTS(bacnetRecvPacket, iPacketLen)
     // BACnet Virtual Link Control
     int serviceChoicePos = 4
     // ex: Control: 0x25, Destination Specifier, Expecting Reply, Priority
@@ -585,10 +596,20 @@ class BIP
     int snetSupport = bacnetRecvPacket[5] & 0x08
 	if(snetSupport == 0x08)
 	{
-	  sourceNetworkAddress = bacnetRecvPacket[9] * 256 + bacnetRecvPacket[10]
-	  // bacnetRecvPacket[11] is Source MAC Layer Address Length: 1
-	  sadr                 = bacnetRecvPacket[12]
+	  if(dnetSupport == 0x20)
+	  {
+		  sourceNetworkAddress = bacnetRecvPacket[9] * 256 + bacnetRecvPacket[10]
+		  // bacnetRecvPacket[11] is Source MAC Layer Address Length: 1
+		  sadr                 = bacnetRecvPacket[12]
+	  }
+	  else
+	  {
+		  sourceNetworkAddress = bacnetRecvPacket[6] * 256 + bacnetRecvPacket[7]
+		  // bacnetRecvPacket[8] is Source MAC Layer Address Length: 1
+		  sadr                 = bacnetRecvPacket[9]
+	  }
       log.message("sourceNetworkAddress is ${sourceNetworkAddress} ")
+      log.message("sadr is ${sadr} ")
 	  serviceChoicePos += 4
 	}
 	
@@ -657,7 +678,7 @@ class BIP
 		}
 		log.message("objectIdentifierAndType = ${objectIdentifierAndType}")
     	objectIdentifier = objectIdentifierAndType % 0x400000
-		log.message("objectIdentifier = ${objectIdentifier}")
+		log.message("BIP::objectIdentifier = ${objectIdentifier}")
 		return 0
 	}
 	else
@@ -667,16 +688,18 @@ class BIP
 		{
 	        log.message("checkReadData read 0x").printHex(bacnetRecvPacket[i]).print(". ").nl()
 		}
-		forwardToVTS(bacnetRecvPacket, iPacketLen)
 	   return -1
 	}
 	serviceChoicePos++
 	// Context Tag: 0, Length/Value/Type: 4
     int LengthValueType = bacnetRecvPacket[serviceChoicePos] & 0x07
 	log.message("LengthValueType = ${LengthValueType} ")
-	serviceChoicePos += 4
+	serviceChoicePos += 2
+	int instanceNumber = bacnetRecvPacket[serviceChoicePos + 1] * 0x100
+						+ bacnetRecvPacket[serviceChoicePos + 2]
+	serviceChoicePos += 2
 	// Instance Number: 99
-	log.message("Instance Number = ${bacnetPacket[serviceChoicePos]} ")
+	log.message("Instance Number = $instanceNumber ")
 	serviceChoicePos++
 	// Property Identifier : Length Value Type: 1
     int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
@@ -703,7 +726,7 @@ class BIP
 	{
 		tagNumber = tagNumber/0x10
 	    int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
-		log.message("iLen = ${iLen} and ")
+		log.message("iLen = $iLen and tagNumber=$tagNumber")
 		serviceChoicePos++
 		link_type = Component.LINK_TYPE_READ + tagNumber
 		switch (tagNumber)
@@ -748,9 +771,35 @@ class BIP
 				serviceChoicePos += iLen
 				break
 			// case BANET_PROPVAR_NULLAPPTAG:
-			// case BANET_PROPVAR_OCTETSTRINGAPPTAG:
-			// case BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
-			// case BANET_PROPVAR_BITSTRINGAPPTAG:
+			case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+			case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+				iLen = bacnetRecvPacket[serviceChoicePos] 
+				log.message("OCTETSTRINGAPPTAG.iLen = $iLen ")
+		        serviceChoicePos++
+				
+			    for (int i = 0; i < iLen; i++)
+			    {
+			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
+			    }
+			    strInfo.set(iLen, '\0')
+				log.message("Character string = $strInfo ")
+				break
+			case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+				iLen = bacnetRecvPacket[serviceChoicePos] 
+				log.message("CHARACTERSTRINGAPPTAG.iLen = $iLen ")
+		        serviceChoicePos++
+		        // Jump over : ASCII/UTF-8 Character Encoding = 0
+		        serviceChoicePos++
+				
+			    for (int i = 0; i < iLen; i++)
+			    {
+				   log.message("bacnetPacketLen = $bacnetPacketLen and we get ${serviceChoicePos} ")
+			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos])
+			       serviceChoicePos++
+			    }
+			    strInfo.set(iLen, '\0')
+				log.message("Character string = $strInfo ")
+				break
 			// case BANET_PROPVAR_ENUMERATEDAPPTAG:
 			// case BANET_PROPVAR_DATEAPPTAG:
 			// case BANET_PROPVAR_TIMEAPPTAG:
@@ -759,8 +808,8 @@ class BIP
 			// case BANET_PROPVAR_RESERVEDAPPTAG14:
 			// case BANET_PROPVAR_RESERVEDAPPTAG15:
 			default:
-				// log.message("Not support $tagNumber ")
-				break
+				log.message("Not support $tagNumber ")
+				return serviceChoicePos
 	    }
 		tagNumber = bacnetRecvPacket[serviceChoicePos]
 	}
@@ -962,6 +1011,8 @@ class BIP
   private inline int[10]    ipArrayList
   private inline int[10]    objIDList
   private inline int[1]     iListLenPtr
+
+  private inline Str(128)   strInfo
 
   native int dO(int port, int device_instance, int retry_delay)
 

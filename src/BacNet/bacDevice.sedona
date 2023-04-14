@@ -100,7 +100,7 @@ class bacDevice
 	        //        			(byte)buf[i]).print(") .").nl()
 		    	    bacnetPacket[i] = (byte)buf[i]
 		    	}
-		    	bus.objectIdentifier = bus.sourceNetworkAddress = -1
+		    	// bus.objectIdentifier = bus.sourceNetworkAddress = -1
 	            int iRet = bus.checkReadData(bacnetPacket, dataLength)
 	            if(iRet == 0)
 	            {

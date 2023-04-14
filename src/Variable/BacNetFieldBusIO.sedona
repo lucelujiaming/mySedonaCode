@@ -22,11 +22,12 @@ abstract class BacNetFieldBusIO
   define int BANET_PROPVAR_INTEGERAPPTAG				= 0x03
   define int BANET_PROPVAR_REALAPPTAG				= 0x04
   define int BANET_PROPVAR_DOUBLEAPPTAG				= 0x05
-  define int BANET_PROPVAR_END            				= 0x06
   
-  // define int BANET_PROPVAR_OCTETSTRINGAPPTAG			= 0x06
-  // define int BANET_PROPVAR_CHARACTERSTRINGAPPTAG		= 0x07
-  // define int BANET_PROPVAR_BITSTRINGAPPTAG			= 0x08
+  define int BANET_PROPVAR_OCTETSTRINGAPPTAG			= 0x06
+  define int BANET_PROPVAR_CHARACTERSTRINGAPPTAG		= 0x07
+  define int BANET_PROPVAR_BITSTRINGAPPTAG			    = 0x08
+  define int BANET_PROPVAR_END            				= 0x09
+  
   // define int BANET_PROPVAR_ENUMERATEDAPPTAG			= 0x09
   // define int BANET_PROPVAR_DATEAPPTAG				= 0x0A
   // define int BANET_PROPVAR_TIMEAPPTAG				= 0x0B
