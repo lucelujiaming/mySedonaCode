@@ -254,9 +254,9 @@ class BacReadPropertyVar
     }
   }
 
-  void setBacReadPropertyVarByProperty(int tagNumber, byte[] data)
+  void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)
   {
-     log.message("BacReadPropertyVar setBacReadPropertyVarByProperty")
+     log.message("BacReadPropertyVar setBacReadPropertyVarByProperty ")
   }
   
   define int SEND_INTERVAL = 30

@@ -57,7 +57,7 @@ class BIP
 
   @asStr
   @config
-  property Buf(64) ipAddress = "192.168.168.180"
+  property Buf(64) ipLocalAddress = "192.168.168.2"
   
   // 
   @config
@@ -225,7 +225,8 @@ class BIP
     }
   }
 
-  private void setBacReadPropertyVarByProperty(int propertyProperty,int tagNumber, byte[] data)
+  private void setBacReadPropertyVarByProperty(int propertyVar,
+  				int tagNumber, byte[] data, int iLen)
   {
     Component root
     Component p = this
@@ -241,16 +242,16 @@ class BIP
            ** log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
            if (r.type.is(BacReadPropertyVar.type)) {
            
-              log.message("BBB r.propertyProperty=0x").printHex(
+              log.message("BBB r.propertyIdentifier=0x").printHex(
               			((BacReadPropertyVar)r).propertyIdentifier).print(
-              			" and propertyProperty= 0x").printHex(propertyProperty).print(". ").nl()
+              			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
            }
            if (r.type.is(BacReadPropertyVar.type) 
-           		&& ((BacReadPropertyVar)r).propertyIdentifier == propertyProperty) {
-              log.message("CCC r.propertyProperty=0x").printHex(
+           		&& ((BacReadPropertyVar)r).propertyIdentifier == propertyVar) {
+              log.message("CCC r.propertyIdentifier=0x").printHex(
               			((BacReadPropertyVar)r).propertyIdentifier).print(
-              			" and propertyProperty= 0x").printHex(propertyProperty).print(". ").nl()
-              ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data)
+              			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+              ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
           }
         }
       }
@@ -681,6 +682,11 @@ class BIP
 		log.message("BIP::objectIdentifier = ${objectIdentifier}")
 		return 0
 	}
+	else if(bacnetRecvPacket[serviceChoicePos] == 0x09)
+	{
+		log.message("return BACnet-Abort-PDU")
+		return -1
+	}
 	else
 	{
 	   log.message("Service Choice: bacnetRecvPacket =${bacnetRecvPacket[serviceChoicePos]} ")
@@ -707,16 +713,19 @@ class BIP
 	
 	// int  propertyProperty = 0x00
 	// Include SD Context Tag
-	int  propertyProperty = bacnetRecvPacket[serviceChoicePos]
+	// int  propertyProperty = bacnetRecvPacket[serviceChoicePos]
+	// log.message("Start propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
+	int  propertyProperty = 0
 	serviceChoicePos++
 	
 	for(int i = 0 ; i < PropertyLengthValue; i++)
 	{
 	   propertyProperty = propertyProperty * 0x100
 	   					+ bacnetRecvPacket[serviceChoicePos + i]
-       log.message("propertyProperty = 0x").printHex(
+	   log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
               			bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
 	}
+	log.message("End propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
 	serviceChoicePos += PropertyLengthValue
 	// .... .110 = Named Tag: Opening Tag (6)
 	log.message("Opening Tag = ${bacnetPacket[serviceChoicePos]} ")
@@ -733,7 +742,7 @@ class BIP
 	    {
 			case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
 			    bufData[0] = iLen
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 1)
 				break
 			case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
 			case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
@@ -742,7 +751,7 @@ class BIP
 			    {
 			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
 			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
 				serviceChoicePos += iLen
 				break
 			case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
@@ -750,7 +759,7 @@ class BIP
 			    {
 			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
 			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
 				serviceChoicePos += iLen
 				break
 			case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
@@ -758,7 +767,7 @@ class BIP
 			    {
 			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
 			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
 				serviceChoicePos += iLen
 				break
 			case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
@@ -769,7 +778,7 @@ class BIP
 			    {
 			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
 			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData)
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
 				serviceChoicePos += iLen
 				break
 			// case BANET_PROPVAR_NULLAPPTAG:
@@ -782,9 +791,13 @@ class BIP
 			    for (int i = 0; i < iLen; i++)
 			    {
 			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
+			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
 			    }
 			    strInfo.set(iLen, '\0')
 				log.message("Character string = $strInfo ")
+			    
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+		        serviceChoicePos += iLen
 				break
 			case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
 				iLen = bacnetRecvPacket[serviceChoicePos] 
@@ -796,30 +809,45 @@ class BIP
 			    for (int i = 0; i < iLen; i++)
 			    {
 				   ** log.message("bacnetPacketLen = $bacnetPacketLen and we get ${serviceChoicePos} ")
-			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos])
-			       serviceChoicePos++
+			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
+			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
 			    }
 			    strInfo.set(iLen, '\0')
 				log.message("Character string = $strInfo ")
+				
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+		        serviceChoicePos += iLen
 				break
 			case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
 				log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+			    bufData[0] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
 				log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+			    bufData[1] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
 				log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+			    bufData[2] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
 				log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+			    bufData[3] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 4)
+				break
 			case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
 				log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
+			    bufData[0] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
 				log.message("minute = ${bacnetRecvPacket[serviceChoicePos]} ")
+			    bufData[1] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
 				log.message("second = ${bacnetRecvPacket[serviceChoicePos]}  ")
+			    bufData[2] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
 				log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
+			    bufData[3] = bacnetRecvPacket[serviceChoicePos]
 		        serviceChoicePos++
+	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 4)
+				break
 			// case BANET_PROPVAR_RESERVEDAPPTAG13:
 			// case BANET_PROPVAR_RESERVEDAPPTAG14:
 			// case BANET_PROPVAR_RESERVEDAPPTAG15:
@@ -834,9 +862,9 @@ class BIP
   }
 
   
-  override int setClientAddress(Str ipAddress)
+  override int setClientAddress(Str ipClientAddress)
   {
-    addrSendLocal.addr.parse(ipAddress)
+    addrSendLocal.addr.parse(ipClientAddress)
     addrSendLocal.port = port
     dataSendGram.setSocketAddr(addrSendLocal)
     return 0
@@ -845,7 +873,7 @@ class BIP
   int bacnet_open(int port, int device_instance, int retry_delay)
   {
     iListLenPtr[0] = 0
-    socket.getBacnetDeviceList("192.168.168.2".toBytes(), 
+    socket.getBacnetDeviceList(ipLocalAddress.bytes, 
     		ipArrayList, objIDList, iListLenPtr)
     log.message("iListLenPtr[0] = ${iListLenPtr[0]} .")
 	bool bRet = openPort(true)
@@ -885,7 +913,7 @@ class BIP
     addrSendLocal.port = 0
     dataSendGram.setSocketAddr(addrSendLocal)
     
-    addrRecvLocal.addr.parse("192.168.168.2")
+    addrRecvLocal.addr.parse(ipLocalAddress.toStr())
     addrRecvLocal.port = port
     dataRecvGram.setSocketAddr(addrRecvLocal)
     return isPortOpen = true

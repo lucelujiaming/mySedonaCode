@@ -90,7 +90,7 @@ abstract class FieldBusNet
     return 0
   }
   
-  virtual int setClientAddress(Str ipAddress)
+  virtual int setClientAddress(Str ipClientAddress)
   {
     return 0
   }
