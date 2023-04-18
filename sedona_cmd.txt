@@ -361,71 +361,96 @@ cd source
 ../bin/sedonac.sh app.xml
 ../bin/sedonac.sh app.sax
 cd ..
+	new_app/
 
 tftp -p -l app.sab 192.168.168.180
 C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
 
 cd linux/sedona
 
+./bin/sedonac.sh src/sys/
+cd source
+../bin/sedonac.sh app.xml
+../bin/sedonac.sh app.sax
+cd ..
+
 ./bin/sedonac.sh src/ModBus/
 ./bin/sedonac.sh src/sys/
 ./bin/sedonac.sh src/Variable/
 
-
 ./bin/sedonac.sh src/inet/
+./bin/sedonac.sh src/Variable/
 ./bin/sedonac.sh src/BacNet/
 
 cd source
 ../bin/sedonac.sh app.xml
 cd -
 
-
 cd source
 export PATH=$PATH:/opt/timesys/toolchains/armv5l-linux/bin/
 make
 
-810A 0015 0100 3001 0C0C 00000000 1A01763E 217B3F
+---------------------------------------------------------------------------------------------
 
-./bin/sedonac.sh src/sys/
-cd source
-../bin/sedonac.sh app.xml
-../bin/sedonac.sh app.sax
-cd ..
-	new_app/
 ps | grep svm
 cd /data/svm/
 
 ps | grep svm | sed "s/ root.*//" | sed "s/^/kill -9/" | sh
+ps | grep svm
 
+tftp -g -r app.sab 192.168.168.180
+tftp -g -r app.scode 192.168.168.180
+tftp -g -r svm 192.168.168.180
+
+./svm app.scode  app.sab
+
+tftp -g -r test_arm51 192.168.168.180
+
+tftp -p -l app.sab 192.168.168.180
+
+./svm app.scode  app.sab
+
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
+ 
+d:
+cd SeconaDownload
+
+/tools/svm /data/svm/app.scode /data/svm/app.sab 
+
+---------------------------------------------------------------------------------------------
+
+cd /source/my_git/
+cd mySedonaCode/
+cp -r ~/linux/sedona/* .
+git status 
+git add src
+git status 
+git commit -m "Add some logic about BIP"
+git push
+
+
+
+
+	./bin/sedonac.sh src/math/
+
+C0A8A802 BAC0810A 00110108 09610105 50090F91 24
+
+
+810A 0015 0100 3001 0C0C 00000000 1A01763E 217B3F
 Vp(VO)-Vp(VI)
 
 810A 00150124 096100FF 0003950C 0C000000 001916
 
 	./bin/sedonac.sh src/math/
+	0000   62 61 63 32 31 31 76 20 31 30 30 31              bac211v 1001
 
-	tftp -p -l app.sab 192.168.168.180
+±¾ÖÜ¹¤×÷£º
+Íê³ÉÔÚSedonaÖĞÊ¹ÓÃ¹ã²¥°ü·¢ÏÖÉè±¸µÄ´úÂë¡£Íê³ÉÊ¹ÓÃ¹ã²¥°ü·µ»ØµÄÉè±¸µØÖ·½øĞĞÍ¨ĞÅµÄ¹¦ÄÜ¡£
+Íê³É¶ÁÈ¡Éè±¸Ãû³Ædevice-nameµÄ¹¦ÄÜ¡£ÏÂÖÜ×¼±¸ÊµÏÖĞŞ¸ÄÉè±¸Ãû³Ædevice-nameµÄ¹¦ÄÜ¡£
 
-C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
-
-C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
-
-tftp -g -r app.scode 192.168.168.180
-tftp -g -r svm 192.168.168.180
-
-
-tftp -g -r test_arm51 192.168.168.180
-Öî¾üÊÂ
-
-
-
-tftp -g -r app.sab 192.168.168.180
-tftp -g -r app.scode 192.168.168.180
-
-./svm app.scode  app.sab
-
-
-/tools/svm /data/svm/app.scode /data/svm/app.sab 
-
+±¾ÖÜ¹¤×÷£º
+±àĞ´Ê¹ÓÃ¹ã²¥°ü·¢ÏÖÉè±¸µÄ´úÂë¡£ÔÚPC²àµ÷ÊÔÍ¨¹ı¡£×¼±¸ÏÂÖÜÒÆÖ²µ½SedonaÖĞ£¬½øĞĞ²âÊÔ¡£
 
 ±¾ÖÜ¹¤×÷£º
 ²âÊÔ²¢ĞŞ¸ÄSedonaµ÷ÑĞÓÃ´úÂë¡£±àĞ´¶ÁÈ¡µ½µÄÊôĞÔÖµµÄ½âÎö²¿·Ö´úÂë¡£µ÷²énaive½Ó¿ÚµÄÊ¹ÓÃ·½·¨¡£ÓÃÓÚÊôĞÔÖµ½âÎö¡£
@@ -437,7 +462,16 @@ tftp -g -r app.scode 192.168.168.180
 ±¾ÖÜ¹¤×÷£º
 ±àĞ´Ê¹ÓÃ¹ã²¥°ü·¢ÏÖÉè±¸µÄ´úÂë¡£ÔÚPC²àµ÷ÊÔÍ¨¹ı¡£×¼±¸ÏÂÖÜÒÆÖ²µ½SedonaÖĞ£¬½øĞĞ²âÊÔ¡£
 
-
+t11=0;t12=1;t21=0;t22=2;
+t1=t11:0.001:t12;
+ft1=2*rectpuls(t1-0.5,1);
+t2=t21:0.001:t22
+ft2=t2;
+t3=t11+t21:0.001:t12+t22;
+ft3=conv(ft1,ft2);
+ft3=ft3*0.001;
+plot(t3,ft3)
+title('ft1(t)*ft2(t) ')
 
 
 C0A8A802 BAC0810A 00270100 30010C0C 00000000 
@@ -822,6 +856,14 @@ extern Operand *g_operand_top;			// ²Ù×÷ÊıÕ»Õ»¶¥
 Ôø¾­ÓĞÒ»Î»ÔÚºşÄÏÎ°ÈË£¬ÔÚËûµÄÍíÄê£¬¶ÔÕâ¸ö¸¯Ğà·â½¨´«Í³Éç»á·¢¶¯ÁË¹¥»÷¡£¡£µ«ÊÇËæ×ÅËûµÄÈ¥ÊÀ¡£ËûµÄÅ¬Á¦Ê§°ÜÁË¡£ 
 		sprintf(cDigest, "\x84\x4e\x3d\x92\xc4\xe1\x80\x07\x8b\x91\x60\x77\x77\x77\x35\x45\x35\x35\x67\x83\x3b\x9e")
 macµçÂ·Ä£ÄâÈí¼ş
+
+
+ÎÚÕæ³¬¹ş,Å£Â¼ÕÂ¾©,¹ÌÉ½¶îÕæ
+·ÖÎª
+¾ü¶ÓµÄÃû×Ö½ĞÎÚÕæ³¬¹ş¡£¡£¾ü¶Ó×Ü¹ÜµÄÃû×Ö½ĞÅ£Â¼ÕÂ¾©¡£·ÖÎª°ËÆì¡£°ËÆì×Ü¹ÜµÄÃû×Ö½Ğ¹ÌÉ½¶îÕæ¡£
+
+°ËÆìºº¾üÓë°ËÆìÂúÖŞ¡¢°ËÆìÃÉ¹Å¹²Í¬¹¹³ÉÇå´ú°ËÆìµÄÕûÌå¡£Æä½¨ÖÆ¡¢ÆìÉ«Óë°ËÆìÂúÖŞ¡¢°ËÆìÃÉ¹Å£¨¼û°ËÆìÖÆ¶È£©Í¬¡£ÇåÌ«×æÅ¬¶û¹ş³àÊ±£¬½«½µ·şµÄººÈË±à³ÉÊ®Áù¸ö×ôÁì£¬Á¥°ËÆìÂúÖŞ¡£Ã÷³çìõËÄÄê£¨1631£©£¬»ÊÌ«¼«ÎªÆ½ºâ°ËÆìÆìÖ÷Öî±´ÀÕµÄ¾üÊÂÊÆÁ¦£¬ÒÔººÈË¾«ÓÚ»ğÆ÷£¬²¦³öººÈË±ğÖÃÒ»¾ü£¬Ãû¡°ÎÚÕæ³¬¹ş¡±£¨¡°ÎÚÕæ¡±£¬ººÓï¡°ÖØ¡±µÄÒâË¼£¬¡°³¬¹ş¡±£¬ººÓï¡°±ø¡±»ò¡°¾ü¡±µÄÒâË¼£©£¬Ù¡ÑøĞÔÎª°º°îÕÂ¾©£¨×Ü¹Ü£©¡£Ê®Äê·ÖÎª¶şÆì£¬Ê¯Í¢ÖùÎª×óÒíÒ»Æì¹ÌÉ½¶îÕæ£¨¼û¶¼Í³£©¡¢Âí¹âÔ¶ÎªÓÒÒíÒ»Æì¹ÌÉ½¶îÕæ¡£Ê®¶şÄê·ÖÎªËÄÆì£¬Ê¯Í¢Öù¡¢Âí¹âÔ¶¡¢ÍõÊÀÑ¡¡¢°ÍÑÕÎª¹ÌÉ½¶îÕæ¡£Ê®ÎåÄêÔö±àÎª°ËÆì£¬ÒÔ×æÔóÈó¡¢ÁõÖ®Ô´¡¢ÎâÊØ½ø¡¢½ğíÂ¡¢Ù¡Í¼Àµ¡¢Ê¯Í¢Öù¡¢°ÍÑÕ¡¢Àî¹úº²Îª¹ÌÉ½¶îÕæ£¬¼ÆÒ»°Ù¶şÊ®¾Å¸ö×ôÁì£¬Á½ÍòËÄÇ§Îå°ÙÈË¡£½ø¹Øºó£¬ÒòĞÎÊÆ¾ç±ä£¬Â½Ğø±à½øÁËĞÂÍ¶½µºÍ¸Ä±àµÄººÈË¹Ù±ø£¬·¢Õ¹Îª¶ş°ÙÆßÊ®¸ö×ôÁì©o±ø¶îÁ½ÍòÈË¡£±àÖÆÀ©´óÒ»±¶¶à£¬±ø¶îÈ´ÉÙÓÚ³õ½¨¡£¹Ù¶à±øÉÙ£¬ÌåÏÖÁËÁıÂçºº½µ¹ÙµÄÕş²ß¡£¿µÎõÖĞÆÚÒÔºóÎª¼ÓÇ¿¶ÔÆä¿ØÖÆ£¬²ÎÁìÒÔÉÏÔ±È±£¬Ã¿ÒÔ°ËÆìÂúÖŞ¡¢°ËÆìÃÉ¹Å²¹ÊÚ¡£
+
 
 ËÕÁªÊÇÒ»¸ö´ÎÉúÎÄÃ÷£¬µ±»ñµÃÀ´×Ô¸ü¸ß¼¶ÎÄÃ÷µÄµÄ¼¼ÊõÁ÷ÈëÊ±£¬Æä±ãÄÜ·¢Õ¹µ½½Ó½ü¶Ô·½µÄ¸ß¶È£»¶øÒ»µ©Ê§È¥¼¼ÊõÁ÷Èë£¬ÆäÎïÖÊË®Æ½²»±ã»á½¥½¥»Ø¹éµ½µÍ¼¶ÎÄÃ÷Ó¦ÓĞµÄË®Æ½¡£
 ´ÎÉúÎÄÃ÷²¢²»¾ß±¸´Ó×ÔÈ»½ç´ó¹æÄ£ÍÚ¾òĞÂ¼¼ÊõµÄÄÜÁ¦£»Èç¹ûÅ·ÃÀÍ»È»´ÓÕâ¸öÊÀ½çÏûÊ§ÁË£¬ÀàËÆÖĞ¹úËÕÁªÕâÑùµÄ¹ú¼Ò±ã»áÔÚ°ë¸öÖÜÆÚºó£¬ÖØ»Ø´óÇå»ò´óÃ÷¡£
@@ -1457,52 +1499,4 @@ class Link
 Ò²¾ÍÊÇÎªÃ¿Ò»¸öÀàÖ¸¶¨Êä³öµÄÊı¾İÀàĞÍ¡£
 µÚÒ»ÖÖÊÇ¶ÔÓÚBacReadPropertyVarÀàĞÍµÄÊäÈëÄ£¿é£¬¸ÃÄ£¿éÖ¸¶¨ÁË¶ÁÈ¡µÄÊı¾İÀàĞÍ¡£
 
-1.	Ê×ÏÈÔÚComponentÖĞÌí¼ÓLinkÀàĞÍĞÅÏ¢ÊôĞÔ¡£ÆäÖĞ¸ß8Î»±íÊ¾¶Á»¹ÊÇĞ´¡£µÍ8Î»±íÊ¾Êı¾İÀàĞÍ¡£Ä¿Ç°¸ß8Î»ÔİÊ±Ã»ÓĞÊ¹ÓÃ¡£
-
-
-    if(from.link_type / Component.LINK_TYPE_FACTOR 
-    			== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR
-    	&& to.link_type / Component.LINK_TYPE_FACTOR 
-    			== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
-    {
-        ** log.message("1111 from.name=$from.name and to.name=$to.name ");
-        to.link_type = Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
-    }
-    else if(from.link_type / Component.LINK_TYPE_FACTOR 
-    		== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR)
-    {
-        ** log.message("33333 from.name=$from.name");
-        to.link_type =Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
-    }
-    else if(to.link_type / Component.LINK_TYPE_FACTOR
-    		== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
-    {
-        ** log.message("55555 to.name=$to.name");
-	    if (fromSlot.isProp())
-	    {
-	        switch (fromSlot.type.id)
-	        {
-	          case Type.boolId:   
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_BOOLEANAPPTAG
-	          	break
-	          case Type.byteId: 
-	          case Type.shortId:   
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_UNSIGNEDINTAPPTAG
-	          	break 
-	          case Type.intId:    
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
-	          	break
-	          case Type.longId:   
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
-	          	break
-	          case Type.floatId:  
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_REALAPPTAG
-	          	break
-	          case Type.doubleId: 
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_DOUBLEAPPTAG
-	          	break
-	          // TODO: buf props
-	        }
-	    }
-    }
-   
+1.	Ê×ÏÈÔÚComponentÖĞÌí¼ÓLinkÀàĞÍĞÅÏ¢ÊôĞÔ¡£ÆäÖĞ¸ß8Î»±íÊ

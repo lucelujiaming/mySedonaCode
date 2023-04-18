@@ -362,6 +362,7 @@ class BIP
       return -1
     packetLength = dataRecvGram.buf[2] * 256 + dataRecvGram.buf[3]
     
+	log.message("packetLength = $packetLength and tagNumber=${dataRecvGram.len}")
     if(packetLength != dataRecvGram.len)
       return -1
     return 0
@@ -484,8 +485,8 @@ class BIP
        return -1;
     }
     int headLength = 0
-    log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
-    log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
+    ** log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
+    ** log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
     headLength = fillHead()
     bacnetPacket[2] = (headLength + iLen)/256
     bacnetPacket[3] = (headLength + iLen)%256
@@ -499,7 +500,7 @@ class BIP
     output_hex(bacnetPacket, headLength + iLen)
 	// Copy head
 	packetSend.copyFromBytes(bacnetPacket, 0, headLength + iLen)
-    log.message("Copy body ${headLength + iLen}")
+    ** log.message("Copy body ${headLength + iLen}")
 	dataSendGram.len = headLength + iLen
     log.message("send dataSendGram.len =${dataSendGram.len}")
 	dataSendGram.buf = packetSend.bytes
@@ -722,8 +723,8 @@ class BIP
 	{
 	   propertyProperty = propertyProperty * 0x100
 	   					+ bacnetRecvPacket[serviceChoicePos + i]
-	   log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
-              			bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
+	   ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
+       **      			bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
 	}
 	log.message("End propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
 	serviceChoicePos += PropertyLengthValue

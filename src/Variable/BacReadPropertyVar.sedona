@@ -242,7 +242,7 @@ class BacReadPropertyVar
       }
       else { 
 	      makePacket()
-          log.message("111111 makePacket($dataLength)")
+          ** log.message("111111 makePacket($dataLength)")
 	      if (bus.writeReg(cache, regId, dataLength, buf) == dataLength) {
 	        ** log.message("bus.readReg")
 	      } else {
@@ -257,6 +257,7 @@ class BacReadPropertyVar
   void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)
   {
      log.message("BacReadPropertyVar setBacReadPropertyVarByProperty ")
+	 log.message("iLen = $iLen and tagNumber=$tagNumber")
   }
   
   define int SEND_INTERVAL = 30

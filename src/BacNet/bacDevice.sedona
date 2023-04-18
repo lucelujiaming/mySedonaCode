@@ -89,7 +89,7 @@ class bacDevice
   {
     if (bus != null) {
     	if (bus.needFlush == false) {
-	        dataLength = bus.readReg(0, 0, 255, buf)
+	        dataLength = bus.readReg(0, 0, 1024, buf)
 	        if(dataLength > 0)
 	        {
 	            log.message("We readReg and return $dataLength from ${bus.dataRecvGramAddr}")
