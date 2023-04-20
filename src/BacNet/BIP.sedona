@@ -230,7 +230,7 @@ class BIP
   {
     Component root
     Component p = this
-    log.message("Sys.app.lookup(p.parent)")
+    ** log.message("Sys.app.lookup(p.parent)")
     while (Sys.app.lookup(p.parent) != null) {
       p = Sys.app.lookup(p.parent)
     }
@@ -240,17 +240,16 @@ class BIP
       if (f.type.is(Folder.type) && !f.name.equals("service")) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
            ** log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
-           if (r.type.is(BacReadPropertyVar.type)) {
-           
-              log.message("BBB r.propertyIdentifier=0x").printHex(
-              			((BacReadPropertyVar)r).propertyIdentifier).print(
-              			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
-           }
+           ** if (r.type.is(BacReadPropertyVar.type)) {
+           **    log.message("BBB r.propertyIdentifier=0x").printHex(
+           **    			((BacReadPropertyVar)r).propertyIdentifier).print(
+           **    			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+           ** }
            if (r.type.is(BacReadPropertyVar.type) 
            		&& ((BacReadPropertyVar)r).propertyIdentifier == propertyVar) {
-              log.message("CCC r.propertyIdentifier=0x").printHex(
-              			((BacReadPropertyVar)r).propertyIdentifier).print(
-              			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+               ** log.message("CCC r.propertyIdentifier=0x").printHex(
+               ** 			((BacReadPropertyVar)r).propertyIdentifier).print(
+               ** 			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
               ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
           }
         }
@@ -362,7 +361,7 @@ class BIP
       return -1
     packetLength = dataRecvGram.buf[2] * 256 + dataRecvGram.buf[3]
     
-	log.message("packetLength = $packetLength and tagNumber=${dataRecvGram.len}")
+	** log.message("packetLength = $packetLength and dataRecvGram.len=${dataRecvGram.len}")
     if(packetLength != dataRecvGram.len)
       return -1
     return 0
@@ -387,7 +386,7 @@ class BIP
 	   ** log.message("readReg failed with len=${dataRecvGram.len} and port=${dataRecvGram.port} ")
        return -1
     }
-	log.message("socket.receive($iLen) ${dataRecvGram.len} bytes from ${dataRecvGram.addr.toStr()}")
+	** log.message("socket.receive($iLen) ${dataRecvGram.len} bytes from ${dataRecvGram.addr.toStr()}")
     dataRecvGramAddr = dataRecvGram.addr.toStr()
 	headLength = checkBacnetHead()
 	if(headLength < 0)

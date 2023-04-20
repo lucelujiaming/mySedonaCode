@@ -256,8 +256,72 @@ class BacReadPropertyVar
 
   void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)
   {
-     log.message("BacReadPropertyVar setBacReadPropertyVarByProperty ")
-	 log.message("iLen = $iLen and tagNumber=$tagNumber")
+    log.message("setBacReadProperty with iLen = $iLen and tagNumber=$tagNumber")
+	switch (tagNumber)
+    {
+		case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+			if(data[0] != 0x00)
+				out := 1.0
+			else
+				out := 0.0
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+			// 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+			int objectType = (data[0] * 0x100 + data[1]) / 0x40
+			// .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+			int instanceNumber = 0x00
+			instanceNumber = data[1] % 0x40
+			instanceNumber = instanceNumber * 0x100 + data[2]
+			instanceNumber = instanceNumber * 0x100 + data[3]
+			out := (float)instanceNumber
+    		log.message("objectType = $objectType and instanceNumber=$out")
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+		case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+			bus.decodeUnsigned(data, iLen, bufInteger)
+			out := (float)bufInteger[0]
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+			bus.decodeUnsigned(data, iLen, bufInteger)
+			out := (float)bufInteger[0]
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+			bus.decodeFloat(data, bufFloat)
+			out := (float)bufFloat[0]
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+			bus.decodeDouble(data, bufDouble)
+			out := (float)bufDouble[0]
+			break
+		// case BANET_PROPVAR_NULLAPPTAG:
+		case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+		case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+		    for (int i = 0; i < iLen; i++)
+		    {
+		       strInfo.set(i, data[i])
+		    }
+		    strInfo.set(iLen, '\0')
+			log.message("Character string = $strInfo ")
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+		    for (int i = 0; i < iLen; i++)
+		    {
+		       strInfo.set(i, data[i])
+		    }
+		    strInfo.set(iLen, '\0')
+			log.message("Character string = $strInfo ")
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+			break
+		// case BANET_PROPVAR_RESERVEDAPPTAG13:
+		// case BANET_PROPVAR_RESERVEDAPPTAG14:
+		// case BANET_PROPVAR_RESERVEDAPPTAG15:
+		default:
+			log.message("Not support $tagNumber ")
+			break
+    }
   }
   
   define int SEND_INTERVAL = 30
@@ -266,5 +330,11 @@ class BacReadPropertyVar
   int dataLength
   // Send interval counter
   int sendInterval = 0
+
+  private inline int[2]    bufInteger
+  private inline float[2]  bufFloat
+  private inline double[2] bufDouble
+  
+  private inline Str(128)   strInfo
 
 }
