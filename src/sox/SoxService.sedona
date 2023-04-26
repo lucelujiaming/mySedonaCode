@@ -489,7 +489,7 @@ class SoxService
 // Fields
 ////////////////////////////////////////////////////////////////
 
-  define Log log
+  // define Log log
   define int HOUSE_KEEPING_INTERVAL = 100   // (ms) do houskeeping no more frequently than this
 
   inline SoxSession[Watch.max] sessions = {...}

@@ -166,7 +166,7 @@ class Variable
         root = p
         if(p.name.equals("play"))
         {
-             log.message("Not deal play node and return with name=$name")
+             ** log.message("Not deal play node and return with name=$name")
              return
         }
         p = Sys.app.lookup(p.parent)
@@ -218,7 +218,7 @@ class Variable
       }
   }
 
-  define Log log
+  // define Log log
   bool isStatus = false
   bool isSchedule = false
   inline float[8] buffer

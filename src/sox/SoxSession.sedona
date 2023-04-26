@@ -382,7 +382,6 @@ class SoxSession
 //////////////////////////////////////////////////////////////////////////
 
   define Log log
-
   
   inline SocketAddr addr             // remote endpoint address
   short remoteId                     // remote endpoint's session id

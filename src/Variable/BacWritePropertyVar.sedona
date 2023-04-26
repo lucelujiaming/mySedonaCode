@@ -138,7 +138,7 @@ class BacWritePropertyVar
   override void start()
   {
     super.start()
-    link_type = Component.LINK_TYPE_WRITE
+    ** link_type = Component.LINK_TYPE_WRITE
   }
   
   override void changed(Slot slot)

@@ -55,7 +55,7 @@ abstract class FieldBusIO
     typeId = 0
     dataLen = 0
     Str tmp = url.toStr()
-    log.message("11111 url=$tmp")
+    ** log.message("11111 url=$tmp")
     if (url.toStr().length() > 0) {
       int findState = 0
       int findIdx = 0
@@ -153,7 +153,7 @@ abstract class FieldBusIO
             busId = tmpBus.busId
             // trigger notify flush.
             if (busId != 0) {
-              log.message("55555 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+             **  log.message("55555 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
               bus = lookupNetById(busId)
               if (bus != null) {
                 bus.notifyFlush()
@@ -166,11 +166,11 @@ abstract class FieldBusIO
             regId = tmpInt
           }
         } else {
-          log.message("10101010 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+          ** log.message("10101010 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
           status := STATUSEURL
         }
       } else {
-        log.message("123123123 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+        ** log.message("123123123 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
         status := STATUSEURL
       }
     }
@@ -234,7 +234,7 @@ abstract class FieldBusIO
     return null
   }
 
-  define Log log
+  // define Log log
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////

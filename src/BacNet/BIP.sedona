@@ -737,7 +737,7 @@ class BIP
 	    int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
 		log.message("iLen = $iLen and tagNumber=$tagNumber")
 		serviceChoicePos++
-		link_type = Component.LINK_TYPE_READ + tagNumber
+		// link_type = Component.LINK_TYPE_READ + tagNumber
 		switch (tagNumber)
 	    {
 			case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
@@ -1021,7 +1021,7 @@ class BIP
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////
-  define Log log
+  // define Log log
   private int ctx = -1
 
   ////////////////////////////////////////////////////////////////

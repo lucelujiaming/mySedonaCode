@@ -30,53 +30,7 @@ class Link
     Slot fromSlot  = from.type.slot(this.fromSlot)
     Slot toSlot    = to.type.slot(this.toSlot)
     if (fromSlot == null || toSlot == null) return
-   
-    if(from.link_type / Component.LINK_TYPE_FACTOR 
-    			== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR
-    	&& to.link_type / Component.LINK_TYPE_FACTOR 
-    			== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
-    {
-        ** log.message("1111 from.name=$from.name and to.name=$to.name ");
-        to.link_type = Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
-    }
-    else if(from.link_type / Component.LINK_TYPE_FACTOR 
-    		== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR)
-    {
-        ** log.message("33333 from.name=$from.name");
-        to.link_type =Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
-    }
-    else if(to.link_type / Component.LINK_TYPE_FACTOR
-    		== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
-    {
-        ** log.message("55555 to.name=$to.name");
-	    if (fromSlot.isProp())
-	    {
-	        switch (fromSlot.type.id)
-	        {
-	          case Type.boolId:   
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_BOOLEANAPPTAG
-	          	break
-	          case Type.byteId: 
-	          case Type.shortId:   
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_UNSIGNEDINTAPPTAG
-	          	break 
-	          case Type.intId:    
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
-	          	break
-	          case Type.longId:   
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
-	          	break
-	          case Type.floatId:  
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_REALAPPTAG
-	          	break
-	          case Type.doubleId: 
-	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_DOUBLEAPPTAG
-	          	break
-	          // TODO: buf props
-	        }
-	    }
-    }
-   
+    
     if (fromSlot.isProp())
     {                    
       if (toSlot.isProp())
@@ -145,7 +99,6 @@ class Link
     return x >= 0
   }
 
-  define Log log
 ////////////////////////////////////////////////////////////////
 // Fields
 ////////////////////////////////////////////////////////////////

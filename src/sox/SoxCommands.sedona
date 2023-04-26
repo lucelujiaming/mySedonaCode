@@ -42,7 +42,7 @@ class SoxCommands
     SendPacket res = session.sendWindow.nextPacket()
     res.replyNum = replyNum
 
-    // log.message("process cmd=$cmd")
+    log.message("process cmd=$cmd")
     // route
     switch (cmd)
     {
@@ -566,6 +566,7 @@ class SoxCommands
     // permission check
     if (!session.user.has(parent, User.aw)) { res.error("denied"); return }
 
+    log.message("addReq 1111111111111")
     // lookup type
     Kit kit = Sys.kit(kitId)
     Type compType = null
@@ -574,11 +575,13 @@ class SoxCommands
       compType = kit.type(typeId)
       if (compType == null || compType.isPrimitive()) { res.error("bad type"); return }
     }
+    log.message("addReq 22222222222")
 
     // add comp to application
     Component comp = Sys.app.add(parent, name, compType)
     if (comp== null) { res.error("app.add"); return }
 
+    log.message("addReq 3333333333333")
     // decode props
     comp.loadProps(in, 'c')
 

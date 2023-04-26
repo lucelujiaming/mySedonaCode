@@ -11,34 +11,7 @@
 **
 class Component
   extends Virtual
-{
-  ////////////////////////////////////////////////////////////////
-  // Constants
-  ////////////////////////////////////////////////////////////////
-  define int LINK_TYPE_NONE = 0x0000
-  define int LINK_TYPE_READ  = 0x0100
-  define int LINK_TYPE_WRITE = 0x0200
-  define int LINK_TYPE_FACTOR  = 0x0100
-
-  define int COMP_PROPVAR_UNUSEDAPPTAG				= 0xFF
-  define int COMP_PROPVAR_NULLAPPTAG				= 0x00
-  define int COMP_PROPVAR_BOOLEANAPPTAG				= 0x01
-  define int COMP_PROPVAR_UNSIGNEDINTAPPTAG			= 0x02
-  define int COMP_PROPVAR_INTEGERAPPTAG				= 0x03
-  define int COMP_PROPVAR_REALAPPTAG				= 0x04
-  define int COMP_PROPVAR_DOUBLEAPPTAG				= 0x05
-  define int COMP_PROPVAR_OCTETSTRINGAPPTAG			= 0x06
-  define int COMP_PROPVAR_CHARACTERSTRINGAPPTAG		= 0x07
-  define int COMP_PROPVAR_BITSTRINGAPPTAG			= 0x08
-  define int COMP_PROPVAR_ENUMERATEDAPPTAG			= 0x09
-  define int COMP_PROPVAR_DATEAPPTAG				= 0x0A
-  define int COMP_PROPVAR_TIMEAPPTAG				= 0x0B
-  define int COMP_PROPVAR_OBJECTIDENTIFIERAPPTAG	= 0x0C
-  define int COMP_PROPVAR_RESERVEDAPPTAG13			= 0x0D
-  define int COMP_PROPVAR_RESERVEDAPPTAG14			= 0x0E
-  define int COMP_PROPVAR_RESERVEDAPPTAG15			= 0x0F
-  
-  
+{  
 //////////////////////////////////////////////////////////////////////////
 // Identity
 //////////////////////////////////////////////////////////////////////////
@@ -466,17 +439,17 @@ class Component
   **   'r' = runtime only
   void loadProps(InStream in, int filter)
   {
-    ** complog.message("type.name=$type.name and type.slotsLen=$type.slotsLen")
-    ** complog.message("--------------------------------------------------------------- ")
+    log.message("type.name=$type.name and type.slotsLen=$type.slotsLen")
+    log.message("--------------------------------------------------------------- ")
     foreach (Slot slot : type.slots, type.slotsLen)
     {
        if (slot.matchProp(filter))
        {
-          ** complog.message("  [$filter]  slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+          log.message("  [$filter]  slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
           loadProp(in, slot)
        }
     }
-    ** complog.message("--------------------------------------------------------------- ")
+    log.message("--------------------------------------------------------------- ")
   }
 
   **
@@ -487,20 +460,58 @@ class Component
   {
     switch (slot.type.id)
     {
-      case Type.boolId:   setBool(slot, in.readBool());     break
-      case Type.byteId:   setInt(slot, (byte)in.read());    break
-      case Type.shortId:  setInt(slot, (short)in.readU2()); break
-      case Type.intId:    setInt(slot, in.readS4());        break
-      case Type.longId:   setLong(slot, in.readS8());       break
-      case Type.floatId:  setFloat(slot, in.readF4());      break
-      case Type.doubleId: setDouble(slot, in.readF8());     break
+      case Type.boolId:   
+        bool boolTmp = in.readBool()
+    	log.message("setBool : $boolTmp")
+      	setBool(slot, boolTmp);     
+      	break
+      case Type.byteId: 
+        // int byteTmp = (byte)in.read()
+    	// log.message("setInt : $byteTmp")
+      	// setInt(slot, (byte)byteTmp);   
+      	setInt(slot, (byte)in.read());   
+      	break
+      case Type.shortId:  
+        // short shortTmp = (short)in.readU2()
+    	// log.message("setInt : $shortTmp")
+      	// setInt(slot, shortTmp);  
+      	setInt(slot, (short)in.readU2());   
+      	break
+      case Type.intId:    
+        int intTmp = in.readS4()
+    	log.message("setInt : $intTmp")
+      	setInt(slot, intTmp);        
+      	break
+      case Type.longId:   
+        long longTmp = in.readS8()
+    	log.message("setLong : $longTmp")
+      	setLong(slot, longTmp);       
+      	break
+      case Type.floatId:  
+        float floatTmp = in.readF4()
+    	log.message("setFloat : $floatTmp")
+      	setFloat(slot, floatTmp);      
+      	break
+      case Type.doubleId: 
+        double doubleTmp = in.readF8()
+    	log.message("setDouble : $doubleTmp")
+      	setDouble(slot, doubleTmp);     
+      	break
       case Type.bufId:
         Buf b = getBuf(slot)
         int size = b.size = in.readU2()
-        if (size > b.bytesLen) b.size = b.bytesLen
+        if (size > b.bytesLen) 
+        	b.size = b.bytesLen
+    	log.message("bufId::size = $size and b.bytesLen = ${b.bytesLen}")
         in.readBytes(b.bytes, 0, b.size)
         in.skip(size - b.size)
-        if (slot.isAsStr()) b.bytes[b.bytesLen-1] = 0 // always cap with \0
+        if (slot.isAsStr()) 
+        	b.bytes[b.bytesLen-1] = 0 // always cap with \0
+        for (int idx =0; idx < b.bytesLen; idx++)
+        {
+			log.message("b.bytes[").printInt(idx).print("] = 0x").printHex(
+	            			b.bytes[idx]).print(". ").nl()
+        }
         slotChanged(slot) // must explicitly call
         break
     }
@@ -526,6 +537,7 @@ class Component
     }
   }            
 
+  define Log log
 //////////////////////////////////////////////////////////////////////////
 // Defines
 //////////////////////////////////////////////////////////////////////////
@@ -577,5 +589,5 @@ class Component
   **   23-31: byte logical y coordinate on wiresheet
   @config property int meta = 0x01
   // 
-  int link_type = LINK_TYPE_NONE
+  // @config property int output_type = LINK_TYPE_NONE
 } 
