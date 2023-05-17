@@ -1,5 +1,5 @@
 @niagaraIcon="module://icons/x16/control/numericPoint.png"
-class BacWritePropertyVar
+class bacReadPropertyMultiple
   extends BacNetFieldBusIO
 {
   // Lujiaming add these at 23/02/24
@@ -104,17 +104,17 @@ class BacWritePropertyVar
   @config
   property int maxAPDULength = 3 // 480
   
-  // Read Property
+  // Read Property Object
   @config
   property int objectReserveType = 8
   // Object Type: access-credential (32)
   // Object Type: device (8)
-  
+
 //  It is replaced by bus.objectIdentifier
 //  @config
 //  property int objectInstanceType = 0
   
-// Move to BacNetFieldBusIO.sedona
+//  Move to BacNetFieldBusIO.sedona
 //  @config
 //  property int propertyIdentifier = 0x1A0176
   
@@ -123,21 +123,15 @@ class BacWritePropertyVar
   // Lujiaming add these end at 23/02/24
 
   // 
-  // @readonly
-  property float in = 0.0f
-  // property float out = 0.0f
+  @readonly
+  property float out = 0.0f
+  // property float in = 0.0f
 
   @summary=true
   @config
   @asStr
   property Buf(64) alias = ""
 
-  override void start()
-  {
-    super.start()
-    ** link_type = Component.LINK_TYPE_WRITE
-  }
-  
   override void changed(Slot slot)
   {
     super.changed(slot)
@@ -178,145 +172,157 @@ class BacWritePropertyVar
 	    bacnetPacket[4] = proposedWindowSize
 	    dataLength = 5
     }
-    // Service Choice: writeProperty (15)
-	bacnetPacket[dataLength++] = 0x0F
+    int instanceNumber = 0x00
+    // Service Choice: readPropertyMultiple (14)
+	bacnetPacket[dataLength++] = 0x0E
+	// ObjectIdentifier: analog-value, 0
 	// Context Tag: 0, Length/Value/Type: 4
 	// .... 1... = Tag Class: Context Specific Tag
 	// 0000 .... = Context Tag Number: 0
 	// Length Value Type: 4
 	bacnetPacket[dataLength++] = 0x0C
-    // 0000 1000 00.. .... .... .... .... .... = Object Type: access-credential (32)
-    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)/256
-    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)%256
-
-	bacnetPacket[dataLength++] = 0x00
-	bacnetPacket[dataLength++] = 0x0A
-	// Property Identifier: (374) Reserved for Use by ASHRAE (374)
-    // Property Type: access-credential (32)
-	if(propertyIdentifier/0x1000000 > 0)
-	{
-		bacnetPacket[dataLength++] = propertyIdentifier/(0x01000000)
-		bacnetPacket[dataLength++] = (propertyIdentifier /(0x010000))%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier /   0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
-    }
-    else 
-	{
-		bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
-		bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
-    }
-/*
-    // property Array Index (Unsigned) 5
-    // Array Information
-	bacnetPacket[dataLength++] = 0x29
-	bacnetPacket[dataLength++] = arrayProperty
- */
-    // Start of value
-    bacnetPacket[dataLength++] = 0x3E
-    if(object_type == BANET_PROPVAR_BOOLEANAPPTAG)
-	{
-	    // action-text: TRUE
-	    if(in != 0.0)
-	       bacnetPacket[dataLength++] = 0x11
-	    else 
-	       bacnetPacket[dataLength++] = 0x10
-	}
-	else if(object_type == BANET_PROPVAR_UNSIGNEDINTAPPTAG)
-	{
-	    // action-text: (Unsigned) 33
-	    bufInteger[0] = (int)in
-	    int iLen = bus.encodeUnsigned(bufInteger, bufData)
-	    bacnetPacket[dataLength++] = 0x20 + iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else if(object_type == BANET_PROPVAR_INTEGERAPPTAG)
-	{
-	    // action-text: (Unsigned) 33
-	    bufInteger[0] = (int)in
-	    int iLen = bus.encodeInteger(bufInteger, bufData)
-	    bacnetPacket[dataLength++] = 0x30 + iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else if(object_type == BANET_PROPVAR_REALAPPTAG)
-	{
-	    // action-text: 1234.560059 (Real)
-	    bufFloat[0] = in
-	    int iLen = bus.encodeFloat(bufFloat, bufData)
-	    bacnetPacket[dataLength++] = 0x40 + iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else if(object_type == BANET_PROPVAR_DOUBLEAPPTAG)
-	{
-	    // action-text: 1234.560000 (Double)
-	    bufDouble[0] = (double)in
-	    int iLen = bus.encodeDouble(bufDouble, bufData)
-	    bacnetPacket[dataLength++] = 0x55
-	    bacnetPacket[dataLength++] = iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else 
-	{
-	    log.message("Error object_type=object_type")
-	}
-    // End of value
-    bacnetPacket[dataLength++] = 0x3F
-    ** log.message("22222 bacnetPacket[$dataLength]")
+    bacnetPacket[dataLength++] = 0x00
+    bacnetPacket[dataLength++] = 0x80
+    bacnetPacket[dataLength++] = 0x00
+    // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+    bacnetPacket[dataLength++] = instanceNumber
+	// listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
+    bacnetPacket[dataLength++] = 0x1E
+    // Property Identifier: required (105)
+    bacnetPacket[dataLength++] = 0x09
+    bacnetPacket[dataLength++] = 0x69
+    // .... .111 = Named Tag: Closing Tag (7)
+    bacnetPacket[dataLength++] = 0x1F
+    // ObjectIdentifier: analog-value, 1
+    bacnetPacket[dataLength++] = 0x0C
+    // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+    bacnetPacket[dataLength++] = 0x00
+    bacnetPacket[dataLength++] = 0x80
+    bacnetPacket[dataLength++] = 0x00
+    bacnetPacket[dataLength++] = instanceNumber
+	// listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
+    bacnetPacket[dataLength++] = 0x1E
+	// Property Identifier: description (28)
+    bacnetPacket[dataLength++] = 0x09
+    bacnetPacket[dataLength++] = 0x1C
+    // .... .111 = Named Tag: Closing Tag (7)
+    bacnetPacket[dataLength++] = 0x1F
+    log.message("22222 bacnetPacket[$dataLength]")
 	for(int i =0 ; i < dataLength; i++)
+	{
 	    buf[i] = (float)bacnetPacket[i]
+	}
   }
   
   virtual override void execute()
   {
+    ** log.message("bacreadPropertyMultiple::execute 11111 status=$status") 
     int iDelayCount = 0
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
     }
+    ** log.message("bacreadPropertyMultiple::execute 222222 status=$status") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
+      ** log.message("23232323 sendInterval=$sendInterval") 
       if(sendInterval < SEND_INTERVAL) {
          sendInterval++
       }
-      else { 
+      else {
 	      makePacket()
+          log.message("111111 makePacket($dataLength)")
 	      if (bus.writeReg(cache, regId, dataLength, buf) == dataLength) {
 	        ** log.message("bus.readReg")
-	        ** log.message("We readReg and return $dataLength ")
-	        // if(dataLength > 0)
 	      } else {
-	        log.message("writeReg Error")
+	        log.message("bacreadPropertyMultiple Error")
 	        status := STATUSOFFLINE
 	      }
 	      sendInterval = 0
 	  }
     }
+    ** log.message("33333 status=$status") 
   }
 
-  int checkWritePropertyData()
+  void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)
   {
-	return 0
+    log.message("setBacReadProperty with iLen = $iLen and tagNumber=$tagNumber")
+	switch (tagNumber)
+    {
+		case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+			if(data[0] != 0x00)
+				out := 1.0
+			else
+				out := 0.0
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+			// 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+			int objectType = (data[0] * 0x100 + data[1]) / 0x40
+			// .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+			int instanceNumber = 0x00
+			instanceNumber = data[1] % 0x40
+			instanceNumber = instanceNumber * 0x100 + data[2]
+			instanceNumber = instanceNumber * 0x100 + data[3]
+			out := (float)instanceNumber
+    		log.message("objectType = $objectType and instanceNumber=$out")
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+		case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+			bus.decodeUnsigned(data, iLen, bufInteger)
+			out := (float)bufInteger[0]
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+			bus.decodeUnsigned(data, iLen, bufInteger)
+			out := (float)bufInteger[0]
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+			bus.decodeFloat(data, bufFloat)
+			out := (float)bufFloat[0]
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+			bus.decodeDouble(data, bufDouble)
+			out := (float)bufDouble[0]
+			break
+		// case BANET_PROPVAR_NULLAPPTAG:
+		case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+		case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+		    for (int i = 0; i < iLen; i++)
+		    {
+		       strInfo.set(i, data[i])
+		    }
+		    strInfo.set(iLen, '\0')
+			log.message("Character string = $strInfo ")
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+		    for (int i = 0; i < iLen; i++)
+		    {
+		       strInfo.set(i, data[i])
+		    }
+		    strInfo.set(iLen, '\0')
+			log.message("Character string = $strInfo ")
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+			break
+		case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+			break
+		// case BANET_PROPVAR_RESERVEDAPPTAG13:
+		// case BANET_PROPVAR_RESERVEDAPPTAG14:
+		// case BANET_PROPVAR_RESERVEDAPPTAG15:
+		default:
+			log.message("Not support $tagNumber ")
+			break
+    }
   }
+  
   define int SEND_INTERVAL = 30
   private inline float[1024] buf
   static inline byte[1024] bacnetPacket
   int dataLength
+  // Send interval counter
+  int sendInterval = 0
 
   private inline int[2]    bufInteger
   private inline float[2]  bufFloat
   private inline double[2] bufDouble
-  static inline byte[8]    bufData
-  // Send interval counter
-  int sendInterval = 0
   
+  private inline Str(128)   strInfo
+
 }

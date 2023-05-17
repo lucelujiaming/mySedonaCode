@@ -5,7 +5,7 @@
   -->
 
 <sedonaKit
- name = "math"
+ name = "Math"
  vendor = "Tridium"
  description = "Math function block library"
  includeSource = "true"

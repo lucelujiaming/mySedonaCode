@@ -87,6 +87,7 @@ class bacDevice
 
   override void execute()
   {
+    ** log.message("bacDevice::execute 11111 status=$status") 
     if (bus != null) {
     	if (bus.needFlush == false) {
 	        dataLength = bus.readReg(0, 0, 1024, buf)
@@ -106,6 +107,10 @@ class bacDevice
 	            {
 	               log.message("We readReg and return (${bus.objectIdentifier}, ${bus.sourceNetworkAddress})")
 	               log.message("          from ${bus.dataRecvGramAddr}")
+	               bus.objectIdentifier = 240001
+	               bus.dataRecvGramAddr = "192.168.168.242"
+
+	               log.message("We use ${bus.objectIdentifier} temply")
 	               bus.setClientAddress(bus.dataRecvGramAddr)
 	            }
 	        }

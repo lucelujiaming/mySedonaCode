@@ -76,7 +76,7 @@ abstract class BacNetFieldBusIO
   property int propertyIdentifier = 0x4D // 0x1A0176
   // Example2:
   // Property Identifier: object-name (77)
-
+  
   override void loaded()
   {
     update()

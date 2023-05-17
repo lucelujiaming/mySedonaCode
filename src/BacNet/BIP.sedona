@@ -239,18 +239,32 @@ class BIP
     for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
       if (f.type.is(Folder.type) && !f.name.equals("service")) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-           ** log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
-           ** if (r.type.is(BacReadPropertyVar.type)) {
-           **    log.message("BBB r.propertyIdentifier=0x").printHex(
-           **    			((BacReadPropertyVar)r).propertyIdentifier).print(
-           **    			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
-           ** }
+           log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
+           // if (r.type.is(BacReadPropertyVar.type)) {
+           //    log.message("BBB r.propertyIdentifier=0x").printHex(
+           //    			((BacReadPropertyVar)r).propertyIdentifier).print(
+           //    			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+           // }
            if (r.type.is(BacReadPropertyVar.type) 
            		&& ((BacReadPropertyVar)r).propertyIdentifier == propertyVar) {
-               ** log.message("CCC r.propertyIdentifier=0x").printHex(
-               ** 			((BacReadPropertyVar)r).propertyIdentifier).print(
-               ** 			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+               log.message("CCC r.propertyIdentifier=0x").printHex(
+                			((BacReadPropertyVar)r).propertyIdentifier).print(
+               			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
               ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
+          }
+          else if (r.type.is(bacReadPropertyMultiple.type) 
+           		&& ((bacReadPropertyMultiple)r).propertyIdentifier == propertyVar) {
+               log.message("CCC r.propertyIdentifier=0x").printHex(
+                			((bacReadPropertyMultiple)r).propertyIdentifier).print(
+               			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+              ((bacReadPropertyMultiple)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
+          }
+          else if (r.type.is(bacReadPropertyObjList.type) 
+           		&& ((bacReadPropertyObjList)r).propertyIdentifier == propertyVar) {
+               log.message("CCC r.propertyIdentifier=0x").printHex(
+                			((bacReadPropertyObjList)r).propertyIdentifier).print(
+               			" and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+              ((bacReadPropertyObjList)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
           }
         }
       }
@@ -267,7 +281,7 @@ class BIP
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR) {
         if (bacnet_add(ctx, ((bacDevice)d).deviceInstance, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
-          ** log.message("11111 updateCache d.status=bacDevice.STATUSEINNER");
+          log.message("11111 updateCache d.status=bacDevice.STATUSEINNER");
           ((bacDevice)d).status := bacDevice.STATUSEINNER
         } else {
           ((bacDevice)d).status := bacDevice.STATUSNOREG
@@ -284,17 +298,17 @@ class BIP
     for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
       if (f.type.is(Folder.type) && !f.name.equals("service")) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-          ** log.message("22222 cleanCache r.name=$r.name and r.type.name=$r.type.name");
+          log.message("22222 updateCache r.name=$r.name and r.type.name=$r.type.name");
           if (r.type.is(BacNetFieldBusIO.type) && 
           		((BacNetFieldBusIO)r).status < BacNetFieldBusIO.STATUSEURL 
           		 && ((BacNetFieldBusIO)r).busId == 0) {
             bacDevice dev = null
-            ** log.message("3333 updateCache f.name=$f.name and type.name=$f.type.name");
+            log.message("3333 updateCache f.name=$f.name and type.name=$f.type.name");
             for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
               ** log.message("4444 updateCache d.name=$d.name and type.name=$d.type.name");
               Str strSrc = ((BacNetFieldBusIO)r).devStr
               Str strDst = ((bacDevice)d).deviceName.toStr()
-              ** log.message("4444 updateCache strSrc=$strSrc and strDst=$strDst");
+              log.message("4444 updateCache strSrc=$strSrc and strDst=$strDst");
               if (d.type.is(bacDevice.type) && ((BacNetFieldBusIO)r).devStr.equals(((bacDevice)d).deviceName.toStr())) {
                 log.message("5555 updateCache d.name=$f.name and type.name=$d.type.name");
                 dev = (bacDevice)d
@@ -434,33 +448,35 @@ class BIP
     // Control: 0x04, Expecting Reply
     if(dataExpectingReplyNPCI == DATAREPLYDISABLE)
     {   
-      bacnetPacket[5] = 0x20
+        bacnetPacket[5] = 0x20
+	    // Building Automation and Control Network APDU
+	    bacnetPacket[5] += 0x04
+	    bacnetPacket[5] += priorityNPCI
+	    // dnetNPCI
+	    bacnetPacket[6] = sourceNetworkAddress/256
+	    bacnetPacket[7] = sourceNetworkAddress%256
+	    log.message("send sourceNetworkAddress =$sourceNetworkAddress")
+	//   // Destination MAC Layer Address Length: 1
+	//   bacnetPacket[8] = 0x01
+	//   // DADR: 5
+	//   log.message("send DADR =$sadr")
+	//   bacnetPacket[9] = sadr
+	     // Destination MAC Layer Address Length: 0
+	     bacnetPacket[8] = 0x00
+	    // hopCountNPCI
+	    bacnetPacket[9] = hopCountNPCI
+        return 10
     }
     else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
     {   
-      bacnetPacket[5] = 0x00
+        bacnetPacket[5] = 0x00
+	    bacnetPacket[5] += 0x04
+        return 6
     }
     else 
     {   
       return -1
     }
-    // Building Automation and Control Network APDU
-    bacnetPacket[5] += 0x04
-    bacnetPacket[5] += priorityNPCI
-    // dnetNPCI
-    bacnetPacket[6] = sourceNetworkAddress/256
-    bacnetPacket[7] = sourceNetworkAddress%256
-    log.message("send sourceNetworkAddress =$sourceNetworkAddress")
-//   // Destination MAC Layer Address Length: 1
-//   bacnetPacket[8] = 0x01
-//   // DADR: 5
-//   log.message("send DADR =$sadr")
-//   bacnetPacket[9] = sadr
-     // Destination MAC Layer Address Length: 0
-     bacnetPacket[8] = 0x00
-    // hopCountNPCI
-    bacnetPacket[9] = hopCountNPCI
-    return 10
   }
 
   void output_hex(byte[] bytePacket, int iPacketLen)
@@ -513,7 +529,7 @@ class BIP
   // For debug
   int forwardToVTS(byte[] bacnetRecvPacket, int iPacketLen)
   {
-    addrSendVTS.addr.parse("192.168.168.180")
+    addrSendVTS.addr.parse("192.168.168.170")
     addrSendVTS.port = port
     dataVTSForwardSendGram.setSocketAddr(addrSendVTS)
 	dataVTSForwardSendGram.len = iPacketLen
@@ -575,9 +591,12 @@ class BIP
   override int checkReadData(byte[] bacnetRecvPacket, int iPacketLen)
   {
     int bacnetPacketLen = bacnetRecvPacket[2] * 256 + bacnetRecvPacket[3]
+	** log.message("bacnetPacketLen = ${bacnetPacketLen} and iPacketLen =${iPacketLen} ")
+	** log.message("with bacnetRecvPacket[2]=0x").printHex(bacnetRecvPacket[2]).print(". ").nl()
+	** log.message("with bacnetRecvPacket[3]=0x").printHex(bacnetRecvPacket[3]).print(". ").nl()
     if(bacnetPacketLen != iPacketLen)
 	{
-	   log.message("bacnetPacketLen = ${bacnetPacketLen} and iPacketLen =${iPacketLen}")
+	   log.message("ERROR: bacnetPacketLen = ${bacnetPacketLen} and iPacketLen =${iPacketLen}")
 	   return -1
 	}
 	forwardToVTS(bacnetRecvPacket, iPacketLen)
@@ -651,10 +670,185 @@ class BIP
 		}
 	    // log.message("Service Choice: read Property ")
 	    // return 0
+	    
+		serviceChoicePos++
+		// Context Tag: 0, Length/Value/Type: 4
+	    int LengthValueType = bacnetRecvPacket[serviceChoicePos] & 0x07
+		log.message("LengthValueType = ${LengthValueType} ")
+		serviceChoicePos += 2
+		int instanceNumber = bacnetRecvPacket[serviceChoicePos] * 0x10000 
+		                    + bacnetRecvPacket[serviceChoicePos + 1] * 0x100
+							+ bacnetRecvPacket[serviceChoicePos + 2]
+		serviceChoicePos += 3
+		// Instance Number: 99
+		log.message("Instance Number = $instanceNumber ")
+		// Property Identifier : Length Value Type: 1
+	    int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
+		log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+		
+		// int  propertyProperty = 0x00
+		// Include SD Context Tag
+		// int  propertyProperty = bacnetRecvPacket[serviceChoicePos]
+		// log.message("Start propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
+		int  propertyProperty = 0
+		serviceChoicePos++
+		
+		for(int i = 0 ; i < PropertyLengthValue; i++)
+		{
+		   propertyProperty = propertyProperty * 0x100
+		   					+ bacnetRecvPacket[serviceChoicePos + i]
+		   ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
+	       **      			bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
+		}
+		log.message("End propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
+		serviceChoicePos += PropertyLengthValue
+		// We have <property Array Index (Unsigned) 8>
+		if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
+		{
+		   serviceChoicePos += 2;
+		}
+		if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
+		{
+		   log.message("ERROR: Can not find start Tag ")
+		}
+		
+		// .... .110 = Named Tag: Opening Tag (6)
+		log.message("Opening Tag = ${bacnetRecvPacket[serviceChoicePos]} ")
+		serviceChoicePos++
+		int tagNumber = bacnetRecvPacket[serviceChoicePos]
+		log.message("Old tagNumber=$tagNumber")
+		while (tagNumber != 0x3F)
+		{
+			tagNumber = tagNumber/0x10
+		    int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+			log.message("iLen = $iLen and tagNumber=$tagNumber")
+			serviceChoicePos++
+			// link_type = Component.LINK_TYPE_READ + tagNumber
+			switch (tagNumber)
+		    {
+				case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+				    bufData[0] = iLen
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 1)
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+				    for (int i = 0; i < iLen; i++)
+				    {
+				       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+				    }
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+					serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+				    for (int i = 0; i < iLen; i++)
+				    {
+				       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+				    }
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+					serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+				    for (int i = 0; i < iLen; i++)
+				    {
+				       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+				    }
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+					serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+		    		iLen = bacnetRecvPacket[serviceChoicePos] 
+			        log.message("iLen fix to ${iLen} ")
+			        serviceChoicePos++
+				    for (int i = 0; i < iLen; i++)
+				    {
+				       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+				    }
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+					serviceChoicePos += iLen
+					break
+				// case BANET_PROPVAR_NULLAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+					iLen = bacnetRecvPacket[serviceChoicePos] 
+					** log.message("OCTETSTRINGAPPTAG.iLen = $iLen ")
+			        serviceChoicePos++
+					
+				    for (int i = 0; i < iLen; i++)
+				    {
+				       strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
+				       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+				    }
+				    strInfo.set(iLen, '\0')
+					log.message("Character string = $strInfo ")
+				    
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+			        serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+					iLen = bacnetRecvPacket[serviceChoicePos] 
+					** log.message("CHARACTERSTRINGAPPTAG.iLen = $iLen ")
+			        serviceChoicePos++
+			        // Jump over : ASCII/UTF-8 Character Encoding = 0
+			        serviceChoicePos++
+					
+				    for (int i = 0; i < iLen; i++)
+				    {
+					   ** log.message("bacnetPacketLen = $bacnetPacketLen and we get ${serviceChoicePos} ")
+				       strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
+				       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+				    }
+				    strInfo.set(iLen, '\0')
+					log.message("Character string = $strInfo ")
+					
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
+			        serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+					log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[0] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[1] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[2] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[3] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 4)
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+					log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[0] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("minute = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[1] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("second = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[2] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[3] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+		            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 4)
+					break
+				// case BANET_PROPVAR_RESERVEDAPPTAG13:
+				// case BANET_PROPVAR_RESERVEDAPPTAG14:
+				// case BANET_PROPVAR_RESERVEDAPPTAG15:
+				default:
+					log.message("Not support $tagNumber ")
+					return serviceChoicePos
+		    }
+			tagNumber = bacnetRecvPacket[serviceChoicePos]
+		}
+	    log.message("End of checkReadData .")
+		return serviceChoicePos
 	}
 	else if(bacnetRecvPacket[serviceChoicePos] == 0x00)
 	{
-		log.message("Service Choice: WhoAmI ")
+		log.message("Service Choice: WhoAmI and bacnetPacketLen = ${bacnetPacketLen}")
 	    // Application Tag: BACnetObjectIdentifier, Length/Value/Type: 4
 	    // bacnetRecvPacket[serviceChoicePos + 1] 
 		if(bacnetPacketLen == 25)
@@ -677,6 +871,16 @@ class BIP
 			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
 							          bacnetRecvPacket[serviceChoicePos + 5]
 		}
+		else
+		{
+			objectIdentifierAndType = bacnetRecvPacket[serviceChoicePos + 2]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 3]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 4]
+			objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
+							          bacnetRecvPacket[serviceChoicePos + 5]
+		}
 		log.message("objectIdentifierAndType = ${objectIdentifierAndType}")
     	objectIdentifier = objectIdentifierAndType % 0x400000
 		log.message("BIP::objectIdentifier = ${objectIdentifier}")
@@ -687,6 +891,114 @@ class BIP
 		log.message("return BACnet-Abort-PDU")
 		return -1
 	}
+	// Service Choice: readPropertyMultiple (14)
+	else if(bacnetRecvPacket[serviceChoicePos] == 0x14)
+	{
+		serviceChoicePos += 6
+	    log.message("bacnetRecvPacket[serviceChoicePos] =${bacnetRecvPacket[serviceChoicePos]} ")
+		if(bacnetRecvPacket[serviceChoicePos] != 0x1E)
+		{
+		   log.message("Error Opening Tag")
+		   return -1
+		}
+		serviceChoicePos += 3
+	    log.message("bacnetRecvPacket[serviceChoicePos] =${bacnetRecvPacket[serviceChoicePos]} ")
+		if(bacnetRecvPacket[serviceChoicePos] != 0x4E)
+		{
+		   log.message("Error tag ")
+		   return -1
+		}
+		serviceChoicePos++
+		int tagNumber = bacnetRecvPacket[serviceChoicePos]
+		while (tagNumber != 0x3F)
+		{
+			tagNumber = tagNumber/0x10
+		    int iLen = tagNumber % 0x10
+			log.message("iLen = $iLen and tagNumber=$tagNumber")
+			serviceChoicePos++
+			// link_type = Component.LINK_TYPE_READ + tagNumber
+			switch (tagNumber)
+		    {
+				case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+				    bufData[0] = iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+					serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+					serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+			        serviceChoicePos++
+					serviceChoicePos += iLen
+					break
+				// case BANET_PROPVAR_NULLAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+				case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+					iLen = bacnetRecvPacket[serviceChoicePos] 
+					** log.message("OCTETSTRINGAPPTAG.iLen = $iLen ")
+			        serviceChoicePos++
+			        serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+			        serviceChoicePos++
+			        serviceChoicePos += iLen
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+					log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[0] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[1] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[2] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[3] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					break
+				case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+					log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[0] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("minute = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[1] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("second = ${bacnetRecvPacket[serviceChoicePos]}  ")
+				    bufData[2] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
+				    bufData[3] = bacnetRecvPacket[serviceChoicePos]
+			        serviceChoicePos++
+					break
+				// case BANET_PROPVAR_RESERVEDAPPTAG13:
+				// case BANET_PROPVAR_RESERVEDAPPTAG14:
+				// case BANET_PROPVAR_RESERVEDAPPTAG15:
+				default:
+					log.message("Not support $tagNumber ")
+					return serviceChoicePos
+		    }
+		    if(bacnetRecvPacket[serviceChoicePos] != 0x4F)
+			{
+		       log.message("Error Closing Tag")
+			   return -1
+			}
+			serviceChoicePos++
+		    tagNumber = bacnetRecvPacket[serviceChoicePos]
+		    if(bacnetRecvPacket[serviceChoicePos] != 0x4E)
+			{
+			   log.message("Error tag ")
+			   return -1
+			}
+		}
+	    log.message("End of checkReadData. ")
+		return serviceChoicePos
+	}
 	else
 	{
 	   log.message("Service Choice: bacnetRecvPacket =${bacnetRecvPacket[serviceChoicePos]} ")
@@ -696,169 +1008,6 @@ class BIP
 		}
 	   return -1
 	}
-	serviceChoicePos++
-	// Context Tag: 0, Length/Value/Type: 4
-    int LengthValueType = bacnetRecvPacket[serviceChoicePos] & 0x07
-	log.message("LengthValueType = ${LengthValueType} ")
-	serviceChoicePos += 2
-	int instanceNumber = bacnetRecvPacket[serviceChoicePos + 1] * 0x100
-						+ bacnetRecvPacket[serviceChoicePos + 2]
-	serviceChoicePos += 2
-	// Instance Number: 99
-	log.message("Instance Number = $instanceNumber ")
-	serviceChoicePos++
-	// Property Identifier : Length Value Type: 1
-    int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
-	log.message("PropertyLengthValue = ${PropertyLengthValue} ")
-	
-	// int  propertyProperty = 0x00
-	// Include SD Context Tag
-	// int  propertyProperty = bacnetRecvPacket[serviceChoicePos]
-	// log.message("Start propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
-	int  propertyProperty = 0
-	serviceChoicePos++
-	
-	for(int i = 0 ; i < PropertyLengthValue; i++)
-	{
-	   propertyProperty = propertyProperty * 0x100
-	   					+ bacnetRecvPacket[serviceChoicePos + i]
-	   ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
-       **      			bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
-	}
-	log.message("End propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
-	serviceChoicePos += PropertyLengthValue
-	// .... .110 = Named Tag: Opening Tag (6)
-	log.message("Opening Tag = ${bacnetPacket[serviceChoicePos]} ")
-	serviceChoicePos++
-	int tagNumber = bacnetRecvPacket[serviceChoicePos]
-	while (tagNumber != 0x3F)
-	{
-		tagNumber = tagNumber/0x10
-	    int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
-		log.message("iLen = $iLen and tagNumber=$tagNumber")
-		serviceChoicePos++
-		// link_type = Component.LINK_TYPE_READ + tagNumber
-		switch (tagNumber)
-	    {
-			case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
-			    bufData[0] = iLen
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 1)
-				break
-			case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
-			case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
-			case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
-			    for (int i = 0; i < iLen; i++)
-			    {
-			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
-			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
-				serviceChoicePos += iLen
-				break
-			case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
-			    for (int i = 0; i < iLen; i++)
-			    {
-			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
-			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
-				serviceChoicePos += iLen
-				break
-			case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
-			    for (int i = 0; i < iLen; i++)
-			    {
-			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
-			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
-				serviceChoicePos += iLen
-				break
-			case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
-	    		iLen = bacnetRecvPacket[serviceChoicePos] 
-		        log.message("iLen fix to ${iLen} ")
-		        serviceChoicePos++
-			    for (int i = 0; i < iLen; i++)
-			    {
-			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
-			    }
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
-				serviceChoicePos += iLen
-				break
-			// case BANET_PROPVAR_NULLAPPTAG:
-			case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
-			case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
-				iLen = bacnetRecvPacket[serviceChoicePos] 
-				** log.message("OCTETSTRINGAPPTAG.iLen = $iLen ")
-		        serviceChoicePos++
-				
-			    for (int i = 0; i < iLen; i++)
-			    {
-			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
-			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
-			    }
-			    strInfo.set(iLen, '\0')
-				log.message("Character string = $strInfo ")
-			    
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
-		        serviceChoicePos += iLen
-				break
-			case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
-				iLen = bacnetRecvPacket[serviceChoicePos] 
-				** log.message("CHARACTERSTRINGAPPTAG.iLen = $iLen ")
-		        serviceChoicePos++
-		        // Jump over : ASCII/UTF-8 Character Encoding = 0
-		        serviceChoicePos++
-				
-			    for (int i = 0; i < iLen; i++)
-			    {
-				   ** log.message("bacnetPacketLen = $bacnetPacketLen and we get ${serviceChoicePos} ")
-			       strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
-			       bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
-			    }
-			    strInfo.set(iLen, '\0')
-				log.message("Character string = $strInfo ")
-				
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, iLen)
-		        serviceChoicePos += iLen
-				break
-			case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
-				log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
-			    bufData[0] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-				log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
-			    bufData[1] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-				log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
-			    bufData[2] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-				log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
-			    bufData[3] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 4)
-				break
-			case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
-				log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
-			    bufData[0] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-				log.message("minute = ${bacnetRecvPacket[serviceChoicePos]} ")
-			    bufData[1] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-				log.message("second = ${bacnetRecvPacket[serviceChoicePos]}  ")
-			    bufData[2] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-				log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
-			    bufData[3] = bacnetRecvPacket[serviceChoicePos]
-		        serviceChoicePos++
-	            setBacReadPropertyVarByProperty(propertyProperty, tagNumber, bufData, 4)
-				break
-			// case BANET_PROPVAR_RESERVEDAPPTAG13:
-			// case BANET_PROPVAR_RESERVEDAPPTAG14:
-			// case BANET_PROPVAR_RESERVEDAPPTAG15:
-			default:
-				log.message("Not support $tagNumber ")
-				return serviceChoicePos
-	    }
-		tagNumber = bacnetRecvPacket[serviceChoicePos]
-	}
-    log.message("End of checkReadData .")
-	return serviceChoicePos
   }
 
   

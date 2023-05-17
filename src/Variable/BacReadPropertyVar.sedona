@@ -104,9 +104,6 @@ class BacReadPropertyVar
   @config
   property int maxAPDULength = 3 // 480
   
-  @config
-  property int invokeID = 9
-
   // Read Property Object
   @config
   property int objectReserveType = 8
@@ -166,7 +163,8 @@ class BacReadPropertyVar
        bacnetPacket[1] = maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = invokeID
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
 	dataLength = 3
     if(segmentedMsg == SEGMENTEDMSGENABLE)
     {
@@ -183,8 +181,13 @@ class BacReadPropertyVar
 	bacnetPacket[dataLength++] = 0x0C
     // 0000 1000 00.. .... .... .... .... .... = Object Type: access-credential (32)
     bacnetPacket[dataLength++] = (objectReserveType *4 * 16)/256
-    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)%256
+    bacnetPacket[dataLength] = (objectReserveType *4 * 16)%256
 	// .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+	if(bus.objectIdentifier > 0x10000)
+	{
+	   bacnetPacket[dataLength] +=  bus.objectIdentifier/0x10000
+	}
+	dataLength++
 	bacnetPacket[dataLength++] = bus.objectIdentifier/256
 	bacnetPacket[dataLength++] = bus.objectIdentifier%256
 	log.message("BacReadPropertyVar::objectIdentifier = ${bus.objectIdentifier}")
@@ -220,8 +223,8 @@ class BacReadPropertyVar
     }
 //    // property Array Index (Unsigned) 5
 //    // Array Information
-//	bacnetPacket[dataLength++] = 0x29
-//	bacnetPacket[dataLength++] = arrayProperty
+	bacnetPacket[dataLength++] = 0x29
+	bacnetPacket[dataLength++] = arrayProperty
 
     log.message("22222 bacnetPacket[$dataLength]")
 	for(int i =0 ; i < dataLength; i++)
@@ -232,17 +235,20 @@ class BacReadPropertyVar
   
   virtual override void execute()
   {
+    log.message("BacReadPropertyVar::execute 11111 status=$status") 
     int iDelayCount = 0
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
     }
+    ** log.message("BacReadPropertyVar::execute 222222 status=$status") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
+      ** log.message("23232323 sendInterval=$sendInterval") 
       if(sendInterval < SEND_INTERVAL) {
          sendInterval++
       }
-      else { 
+      else {
 	      makePacket()
-          ** log.message("111111 makePacket($dataLength)")
+          log.message("111111 makePacket($dataLength)")
 	      if (bus.writeReg(cache, regId, dataLength, buf) == dataLength) {
 	        ** log.message("bus.readReg")
 	      } else {
@@ -252,6 +258,7 @@ class BacReadPropertyVar
 	      sendInterval = 0
 	  }
     }
+    ** log.message("33333 status=$status") 
   }
 
   void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)

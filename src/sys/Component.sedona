@@ -439,17 +439,17 @@ class Component
   **   'r' = runtime only
   void loadProps(InStream in, int filter)
   {
-    log.message("type.name=$type.name and type.slotsLen=$type.slotsLen")
-    log.message("--------------------------------------------------------------- ")
+    ** log.message("type.name=$type.name and type.slotsLen=$type.slotsLen")
+    ** log.message("--------------------------------------------------------------- ")
     foreach (Slot slot : type.slots, type.slotsLen)
     {
        if (slot.matchProp(filter))
        {
-          log.message("  [$filter]  slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+          ** log.message("  [$filter]  slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
           loadProp(in, slot)
        }
     }
-    log.message("--------------------------------------------------------------- ")
+    ** log.message("--------------------------------------------------------------- ")
   }
 
   **
@@ -479,22 +479,24 @@ class Component
       	break
       case Type.intId:    
         int intTmp = in.readS4()
-    	log.message("setInt : $intTmp")
+    	// log.message("setInt : $intTmp")
+        if(intTmp == -1)
+        	return
       	setInt(slot, intTmp);        
       	break
       case Type.longId:   
         long longTmp = in.readS8()
-    	log.message("setLong : $longTmp")
+    	// log.message("setLong : $longTmp")
       	setLong(slot, longTmp);       
       	break
       case Type.floatId:  
         float floatTmp = in.readF4()
-    	log.message("setFloat : $floatTmp")
+    	// log.message("setFloat : $floatTmp")
       	setFloat(slot, floatTmp);      
       	break
       case Type.doubleId: 
         double doubleTmp = in.readF8()
-    	log.message("setDouble : $doubleTmp")
+    	// log.message("setDouble : $doubleTmp")
       	setDouble(slot, doubleTmp);     
       	break
       case Type.bufId:
@@ -502,16 +504,20 @@ class Component
         int size = b.size = in.readU2()
         if (size > b.bytesLen) 
         	b.size = b.bytesLen
-    	log.message("bufId::size = $size and b.bytesLen = ${b.bytesLen}")
+    	// log.message("bufId::size = $size and b.bytesLen = ${b.bytesLen}")
+        if(size == -1)
+        	return
         in.readBytes(b.bytes, 0, b.size)
         in.skip(size - b.size)
         if (slot.isAsStr()) 
-        	b.bytes[b.bytesLen-1] = 0 // always cap with \0
-        for (int idx =0; idx < b.bytesLen; idx++)
         {
-			log.message("b.bytes[").printInt(idx).print("] = 0x").printHex(
-	            			b.bytes[idx]).print(". ").nl()
+            b.bytes[b.bytesLen-1] = 0 // always cap with \0
         }
+        // for (int idx =0; idx < b.size; idx++)
+        // {
+		// 		log.message("b.bytes[").printInt(idx).print("] = 0x").printHex(
+	    //         			b.bytes[idx]).print(". ").nl()
+        // }
         slotChanged(slot) // must explicitly call
         break
     }
