@@ -165,6 +165,8 @@ class BacReadPropertyVar
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
     bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 0
 	dataLength = 3
     if(segmentedMsg == SEGMENTEDMSGENABLE)
     {
