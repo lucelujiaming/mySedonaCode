@@ -337,8 +337,12 @@ Cell BacNet_BIP_eD(SedonaVM* vm, Cell* params)
 	bufOutput[5] = pCharValue[6];
 	bufOutput[6] = pCharValue[5];
 	bufOutput[7] = pCharValue[4];
-	
-	ret.ival = 0;
+
+	printf("[%s:%s:%d] BacNet_BIP_eD Fill [%02d:%02d:%02d:%02d:%02d:%02d:%02d:%02d]\n",
+			 __FILE__, __FUNCTION__, __LINE__, 
+			 bufOutput[0], bufOutput[1], bufOutput[2], bufOutput[3], 
+			 bufOutput[4], bufOutput[5], bufOutput[6], bufOutput[7]);	
+	ret.ival = 8;
 	
     return ret;
 }
@@ -356,8 +360,11 @@ Cell BacNet_BIP_eF(SedonaVM* vm, Cell* params)
 	bufOutput[1] = pCharValue[2];
 	bufOutput[2] = pCharValue[1];
 	bufOutput[3] = pCharValue[0];
-	ret.ival = 0;
+	ret.ival = 4;
 	
+	printf("[%s:%s:%d] BacNet_BIP_eD Fill [%02d:%02d:%02d:%02d]\n",
+			 __FILE__, __FUNCTION__, __LINE__, 
+			 bufOutput[0], bufOutput[1], bufOutput[2], bufOutput[3]);	
     return ret;
 }
 

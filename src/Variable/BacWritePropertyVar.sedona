@@ -102,25 +102,14 @@ class BacWritePropertyVar
   property int maxSegments = MAXSEGMENTUNDEFED
 
   @config
-  property int maxAPDULength = 3 // 480
-  
-  // Read Property
-  @config
-  property int objectReserveType = 8
-  // Object Type: access-credential (32)
-  // Object Type: device (8)
-  
-//  It is replaced by bus.objectIdentifier
-//  @config
-//  property int objectInstanceType = 0
-  
-// Move to BacNetFieldBusIO.sedona
-//  @config
-//  property int propertyIdentifier = 0x1A0176
+  property int maxAPDULength = 5 // 480
   
   @config
-  property int arrayProperty = 5
-  // Lujiaming add these end at 23/02/24
+  property int objectType = 2
+  
+  @config
+  property int instanceNumber = 14
+  
 
   // 
   // @readonly
@@ -171,6 +160,8 @@ class BacWritePropertyVar
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
     bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 0
 	dataLength = 3
     if(segmentedMsg == SEGMENTEDMSGENABLE)
     {
@@ -180,134 +171,92 @@ class BacWritePropertyVar
     }
     // Service Choice: writeProperty (15)
 	bacnetPacket[dataLength++] = 0x0F
-	// Context Tag: 0, Length/Value/Type: 4
-	// .... 1... = Tag Class: Context Specific Tag
-	// 0000 .... = Context Tag Number: 0
-	// Length Value Type: 4
+	// ObjectIdentifier: analog-value, 14
+	//   Context Tag: 0, Length/Value/Type: 4
+    //   .... 1... = Tag Class: Context Specific Tag
+    //   0000 .... = Context Tag Number: 0
+    //   Length Value Type: 4
 	bacnetPacket[dataLength++] = 0x0C
-    // 0000 1000 00.. .... .... .... .... .... = Object Type: access-credential (32)
-    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)/256
-    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)%256
-
-	bacnetPacket[dataLength++] = 0x00
-	bacnetPacket[dataLength++] = 0x0A
-	// Property Identifier: (374) Reserved for Use by ASHRAE (374)
-    // Property Type: access-credential (32)
-	if(propertyIdentifier/0x1000000 > 0)
-	{
-		bacnetPacket[dataLength++] = propertyIdentifier/(0x01000000)
-		bacnetPacket[dataLength++] = (propertyIdentifier /(0x010000))%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier /   0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+	// 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+    if(objectType > 4)
+    {
+        bacnetPacket[dataLength++] = objectType / 4
     }
     else 
-	{
-		bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
-		bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    {
+        bacnetPacket[dataLength++] = 0x00
     }
-/*
-    // property Array Index (Unsigned) 5
-    // Array Information
-	bacnetPacket[dataLength++] = 0x29
-	bacnetPacket[dataLength++] = arrayProperty
- */
-    // Start of value
-    bacnetPacket[dataLength++] = 0x3E
-    if(object_type == BANET_PROPVAR_BOOLEANAPPTAG)
-	{
-	    // action-text: TRUE
-	    if(in != 0.0)
-	       bacnetPacket[dataLength++] = 0x11
-	    else 
-	       bacnetPacket[dataLength++] = 0x10
-	}
-	else if(object_type == BANET_PROPVAR_UNSIGNEDINTAPPTAG)
-	{
-	    // action-text: (Unsigned) 33
-	    bufInteger[0] = (int)in
-	    int iLen = bus.encodeUnsigned(bufInteger, bufData)
-	    bacnetPacket[dataLength++] = 0x20 + iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else if(object_type == BANET_PROPVAR_INTEGERAPPTAG)
-	{
-	    // action-text: (Unsigned) 33
-	    bufInteger[0] = (int)in
-	    int iLen = bus.encodeInteger(bufInteger, bufData)
-	    bacnetPacket[dataLength++] = 0x30 + iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else if(object_type == BANET_PROPVAR_REALAPPTAG)
-	{
-	    // action-text: 1234.560059 (Real)
-	    bufFloat[0] = in
-	    int iLen = bus.encodeFloat(bufFloat, bufData)
-	    bacnetPacket[dataLength++] = 0x40 + iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else if(object_type == BANET_PROPVAR_DOUBLEAPPTAG)
-	{
-	    // action-text: 1234.560000 (Double)
-	    bufDouble[0] = (double)in
-	    int iLen = bus.encodeDouble(bufDouble, bufData)
-	    bacnetPacket[dataLength++] = 0x55
-	    bacnetPacket[dataLength++] = iLen
-	    for(int i = 0; i < iLen; i++)
-	    {
-	       bacnetPacket[dataLength++] = bufData[i]
-	    }
-	}
-	else 
-	{
-	    log.message("Error object_type=object_type")
-	}
-    // End of value
-    bacnetPacket[dataLength++] = 0x3F
-    ** log.message("22222 bacnetPacket[$dataLength]")
+    bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+    // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+	bacnetPacket[dataLength++] = instanceNumber
+	// Property Identifier: present-value (85)
+	bacnetPacket[dataLength++] = 0x19
+	bacnetPacket[dataLength++] = propertyIdentifier
+	
+	// .... .110 = Named Tag: Opening Tag (6)
+	bacnetPacket[dataLength++] = 0x3E
+	// Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
+	bacnetPacket[dataLength++] = 0x44
+    bufFloat[0] = (float)in
+    int iLen = bus.encodeFloat(bufFloat, bufData)
+    for(int i = 0; i < iLen; i++)
+    {
+       bacnetPacket[dataLength++] = bufData[i]
+    }
+	// .... .111 = Named Tag: Closing Tag (7)
+	bacnetPacket[dataLength++] = 0x3F
+	// Priority: (Unsigned) 16
+	// Context Tag: 4, Length/Value/Type: 1
+	bacnetPacket[dataLength++] = 0x49
+	// Priority: (Unsigned) 16
+	bacnetPacket[dataLength++] = 0x10
+	
+    log.message("22222 bacnetPacket[$dataLength]")
 	for(int i =0 ; i < dataLength; i++)
 	    buf[i] = (float)bacnetPacket[i]
   }
   
   virtual override void execute()
   {
+    ** log.message("BacWritePropertyVar::execute 11111 status=$status") 
     int iDelayCount = 0
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
     }
+    ** log.message("BacWritePropertyVar::execute 222222 status=$status") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
+      ** log.message("23232323 sendInterval=$sendInterval") 
       if(sendInterval < SEND_INTERVAL) {
          sendInterval++
       }
       else { 
 	      makePacket()
+          log.message("111111 makePacket($dataLength)")
 	      if (bus.writeReg(cache, regId, dataLength, buf) == dataLength) {
 	        ** log.message("bus.readReg")
-	        ** log.message("We readReg and return $dataLength ")
-	        // if(dataLength > 0)
 	      } else {
-	        log.message("writeReg Error")
+	        log.message("BacWritePropertyVar Error")
 	        status := STATUSOFFLINE
 	      }
 	      sendInterval = 0
 	  }
     }
+    ** log.message("33333 status=$status") 
   }
 
   int checkWritePropertyData()
   {
 	return 0
   }
-  define int SEND_INTERVAL = 30
+  define int SEND_INTERVAL = 10
   private inline float[1024] buf
   static inline byte[1024] bacnetPacket
   int dataLength

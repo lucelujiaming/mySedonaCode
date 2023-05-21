@@ -106,17 +106,10 @@ class bacReadPropertyObjList
   
   // Read Property Object
   @config
-  property int objectReserveType = 8
-  // Object Type: access-credential (32)
-  // Object Type: device (8)
-
-//  It is replaced by bus.objectIdentifier
-//  @config
-//  property int objectInstanceType = 0
+  property int objectType = 8
   
-//  Move to BacNetFieldBusIO.sedona
-//  @config
-//  property int propertyIdentifier = 0x1A0176
+  @config
+  property int instanceNumber = 0
   
   @config
   property int arrayProperty = 5
@@ -175,53 +168,61 @@ class bacReadPropertyObjList
 	    dataLength = 5
     }
     // Service Choice: readProperty (12)
-	bacnetPacket[dataLength++] = 0x0C
-	// Context Tag: 0, Length/Value/Type: 4
-	// .... 1... = Tag Class: Context Specific Tag
-	// 0000 .... = Context Tag Number: 0
-	// Length Value Type: 4
-	bacnetPacket[dataLength++] = 0x0C
-    // 0000 1000 00.. .... .... .... .... .... = Object Type: access-credential (32)
-    bacnetPacket[dataLength++] = (objectReserveType *4 * 16)/256
-    bacnetPacket[dataLength] = (objectReserveType *4 * 16)%256
-	// .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
-	if(bus.objectIdentifier > 0x10000)
-	{
-	   bacnetPacket[dataLength] +=  bus.objectIdentifier/0x10000
-	}
-	dataLength++
-	bacnetPacket[dataLength++] = bus.objectIdentifier/256
-	bacnetPacket[dataLength++] = bus.objectIdentifier%256
-	log.message("bacReadPropertyObjList::objectIdentifier = ${bus.objectIdentifier}")
-	// Property Identifier: (374) Reserved for Use by ASHRAE (374)
-    // Property Type: access-credential (32)
-	log.message("bacReadPropertyObjList::propertyIdentifier = $propertyIdentifier")
-	if(propertyIdentifier/0x1000000 > 0)
-	{
-		bacnetPacket[dataLength++] = 0x18 + 4
-		bacnetPacket[dataLength++] = propertyIdentifier/(0x01000000)
-		bacnetPacket[dataLength++] = (propertyIdentifier /(0x010000))%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier /   0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
-    }
-    else if(propertyIdentifier/0x10000 > 0)
-	{
-		bacnetPacket[dataLength++] = 0x18 + 3
-		bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
-		bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
-    }
-    else if(propertyIdentifier/0x100 > 0)
-	{
-		bacnetPacket[dataLength++] = 0x18 + 2
-		bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
-		bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    bacnetPacket[dataLength++] = 0x0C
+    // Context Tag: 0, Length/Value/Type: 4
+    // .... 1... = Tag Class: Context Specific Tag
+    // 0000 .... = Context Tag Number: 0
+    // Length Value Type: 4
+    bacnetPacket[dataLength++] = 0x0C
+    if(objectType > 4)
+    {
+        bacnetPacket[dataLength++] = objectType / 4
     }
     else 
-	{
-		bacnetPacket[dataLength++] = 0x18 + 1
-		bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+    // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    log.message("bacReadPropertyObjList::instanceNumber = ${instanceNumber}")
+    // Property Identifier: (374) Reserved for Use by ASHRAE (374)
+    // Property Type: access-credential (32)
+    log.message("bacReadPropertyObjList::propertyIdentifier = $propertyIdentifier")
+    if(propertyIdentifier/0x1000000 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 4
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x01000000)
+        bacnetPacket[dataLength++] = (propertyIdentifier /(0x010000))%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier /   0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else if(propertyIdentifier/0x10000 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 3
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
+        bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else if(propertyIdentifier/0x100 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 2
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
+        bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x18 + 1
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
     }
 //    // property Array Index (Unsigned) 5
 //    // Array Information
@@ -265,7 +266,7 @@ class bacReadPropertyObjList
 
   void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)
   {
-    log.message("setBacReadProperty with iLen = $iLen and tagNumber=$tagNumber")
+    ** log.message("setBacReadProperty with iLen = $iLen and tagNumber=$tagNumber")
 	switch (tagNumber)
     {
 		case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:

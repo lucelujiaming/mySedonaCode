@@ -73,7 +73,7 @@ class SoxService
     datagram.getSocketAddr(s.addr)
 
     // log open
-    //log.message("opened ${Sys.hexStr(s.id())}")
+    // log.message("opened ${Sys.hexStr(s.id())}")
 
     return s
   }
@@ -135,7 +135,7 @@ class SoxService
       return false
     }
 
-    log.message("started port=$port")
+    // log.message("started port=$port")
 
     if (socket.join())
       log.message("DASP Discovery enabled")

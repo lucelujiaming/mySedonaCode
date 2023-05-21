@@ -58,7 +58,7 @@ class ReceiveWindow
   void init(int num)
   {
     seqNum  = num - 1  // assignement to short will mask
-    log.message("ReceiveWindow seqNum=$seqNum")
+    ** log.message("ReceiveWindow seqNum=$seqNum")
     seqMore = 1
     acked   = false
   }

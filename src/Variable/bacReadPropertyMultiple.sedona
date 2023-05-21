@@ -109,10 +109,6 @@ class bacReadPropertyMultiple
   property int objectReserveType = 8
   // Object Type: access-credential (32)
   // Object Type: device (8)
-
-//  It is replaced by bus.objectIdentifier
-//  @config
-//  property int objectInstanceType = 0
   
 //  Move to BacNetFieldBusIO.sedona
 //  @config
@@ -179,7 +175,6 @@ class bacReadPropertyMultiple
 	    bacnetPacket[4] = proposedWindowSize
 	    dataLength = 5
     }
-    // int instanceNumber = 0x00
     // Service Choice: readPropertyMultiple (14)
     bacnetPacket[dataLength++] = 0x0E
     // ObjectIdentifier: analog-value, 0
@@ -216,11 +211,25 @@ class bacReadPropertyMultiple
     bacnetPacket[dataLength++] = 0x1F
     // ObjectIdentifier: analog-value, 1
     bacnetPacket[dataLength++] = 0x0C
+    if(objectType > 4)
+    {
+        bacnetPacket[dataLength++] = objectType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = (objectType % 4) * 0x40
     // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
-    bacnetPacket[dataLength++] = 0x00
-    bacnetPacket[dataLength++] = 0x80
-    bacnetPacket[dataLength++] = 0x00
-    bacnetPacket[dataLength++] = instanceNumber
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
 	// listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
     bacnetPacket[dataLength++] = 0x1E
 	// Property Identifier: description (28)
@@ -265,7 +274,7 @@ class bacReadPropertyMultiple
 
   void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)
   {
-    log.message("setBacReadProperty with iLen = $iLen and tagNumber=$tagNumber")
+    ** log.message("setBacReadProperty with iLen = $iLen and tagNumber=$tagNumber")
 	switch (tagNumber)
     {
 		case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
@@ -290,28 +299,28 @@ class bacReadPropertyMultiple
 			bus.decodeUnsigned(data, iLen, bufInteger)
 			out := (float)bufInteger[0]
     		log.message("-------------------------------------------------------------------------------")
-    		log.message("-----------------------------ReadPropertyMultipleUnsignedInteger = $out-----------------------")
+    		log.message("-------------------------ReadPropertyMultipleUnsignedInteger = $out------------------")
     		log.message("-------------------------------------------------------------------------------")
 			break
 		case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
 			bus.decodeUnsigned(data, iLen, bufInteger)
 			out := (float)bufInteger[0]
     		log.message("-------------------------------------------------------------------------------")
-    		log.message("-----------------------------ReadPropertyMultipleSignedInteger = $out-----------------------")
+    		log.message("------------------------ReadPropertyMultipleSignedInteger = $out------------------")
     		log.message("-------------------------------------------------------------------------------")
 			break
 		case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
 			bus.decodeFloat(data, bufFloat)
 			out := (float)bufFloat[0]
     		log.message("-------------------------------------------------------------------------------")
-    		log.message("-----------------------------ReadPropertyMultipleFloat = $out-----------------------")
+    		log.message("--------------------------ReadPropertyMultipleFloat = $out--------------------")
     		log.message("-------------------------------------------------------------------------------")
 			break
 		case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
 			bus.decodeDouble(data, bufDouble)
 			out := (float)bufDouble[0]
     		log.message("-------------------------------------------------------------------------------")
-    		log.message("-----------------------------ReadPropertyMultipleDouble = $out-----------------------")
+    		log.message("-------------------------ReadPropertyMultipleDouble = $out--------------------")
     		log.message("-------------------------------------------------------------------------------")
 			break
 		// case BANET_PROPVAR_NULLAPPTAG:

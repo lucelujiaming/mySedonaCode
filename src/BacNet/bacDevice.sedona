@@ -96,9 +96,9 @@ class bacDevice
 	            log.message("We readReg and return $dataLength from ${bus.dataRecvGramAddr}")
 	        	for(int i =0 ; i < dataLength; i++)
 		    	{
-	        //        log.message(
-	        //        		"execute readReg (0x").printHex(
-	        //        			(byte)buf[i]).print(") .").nl()
+	        		//	log.message(
+	        		//		"execute readReg (0x").printHex(
+	        		//			(byte)buf[i]).print(") .").nl()
 		    	    bacnetPacket[i] = (byte)buf[i]
 		    	}
 		    	// bus.objectIdentifier = bus.sourceNetworkAddress = -1
@@ -107,8 +107,8 @@ class bacDevice
 	            {
 	               log.message("We readReg and return (${bus.objectIdentifier}, ${bus.sourceNetworkAddress})")
 	               log.message("          from ${bus.dataRecvGramAddr}")
-	               bus.objectIdentifier = 240001
-	               bus.dataRecvGramAddr = "192.168.168.242"
+	               bus.objectIdentifier = 240012
+	               bus.dataRecvGramAddr = "192.168.168.241"
 
 	               log.message("We use ${bus.objectIdentifier} temply")
 	               bus.setClientAddress(bus.dataRecvGramAddr)
