@@ -11,37 +11,9 @@ class BIP
   define int BACPACKETSTATUSNG = 2
   define int BACPACKETSTATUSEND = 3
   
-  define Str BVLCISTATUSRANGE = "NoBVLCI, DistributeBroadcastToNetWork, Unicast, Broadcast, ForwardNPDU_WT, END"
-  define int BVLCISTATUSNOBVLCI = 0
-  define int BVLCISTATUSDISTRIBUTEBROADCAST = 1
-  define int BVLCISTATUSUNICAST = 2
-  define int BVLCISTATUSBROADCAST = 3
-  define int BVLCISTATUSFORARDNPDU = 4
-  define int BVLCISTATUSEND = 5
-
-  define Str NPCIRANGE = "Disable, Enable, END"
-  define int DNETDISABLE = 0
-  define int DNETENABLE = 1
-  
-  define int SNETDISABLE = 0
-  define int SNETENABLE = 1
-  
-  define int DATAREPLYDISABLE = 0
-  define int DATAREPLYENABLE = 1
-  
-  define int NPCIEND = 3
-
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
-  @asStr
-  // @config
-  property Buf(64) errorInfo = ""
-  
-  @asStr
-  // @config
-  @fieldWidth = 100
-  property Buf(64) packet_output = ""
   
   @readonly
   @range = BACPACKETSTATUSRANGE
@@ -63,56 +35,6 @@ class BIP
   @config
   @max = 65535
   property int port = 47808
-
-  @config
-  @range = BVLCISTATUSRANGE
-  @fieldWidth = 200
-  property int typeBVLCI = BVLCISTATUSUNICAST
-
-  // NPCI
-  @config
-  property int versionNPCI = 1
-
-  // DNET/DLEN/DADR Present
-  @readonly
-  @range = NPCIRANGE
-  @fieldWidth = 200
-  property int dnetPresentNPCI = DNETENABLE
-  
-//  @config
-//  property int dnetNPCI = 2401
-
-/* 
-  @asStr
-  @config
-  property Buf(64) dadrNPCI = ""
- */ 
-  
-  @config
-  property int hopCountNPCI = 255
-  
-  // SNET/SLEN/SADR Present
-  @readonly
-  @range = NPCIRANGE
-  @fieldWidth = 200
-  property int snetPresentNPCI = SNETDISABLE
-/* 
-  @config
-  property int snetNPCI = 0
-
-  @asStr
-  @config
-  property Buf(64) sadrNPCI = ""
- */ 
-  // Data Expecting Reply
-  @config
-  @range = NPCIRANGE
-  @fieldWidth = 200
-  property int dataExpectingReplyNPCI = DATAREPLYDISABLE
-  
-  @config
-  property int priorityNPCI = 0
-  // Lujiaming add these end at 23/02/24
   
   ////////////////////////////////////////////////////////////////
   // Life cycle
@@ -311,7 +233,7 @@ class BIP
             bacDevice dev = null
             log.message("3333 updateCache f.name=$f.name and type.name=$f.type.name");
             for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-              ** log.message("4444 updateCache d.name=$d.name and type.name=$d.type.name");
+              ** log.message("3434 updateCache d.name=$d.name and type.name=$d.type.name");
               Str strSrc = ((BacNetFieldBusIO)r).devStr
               Str strDst = ((bacDevice)d).deviceName.toStr()
               log.message("4444 updateCache strSrc=$strSrc and strDst=$strDst");
@@ -322,21 +244,23 @@ class BIP
               }
             }
             if (dev != null) {
-              ** log.message("66666 cleanCache dev.name=$dev.name and dev.type.name=$dev.type.name");
+              log.message("66666 cleanCache dev.name=$dev.name and dev.type.name=$dev.type.name");
               ((BacNetFieldBusIO)r).cache = bacnet_add(ctx, dev.deviceInstance, 
                        0, // ((BacNetFieldBusIO)r).regId, 
                        0, // ((BacNetFieldBusIO)r).typeId, 
                        85, 0)
               if (((BacNetFieldBusIO)r).cache >= 0) {
                 if (((BacNetFieldBusIO)r).bus == null) {
+                  log.message("676767 cleanCache dev.name=$dev.name and dev.type.name=$dev.type.name");
                   ((BacNetFieldBusIO)r).bus = this
+                  ((BacNetFieldBusIO)r).device = dev
                 }
-                ** log.message("7777 cleanCache dev.status=$dev.status");
+                log.message("7777 cleanCache dev.status=$dev.status");
                 ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSREADY
                 dev.status := bacDevice.STATUSREADY
                 result = true
               } else {
-                ** log.message("8888 cleanCache dev.status=$dev.status");
+                log.message("8888 cleanCache dev.status=$dev.status");
                 ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSEADDR
               }
             } else {
@@ -423,68 +347,6 @@ class BIP
     return dataRecvGram.len
   }
 
-  int fillHead()
-  {
-    // BACnet Virtual Link Control
-    // Type: BACnet/IP (Annex J) (0x81)
-    bacnetPacket[0] = 0x81
-    if(typeBVLCI == BVLCISTATUSDISTRIBUTEBROADCAST)
-    {   
-      bacnetPacket[1] = 0x9
-    }
-    else if(typeBVLCI == BVLCISTATUSUNICAST)
-    {   
-      // Function: Original-Unicast-NPDU (0x0a)
-      bacnetPacket[1] = 0xA
-    }
-    else if(typeBVLCI == BVLCISTATUSBROADCAST)
-    {   
-      bacnetPacket[1] = 0xB
-    }
-    else 
-    {   
-      return -1
-    }
-    // Skip BVLC-Length: 4 of 18 bytes BACnet packet length
-    bacnetPacket[2] = 0x00
-    bacnetPacket[3] = 0x00
-    // Building Automation and Control Network NPDU
-    // NPCI Version: 0x01 (ASHRAE 135-1995)
-    bacnetPacket[4] = versionNPCI
-    // Control: 0x04, Expecting Reply
-    if(dataExpectingReplyNPCI == DATAREPLYDISABLE)
-    {   
-        bacnetPacket[5] = 0x20
-	    // Building Automation and Control Network APDU
-	    bacnetPacket[5] += 0x04
-	    bacnetPacket[5] += priorityNPCI
-	    // dnetNPCI
-	    bacnetPacket[6] = sourceNetworkAddress/256
-	    bacnetPacket[7] = sourceNetworkAddress%256
-	    log.message("send sourceNetworkAddress =$sourceNetworkAddress")
-	//   // Destination MAC Layer Address Length: 1
-	//   bacnetPacket[8] = 0x01
-	//   // DADR: 5
-	//   log.message("send DADR =$sadr")
-	//   bacnetPacket[9] = sadr
-	     // Destination MAC Layer Address Length: 0
-	     bacnetPacket[8] = 0x00
-	    // hopCountNPCI
-	    bacnetPacket[9] = hopCountNPCI
-        return 10
-    }
-    else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
-    {   
-        bacnetPacket[5] = 0x00
-	    bacnetPacket[5] += 0x04
-        return 6
-    }
-    else 
-    {   
-      return -1
-    }
-  }
-
   void output_hex(byte[] bytePacket, int iPacketLen)
   {
      Str strHexByte;
@@ -497,32 +359,29 @@ class BIP
 
   override int writeReg(int deviceAddr, int addr, int iLen, float[] buf)
   { 
+    // Init sockReadAddr
     sockReadAddr.addr.parse("0.0.0.0")
-	sockReadAddr.port = 0
+    sockReadAddr.port = 0
     dataSendGram.getSocketAddr(sockReadAddr)
+    // Get Addr and port from dataSendGram
     if(sockReadAddr.port == 0)
     {
        log.message("111111 writeReg")
        return -1;
     }
-    int headLength = 0
     ** log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
     ** log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
-    headLength = fillHead()
-    bacnetPacket[2] = (headLength + iLen)/256
-    bacnetPacket[3] = (headLength + iLen)%256
     
     for(int i =0; i < iLen; i++)
     {
-       bacnetPacket[i + headLength] = (byte)buf[i]
+       bacnetPacket[i] = (byte)buf[i]
     }
 
-    errorInfo.copyFromStr("OK")
-    output_hex(bacnetPacket, headLength + iLen)
+    output_hex(bacnetPacket, iLen)
 	// Copy head
-	packetSend.copyFromBytes(bacnetPacket, 0, headLength + iLen)
-    ** log.message("Copy body ${headLength + iLen}")
-	dataSendGram.len = headLength + iLen
+	packetSend.copyFromBytes(bacnetPacket, 0, iLen)
+    ** log.message("Copy body ${iLen}")
+	dataSendGram.len = iLen
     log.message("send dataSendGram.len =${dataSendGram.len}")
 	dataSendGram.buf = packetSend.bytes
 	if(dataSendGram.len > 0)

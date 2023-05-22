@@ -36,27 +36,9 @@ class bacReadPropertyMultiple
   define int MAXAPDULENGTHReserved15 = 15
   define int MAXAPDULENGTHEND = 16
   
-  define Str CONFIRMEDREQUESTRANGE = "Disable, Enable, END"
-  define int SEGMENTEDMSGDISABLE = 0
-  define int SEGMENTEDMSGENABLE = 1
-  
-  define int SEGMENTEDRESPONSEACCEPTEDDISABLE = 0
-  define int SEGMENTEDRESPONSEACCEPTEDENABLE = 1
-  
-  define int CONFIRMEDREQUESTEND = 3
-
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
-  @asStr
-  // @config
-  property Buf(64) errorInfo = ""
-  
-  @asStr
-  // @config
-  @fieldWidth = 100
-  property Buf(1024) packet_output = ""
-    
   @config
   property int deviceInstance = 0
 
@@ -64,7 +46,7 @@ class bacReadPropertyMultiple
   @defaultOnClone
   @unit = Units.millisecond
   @min = 100
-  property int refreshTime = 500
+  property int refreshTime = 2000
 
   @readonly
   @unit = Units.millisecond
@@ -73,33 +55,6 @@ class bacReadPropertyMultiple
   ////////////////////////////////////////////////////////////////
   // config Properties
   ////////////////////////////////////////////////////////////////
-  // Confirmed-Request
-  @config
-  @readonly
-  property int segmentSize = 0
-
-  // Confirmed-Request::Segmented message
-  @config
-  @range = CONFIRMEDREQUESTRANGE
-  property int segmentedMsg = SEGMENTEDMSGDISABLE
-  
-  @config
-  property int moreFllows = 0
-
-  @config
-  property int sequenceNumber = 0 
-  
-  @config
-  property int proposedWindowSize = 0
-  
-  // Confirmed-Request::Segmented response accepted
-  @config
-  @range = CONFIRMEDREQUESTRANGE
-  property int segmentedResponseAccepted = SEGMENTEDRESPONSEACCEPTEDDISABLE
-  
-  @config
-  @range = MAXSEGMENTS
-  property int maxSegments = MAXSEGMENTUNDEFED
 
   @config
   property int maxAPDULength = 3 // 480
@@ -107,12 +62,7 @@ class bacReadPropertyMultiple
   // Read Property Object
   @config
   property int objectReserveType = 8
-  // Object Type: access-credential (32)
-  // Object Type: device (8)
   
-//  Move to BacNetFieldBusIO.sedona
-//  @config
-//  property int propertyIdentifier = 0x1A0176
   
   @config
   property int arrayProperty = 5
@@ -147,21 +97,24 @@ class bacReadPropertyMultiple
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    if(segmentedMsg == SEGMENTEDMSGENABLE)
-       bacnetPacket[0] = 0x08
+    // if(segmentedMsg == SEGMENTEDMSGENABLE)
+    //   bacnetPacket[0] = 0x08
     // .... 0100 = PDU Flags: 0x4
-    if(moreFllows != 0x00)
-      bacnetPacket[0] += 0x04
-    if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
-       bacnetPacket[0] += 0x02
+    // if(moreFllows != 0x00)
+    //    bacnetPacket[0] += 0x04
+    // if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
+    //    bacnetPacket[0] += 0x02
     // .000 .... = Max Response Segments accepted: Unspecified (0)
     // .... 0011 = Size of Maximum ADPU accepted: Up to 480 octets (fits in an ARCNET frame) (3)
-    if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
-       // maxSegments and maxAPDULength
-       bacnetPacket[1] = maxSegments * 0x10 + maxAPDULength
-    else 
-       // maxSegments and maxAPDULength
-       bacnetPacket[1] = maxAPDULength
+    // if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
+	// {
+    //    // maxSegments and maxAPDULength
+    //    // bacnetPacket[1] = maxSegments * 0x10 + maxAPDULength
+    //    bacnetPacket[1] = 0x00 * 0x10 + maxAPDULength
+	// }
+    // else 
+    // maxSegments and maxAPDULength
+    bacnetPacket[1] = maxAPDULength
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
@@ -169,12 +122,12 @@ class bacReadPropertyMultiple
     if(bus.invokeID == 0xFF)
        bus.invokeID = 0
 	dataLength = 3
-    if(segmentedMsg == SEGMENTEDMSGENABLE)
-    {
-	    bacnetPacket[3] = sequenceNumber
-	    bacnetPacket[4] = proposedWindowSize
-	    dataLength = 5
-    }
+    // if(segmentedMsg == SEGMENTEDMSGENABLE)
+    // {
+	//     bacnetPacket[3] = sequenceNumber
+	//     bacnetPacket[4] = proposedWindowSize
+	//     dataLength = 5
+    // }
     // Service Choice: readPropertyMultiple (14)
     bacnetPacket[dataLength++] = 0x0E
     // ObjectIdentifier: analog-value, 0
@@ -253,20 +206,19 @@ class bacReadPropertyMultiple
     }
     ** log.message("bacreadPropertyMultiple::execute 222222 status=$status") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
-      ** log.message("23232323 sendInterval=$sendInterval") 
-      if(sendInterval < SEND_INTERVAL) {
-         sendInterval++
-      }
-      else {
+      long nowNanoSecond  = Sys.ticks()
+      long nowMilliSecond = nowNanoSecond / (long)1000000
+      ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+      if(sendInterval < nowMilliSecond) {
 	      makePacket()
-          log.message("111111 makePacket($dataLength)")
-	      if (bus.writeReg(cache, regId, dataLength, buf) == dataLength) {
-	        ** log.message("bus.readReg")
+          log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+	      if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+	        ** log.message("device.readReg")
 	      } else {
-	        log.message("bacreadPropertyMultiple Error")
+	        log.message("BacReadPropertyVar Error")
 	        status := STATUSOFFLINE
 	      }
-	      sendInterval = 0
+	      sendInterval = nowMilliSecond + (long)refreshTime
 	  }
     }
     ** log.message("33333 status=$status") 
@@ -359,7 +311,7 @@ class bacReadPropertyMultiple
   static inline byte[1024] bacnetPacket
   int dataLength
   // Send interval counter
-  int sendInterval = 0
+  long sendInterval = (long)0
 
   private inline int[2]    bufInteger
   private inline float[2]  bufFloat

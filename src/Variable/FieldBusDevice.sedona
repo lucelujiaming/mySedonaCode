@@ -15,6 +15,11 @@ abstract class FieldBusDevice
   define int STATUSENAME = 7
   define int STATUSEND = 8
 
+  virtual int writeReg(int a, int b, int c, float[] buf)
+  {
+     log.message("---------------FieldBusDevice---------------");
+     return 0
+  }
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
@@ -25,5 +30,5 @@ abstract class FieldBusDevice
 
   @asStr
   @config
-  property Buf(64) deviceName = ""
+  property Buf(64) deviceName = "FFFFFFFF"
 }

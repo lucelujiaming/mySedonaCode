@@ -5,6 +5,28 @@ class bacDevice
   @config
   property int deviceInstance = 0
 
+  // Lujiaming add these at 23/05/22
+  define Str BVLCISTATUSRANGE = "NoBVLCI, DistributeBroadcastToNetWork, Unicast, Broadcast, ForwardNPDU_WT, END"
+  define int BVLCISTATUSNOBVLCI = 0
+  define int BVLCISTATUSDISTRIBUTEBROADCAST = 1
+  define int BVLCISTATUSUNICAST = 2
+  define int BVLCISTATUSBROADCAST = 3
+  define int BVLCISTATUSFORARDNPDU = 4
+  define int BVLCISTATUSEND = 5
+
+  define Str NPCIRANGE = "Disable, Enable, END"
+  define int DNETDISABLE = 0
+  define int DNETENABLE = 1
+  
+  define int SNETDISABLE = 0
+  define int SNETENABLE = 1
+  
+  define int DATAREPLYDISABLE = 0
+  define int DATAREPLYENABLE = 1
+  
+  define int NPCIEND = 3
+  // Lujiaming add these end at 23/05/22
+  
   @config
   @defaultOnClone
   @unit = Units.millisecond
@@ -15,6 +37,43 @@ class bacDevice
   @unit = Units.millisecond
   property int elapsedTime = -1
 
+  // Lujiaming add these at 23/05/22
+  @config
+  @range = BVLCISTATUSRANGE
+  @fieldWidth = 200
+  property int typeBVLCI = BVLCISTATUSUNICAST
+
+  // NPCI
+  @config
+  property int versionNPCI = 1
+
+  // DNET/DLEN/DADR Present
+  @readonly
+  @range = NPCIRANGE
+  @fieldWidth = 200
+  property int dnetPresentNPCI = DNETENABLE
+  
+//  @config
+//  property int dnetNPCI = 2401
+  @config
+  property int hopCountNPCI = 255
+  
+  // SNET/SLEN/SADR Present
+  @readonly
+  @range = NPCIRANGE
+  @fieldWidth = 200
+  property int snetPresentNPCI = SNETDISABLE
+  
+  // Data Expecting Reply
+  @config
+  @range = NPCIRANGE
+  @fieldWidth = 200
+  property int dataExpectingReplyNPCI = DATAREPLYDISABLE
+  
+  @config
+  property int priorityNPCI = 0
+  // Lujiaming add these end at 23/05/22
+  
   ////////////////////////////////////////////////////////////////
   // Life cycle
   ////////////////////////////////////////////////////////////////
@@ -99,10 +158,10 @@ class bacDevice
 	        		//	log.message(
 	        		//		"execute readReg (0x").printHex(
 	        		//			(byte)buf[i]).print(") .").nl()
-		    	    bacnetPacket[i] = (byte)buf[i]
+		    	    bacnetRecvPacket[i] = (byte)buf[i]
 		    	}
 		    	// bus.objectIdentifier = bus.sourceNetworkAddress = -1
-	            int iRet = bus.checkReadData(bacnetPacket, dataLength)
+	            int iRet = bus.checkReadData(bacnetRecvPacket, dataLength)
 	            if(iRet == 0)
 	            {
 	               log.message("We readReg and return (${bus.objectIdentifier}, ${bus.sourceNetworkAddress})")
@@ -122,12 +181,101 @@ class bacDevice
     }
   }
   
+  int fillHead()
+  {
+    // BACnet Virtual Link Control
+    // Type: BACnet/IP (Annex J) (0x81)
+    bacnetPacket[0] = 0x81
+    if(typeBVLCI == BVLCISTATUSDISTRIBUTEBROADCAST)
+    {   
+      bacnetPacket[1] = 0x9
+    }
+    else if(typeBVLCI == BVLCISTATUSUNICAST)
+    {   
+      // Function: Original-Unicast-NPDU (0x0a)
+      bacnetPacket[1] = 0xA
+    }
+    else if(typeBVLCI == BVLCISTATUSBROADCAST)
+    {   
+      bacnetPacket[1] = 0xB
+    }
+    else 
+    {   
+      return -1
+    }
+    // Skip BVLC-Length: 4 of 18 bytes BACnet packet length
+    bacnetPacket[2] = 0x00
+    bacnetPacket[3] = 0x00
+    // Building Automation and Control Network NPDU
+    // NPCI Version: 0x01 (ASHRAE 135-1995)
+    bacnetPacket[4] = versionNPCI
+    // Control: 0x04, Expecting Reply
+    if(dataExpectingReplyNPCI == DATAREPLYDISABLE)
+    {   
+        bacnetPacket[5] = 0x20
+	    // Building Automation and Control Network APDU
+	    bacnetPacket[5] += 0x04
+	    bacnetPacket[5] += priorityNPCI
+	    // dnetNPCI
+	    bacnetPacket[6] = ((BIP)bus).sourceNetworkAddress/256
+	    bacnetPacket[7] = ((BIP)bus).sourceNetworkAddress%256
+	    log.message("send sourceNetworkAddress =${bus.sourceNetworkAddress}")
+	//   // Destination MAC Layer Address Length: 1
+	//   bacnetPacket[8] = 0x01
+	//   // DADR: 5
+	//   log.message("send DADR =$sadr")
+	//   bacnetPacket[9] = sadr
+	     // Destination MAC Layer Address Length: 0
+	     bacnetPacket[8] = 0x00
+	    // hopCountNPCI
+	    bacnetPacket[9] = hopCountNPCI
+        return 10
+    }
+    else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
+    {   
+        bacnetPacket[5] = 0x00
+	    bacnetPacket[5] += 0x04
+        return 6
+    }
+    else 
+    {   
+      return -1
+    }
+  }
+
+  override int writeReg(int deviceAddr, int addr, int iLen, float[] buf)
+  { 
+    int headLength = 0
+    log.message("headLength=$headLength") 
+    headLength = fillHead()
+    log.message("headLength=$headLength") 
+    bacnetPacket[2] = (headLength + iLen)/256
+    bacnetPacket[3] = (headLength + iLen)%256
+
+	for(int i =0; i < headLength; i++)
+    {
+       bufToBIP[i] = (float)bacnetPacket[i]
+    }
+    
+    for(int j =0; j < iLen; j++)
+    {
+       bufToBIP[j + headLength] = buf[j]
+    }
+    int iRet = bus.writeReg(deviceAddr, addr, iLen + headLength, bufToBIP)
+	return iLen
+  }
+
   // define Log log
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////
   FieldBusNet bus = null
+  
+  ** static inline byte[256] bacnetHead
+  static inline byte[512] bacnetPacket
+  private inline float[512] bufToBIP
+  
   private inline float[1024] buf
-  static inline byte[1024] bacnetPacket
+  static inline byte[1024] bacnetRecvPacket
   int dataLength
 }

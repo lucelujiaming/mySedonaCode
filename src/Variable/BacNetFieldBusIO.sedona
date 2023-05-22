@@ -72,10 +72,11 @@ abstract class BacNetFieldBusIO
   //         Length Value Type: 2
   //     Property Identifier: Unknown (374) = 0x176
   // property int propertyIdentifier = 0x176 // 0x1A0176
-  @config
-  property int propertyIdentifier = 0x4D // 0x1A0176
+  // @config
+  // property int propertyIdentifier = 0x4D // 0x1A0176
   // Example2:
   // Property Identifier: object-name (77)
+  // Now we set it as Property Identifier: present-value (85) forever
   
   override void loaded()
   {
@@ -153,6 +154,7 @@ abstract class BacNetFieldBusIO
 
     return null
   }
+  
   private FieldBusNet lookupNetByDeviceName(Str devName)
   {
     Component root
@@ -181,12 +183,43 @@ abstract class BacNetFieldBusIO
 
     return null
   }
+  /*
+  private FieldBusDevice lookupDeviceByDeviceName(Str devName)
+  {
+    Component root
+    Component f
+    Component n
+    Component p = this
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && f.name.equals("service")) {
+        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+          if (n.type.is(FieldBusNet.type)) {
+            for (p = Sys.app.lookup(n.children); p != null; p = Sys.app.lookup(p.nextSibling)) {
+              if (p.type.is(FieldBusDevice.type) && devName.equals(((FieldBusDevice)p).deviceName.toStr())) {
+                return (FieldBusDevice)p
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return null
+  }
+  */
   
   // define Log log
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////
   FieldBusNet bus = null
+  FieldBusDevice device = null
   int cache = 0
 
   int busId = 0
@@ -194,4 +227,7 @@ abstract class BacNetFieldBusIO
   int regId = 0
   // int typeId = 0
   // int dataLen = 0
+
+  // Property Identifier: present-value (85)
+  int propertyIdentifier = 85
 }
