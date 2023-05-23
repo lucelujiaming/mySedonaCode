@@ -649,10 +649,10 @@ int sendBroadcast(int iRetryCount, socket_t clientSocket,
 			memset(buf, 0x00, MAXDATASIZE);
 			printf("try to  recvfrom \r\n");
 			iRecvCount = recvfrom(clientSocket, (char *)buf, 
-				MAXDATASIZE, 0, (struct sockaddr *)&user_addr, &size);
+				MAXDATASIZE, 0, (struct sockaddr *)&user_addr, (socklen_t *)&size);
 			if (iRecvCount == -1)
 			{
-				printf("recvfrom over \r\n");
+				printf("recvfrom over because of (%s) \r\n", strerror(errno));
 				break;
 			}
 			if((iRecvCount == iSendCount)

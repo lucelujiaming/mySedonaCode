@@ -323,8 +323,11 @@ Cell BacNet_BIP_dF(SedonaVM* vm, Cell* params)
 // #define ENDIAN_SWAP 1
 Cell BacNet_BIP_eD(SedonaVM* vm, Cell* params)
 {
-    double * bufInput = params[1].aval;
+    double * bufInput = (double *)params[1].aval;
     char * bufOutput = params[2].aval;
+	
+	printf("[%s:%s:%d] bufInput = %f\n",
+				 __FILE__, __FUNCTION__, __LINE__, bufInput[0]);
 
     Cell ret;
     ret.ival = -1;
@@ -352,6 +355,9 @@ Cell BacNet_BIP_eF(SedonaVM* vm, Cell* params)
 {
     float * bufInput = params[1].aval;
     char * bufOutput = params[2].aval;
+	
+	printf("[%s:%s:%d] bufInput = %f\n",
+				 __FILE__, __FUNCTION__, __LINE__, bufInput[0]);
 	
     Cell ret;
     ret.ival = -1;

@@ -24,7 +24,13 @@ class bacDevice
   define int DATAREPLYDISABLE = 0
   define int DATAREPLYENABLE = 1
   
-  define int NPCIEND = 3
+  define int NPCIEND = 2
+
+  
+  define Str COMMUNICATIONMETHOD = "InstanceNumber, SubNetAndAMC, END"
+  define int COMMUNICATIONBYINSTANCE = 0
+  define int COMMUNICATIONBYSUBNET = 1
+  define int COMMUNICATIONEND = 2
   // Lujiaming add these end at 23/05/22
   
   @config
@@ -36,6 +42,12 @@ class bacDevice
   @readonly
   @unit = Units.millisecond
   property int elapsedTime = -1
+
+  
+  @config
+  @range = COMMUNICATIONMETHOD
+  @fieldWidth = 200
+  property int communicationMethod = COMMUNICATIONBYSUBNET
 
   // Lujiaming add these at 23/05/22
   @config
@@ -211,7 +223,7 @@ class bacDevice
     bacnetPacket[4] = versionNPCI
     // Control: 0x04, Expecting Reply
     if(dataExpectingReplyNPCI == DATAREPLYDISABLE)
-    {   
+    {
         bacnetPacket[5] = 0x20
 	    // Building Automation and Control Network APDU
 	    bacnetPacket[5] += 0x04
@@ -220,16 +232,24 @@ class bacDevice
 	    bacnetPacket[6] = ((BIP)bus).sourceNetworkAddress/256
 	    bacnetPacket[7] = ((BIP)bus).sourceNetworkAddress%256
 	    log.message("send sourceNetworkAddress =${bus.sourceNetworkAddress}")
-	//   // Destination MAC Layer Address Length: 1
-	//   bacnetPacket[8] = 0x01
-	//   // DADR: 5
-	//   log.message("send DADR =$sadr")
-	//   bacnetPacket[9] = sadr
-	     // Destination MAC Layer Address Length: 0
-	     bacnetPacket[8] = 0x00
+	//  // Destination MAC Layer Address Length: 1
+	//  bacnetPacket[8] = 0x01
+	//  // DADR: 5
+	//  log.message("send DADR =$sadr")
+	//  bacnetPacket[9] = sadr
+	    // Destination MAC Layer Address Length: 0
+	    if(bus.sadr == 0)
+    	{
+	       bacnetPacket[8] = 0x00
+        }
+	    else
+    	{
+	       bacnetPacket[8] = 0x01
+	       bacnetPacket[9] = bus.sadr
+        }
 	    // hopCountNPCI
-	    bacnetPacket[9] = hopCountNPCI
-        return 10
+	    bacnetPacket[10] = hopCountNPCI
+        return 11
     }
     else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
     {   
