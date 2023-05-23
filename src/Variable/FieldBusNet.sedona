@@ -80,17 +80,17 @@ abstract class FieldBusNet
       return -1;
   }
 
-  virtual int encodeInteger(int[] data, byte[] value)
-  {
-      return -1;
-  }
-  
   virtual int checkReadData(byte[] bacnetRecvPacket, int iLen)
   {
     return 0
   }
   
   virtual int setClientAddress(Str ipClientAddress)
+  {
+    return 0
+  }
+  
+  virtual int setClientAddressByInstanceNumber(int instanceNumber)
   {
     return 0
   }

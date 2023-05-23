@@ -94,7 +94,10 @@ class UdpSocket
   **
   native void close()
 
-  native bool getBacnetDeviceList(byte[] ipAddress, int[] ipArrayList, int[] objIDList, int[] iListLenPtr)
+  native int getBacnetDeviceList(byte[] ipAddress, 
+  			int[] ipArrayList,  int[] controlDstSpecList, 
+  			int[] NPDUList,     int[] objectIdentifierList, 
+  			int[] maxADPUList)
 
 ////////////////////////////////////////////////////////////////
 // Fields

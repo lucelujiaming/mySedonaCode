@@ -27,10 +27,11 @@ class bacDevice
   define int NPCIEND = 2
 
   
-  define Str COMMUNICATIONMETHOD = "InstanceNumber, SubNetAndAMC, END"
-  define int COMMUNICATIONBYINSTANCE = 0
-  define int COMMUNICATIONBYSUBNET = 1
-  define int COMMUNICATIONEND = 2
+  define Str COMMUNICATIONMETHOD = "None, InstanceNumber, SubNetAndMAC, END"
+  define int COMMUNICATIONNONE       = 0
+  define int COMMUNICATIONBYINSTANCE = 1
+  define int COMMUNICATIONBYSUBNET   = 2
+  define int COMMUNICATIONEND = 3
   // Lujiaming add these end at 23/05/22
   
   @config
@@ -47,8 +48,12 @@ class bacDevice
   @config
   @range = COMMUNICATIONMETHOD
   @fieldWidth = 200
-  property int communicationMethod = COMMUNICATIONBYSUBNET
+  property int communicationMethod = COMMUNICATIONNONE
 
+  // InstanceNumber
+  @config
+  property int InstanceNumber = 0
+    
   // Lujiaming add these at 23/05/22
   @config
   @range = BVLCISTATUSRANGE
@@ -76,11 +81,11 @@ class bacDevice
   @fieldWidth = 200
   property int snetPresentNPCI = SNETDISABLE
   
-  // Data Expecting Reply
-  @config
-  @range = NPCIRANGE
-  @fieldWidth = 200
-  property int dataExpectingReplyNPCI = DATAREPLYDISABLE
+//  // Data Expecting Reply
+//  @config
+//  @range = NPCIRANGE
+//  @fieldWidth = 200
+//  property int dataExpectingReplyNPCI = DATAREPLYDISABLE
   
   @config
   property int priorityNPCI = 0
@@ -160,36 +165,48 @@ class bacDevice
   {
     ** log.message("bacDevice::execute 11111 status=$status") 
     if (bus != null) {
-    	if (bus.needFlush == false) {
-	        dataLength = bus.readReg(0, 0, 1024, buf)
-	        if(dataLength > 0)
-	        {
-	            log.message("We readReg and return $dataLength from ${bus.dataRecvGramAddr}")
-	        	for(int i =0 ; i < dataLength; i++)
-		    	{
-	        		//	log.message(
-	        		//		"execute readReg (0x").printHex(
-	        		//			(byte)buf[i]).print(") .").nl()
-		    	    bacnetRecvPacket[i] = (byte)buf[i]
-		    	}
-		    	// bus.objectIdentifier = bus.sourceNetworkAddress = -1
-	            int iRet = bus.checkReadData(bacnetRecvPacket, dataLength)
-	            if(iRet == 0)
-	            {
-	               log.message("We readReg and return (${bus.objectIdentifier}, ${bus.sourceNetworkAddress})")
-	               log.message("          from ${bus.dataRecvGramAddr}")
-	               bus.objectIdentifier = 240012
-	               bus.dataRecvGramAddr = "192.168.168.241"
+        if (bus.needFlush == false) {
+            dataLength = bus.readReg(0, 0, 1024, buf)
+            if(dataLength > 0)
+            {
+                log.message("We readReg and return $dataLength from ${bus.dataRecvGramAddr}")
+                for(int i =0 ; i < dataLength; i++)
+                {
+                    //    log.message(
+                    //        "execute readReg (0x").printHex(
+                    //            (byte)buf[i]).print(") .").nl()
+                    bacnetRecvPacket[i] = (byte)buf[i]
+                }
+                // bus.objectIdentifier = bus.sourceNetworkAddress = -1
+                int iRet = bus.checkReadData(bacnetRecvPacket, dataLength)
+                if(iRet == 0)
+                {
+                   log.message("We readReg and return (${bus.objectIdentifier}, ${bus.sourceNetworkAddress})")
+                   log.message("          from ${bus.dataRecvGramAddr}")
+                   bus.objectIdentifier = 240012
+                   bus.dataRecvGramAddr = "192.168.168.241"
 
-	               log.message("We use ${bus.objectIdentifier} temply")
-	               bus.setClientAddress(bus.dataRecvGramAddr)
-	            }
-	        }
+                   log.message("We use ${bus.objectIdentifier} temply")
+                   bus.setClientAddress(bus.dataRecvGramAddr)
+                }
+            }
+            if(communicationMethod == COMMUNICATIONNONE)
+            {
+                log.message("Setting communicationMethod...")
+                if(InstanceNumber != 0)
+                {
+                    communicationMethod := bus.setClientAddressByInstanceNumber(InstanceNumber)
+                }
+                else
+                {
+                   log.message("Setting InstanceNumber...")
+                }
+            }
         }
         else 
-	    {
-	        log.message("We needFlush ")
-    	}
+        {
+            log.message("We needFlush ")
+        }
     }
   }
   
@@ -222,43 +239,45 @@ class bacDevice
     // NPCI Version: 0x01 (ASHRAE 135-1995)
     bacnetPacket[4] = versionNPCI
     // Control: 0x04, Expecting Reply
-    if(dataExpectingReplyNPCI == DATAREPLYDISABLE)
+    if((bus.sourceNetworkAddress != 0) && (bus.sadr != 0))
     {
         bacnetPacket[5] = 0x20
-	    // Building Automation and Control Network APDU
-	    bacnetPacket[5] += 0x04
-	    bacnetPacket[5] += priorityNPCI
-	    // dnetNPCI
-	    bacnetPacket[6] = ((BIP)bus).sourceNetworkAddress/256
-	    bacnetPacket[7] = ((BIP)bus).sourceNetworkAddress%256
-	    log.message("send sourceNetworkAddress =${bus.sourceNetworkAddress}")
-	//  // Destination MAC Layer Address Length: 1
-	//  bacnetPacket[8] = 0x01
-	//  // DADR: 5
-	//  log.message("send DADR =$sadr")
-	//  bacnetPacket[9] = sadr
-	    // Destination MAC Layer Address Length: 0
-	    if(bus.sadr == 0)
-    	{
-	       bacnetPacket[8] = 0x00
+        // Building Automation and Control Network APDU
+        bacnetPacket[5] += 0x04
+        bacnetPacket[5] += priorityNPCI
+        // dnetNPCI
+        bacnetPacket[6] = bus.sourceNetworkAddress/256
+        bacnetPacket[7] = bus.sourceNetworkAddress%256
+        log.message("send sourceNetworkAddress =${bus.sourceNetworkAddress}")
+    //  // Destination MAC Layer Address Length: 1
+    //  bacnetPacket[8] = 0x01
+    //  // DADR: 5
+    //  log.message("send DADR =$sadr")
+    //  bacnetPacket[9] = sadr
+        // Destination MAC Layer Address Length: 0
+        if(bus.sadr == 0)
+        {
+           bacnetPacket[8] = 0x00
         }
-	    else
-    	{
-	       bacnetPacket[8] = 0x01
-	       bacnetPacket[9] = bus.sadr
+        else
+        {
+           bacnetPacket[8] = 0x01
+           bacnetPacket[9] = bus.sadr
         }
-	    // hopCountNPCI
-	    bacnetPacket[10] = hopCountNPCI
+        // hopCountNPCI
+        bacnetPacket[10] = hopCountNPCI
         return 11
     }
-    else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
+    // else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
+    else if((bus.sourceNetworkAddress == 0) && (bus.sadr == 0))
     {   
         bacnetPacket[5] = 0x00
-	    bacnetPacket[5] += 0x04
+        bacnetPacket[5] += 0x04
         return 6
     }
     else 
     {   
+      log.message("Error dataExpectingReplyNPCI with (${bus.sourceNetworkAddress}, ${bus.sadr})") 
       return -1
     }
   }
@@ -272,7 +291,7 @@ class bacDevice
     bacnetPacket[2] = (headLength + iLen)/256
     bacnetPacket[3] = (headLength + iLen)%256
 
-	for(int i =0; i < headLength; i++)
+    for(int i =0; i < headLength; i++)
     {
        bufToBIP[i] = (float)bacnetPacket[i]
     }
@@ -282,7 +301,7 @@ class bacDevice
        bufToBIP[j + headLength] = buf[j]
     }
     int iRet = bus.writeReg(deviceAddr, addr, iLen + headLength, bufToBIP)
-	return iLen
+    return iLen
   }
 
   // define Log log

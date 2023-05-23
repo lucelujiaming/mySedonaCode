@@ -36,5 +36,6 @@
   <native qname="BacNet::BIP.dF" id="4::15"/>
   <native qname="BacNet::BIP.eD" id="4::16"/>
   <native qname="BacNet::BIP.eF" id="4::17"/>
+  <native qname="BacNet::BIP.eUI" id="4::18"/>
 
 </sedonaKit>

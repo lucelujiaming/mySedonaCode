@@ -30,5 +30,5 @@ abstract class FieldBusDevice
 
   @asStr
   @config
-  property Buf(64) deviceName = "FFFFFFFF"
+  property Buf(64) deviceName = ""
 }

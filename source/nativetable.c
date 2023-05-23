@@ -570,6 +570,9 @@ Cell BacNet_BIP_eD(SedonaVM* vm, Cell* params);
 // int BIP.dF(int, int, int[], float[])
 Cell BacNet_BIP_eF(SedonaVM* vm, Cell* params);
 
+// int BIP.eUI(int, int, int[], float[])
+Cell BacNet_BIP_eUI(SedonaVM* vm, Cell* params);
+
 // native table for kit 4
 NativeMethod kitNatives4[] = 
 {
@@ -591,6 +594,7 @@ NativeMethod kitNatives4[] =
   BacNet_BIP_dF,                  // 4::15
   BacNet_BIP_eD,                  // 4::16
   BacNet_BIP_eF,                  // 4::17
+  BacNet_BIP_eUI,                 // 4::18
 };
 
 ////////////////////////////////////////////////////////////////
@@ -657,7 +661,7 @@ int isNativeIdValid(int kitId, int methodId)
     case 4:
       // jiaming.lu adjust it @03/20/2023
       // if (methodId >= 14) return 0;
-      if (methodId >= 18) return 0;
+      if (methodId >= 19) return 0;
       else return kitNatives4[methodId] != NULL;
     case 10:
       if (methodId >= 6) return 0;

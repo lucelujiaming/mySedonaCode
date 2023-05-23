@@ -41,6 +41,7 @@ int inet_setNonBlocking(socket_t sock)
 #elif defined(NETOS_GNU_TOOLS)
   return setsockopt(sock, SOL_SOCKET, SO_NBIO, (char *)&nonBlocking, sizeof(nonBlocking));
 #else
+    // printf("set ioctl(FIONBIO). \r\n");
   return ioctl(sock, FIONBIO, &nonBlocking);
 #endif
 }
