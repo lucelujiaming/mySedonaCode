@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Convert function block library"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:48.490+08:00"
+   buildTime="2023-05-17T09:12:17.147+08:00"
 >
 
 <!-- Dependencies -->
@@ -18,7 +18,7 @@
 </depends>
 
 <!-- Convert::Norm -->
-<type id="0" name="Norm" sizeof="56" base="sys::Component">
+<type id="0" name="Norm" sizeof="52" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -43,7 +43,7 @@
 </type>
 
 <!-- Convert::Round -->
-<type id="1" name="Round" sizeof="48" base="sys::Component">
+<type id="1" name="Round" sizeof="44" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -56,7 +56,7 @@
 </type>
 
 <!-- Convert::Scale -->
-<type id="2" name="Scale" sizeof="56" base="sys::Component">
+<type id="2" name="Scale" sizeof="52" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -81,7 +81,7 @@
 </type>
 
 <!-- Convert::ToReal -->
-<type id="3" name="ToReal" sizeof="48" base="sys::Component">
+<type id="3" name="ToReal" sizeof="44" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -94,7 +94,7 @@
 </type>
 
 <!-- Convert::ToWord -->
-<type id="4" name="ToWord" sizeof="48" base="sys::Component">
+<type id="4" name="ToWord" sizeof="44" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>

@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="PID function block library"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:41.979+08:00"
+   buildTime="2023-05-17T09:12:10.607+08:00"
 >
 
 <!-- Dependencies -->
@@ -18,7 +18,7 @@
 </depends>
 
 <!-- PID::Pid -->
-<type id="0" name="Pid" sizeof="88" base="sys::Component">
+<type id="0" name="Pid" sizeof="84" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>

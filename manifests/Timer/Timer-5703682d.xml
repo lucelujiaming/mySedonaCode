@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Timer function block library"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:43.248+08:00"
+   buildTime="2023-05-17T09:12:11.974+08:00"
 >
 
 <!-- Dependencies -->
@@ -18,7 +18,7 @@
 </depends>
 
 <!-- Timer::DelayOff -->
-<type id="0" name="DelayOff" sizeof="68" base="sys::Component">
+<type id="0" name="DelayOff" sizeof="64" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -42,7 +42,7 @@
 </type>
 
 <!-- Timer::DelayOn -->
-<type id="1" name="DelayOn" sizeof="68" base="sys::Component">
+<type id="1" name="DelayOn" sizeof="64" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -66,7 +66,7 @@
 </type>
 
 <!-- Timer::RunHour -->
-<type id="2" name="RunHour" sizeof="148" base="sys::Component">
+<type id="2" name="RunHour" sizeof="144" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -94,7 +94,7 @@
 </type>
 
 <!-- Timer::Tick -->
-<type id="3" name="Tick" sizeof="56" base="sys::Component">
+<type id="3" name="Tick" sizeof="52" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/util/sine.png"/>
   </facets>

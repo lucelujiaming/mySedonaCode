@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Sedona core system module"
    buildHost="ubuntu"
-   buildTime="2023-04-03T10:00:16.810+08:00"
+   buildTime="2023-05-17T09:54:59.206+08:00"
 >
 
 <!-- Dependencies -->
@@ -53,7 +53,7 @@
 </type>
 
 <!-- sys::Component -->
-<type id="9" name="Component" sizeof="40">
+<type id="9" name="Component" sizeof="36">
   <slot id="0" name="meta" type="int" flags="c" default="1">
     <facets>
       <bool name="config" val="true"/>
@@ -62,7 +62,7 @@
 </type>
 
 <!-- sys::App -->
-<type id="10" name="App" sizeof="276" base="sys::Component">
+<type id="10" name="App" sizeof="272" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/database.png"/>
     <bool name="palette" val="false"/>
@@ -118,21 +118,21 @@
 </type>
 
 <!-- sys::Folder -->
-<type id="11" name="Folder" sizeof="40" base="sys::Component">
+<type id="11" name="Folder" sizeof="36" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/folder.png"/>
   </facets>
 </type>
 
 <!-- sys::Service -->
-<type id="12" name="Service" sizeof="44" flags="a" base="sys::Component">
+<type id="12" name="Service" sizeof="40" flags="a" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/gears.png"/>
   </facets>
 </type>
 
 <!-- sys::PlatformService -->
-<type id="13" name="PlatformService" sizeof="208" base="sys::Service">
+<type id="13" name="PlatformService" sizeof="204" base="sys::Service">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/platform.png"/>
   </facets>
@@ -170,7 +170,7 @@
 </type>
 
 <!-- sys::RateFolder -->
-<type id="14" name="RateFolder" sizeof="48" base="sys::Folder">
+<type id="14" name="RateFolder" sizeof="44" base="sys::Folder">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/folder.png"/>
   </facets>
@@ -183,7 +183,7 @@
 </type>
 
 <!-- sys::User -->
-<type id="15" name="User" sizeof="72" base="sys::Component">
+<type id="15" name="User" sizeof="68" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/user.png"/>
   </facets>
@@ -206,14 +206,14 @@
 </type>
 
 <!-- sys::UserService -->
-<type id="16" name="UserService" sizeof="44" base="sys::Service">
+<type id="16" name="UserService" sizeof="40" base="sys::Service">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/user.png"/>
   </facets>
 </type>
 
 <!-- sys::AbstractBase -->
-<type id="17" name="AbstractBase" sizeof="100" flags="a" base="sys::Component">
+<type id="17" name="AbstractBase" sizeof="96" flags="a" base="sys::Component">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>
@@ -234,7 +234,7 @@
 </type>
 
 <!-- sys::AbstractTestComp -->
-<type id="18" name="AbstractTestComp" sizeof="48" flags="a" base="sys::Component">
+<type id="18" name="AbstractTestComp" sizeof="44" flags="a" base="sys::Component">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>
@@ -243,7 +243,7 @@
 </type>
 
 <!-- sys::AppDbg -->
-<type id="19" name="AppDbg" sizeof="172" base="sys::Component">
+<type id="19" name="AppDbg" sizeof="168" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/bug.png"/>
     <bool name="testonly" val="true"/>
@@ -392,7 +392,7 @@
 </type>
 
 <!-- sys::FooAction -->
-<type id="20" name="FooAction" sizeof="104" base="sys::AbstractBase">
+<type id="20" name="FooAction" sizeof="100" base="sys::AbstractBase">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>
@@ -405,7 +405,7 @@
 </type>
 
 <!-- sys::BarAction -->
-<type id="21" name="BarAction" sizeof="116" base="sys::FooAction">
+<type id="21" name="BarAction" sizeof="112" base="sys::FooAction">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>
@@ -425,7 +425,7 @@
 </type>
 
 <!-- sys::BazAction -->
-<type id="22" name="BazAction" sizeof="120" base="sys::BarAction">
+<type id="22" name="BazAction" sizeof="116" base="sys::BarAction">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>
@@ -444,7 +444,7 @@
 </type>
 
 <!-- sys::TestComp -->
-<type id="23" name="TestComp" sizeof="144" base="sys::AbstractTestComp">
+<type id="23" name="TestComp" sizeof="140" base="sys::AbstractTestComp">
   <facets>
     <str name="testStr" val="roger\nroger"/>
     <bool name="testonly" val="true"/>
@@ -542,7 +542,7 @@
 </type>
 
 <!-- sys::SubTestComp -->
-<type id="24" name="SubTestComp" sizeof="164" base="sys::TestComp">
+<type id="24" name="SubTestComp" sizeof="160" base="sys::TestComp">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>
@@ -570,7 +570,7 @@
 </type>
 
 <!-- sys::TestService -->
-<type id="25" name="TestService" sizeof="44" base="sys::Service">
+<type id="25" name="TestService" sizeof="40" base="sys::Service">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>

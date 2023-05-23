@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Compare function block library"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:47.310+08:00"
+   buildTime="2023-05-17T09:12:15.983+08:00"
 >
 
 <!-- Dependencies -->
@@ -18,7 +18,7 @@
 </depends>
 
 <!-- Compare::CompHystH -->
-<type id="0" name="CompHystH" sizeof="60" base="sys::Component">
+<type id="0" name="CompHystH" sizeof="56" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -33,7 +33,7 @@
 </type>
 
 <!-- Compare::CompHystL -->
-<type id="1" name="CompHystL" sizeof="60" base="sys::Component">
+<type id="1" name="CompHystL" sizeof="56" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -48,7 +48,7 @@
 </type>
 
 <!-- Compare::CompareE -->
-<type id="2" name="CompareE" sizeof="52" base="sys::Component">
+<type id="2" name="CompareE" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
   </facets>
@@ -62,7 +62,7 @@
 </type>
 
 <!-- Compare::CompareG -->
-<type id="3" name="CompareG" sizeof="52" base="sys::Component">
+<type id="3" name="CompareG" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
   </facets>
@@ -76,7 +76,7 @@
 </type>
 
 <!-- Compare::CompareL -->
-<type id="4" name="CompareL" sizeof="52" base="sys::Component">
+<type id="4" name="CompareL" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
   </facets>
@@ -90,7 +90,7 @@
 </type>
 
 <!-- Compare::InRange -->
-<type id="5" name="InRange" sizeof="56" base="sys::Component">
+<type id="5" name="InRange" sizeof="52" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/util/limit.png"/>
   </facets>

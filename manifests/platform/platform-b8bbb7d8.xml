@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Platform support for Unix based devices"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:33.496+08:00"
+   buildTime="2023-05-17T09:12:02.050+08:00"
 >
 
 <!-- Dependencies -->
@@ -18,7 +18,7 @@
 </depends>
 
 <!-- platform::UnixPlatformService -->
-<type id="0" name="UnixPlatformService" sizeof="208" base="sys::PlatformService">
+<type id="0" name="UnixPlatformService" sizeof="204" base="sys::PlatformService">
 </type>
 
 </kitManifest>

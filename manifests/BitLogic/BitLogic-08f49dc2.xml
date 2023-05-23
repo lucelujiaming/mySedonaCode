@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Logic Operation Library"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:45.945+08:00"
+   buildTime="2023-05-17T09:12:14.761+08:00"
 >
 
 <!-- Dependencies -->
@@ -18,7 +18,7 @@
 </depends>
 
 <!-- BitLogic::And -->
-<type id="0" name="And" sizeof="52" base="sys::Component">
+<type id="0" name="And" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/and.png"/>
   </facets>
@@ -32,7 +32,7 @@
 </type>
 
 <!-- BitLogic::And4 -->
-<type id="1" name="And4" sizeof="60" base="sys::Component">
+<type id="1" name="And4" sizeof="56" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/and.png"/>
   </facets>
@@ -48,7 +48,7 @@
 </type>
 
 <!-- BitLogic::FEdge -->
-<type id="2" name="FEdge" sizeof="52" base="sys::Component">
+<type id="2" name="FEdge" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -61,7 +61,7 @@
 </type>
 
 <!-- BitLogic::Not -->
-<type id="3" name="Not" sizeof="48" base="sys::Component">
+<type id="3" name="Not" sizeof="44" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/not.png"/>
   </facets>
@@ -74,7 +74,7 @@
 </type>
 
 <!-- BitLogic::Or -->
-<type id="4" name="Or" sizeof="52" base="sys::Component">
+<type id="4" name="Or" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/or.png"/>
   </facets>
@@ -88,7 +88,7 @@
 </type>
 
 <!-- BitLogic::Or4 -->
-<type id="5" name="Or4" sizeof="60" base="sys::Component">
+<type id="5" name="Or4" sizeof="56" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/or.png"/>
   </facets>
@@ -104,7 +104,7 @@
 </type>
 
 <!-- BitLogic::REdge -->
-<type id="6" name="REdge" sizeof="52" base="sys::Component">
+<type id="6" name="REdge" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
   </facets>
@@ -117,7 +117,7 @@
 </type>
 
 <!-- BitLogic::Xor -->
-<type id="7" name="Xor" sizeof="52" base="sys::Component">
+<type id="7" name="Xor" sizeof="48" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/logic/xor.png"/>
   </facets>

@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="ModBus Management"
    buildHost="ubuntu"
-   buildTime="2023-03-30T13:41:20.017+08:00"
+   buildTime="2023-05-17T09:12:07.659+08:00"
 >
 
 <!-- Dependencies -->
@@ -19,7 +19,7 @@
 </depends>
 
 <!-- ModBus::mbDevice -->
-<type id="0" name="mbDevice" sizeof="140" base="Variable::FieldBusDevice">
+<type id="0" name="mbDevice" sizeof="136" base="Variable::FieldBusDevice">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/device.png"/>
   </facets>
@@ -69,7 +69,7 @@
 </type>
 
 <!-- ModBus::rtuMaster -->
-<type id="1" name="rtuMaster" sizeof="4180" base="Variable::FieldBusNet">
+<type id="1" name="rtuMaster" sizeof="4192" base="Variable::FieldBusNet">
   <slot id="0" name="port" type="int" flags="c" default="0">
     <facets>
       <int name="fieldWidth" val="10"/>
@@ -131,7 +131,7 @@
 </type>
 
 <!-- ModBus::rtuSlave -->
-<type id="2" name="rtuSlave" sizeof="4172" base="Variable::FieldBusNet">
+<type id="2" name="rtuSlave" sizeof="4184" base="Variable::FieldBusNet">
   <slot id="0" name="port" type="int" flags="c" default="0">
     <facets>
       <int name="fieldWidth" val="10"/>
@@ -181,7 +181,7 @@
 </type>
 
 <!-- ModBus::tcpClient -->
-<type id="3" name="tcpClient" sizeof="4180" base="Variable::FieldBusNet">
+<type id="3" name="tcpClient" sizeof="4192" base="Variable::FieldBusNet">
   <slot id="0" name="ipaddr" type="sys::Buf" flags="cs" default="127.0.0.1">
     <facets>
       <bool name="asStr" val="true"/>
@@ -199,7 +199,7 @@
 </type>
 
 <!-- ModBus::tcpServer -->
-<type id="4" name="tcpServer" sizeof="4156" base="Variable::FieldBusNet">
+<type id="4" name="tcpServer" sizeof="4168" base="Variable::FieldBusNet">
   <slot id="0" name="port" type="int" flags="c" default="502">
     <facets>
       <bool name="config" val="true"/>

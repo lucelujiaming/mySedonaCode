@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Date Schedule Management"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:52.523+08:00"
+   buildTime="2023-05-17T09:12:21.157+08:00"
 >
 
 <!-- Dependencies -->
@@ -18,7 +18,7 @@
 </depends>
 
 <!-- Schedule::DateTime -->
-<type id="0" name="DateTime" sizeof="80" base="sys::Service">
+<type id="0" name="DateTime" sizeof="76" base="sys::Service">
   <slot id="0" name="hour" type="float">
     <facets>
       <bool name="readonly" val="true"/>
@@ -67,7 +67,7 @@
 </type>
 
 <!-- Schedule::Week -->
-<type id="1" name="Week" sizeof="72" base="sys::Component">
+<type id="1" name="Week" sizeof="68" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/clock.png"/>
   </facets>

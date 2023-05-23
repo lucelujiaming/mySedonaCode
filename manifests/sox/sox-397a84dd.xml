@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Sox service for remote management"
    buildHost="ubuntu"
-   buildTime="2023-03-28T10:31:36.183+08:00"
+   buildTime="2023-05-21T15:04:26.696+08:00"
 >
 
 <!-- Dependencies -->
@@ -19,7 +19,7 @@
 </depends>
 
 <!-- sox::SoxCert -->
-<type id="0" name="SoxCert" sizeof="76" base="sys::Component">
+<type id="0" name="SoxCert" sizeof="72" base="sys::Component">
   <facets>
     <bool name="palette" val="false"/>
   </facets>
@@ -51,7 +51,7 @@
 </type>
 
 <!-- sox::SoxService -->
-<type id="1" name="SoxService" sizeof="1992" base="sys::Service">
+<type id="1" name="SoxService" sizeof="1988" base="sys::Service">
   <slot id="0" name="port" type="short" flags="c" default="1876">
     <facets>
       <bool name="defaultOnClone" val="true"/>
@@ -71,7 +71,7 @@
 </type>
 
 <!-- sox::SoxTest -->
-<type id="2" name="SoxTest" sizeof="52" base="sys::Component">
+<type id="2" name="SoxTest" sizeof="48" base="sys::Component">
   <facets>
     <bool name="testonly" val="true"/>
   </facets>

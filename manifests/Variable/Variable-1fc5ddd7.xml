@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Variable"
    buildHost="ubuntu"
-   buildTime="2023-04-04T10:57:37.828+08:00"
+   buildTime="2023-04-11T16:22:54.903+08:00"
 >
 
 <!-- Dependencies -->
@@ -353,7 +353,7 @@
 </type>
 
 <!-- Variable::FieldBusNet -->
-<type id="7" name="FieldBusNet" sizeof="4148" flags="a" base="sys::Component">
+<type id="7" name="FieldBusNet" sizeof="4160" flags="a" base="sys::Component">
   <slot id="0" name="status" type="int" default="0">
     <facets>
       <int name="fieldWidth" val="20"/>
