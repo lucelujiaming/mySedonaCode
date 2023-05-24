@@ -49,8 +49,9 @@ class bacDevice
   @readonly property int communicationMethod = COMMUNICATIONNONE   
 
   // InstanceNumber
+  @asStr
   @config
-  property int InstanceNumber = 0
+  property Buf(64) InstanceNumber = ""
     
   // Lujiaming add these at 23/05/22
   @config
@@ -194,10 +195,30 @@ class bacDevice
        //     }
             
             ** log.message("Setting communicationMethod with ($lastInstanceNumber, $InstanceNumber)")
-            if(lastInstanceNumber != InstanceNumber)
+            if(lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false)
             {
-               communicationMethod := setClientAddressByInstanceNumber(InstanceNumber)
-               lastInstanceNumber = InstanceNumber
+               bool isSubNetMac = false
+               Str sNetBuf = ""
+               Str macBuf  = ""
+               for (int i=0; i<InstanceNumber.toStr().length(); i++) {
+                  int c = InstanceNumber.toStr().get(i)
+                  if (c == "/".get(0)) {
+                     isSubNetMac = true
+                     sNetBuf.copyFromStr(InstanceNumber.toStr(), i+1);
+                     macBuf = InstanceNumber.toStr().suffix(i + 1)
+                     log.message("-------Get with ($sNetBuf, $macBuf)--------------")
+                     break
+                  }
+               }
+               if(isSubNetMac) {
+                   communicationMethod := setClientAddressBySNetAndMac(
+                                             sNetBuf.parseInt(), macBuf.parseInt())
+               }
+               else {
+                   communicationMethod := setClientAddressByInstanceNumber(
+                                                        InstanceNumber.toStr().parseInt())
+               }
+               lastInstanceNumber.copyFromBuf(InstanceNumber)
             }
         }
         else 
@@ -907,6 +928,40 @@ class bacDevice
     return serviceChoicePos
   }
 
+  int setClientAddressBySNetAndMac(int sNetAddrID, int macID)
+  {
+    for(int i = 0 ; i < ((BIP)bus).iDeviceCount; i++)
+    {
+        sourceNetworkAddress = ((BIP)bus).NPDUList[i] % 0x10000
+        sadr                 = ((BIP)bus).NPDUList[i] / 0x10000
+        if((sourceNetworkAddress == sNetAddrID) && (sadr == macID))
+        {
+            bufInteger[0] = ((BIP)bus).ipArrayList[i]
+            bus.encodeUnsigned(bufInteger, bufData)
+            addrClientBuf.copyFromBytes(bufData, 0, 4)
+            addrClient.loadBuf(addrClientBuf)
+            setClientAddress(addrClient.toStr())
+            if((sourceNetworkAddress != 0) && (sadr != 0))
+            {
+                log.message("Setting communicationMethod to COMMUNICATIONBYSUBNET")
+               return 2 // COMMUNICATIONBYSUBNET
+            }
+         //   else if((sourceNetworkAddress == 0) && (sadr == 0))
+         //   {
+         //       log.message("Setting communicationMethod to COMMUNICATIONBYINSTANCE")
+         //      return 1 // COMMUNICATIONBYINSTANCE
+         //   }
+            else
+            {
+                log.message("Error to setting communicationMethod to COMMUNICATIONNONE")
+               return 0 // COMMUNICATIONNONE
+            }
+        }
+    }
+    log.message("Failed to Setting communicationMethod to COMMUNICATIONNONE")
+    return 0 // COMMUNICATIONNONE
+  }
+  
   int setClientAddressByInstanceNumber(int instanceNumber)
   {
     int iCurrentInstanceNumber = 0;
@@ -1039,5 +1094,5 @@ class bacDevice
   static inline byte[1024] bacnetRecvPacket
   int dataLength
   
-  int lastInstanceNumber = 0
+  inline Buf(64) lastInstanceNumber = ""
 }
