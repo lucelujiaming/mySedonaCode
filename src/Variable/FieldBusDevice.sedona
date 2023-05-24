@@ -20,6 +20,10 @@ abstract class FieldBusDevice
      log.message("---------------FieldBusDevice---------------");
      return 0
   }
+  virtual bool openPort(bool logError)
+  {
+     return true
+  }
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
@@ -31,4 +35,15 @@ abstract class FieldBusDevice
   @asStr
   @config
   property Buf(64) deviceName = ""
+
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  Str dataRecvGramAddr
+  int objectIdentifier
+  int sourceNetworkAddress
+  int invokeID = 1
+  
+  // SADR: 5
+  int sadr = 0
 }

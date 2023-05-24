@@ -107,26 +107,26 @@ class bacReadPropertyMultiple
     // .000 .... = Max Response Segments accepted: Unspecified (0)
     // .... 0011 = Size of Maximum ADPU accepted: Up to 480 octets (fits in an ARCNET frame) (3)
     // if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
-	// {
+    // {
     //    // maxSegments and maxAPDULength
     //    // bacnetPacket[1] = maxSegments * 0x10 + maxAPDULength
     //    bacnetPacket[1] = 0x00 * 0x10 + maxAPDULength
-	// }
+    // }
     // else 
     // maxSegments and maxAPDULength
     bacnetPacket[1] = maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = bus.invokeID
-    bus.invokeID = bus.invokeID + 1
-    if(bus.invokeID == 0xFF)
-       bus.invokeID = 0
-	dataLength = 3
+    bacnetPacket[2] = device.invokeID
+    device.invokeID = device.invokeID + 1
+    if(device.invokeID == 0xFF)
+       device.invokeID = 0
+    dataLength = 3
     // if(segmentedMsg == SEGMENTEDMSGENABLE)
     // {
-	//     bacnetPacket[3] = sequenceNumber
-	//     bacnetPacket[4] = proposedWindowSize
-	//     dataLength = 5
+    //     bacnetPacket[3] = sequenceNumber
+    //     bacnetPacket[4] = proposedWindowSize
+    //     dataLength = 5
     // }
     // Service Choice: readPropertyMultiple (14)
     bacnetPacket[dataLength++] = 0x0E
@@ -155,7 +155,7 @@ class bacReadPropertyMultiple
         bacnetPacket[dataLength++] = 0x00
     }
     bacnetPacket[dataLength++] = instanceNumber % 0x100
-	// listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
+    // listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
     bacnetPacket[dataLength++] = 0x1E
     // Property Identifier: required (105)
     bacnetPacket[dataLength++] = 0x09
@@ -183,18 +183,18 @@ class bacReadPropertyMultiple
         bacnetPacket[dataLength++] = 0x00
     }
     bacnetPacket[dataLength++] = instanceNumber % 0x100
-	// listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
+    // listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
     bacnetPacket[dataLength++] = 0x1E
-	// Property Identifier: description (28)
+    // Property Identifier: description (28)
     bacnetPacket[dataLength++] = 0x09
     bacnetPacket[dataLength++] = 0x1C
     // .... .111 = Named Tag: Closing Tag (7)
     bacnetPacket[dataLength++] = 0x1F
     log.message("22222 bacnetPacket[$dataLength]")
-	for(int i =0 ; i < dataLength; i++)
-	{
-	    buf[i] = (float)bacnetPacket[i]
-	}
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
   }
   
   virtual override void execute()
@@ -210,16 +210,16 @@ class bacReadPropertyMultiple
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
-	      makePacket()
+          makePacket()
           log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
-	      if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
-	        ** log.message("device.readReg")
-	      } else {
-	        log.message("BacReadPropertyVar Error")
-	        status := STATUSOFFLINE
-	      }
-	      sendInterval = nowMilliSecond + (long)refreshTime
-	  }
+          if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+            ** log.message("device.readReg")
+          } else {
+            log.message("BacReadPropertyVar Error")
+            status := STATUSOFFLINE
+          }
+          sendInterval = nowMilliSecond + (long)refreshTime
+      }
     }
     ** log.message("33333 status=$status") 
   }
@@ -227,82 +227,82 @@ class bacReadPropertyMultiple
   void setBacReadPropertyVarByProperty(int tagNumber, byte[] data, int iLen)
   {
     ** log.message("setBacReadProperty with iLen = $iLen and tagNumber=$tagNumber")
-	switch (tagNumber)
+    switch (tagNumber)
     {
-		case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
-			if(data[0] != 0x00)
-				out := 1.0
-			else
-				out := 0.0
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
-			// 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
-			int objectType = (data[0] * 0x100 + data[1]) / 0x40
-			// .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
-			int instanceNumber = 0x00
-			instanceNumber = data[1] % 0x40
-			instanceNumber = instanceNumber * 0x100 + data[2]
-			instanceNumber = instanceNumber * 0x100 + data[3]
-			out := (float)instanceNumber
-    		log.message("objectType = $objectType and instanceNumber=$out")
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
-		case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
-			bus.decodeUnsigned(data, iLen, bufInteger)
-			out := (float)bufInteger[0]
-    		log.message("-------------------------------------------------------------------------------")
-    		log.message("-------------------------ReadPropertyMultipleUnsignedInteger = $out------------------")
-    		log.message("-------------------------------------------------------------------------------")
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
-			bus.decodeUnsigned(data, iLen, bufInteger)
-			out := (float)bufInteger[0]
-    		log.message("-------------------------------------------------------------------------------")
-    		log.message("------------------------ReadPropertyMultipleSignedInteger = $out------------------")
-    		log.message("-------------------------------------------------------------------------------")
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
-			bus.decodeFloat(data, bufFloat)
-			out := (float)bufFloat[0]
-    		log.message("-------------------------------------------------------------------------------")
-    		log.message("--------------------------ReadPropertyMultipleFloat = $out--------------------")
-    		log.message("-------------------------------------------------------------------------------")
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
-			bus.decodeDouble(data, bufDouble)
-			out := (float)bufDouble[0]
-    		log.message("-------------------------------------------------------------------------------")
-    		log.message("-------------------------ReadPropertyMultipleDouble = $out--------------------")
-    		log.message("-------------------------------------------------------------------------------")
-			break
-		// case BANET_PROPVAR_NULLAPPTAG:
-		case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
-		case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
-		    for (int i = 0; i < iLen; i++)
-		    {
-		       strInfo.set(i, data[i])
-		    }
-		    strInfo.set(iLen, '\0')
-			log.message("Character string = $strInfo ")
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
-		    for (int i = 0; i < iLen; i++)
-		    {
-		       strInfo.set(i, data[i])
-		    }
-		    strInfo.set(iLen, '\0')
-			log.message("Character string = $strInfo ")
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
-			break
-		case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
-			break
-		// case BANET_PROPVAR_RESERVEDAPPTAG13:
-		// case BANET_PROPVAR_RESERVEDAPPTAG14:
-		// case BANET_PROPVAR_RESERVEDAPPTAG15:
-		default:
-			log.message("Not support $tagNumber ")
-			break
+        case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+            if(data[0] != 0x00)
+                out := 1.0
+            else
+                out := 0.0
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+            // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+            int objectType = (data[0] * 0x100 + data[1]) / 0x40
+            // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+            int instanceNumber = 0x00
+            instanceNumber = data[1] % 0x40
+            instanceNumber = instanceNumber * 0x100 + data[2]
+            instanceNumber = instanceNumber * 0x100 + data[3]
+            out := (float)instanceNumber
+            log.message("objectType = $objectType and instanceNumber=$out")
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+        case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+            bus.decodeUnsigned(data, iLen, bufInteger)
+            out := (float)bufInteger[0]
+            log.message("-------------------------------------------------------------------------------")
+            log.message("-------------------------ReadPropertyMultipleUnsignedInteger = $out------------------")
+            log.message("-------------------------------------------------------------------------------")
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+            bus.decodeUnsigned(data, iLen, bufInteger)
+            out := (float)bufInteger[0]
+            log.message("-------------------------------------------------------------------------------")
+            log.message("------------------------ReadPropertyMultipleSignedInteger = $out------------------")
+            log.message("-------------------------------------------------------------------------------")
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+            bus.decodeFloat(data, bufFloat)
+            out := (float)bufFloat[0]
+            log.message("-------------------------------------------------------------------------------")
+            log.message("--------------------------ReadPropertyMultipleFloat = $out--------------------")
+            log.message("-------------------------------------------------------------------------------")
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+            bus.decodeDouble(data, bufDouble)
+            out := (float)bufDouble[0]
+            log.message("-------------------------------------------------------------------------------")
+            log.message("-------------------------ReadPropertyMultipleDouble = $out--------------------")
+            log.message("-------------------------------------------------------------------------------")
+            break
+        // case BANET_PROPVAR_NULLAPPTAG:
+        case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+        case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+            for (int i = 0; i < iLen; i++)
+            {
+               strInfo.set(i, data[i])
+            }
+            strInfo.set(iLen, '\0')
+            log.message("Character string = $strInfo ")
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+            for (int i = 0; i < iLen; i++)
+            {
+               strInfo.set(i, data[i])
+            }
+            strInfo.set(iLen, '\0')
+            log.message("Character string = $strInfo ")
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+            break
+        // case BANET_PROPVAR_RESERVEDAPPTAG13:
+        // case BANET_PROPVAR_RESERVEDAPPTAG14:
+        // case BANET_PROPVAR_RESERVEDAPPTAG15:
+        default:
+            log.message("Not support $tagNumber ")
+            break
     }
   }
   

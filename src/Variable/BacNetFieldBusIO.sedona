@@ -15,34 +15,34 @@ abstract class BacNetFieldBusIO
   define int STATUSEND = 7
 
   define Str BANET_PROPVAR_RANGE = "NULL, Boolean, UnsignedInteger, Integer, Float, Double, END"
-  // define int BANET_PROPVAR_UNUSEDAPPTAG				= 0xFF
-  define int BANET_PROPVAR_NULLAPPTAG				= 0x00
-  define int BANET_PROPVAR_BOOLEANAPPTAG				= 0x01
-  define int BANET_PROPVAR_UNSIGNEDINTAPPTAG			= 0x02
-  define int BANET_PROPVAR_INTEGERAPPTAG				= 0x03
-  define int BANET_PROPVAR_REALAPPTAG				= 0x04
-  define int BANET_PROPVAR_DOUBLEAPPTAG				= 0x05
+  // define int BANET_PROPVAR_UNUSEDAPPTAG                = 0xFF
+  define int BANET_PROPVAR_NULLAPPTAG                = 0x00
+  define int BANET_PROPVAR_BOOLEANAPPTAG                = 0x01
+  define int BANET_PROPVAR_UNSIGNEDINTAPPTAG            = 0x02
+  define int BANET_PROPVAR_INTEGERAPPTAG                = 0x03
+  define int BANET_PROPVAR_REALAPPTAG                = 0x04
+  define int BANET_PROPVAR_DOUBLEAPPTAG                = 0x05
   
-  define int BANET_PROPVAR_OCTETSTRINGAPPTAG			= 0x06
-  define int BANET_PROPVAR_CHARACTERSTRINGAPPTAG		= 0x07
-  define int BANET_PROPVAR_BITSTRINGAPPTAG			    = 0x08
-  define int BANET_PROPVAR_ENUMERATEDAPPTAG		    	= 0x09
-  define int BANET_PROPVAR_DATEAPPTAG				= 0x0A
-  define int BANET_PROPVAR_TIMEAPPTAG				= 0x0B
-  define int BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG	= 0x0C
-  define int BANET_PROPVAR_END            				= 0x0D
-  // define int BANET_PROPVAR_RESERVEDAPPTAG13			= 0x0D
-  // define int BANET_PROPVAR_RESERVEDAPPTAG14			= 0x0E
-  // define int BANET_PROPVAR_RESERVEDAPPTAG15			= 0x0F
+  define int BANET_PROPVAR_OCTETSTRINGAPPTAG            = 0x06
+  define int BANET_PROPVAR_CHARACTERSTRINGAPPTAG        = 0x07
+  define int BANET_PROPVAR_BITSTRINGAPPTAG                = 0x08
+  define int BANET_PROPVAR_ENUMERATEDAPPTAG                = 0x09
+  define int BANET_PROPVAR_DATEAPPTAG                = 0x0A
+  define int BANET_PROPVAR_TIMEAPPTAG                = 0x0B
+  define int BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG    = 0x0C
+  define int BANET_PROPVAR_END                            = 0x0D
+  // define int BANET_PROPVAR_RESERVEDAPPTAG13            = 0x0D
+  // define int BANET_PROPVAR_RESERVEDAPPTAG14            = 0x0E
+  // define int BANET_PROPVAR_RESERVEDAPPTAG15            = 0x0F
 
-  define int BACNET_CONFIRMED_REQUEST_PDU 	= 0 //	[0] BACnet-Confirmed-Request-PDU,
-  define int BACNET_UNCONFIRMED_REQUEST_PDU = 1 //	[1] BACnet-Unconfirmed-Request-PDU,
-  define int BACNET_SIMPLEACK_PDU 			= 2 //	[2] BACnet-SimpleACK-PDU,
-  define int BACNET_COMPLEXACK_PDU 			= 3 //	[3] BACnet-ComplexACK-PDU,
-  define int BACNET_SEGMENTACK_PDU 			= 4 //	[4] BACnet-SegmentACK-PDU,
-  define int BACNET_ERROR_PDU 				= 5 //	[5] BACnet-Error-PDU,
-  define int BACNET_REJECT_PDU 				= 6 //	[6] BACnet-Reject-PDU,
-  define int BACNET_ABORT_PDU 				= 7 //	[7] BACnet-Abort-PDU
+  define int BACNET_CONFIRMED_REQUEST_PDU     = 0 //    [0] BACnet-Confirmed-Request-PDU,
+  define int BACNET_UNCONFIRMED_REQUEST_PDU = 1 //    [1] BACnet-Unconfirmed-Request-PDU,
+  define int BACNET_SIMPLEACK_PDU             = 2 //    [2] BACnet-SimpleACK-PDU,
+  define int BACNET_COMPLEXACK_PDU             = 3 //    [3] BACnet-ComplexACK-PDU,
+  define int BACNET_SEGMENTACK_PDU             = 4 //    [4] BACnet-SegmentACK-PDU,
+  define int BACNET_ERROR_PDU                 = 5 //    [5] BACnet-Error-PDU,
+  define int BACNET_REJECT_PDU                 = 6 //    [6] BACnet-Reject-PDU,
+  define int BACNET_ABORT_PDU                 = 7 //    [7] BACnet-Abort-PDU
 
 
 
@@ -96,31 +96,31 @@ abstract class BacNetFieldBusIO
   {
     // devStr = url.toStr()
     devStr.copyFromStr(url.toStr(), url.toStr().length() + 1)
-	log.message("111111 devStr=$devStr")
+    log.message("111111 devStr=$devStr")
     busId = 0
     if (bus != null) {
       bus.notifyFlush()
     }
     status := STATUSNODEV
-	Str tmpBuf = url.toStr()
-	log.message("222222 url=$tmpBuf")
+    Str tmpBuf = url.toStr()
+    log.message("222222 url=$tmpBuf")
     FieldBusNet tmpBus = lookupNetByDeviceName(tmpBuf)
-	if (tmpBus != null) {
-	    busId = tmpBus.busId
-	    log.message("444444 busId=$busId")
-	    // trigger notify flush.
-	    if (busId != 0) {
-	      log.message("55555 busId=$busId")
-	      bus = lookupNetById(busId)
-	      if (bus != null) {
-	      	log.message("66666 bus.notifyFlush()")
-	        bus.notifyFlush()
-	      }
-	    } else {
-	      log.message("77777 tmpBus.notifyFlush()")
-	      tmpBus.notifyFlush()
-	    }
-	}
+    if (tmpBus != null) {
+        busId = tmpBus.busId
+        log.message("444444 busId=$busId")
+        // trigger notify flush.
+        if (busId != 0) {
+          log.message("55555 busId=$busId")
+          bus = lookupNetById(busId)
+          if (bus != null) {
+              log.message("66666 bus.notifyFlush()")
+            bus.notifyFlush()
+          }
+        } else {
+          log.message("77777 tmpBus.notifyFlush()")
+          tmpBus.notifyFlush()
+        }
+    }
           
     if(bus != null)
     {
