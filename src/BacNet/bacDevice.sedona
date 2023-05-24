@@ -44,11 +44,9 @@ class bacDevice
   @unit = Units.millisecond
   property int elapsedTime = -1
 
-  
-  @config
-  @range = COMMUNICATIONMETHOD
-  @fieldWidth = 200
-  property int communicationMethod = COMMUNICATIONNONE
+                          
+  @range=COMMUNICATIONMETHOD
+  @readonly property int communicationMethod = COMMUNICATIONNONE   
 
   // InstanceNumber
   @config
@@ -190,17 +188,16 @@ class bacDevice
                    bus.setClientAddress(bus.dataRecvGramAddr)
                 }
             }
-            if(communicationMethod == COMMUNICATIONNONE)
+       //     else 
+       //     {
+       //         log.message("communicationMethod =$communicationMethod We need set it ")
+       //     }
+            
+            ** log.message("Setting communicationMethod with ($lastInstanceNumber, $InstanceNumber)")
+            if(lastInstanceNumber != InstanceNumber)
             {
-                log.message("Setting communicationMethod...")
-                if(InstanceNumber != 0)
-                {
-                    communicationMethod := bus.setClientAddressByInstanceNumber(InstanceNumber)
-                }
-                else
-                {
-                   log.message("Setting InstanceNumber...")
-                }
+               communicationMethod := bus.setClientAddressByInstanceNumber(InstanceNumber)
+               lastInstanceNumber = InstanceNumber
             }
         }
         else 
@@ -239,7 +236,7 @@ class bacDevice
     // NPCI Version: 0x01 (ASHRAE 135-1995)
     bacnetPacket[4] = versionNPCI
     // Control: 0x04, Expecting Reply
-    if((bus.sourceNetworkAddress != 0) && (bus.sadr != 0))
+    if(communicationMethod == COMMUNICATIONBYSUBNET)
     {
         bacnetPacket[5] = 0x20
         // Building Automation and Control Network APDU
@@ -268,8 +265,7 @@ class bacDevice
         bacnetPacket[10] = hopCountNPCI
         return 11
     }
-    // else if(dataExpectingReplyNPCI == DATAREPLYENABLE)
-    else if((bus.sourceNetworkAddress == 0) && (bus.sadr == 0))
+    else if(communicationMethod == COMMUNICATIONBYINSTANCE)
     {   
         bacnetPacket[5] = 0x00
         bacnetPacket[5] += 0x04
@@ -287,6 +283,8 @@ class bacDevice
     int headLength = 0
     log.message("headLength=$headLength") 
     headLength = fillHead()
+    if(headLength == -1)
+        return headLength
     log.message("headLength=$headLength") 
     bacnetPacket[2] = (headLength + iLen)/256
     bacnetPacket[3] = (headLength + iLen)%256
@@ -317,4 +315,6 @@ class bacDevice
   private inline float[1024] buf
   static inline byte[1024] bacnetRecvPacket
   int dataLength
+  
+  int lastInstanceNumber = 0
 }
