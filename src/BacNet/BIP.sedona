@@ -150,16 +150,9 @@ class BIP
   override void setBacReadPropertyVarByProperty(int propertyVar, int iObjectType, int iInstanceNumber,
                   int tagNumber, byte[] data, int iLen)
   {
-    Component root
-    Component p = this
-    ** log.message("Sys.app.lookup(p.parent)")
-    while (Sys.app.lookup(p.parent) != null) {
-      p = Sys.app.lookup(p.parent)
-    }
-    
-    root = p
-    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+    // log.message("AAAA bus.setBacReadPropertyVarByProperty")
+    for (Component f = Sys.app.lookup(children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(bacDevice.type)) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
            // log.message("AAA cleanCache r.name=$r.name and r.type.name=$r.type.name")
            // if (r.type.is(BacReadPropertyVar.type)) {
@@ -201,7 +194,7 @@ class BIP
   
   private bool updateCache()
   {
-    Component root
+//    Component root
     Component p = this
     bool result = false
 
@@ -217,58 +210,34 @@ class BIP
       }
     }
 
-    // add register node in play.
-    while (Sys.app.lookup(p.parent) != null) {
-      p = Sys.app.lookup(p.parent)
-    }
+//    // add register node in play.
+//    while (Sys.app.lookup(p.parent) != null) {
+//      p = Sys.app.lookup(p.parent)
+//    }
 
-    root = p
-    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-      if (f.type.is(Folder.type) && !f.name.equals("service")) {
-        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-          log.message("22222 updateCache r.name=$r.name and r.type.name=$r.type.name");
-          if (r.type.is(BacNetFieldBusIO.type) && 
-                  ((BacNetFieldBusIO)r).status < BacNetFieldBusIO.STATUSEURL 
-                   && ((BacNetFieldBusIO)r).busId == 0) {
-            bacDevice dev = null
-            log.message("3333 updateCache f.name=$f.name and type.name=$f.type.name");
-            for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-              ** log.message("3434 updateCache d.name=$d.name and type.name=$d.type.name");
-              Str strSrc = ((BacNetFieldBusIO)r).devStr
-              Str strDst = ((bacDevice)d).deviceName.toStr()
-              log.message("4444 updateCache strSrc=$strSrc and strDst=$strDst");
-              if (d.type.is(bacDevice.type) && ((BacNetFieldBusIO)r).devStr.equals(((bacDevice)d).deviceName.toStr())) {
-                log.message("5555 updateCache d.name=$f.name and type.name=$d.type.name");
-                dev = (bacDevice)d
-                break
-              }
-            }
-            if (dev != null) {
-              log.message("66666 cleanCache dev.name=$dev.name and dev.type.name=$dev.type.name");
-              ((BacNetFieldBusIO)r).cache = bacnet_add(ctx, dev.deviceInstance, 
+//    root = p
+    // bacDevice dev = null
+    for (Component r = Sys.app.lookup(children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+        log.message("22222 updateCache r.name=$r.name and r.type.name=$r.type.name");
+        if (r.type.is(bacDevice.type)) {
+          log.message("SetBus: 3333 updateCache r.name=$r.name and type.name=$r.type.name");
+          // dev = (bacDevice)r
+          ((bacDevice)r).bus = this
+          ((bacDevice)r).status := bacDevice.STATUSREADY
+          for (Component d = Sys.app.lookup(r.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            log.message("3434 updateCache d.name=$d.name and type.name=$d.type.name");
+            if (d.type.is(BacNetFieldBusIO.type)) {
+              log.message("5555 updateCache d.name=$d.name and type.name=$d.type.name");
+              ((BacNetFieldBusIO)d).cache = bacnet_add(ctx, 0, // (bacDevice)r.deviceInstance, 
                        0, // ((BacNetFieldBusIO)r).regId, 
                        0, // ((BacNetFieldBusIO)r).typeId, 
                        85, 0)
-              if (((BacNetFieldBusIO)r).cache >= 0) {
-                if (((BacNetFieldBusIO)r).bus == null) {
-                  log.message("676767 cleanCache dev.name=$dev.name and dev.type.name=$dev.type.name");
-                  ((BacNetFieldBusIO)r).bus = this
-                  ((BacNetFieldBusIO)r).device = dev
-                }
-                log.message("7777 cleanCache dev.status=$dev.status");
-                ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSREADY
-                dev.status := bacDevice.STATUSREADY
-                result = true
-              } else {
-                log.message("8888 cleanCache dev.status=$dev.status");
-                ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSEADDR
-              }
-            } else {
-              //((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+              ((BacNetFieldBusIO)d).bus = this
+            // ((BacNetFieldBusIO)d).device = (bacDevice)r
+              ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
             }
           }
         }
-      }
     }
 
     ** log.message("9999 add schedule");
@@ -330,23 +299,27 @@ class BIP
                 " and can decode into (").printInt(bufData[0]).print(
                     ".").printInt(bufData[1]).print(
                     ".").printInt(bufData[2]).print(
-                    ".").printInt(bufData[3]).print(").").nl()
-        log.message("controlDstSpecList[$i] = 0x").printHex(controlDstSpecList[i]).nl()
+                    ".").printInt(bufData[3]).print(
+                    ") and controlDstSpecList[$i] = 0x").printHex(controlDstSpecList[i]).nl()
         if(NPDUList[i] != 0x00)
         {
             log.message("NPDUList[$i] = (SourceNetworkAddress: ").printInt(NPDUList[i] % 0x10000).print(
                     ", SADR:").printInt(NPDUList[i] / 0x10000).print(").").nl()
         }
         log.message("objectIdentifierList[$i] = (Instance Number:").printInt(objectIdentifierList[i] % 0x400000).print(
-                ", ObjectType:").printInt(objectIdentifierList[i] / 0x400000).print(").").nl()
-        log.message("maxADPUList[$i] = ${maxADPUList[i]}")
+                ", ObjectType:").printInt(objectIdentifierList[i] / 0x400000).print(
+                ") and maxADPUList[$i] = ${maxADPUList[i]}.").nl()
         log.message("----------------------------------------------------------")
     }
 
     bool bRet = false;
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-           log.message("d.type  = $d.type.name")
+      log.message("d.type  = $d.type.name")
       if (d.type.is(bacDevice.type) && ((bacDevice)d).status != bacDevice.STATUSEND) {
+         if(((bacDevice)d).bus == null)
+         {
+            ((bacDevice)d).bus = this
+         }
          bRet = ((bacDevice)d).openPort(true)
          if(bRet == false)
          {

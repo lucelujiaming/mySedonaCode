@@ -119,50 +119,20 @@ class bacDevice
   ////////////////////////////////////////////////////////////////
   void update()
   {
-    Component n = Sys.app.lookup(parent)
-    if (n != null && n.type.is(FieldBusNet.type)) {
-      bus = (FieldBusNet)Sys.app.lookup(parent)
-      ((FieldBusNet)n).update()
-      ((FieldBusNet)n).notifyFlush()
-      for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-        if (d == this) {
-          continue
-        }
-        if (d.type.is(bacDevice.type) && ((bacDevice)d).deviceInstance == deviceInstance) {
-          status := STATUSEADDR
-          return
-        }
-      }
-      if (deviceName.toStr().length() > 0) {
-        Component s = Sys.app.lookup(n.parent)
-        if (s != null && s.type.is(Folder.type) && s.name.equals("service")) {
-          for (Component n1 = Sys.app.lookup(s.children); n1 != null; n1 = Sys.app.lookup(n1.nextSibling)) {
-            if (n1.type.is(FieldBusNet.type)) {
-              for (Component d = Sys.app.lookup(n1.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-                if (d == this) {
-                  continue
-                }
-                if (d.type.is(bacDevice.type) && ((bacDevice)d).deviceName.toStr().equals(deviceName.toStr())) {
-                  status := STATUSENAME
-                  return
-                }
-              }
-            }
-          }
-        }
-      } else {
-        status := STATUSENAME
-        return
-      }
-      status := STATUSNOREG
-    } else {
-      status := STATUSNONET
+    log.message("bacDevice update 1111 status=$status") 
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+         if(((BacNetFieldBusIO)d).device == null)
+         {
+            ((BacNetFieldBusIO)d).device = this
+         }
+         log.message("bacDevice update 22222 status=$status") 
     }
+    log.message("bacDevice update 3333 status=$status") 
   }
 
   override void execute()
   {
-    ** log.message("bacDevice::execute 11111 status=$status") 
+    ** log.message("bacDevice execute 11111 status=$status") 
     if (bus != null) {
         if (bus.needFlush == false) {
             dataLength = readReg(0, 0, 1024, buf)
@@ -225,6 +195,25 @@ class bacDevice
         {
             log.message("We needFlush ")
         }
+        // 
+        ** log.message("bacDevice execute 33333 status=$status") 
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            // ((BacNetFieldBusIO)d).device = this
+            // d.execute()
+            if (d.type.is(BacReadPropertyVar.type))  {
+               ((BacReadPropertyVar)d).execute()
+            } else if (d.type.is(bacReadPropertyObjList.type))  {
+               ((bacReadPropertyObjList)d).execute()
+            } else if (d.type.is(bacReadPropertyMultiple.type))  {
+               ((bacReadPropertyMultiple)d).execute()
+            } else if (d.type.is(BacWritePropertyVar.type))  {
+               ((BacWritePropertyVar)d).execute()
+            }
+        }
+    }
+    else
+    {
+       log.message("bus is null ")
     }
   }
   
@@ -716,7 +705,7 @@ class bacDevice
                ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
                **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
             }
-            log.message("-----------------  Get propertyProperty = ${propertyProperty} ")
+            log.message("----------------- We Get propertyProperty = ${propertyProperty} ")
             serviceChoicePos += PropertyLengthValue
             ** log.message("22222 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
             if(bacnetRecvPacket[serviceChoicePos] != 0x4E)
@@ -730,7 +719,7 @@ class bacDevice
             {
                 tagNumber = tagNumber/0x10
                 int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
-                ** log.message("33333 iLen = $iLen and tagNumber=$tagNumber")
+                log.message("33333 iLen = $iLen and tagNumber=$tagNumber")
                 serviceChoicePos++
                 serviceChoicePos = decode_one_tag(bacnetRecvPacket, serviceChoicePos, 
                                         propertyProperty, iObjectType, iInstanceNumber, tagNumber, iLen)
@@ -769,7 +758,7 @@ class bacDevice
                    ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
                    **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
                 }
-                log.message("-----------------  Get propertyProperty = ${propertyProperty} ")
+                log.message("-----------------  Get next propertyProperty = ${propertyProperty} ")
                 serviceChoicePos += PropertyLengthValue
                 ** log.message("22222 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
 
@@ -789,7 +778,7 @@ class bacDevice
     }
     else
     {
-       log.message("Service Choice: bacnetRecvPacket =${bacnetRecvPacket[serviceChoicePos]} ")
+        log.message("Service Choice: bacnetRecvPacket =${bacnetRecvPacket[serviceChoicePos]} ")
         for(int i =0 ; i < iPacketLen; i++)
         {
             log.message("checkReadData read 0x").printHex(bacnetRecvPacket[i]).print(". ").nl()
