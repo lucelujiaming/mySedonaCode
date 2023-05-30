@@ -158,39 +158,60 @@ class Variable
     }
     else {
       Str aliasStr = alias.toStr()
-      **  log.message(" name=$name")
+      ** log.message("111111111 Variable name=$name")
       // find bus and dev
       Component p = Sys.app.lookup(this.parent)
       Component root = null
       while (p != null) {
         root = p
-        if(p.name.equals("play"))
-        {
-             ** log.message("Not deal play node and return with name=$name")
-             return
-        }
+      **  if(p.name.equals("play"))
+      **  {
+      **       ** log.message("Not deal play node and return with name=$name")
+      **       return
+      **  }
         p = Sys.app.lookup(p.parent)
       }
       if (root != null) {
         // log.message("root:: aliasStr=$aliasStr")
-        ** log.message(" name=$name")
+        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr")
         for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-          if (f.type.is(Folder.type) && !f.name.equals("service")) {
+          if (f.type.is(Folder.type) && f.name.equals("service")) {
              for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-                Str nameComponentStr = ((Variable)n).name
-                ** log.message("VarInput nameComponentStr=$nameComponentStr and name=$name")
-                if (n.type.is(VarInput.type) && ((VarInput)n).alias.toStr().equals(aliasStr))  {
-                   value := ((VarInput)n).out
-                   ** log.message("VarInput::out_value=$value")
-                   return
-                } else if (n.type.is(VarOutput.type) && ((VarOutput)n).alias.toStr().equals(aliasStr))  {
-                   value := ((VarOutput)n).out
-                   ** log.message("VarOutput::out_value=$value")
-                   return
-                } else if (n.type.is(Variable.type) && ((Variable)n).alias.toStr().equals(aliasStr))  {
-                   value := ((Variable)n).value
-                   ** log.message("Variable:: value=$value")
-                   return
+                if (n.type.is(FieldBusNet.type))  {
+                   for (Component r = Sys.app.lookup(n.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                      if (r.type.is(FieldBusDevice.type))  {
+                         for (Component q = Sys.app.lookup(r.children); q != null; q = Sys.app.lookup(q.nextSibling)) {
+                            if (q.type.is(BacReadPropertyVar.type) 
+                                && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("BacReadPropertyVar.name=${q.name}")
+                                value := ((BacReadPropertyVar)q).out
+                            }
+                            else if (q.type.is(bacReadPropertyObjList.type) 
+                                && ((bacReadPropertyObjList)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("bacReadPropertyMultiple.name=${q.name}")
+                                value := ((bacReadPropertyMultiple)q).out
+                            }
+                            else if (q.type.is(bacReadPropertyMultiple.type) 
+                                && ((bacReadPropertyMultiple)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("bacReadPropertyMultiple.name=${q.name}")
+                                value := ((bacReadPropertyMultiple)q).out
+                            }
+                            else if (q.type.is(BacWritePropertyVar.type) 
+                                && ((BacWritePropertyVar)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("BacWritePropertyVar.name=${q.name}")
+                                ((BacWritePropertyVar)q).in := value
+                            }
+                            else if (q.type.is(VarInput.type))  {
+                                log.message("VarInput.name=${q.name}")
+                                value := ((VarInput)q).out
+                            }
+                            else if (q.type.is(VarOutput.type))  {
+                                log.message("VarOutput.name=${q.name}")
+                                ((VarOutput)q).in := value
+                            }
+                         }
+                      }
+                   }
                 }
              }
           }
