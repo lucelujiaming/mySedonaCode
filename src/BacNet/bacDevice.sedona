@@ -125,8 +125,9 @@ class bacDevice
          {
             ((BacNetFieldBusIO)d).device = this
          }
-         log.message("bacDevice update 22222 status=$status") 
-    }
+         ** log.message("bacDevice update 22222 status=$status") 
+    } 
+    createRPMAndWPM()
     log.message("bacDevice update 3333 status=$status") 
   }
 
@@ -196,7 +197,7 @@ class bacDevice
             log.message("We needFlush ")
         }
         // 
-        ** log.message("bacDevice execute 33333 status=$status") 
+        ** log.message("bacDevice execute 33333 status=$status")
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
             // ((BacNetFieldBusIO)d).device = this
             // d.execute()
@@ -409,7 +410,7 @@ class bacDevice
   // For debug
   int forwardToVTS(byte[] bacnetRecvPacket, int iPacketLen)
   {
-    addrSendVTS.addr.parse("192.168.168.170")
+    addrSendVTS.addr.parse("192.168.168.180")
     addrSendVTS.port = ((BIP)bus).port
     dataVTSForwardSendGram.setSocketAddr(addrSendVTS)
     dataVTSForwardSendGram.len = iPacketLen
@@ -852,7 +853,7 @@ class bacDevice
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
             strInfo.set(iLen, '\0')
-            log.message("Character string = $strInfo ")
+            ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
             
             bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
@@ -872,7 +873,7 @@ class bacDevice
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
             strInfo.set(iLen, '\0')
-            log.message("Character string = $strInfo ")
+            ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
             
             bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
@@ -1041,12 +1042,331 @@ class bacDevice
     return 1;
   }
 
+  void createRPMAndWPM()
+  {
+     log.message("-------------------------------------------------------------------------------")
+     log.message("-------------------------bacDevice update createRPMAndWPM-------------------------") 
+     log.message("-------------------------------------------------------------------------------")
+     bacnetReadAnalogInputCount = 0
+     bacnetReadAnalogOutputCount = 0
+     bacnetReadAnalogValueCount = 0
+     
+     bacnetReadBinaryInputCount = 0
+     bacnetReadBinaryOutputCount = 0
+     bacnetReadBinaryValueCount = 0
+     
+     bacnetWriteAnalogInputCount = 0
+     bacnetWriteAnalogOutputCount = 0
+     bacnetWriteAnalogValueCount = 0
+     
+     bacnetWriteBinaryInputCount = 0
+     bacnetWriteBinaryOutputCount = 0
+     bacnetWriteBinaryValueCount = 0
+     
+     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d.type.is(bacReadPropertyMultiple.type))  {
+           int iObjectType = ((bacReadPropertyMultiple)d).objectType
+           int iInstanceNumber = ((bacReadPropertyMultiple)d).instanceNumber
+           if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT){
+               bacnetReadAnalogInput[bacnetReadAnalogInputCount] = iInstanceNumber
+               bacnetReadAnalogInputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT){
+               bacnetReadAnalogOutput[bacnetReadAnalogOutputCount] = iInstanceNumber
+               bacnetReadAnalogOutputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE){
+               bacnetReadAnalogValue[bacnetReadAnalogValueCount] = iInstanceNumber
+               bacnetReadAnalogValueCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT){
+               bacnetReadBinaryInput[bacnetReadBinaryInputCount] = iInstanceNumber
+               bacnetReadBinaryInputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT){
+               bacnetReadBinaryOutput[bacnetReadBinaryOutputCount] = iInstanceNumber
+               bacnetReadBinaryOutputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE){
+               bacnetReadBinaryValue[bacnetReadBinaryValueCount] = iInstanceNumber
+               bacnetReadBinaryValueCount++
+           }
+        } else if (d.type.is(BacWritePropertyVar.type))  {
+           int iObjectType = ((BacWritePropertyVar)d).objectType
+           int iInstanceNumber = ((BacWritePropertyVar)d).instanceNumber
+           if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT){
+               bacnetWriteAnalogInput[bacnetWriteAnalogInputCount] = iInstanceNumber
+               bacnetWriteAnalogInputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT){
+               bacnetWriteAnalogOutput[bacnetWriteAnalogOutputCount] = iInstanceNumber
+               bacnetWriteAnalogOutputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE){
+               bacnetWriteAnalogValue[bacnetWriteAnalogValueCount] = iInstanceNumber
+               bacnetWriteAnalogValueCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT){
+               bacnetWriteBinaryInput[bacnetWriteBinaryInputCount] = iInstanceNumber
+               bacnetWriteBinaryInputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT){
+               bacnetWriteBinaryOutput[bacnetWriteBinaryOutputCount] = iInstanceNumber
+               bacnetWriteBinaryOutputCount++
+           }
+           else if(iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE){
+               bacnetWriteBinaryValue[bacnetWriteBinaryValueCount] = iInstanceNumber
+               bacnetWriteBinaryValueCount++
+           }
+        }
+     }
+     
+     log.message("bacnetReadAnalogInputCount = $bacnetReadAnalogInputCount")
+     log.message("bacnetReadAnalogOutputCount = $bacnetReadAnalogOutputCount")
+     log.message("bacnetReadAnalogValueCount = $bacnetReadAnalogValueCount")
+     
+     log.message("bacnetReadBinaryInputCount = $bacnetReadBinaryInputCount")
+     log.message("bacnetReadBinaryOutputCount = $bacnetReadBinaryOutputCount")
+     log.message("bacnetReadBinaryValueCount = $bacnetReadBinaryValueCount")
+     
+     // RPM
+     if(bacnetReadAnalogInputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT, 
+            bacnetReadAnalogInput, bacnetReadAnalogInputCount)
+     }
+     if(bacnetReadAnalogOutputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT, 
+            bacnetReadAnalogOutput, bacnetReadAnalogOutputCount)
+     }
+     if(bacnetReadAnalogValueCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE, 
+            bacnetReadAnalogValue, bacnetReadAnalogValueCount)
+     }
+     if(bacnetReadBinaryInputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT, 
+            bacnetReadBinaryInput, bacnetReadBinaryInputCount)
+     }
+     if(bacnetReadBinaryOutputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT, 
+            bacnetReadBinaryOutput, bacnetReadBinaryOutputCount)
+     }
+     if(bacnetReadBinaryValueCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE, 
+            bacnetReadBinaryValue, bacnetReadBinaryValueCount)
+     }
+
+     
+     log.message("bacnetWriteAnalogInputCount = $bacnetWriteAnalogInputCount")
+     log.message("bacnetWriteAnalogOutputCount = $bacnetWriteAnalogOutputCount")
+     log.message("bacnetWriteAnalogValueCount = $bacnetWriteAnalogValueCount")
+     
+     log.message("bacnetWriteBinaryInputCount = $bacnetWriteBinaryInputCount")
+     log.message("bacnetWriteBinaryOutputCount = $bacnetWriteBinaryOutputCount")
+     log.message("bacnetWriteBinaryValueCount = $bacnetWriteBinaryValueCount")
+     // WPM
+     if(bacnetWriteAnalogInputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT, 
+            bacnetWriteAnalogInput, bacnetWriteAnalogInputCount)
+     }
+     if(bacnetWriteAnalogOutputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT, 
+            bacnetWriteAnalogOutput, bacnetWriteAnalogOutputCount)
+     }
+     if(bacnetWriteAnalogValueCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE, 
+            bacnetWriteAnalogValue, bacnetWriteAnalogValueCount)
+     }
+     if(bacnetWriteBinaryInputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT, 
+            bacnetWriteBinaryInput, bacnetWriteBinaryInputCount)
+     }
+     if(bacnetWriteBinaryOutputCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT, 
+            bacnetWriteBinaryOutput, bacnetWriteBinaryOutputCount)
+     }
+     if(bacnetWriteBinaryValueCount > 0)
+     {
+         operateMultipleProperty(BACNET_PROPERTY_READ, 
+            BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE, 
+            bacnetWriteBinaryValue, bacnetWriteBinaryValueCount)
+     }
+     
+  }
+
+  void sortArray(int[] iData, int iLen)
+  {
+     int iSwap = 0 ;
+     for (int i = 0; i < iLen; i++)
+     {
+        for (int j = i + 1; j < iLen; j++)
+        {
+            if(iData[i] > iData[j])
+            {
+                iSwap = iData[i];
+                iData[i] = iData[j];
+                iData[j] = iSwap;
+            }
+        }
+     }
+  }
+
+  int searchIDBlock(int[] iData, int[] iOffset, int iLen)
+  {
+    int iBlockEnd = 0
+    int iBlockLen = 0
+    int iStartSearchPos = iOffset[0];
+    for (int i = iStartSearchPos; i < iLen; i++)
+    {
+        if(iData[i] + 1 == iData[i+1])
+        {
+            iBlockEnd = i;
+            iBlockLen++;
+        }
+        else if (iBlockLen > 0)
+        {
+            iBlockEnd = iBlockEnd + 1;
+            iOffset[0] = iBlockEnd;
+            iBlockLen = iBlockLen + 1;
+            return iBlockLen;
+        }         
+    }
+    return -1;
+  }
+  
+  int operateMultipleProperty(int iOperateType, int iObjectType, 
+                                int[] iInstanceNumberList, int iLen)
+  {
+     int iStartPos = 0
+     int iBlockLen = 0
+     iListOffset[0] = 0;
+     sortArray(iInstanceNumberList, iLen)
+     
+    for (int i = 0; i < iLen; i++)
+    {
+        log.message("iInstanceNumberList[$i] = ${iInstanceNumberList[i]}")
+    }
+     log.message("-------------------------bacDevice update operateMultipleProperty-------------------------") 
+     while (iBlockLen != -1)
+     {
+        iBlockLen = searchIDBlock(
+            iInstanceNumberList, iListOffset, iLen);
+        if(iBlockLen != -1)
+        {
+            iStartPos = iListOffset[0] - iBlockLen + 1;
+            log.message("Get Block at $iStartPos with $iBlockLen when iOperateType=$iOperateType and iObjectType=$iObjectType") 
+            if(iBlockLen >= BACNET_PROPERTY_MULTIPLE_LIMIT)
+            {
+               operateOneBlock(iOperateType, iObjectType, iInstanceNumberList, iStartPos, iBlockLen);
+            }
+        }
+     }
+     return 1
+  }
+  
+  int operateOneBlock(int iOperateType, int iObjectType, 
+                                int[] iData, int iStartPos, int iLen)
+  {
+     log.message("111 operateOneBlock Enter") 
+     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+         if (d.type.is(bacReadPropertyMultiple.type)
+            && iOperateType == BACNET_PROPERTY_READ)  {
+            // Assume We donot use ReadMultiple
+            ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = -1
+
+            if(iObjectType == ((bacReadPropertyMultiple)d).objectType) {
+
+               log.message("44444 operateOneBlock when instanceNumber=${((bacReadPropertyMultiple)d).instanceNumber}") 
+               for (int i = iStartPos ; i < iStartPos + iLen; i++)
+               {
+                  if(iData[i] == ((bacReadPropertyMultiple)d).instanceNumber)
+                  {
+                     if(i != iStartPos)
+                     {
+                        // We use ReadMultiple and do nothing
+                        log.message("666 Disable $i when iOperateType=$iOperateType and iObjectType=$iObjectType") 
+                       ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = 0
+                     }
+                     else
+                     {
+                        // We use ReadMultiple and use instance number list
+                         log.message("7777 Enable $i when iOperateType=$iOperateType and iObjectType=$iObjectType") 
+                       ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = iLen
+                        int j = 0
+                        for (int k = iStartPos + 1; k < iStartPos + iLen; k++)
+                        {
+                            ((bacReadPropertyMultiple)d).bacnetReadMultipleList[j] = iData[k]
+                            j++
+                        }
+                     }
+                  }
+               }
+            }
+        }
+        else if (d.type.is(BacWritePropertyVar.type)
+            && iOperateType == BACNET_PROPERTY_WRITE)  {
+            // Assume We donot use WriteMultiple
+            ((BacWritePropertyVar)d).bacnetWriteMultipleCount = -1
+            if(iObjectType == ((BacNetFieldBusIO)d).objectType) {
+               for (int i = iStartPos + 1; i < iStartPos + iLen; i++)
+               {
+                  if(iData[i] == ((BacNetFieldBusIO)d).instanceNumber)
+                  {
+                     if(i != iStartPos + 1)
+                     {
+                        // We use WriteMultiple and do nothing
+                        ((BacWritePropertyVar)d).bacnetWriteMultipleCount = 0
+                     }
+                     else
+                     {
+                        // We use WriteMultiple and use instance number list
+                        ((BacWritePropertyVar)d).bacnetWriteMultipleCount = iLen
+                        int j = 0
+                        for (int k = iStartPos + 1; k < iStartPos + iLen; k++)
+                        {
+                            ((BacWritePropertyVar)d).bacnetWriteMultipleList[j] = iData[k]
+                            j++
+                        }
+                     }
+                  }
+               }
+            }
+        }
+     }
+     return -1;
+  }
+  
   // define Log log
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////
-  FieldBusNet bus = null
+  define int BACNET_PROPERTY_MULTIPLE_LIMIT = 3
 
+  define int BACNET_PROPERTY_READ  = 1
+  define int BACNET_PROPERTY_WRITE = 2
+  
+  FieldBusNet bus = null
   
   inline UdpSocket socket           // socket used for send/receive
 
@@ -1084,4 +1404,36 @@ class bacDevice
   int dataLength
   
   inline Buf(64) lastInstanceNumber = ""
+
+  // RPM
+  int                     bacnetReadAnalogInputCount = 0
+  inline static int[128]  bacnetReadAnalogInput
+  int                     bacnetReadAnalogOutputCount = 0
+  inline static int[128]  bacnetReadAnalogOutput
+  int                     bacnetReadAnalogValueCount = 0
+  inline static int[128]  bacnetReadAnalogValue
+
+  int                     bacnetReadBinaryInputCount = 0
+  inline static int[128]  bacnetReadBinaryInput
+  int                     bacnetReadBinaryOutputCount = 0
+  inline static int[128]  bacnetReadBinaryOutput
+  int                     bacnetReadBinaryValueCount = 0
+  inline static int[128]  bacnetReadBinaryValue
+  
+  // WPM
+  int                     bacnetWriteAnalogInputCount = 0
+  inline static int[128]  bacnetWriteAnalogInput
+  int                     bacnetWriteAnalogOutputCount = 0
+  inline static int[128]  bacnetWriteAnalogOutput
+  int                     bacnetWriteAnalogValueCount = 0
+  inline static int[128]  bacnetWriteAnalogValue
+
+  int                     bacnetWriteBinaryInputCount = 0
+  inline static int[128]  bacnetWriteBinaryInput
+  int                     bacnetWriteBinaryOutputCount = 0
+  inline static int[128]  bacnetWriteBinaryOutput
+  int                     bacnetWriteBinaryValueCount = 0
+  inline static int[128]  bacnetWriteBinaryValue
+  // 
+  inline static int[1] iListOffset;
 }

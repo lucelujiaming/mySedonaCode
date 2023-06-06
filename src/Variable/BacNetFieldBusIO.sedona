@@ -44,8 +44,6 @@ abstract class BacNetFieldBusIO
   define int BACNET_REJECT_PDU                 = 6 //    [6] BACnet-Reject-PDU,
   define int BACNET_ABORT_PDU                 = 7 //    [7] BACnet-Abort-PDU
 
-
-
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
@@ -64,6 +62,15 @@ abstract class BacNetFieldBusIO
   @asStr
   @config
   property Buf(64) url = ""
+  
+  @config
+  property int objectType = 2
+  // P415 - BACnetObjectType
+  
+  @config
+  property int instanceNumber = 0
+  
+  
   // Example1:
   // Property Identifier: (374) Reserved for Use by ASHRAE (374)
   //     Context Tag: 1, Length/Value/Type: 2
@@ -215,6 +222,17 @@ abstract class BacNetFieldBusIO
   */
   
   // define Log log
+  
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  // P414 - BACnetObjectType
+  static int BACNET_OBJERCTTYPE_ANALOG_INPUT  =  0
+  static int BACNET_OBJERCTTYPE_ANALOG_OUTPUT =  1
+  static int BACNET_OBJERCTTYPE_ANALOG_VALUE  =  2
+  static int BACNET_OBJERCTTYPE_BINARY_INPUT  =  3
+  static int BACNET_OBJERCTTYPE_BINARY_OUTPUT =  4
+  static int BACNET_OBJERCTTYPE_BINARY_VALUE  =  5
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////
@@ -230,4 +248,9 @@ abstract class BacNetFieldBusIO
 
   // Property Identifier: present-value (85)
   int propertyIdentifier = 85
+
+  bool isEnableRPM = false;
+  bool isEnableWPM = false;  
+
+  
 }

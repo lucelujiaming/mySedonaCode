@@ -68,11 +68,6 @@ class bacReadPropertyMultiple
   property int arrayProperty = 5
   // Lujiaming add these end at 23/02/24
 
-  @config
-  property int objectType = 2
-  
-  @config
-  property int instanceNumber = 0
   // 
   @readonly
   property float out = 0.0f
@@ -92,7 +87,7 @@ class bacReadPropertyMultiple
     }
   }
 
-  void makePacket()
+  void makeReadPacket()
   {
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
@@ -190,7 +185,66 @@ class bacReadPropertyMultiple
     bacnetPacket[dataLength++] = 0x1C
     // .... .111 = Named Tag: Closing Tag (7)
     bacnetPacket[dataLength++] = 0x1F
-    log.message("22222 bacnetPacket[$dataLength]")
+    ** log.message("22222 bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+  }
+
+  
+  void makeMultipleReadPacket()
+  {
+    dataLength = 0
+    if(bacnetReadMultipleCount <= 0)
+    {
+       return
+    }
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    bacnetPacket[1] = maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = device.invokeID
+    device.invokeID = device.invokeID + 1
+    if(device.invokeID == 0xFF)
+       device.invokeID = 0
+    dataLength = 3
+    // Service Choice: readPropertyMultiple (14)
+    bacnetPacket[dataLength++] = 0x0E
+    for(int i = 0; i < bacnetReadMultipleCount; i++)
+    {
+        // ObjectIdentifier: analog-value, 0
+        // Context Tag: 0, Length/Value/Type: 4
+        bacnetPacket[dataLength++] = 0x0C
+        if(objectType > 4)
+        {
+            bacnetPacket[dataLength++] = objectType / 4
+        }
+        else 
+        {
+            bacnetPacket[dataLength++] = 0x00
+        }
+        bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+        // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+        if(instanceNumber > 0x00)
+        {
+            bacnetPacket[dataLength++] = bacnetReadMultipleList[i] / 0x100
+        }
+        else 
+        {
+            bacnetPacket[dataLength++] = 0x00
+        }
+        bacnetPacket[dataLength++] = instanceNumber % 0x100
+        // listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
+        bacnetPacket[dataLength++] = 0x1E
+        // Property Identifier: required (105)
+        bacnetPacket[dataLength++] = 0x09
+        bacnetPacket[dataLength++] = 0x69
+        // .... .111 = Named Tag: Closing Tag (7)
+        bacnetPacket[dataLength++] = 0x1F
+    }
+    ** log.message("22222 bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -210,15 +264,31 @@ class bacReadPropertyMultiple
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
-          makePacket()
-          log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+        log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
+        if(bacnetReadMultipleCount == -1){
+          makeReadPacket()
+          ** log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
             ** log.message("device.readReg")
           } else {
             log.message("BacReadPropertyVar Error")
             status := STATUSOFFLINE
           }
-          sendInterval = nowMilliSecond + (long)refreshTime
+        }
+        else if(bacnetReadMultipleCount == 0){
+           log.message("ReadMultiple Disable")
+        }
+        else if(bacnetReadMultipleCount > 0){
+          makeMultipleReadPacket()
+          ** log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+          if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+            ** log.message("device.readReg")
+          } else {
+            log.message("BacReadPropertyVar Error")
+            status := STATUSOFFLINE
+          }
+        }
+        sendInterval = nowMilliSecond + (long)refreshTime
       }
     }
     ** log.message("33333 status=$status") 
@@ -237,7 +307,7 @@ class bacReadPropertyMultiple
             break
         case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
             // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
-            int objectType = (data[0] * 0x100 + data[1]) / 0x40
+            // int objectType = (data[0] * 0x100 + data[1]) / 0x40
             // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
             int instanceNumber = 0x00
             instanceNumber = data[1] % 0x40
@@ -283,7 +353,7 @@ class bacReadPropertyMultiple
                strInfo.set(i, data[i])
             }
             strInfo.set(iLen, '\0')
-            log.message("Character string = $strInfo ")
+            ** log.message("bacreadPropertyMultiple Character string = $strInfo ")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
             for (int i = 0; i < iLen; i++)
@@ -291,7 +361,7 @@ class bacReadPropertyMultiple
                strInfo.set(i, data[i])
             }
             strInfo.set(iLen, '\0')
-            log.message("Character string = $strInfo ")
+            ** log.message("bacreadPropertyMultiple Character string = $strInfo ")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
             break
@@ -307,6 +377,7 @@ class bacReadPropertyMultiple
   }
   
   define int SEND_INTERVAL = 30
+  
   private inline float[1024] buf
   static inline byte[1024] bacnetPacket
   int dataLength
@@ -318,5 +389,11 @@ class bacReadPropertyMultiple
   private inline double[2] bufDouble
   
   private inline Str(128)   strInfo
+
+  // -1                - We donot use ReadMultiple
+  // 0                 - We use ReadMultiple and do nothing
+  // Positive number   - We use ReadMultiple and use instance number list
+  int                     bacnetReadMultipleCount = -1
+  inline int[128]  bacnetReadMultipleList
 
 }

@@ -60,11 +60,6 @@ class bacReadPropertyObjList
   property int maxAPDULength = 3 // 480
   
   // Read Property Object
-  @config
-  property int objectType = 8
-  
-  @config
-  property int instanceNumber = 0
   
   @config
   property int arrayProperty = 5
@@ -207,6 +202,7 @@ class bacReadPropertyObjList
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
+        if(bacnetReadMultipleCount == -1){
           makePacket()
           log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
@@ -215,7 +211,14 @@ class bacReadPropertyObjList
             log.message("bacReadPropertyObjList Error")
             status := STATUSOFFLINE
           }
-          sendInterval = nowMilliSecond + (long)refreshTime
+        }
+        else if(bacnetReadMultipleCount == 0){
+           log.message("ReadMultiple Disable")
+        }
+        else if(bacnetReadMultipleCount > 0){
+           
+        }
+        sendInterval = nowMilliSecond + (long)refreshTime
       }
     }
     ** log.message("33333 status=$status") 
@@ -268,7 +271,7 @@ class bacReadPropertyObjList
                strInfo.set(i, data[i])
             }
             strInfo.set(iLen, '\0')
-            log.message("Character string = $strInfo ")
+            ** log.message("bacReadPropertyObjList Character string = $strInfo ")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
             for (int i = 0; i < iLen; i++)
@@ -276,7 +279,7 @@ class bacReadPropertyObjList
                strInfo.set(i, data[i])
             }
             strInfo.set(iLen, '\0')
-            log.message("Character string = $strInfo ")
+            ** log.message("bacReadPropertyObjList Character string = $strInfo ")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
             break
@@ -304,4 +307,9 @@ class bacReadPropertyObjList
   
   private inline Str(128)   strInfo
 
+  // -1                - We donot use ReadMultiple
+  // 0                 - We use ReadMultiple and do nothing
+  // Positive number   - We use ReadMultiple and use instance number list
+  int                     bacnetReadMultipleCount = -1
+  inline int[128]  bacnetReadMultipleList
 }

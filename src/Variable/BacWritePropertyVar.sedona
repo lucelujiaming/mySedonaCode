@@ -59,12 +59,6 @@ class BacWritePropertyVar
   @config
   property int maxAPDULength = 5 // 480
   
-  @config
-  property int objectType = 2
-  
-  @config
-  property int instanceNumber = 14
-  
 
   // 
   // @readonly
@@ -193,6 +187,7 @@ class BacWritePropertyVar
     if (cache != 0 && bus != null && status <= STATUSREADY) {
       ** log.message("23232323 sendInterval=$sendInterval") 
       if(lastInValue != in) {
+        if(bacnetWriteMultipleCount == -1){
           makePacket()
           log.message("BacWritePropertyVar makePacket($dataLength)")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
@@ -201,7 +196,14 @@ class BacWritePropertyVar
             log.message("BacWritePropertyVar Error")
             status := STATUSOFFLINE
           }
-          lastInValue = in
+        }
+        else if(bacnetWriteMultipleCount == 0){
+           log.message("ReadMultiple Disable")
+        }
+        else if(bacnetWriteMultipleCount > 0){
+           
+        }
+        lastInValue = in
       }
     }
     ** log.message("33333 status=$status") 
@@ -223,4 +225,10 @@ class BacWritePropertyVar
   private inline double[2] bufDouble
   static inline byte[8]    bufData
   
+  // -1                - We donot use ReadMultiple
+  // 0                 - We use ReadMultiple and do nothing
+  // Positive number   - We use ReadMultiple and use instance number list
+  int                     bacnetWriteMultipleCount = -1
+  inline int[128]  bacnetWriteMultipleList
 }
+
