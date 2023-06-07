@@ -668,9 +668,9 @@ class bacDevice
         serviceChoicePos++
         while (serviceChoicePos < iPacketLen)
         {
-            ** log.message("00000 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+            log.message("00000 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
             int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
-            ** log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
+            log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
             serviceChoicePos++
             
             int iObjectIdentifier = 0
@@ -684,18 +684,18 @@ class bacDevice
             int iObjectType = iObjectIdentifier/0x400000
             // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
             int iInstanceNumber = iObjectIdentifier % 0x400000
-            ** log.message("iObjectType = ${iObjectType} and iInstanceNumber = ${iInstanceNumber} ")
+            log.message("iObjectType = ${iObjectType} and iInstanceNumber = ${iInstanceNumber} ")
             serviceChoicePos += iObjectIdentifierLen
-            ** log.message("11111 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+            log.message("11111 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
             if(bacnetRecvPacket[serviceChoicePos] != 0x1E)
             {
-               log.message("Error Opening Tag")
+               log.message("bacnetRecvPacket Error Opening Tag")
                return -1
             }
             serviceChoicePos++
             // Property Identifier : Length Value Type: 1
             int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
-            ** log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+            log.message("PropertyLengthValue = ${PropertyLengthValue} ")
             
             int  propertyProperty = 0
             serviceChoicePos++
@@ -706,7 +706,7 @@ class bacDevice
                ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
                **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
             }
-            ** log.message("----------------- We Get propertyProperty = ${propertyProperty} ")
+            log.message("----------------- We Get propertyProperty = ${propertyProperty} ")
             serviceChoicePos += PropertyLengthValue
             ** log.message("22222 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
             if(bacnetRecvPacket[serviceChoicePos] != 0x4E)
@@ -720,7 +720,7 @@ class bacDevice
             {
                 tagNumber = tagNumber/0x10
                 int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
-                ** log.message("33333 iLen = $iLen and tagNumber=$tagNumber")
+                log.message("33333 iLen = $iLen and tagNumber=$tagNumber")
                 serviceChoicePos++
                 serviceChoicePos = decode_one_tag(bacnetRecvPacket, serviceChoicePos, 
                                         propertyProperty, iObjectType, iInstanceNumber, tagNumber, iLen)
@@ -729,14 +729,14 @@ class bacDevice
                    log.message("34343434 Error serviceChoicePos ")
                    return -1
                 }
-                ** log.message("444444 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                log.message("444444 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
                 if(bacnetRecvPacket[serviceChoicePos] != 0x4F)
                 {
                    log.message("Error Closing Tag")
                    return -1
                 }
                 serviceChoicePos++
-                ** log.message("45454545 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                log.message("45454545 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
                 if (bacnetRecvPacket[serviceChoicePos] == 0x1F)
                 {
                    log.message("We meet the end of this packet ")
@@ -746,9 +746,9 @@ class bacDevice
                 tagNumber = bacnetRecvPacket[serviceChoicePos]
 
                 // Property Identifier
-                ** log.message("We meet a Property Identifier with 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                log.message("We meet a Property Identifier with 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
                 PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
-                ** log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+                log.message("PropertyLengthValue = ${PropertyLengthValue} ")
                 
                 propertyProperty = 0
                 serviceChoicePos++
@@ -759,19 +759,47 @@ class bacDevice
                    ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
                    **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
                 }
-                ** log.message("-----------------  Get next propertyProperty = ${propertyProperty} ")
+                log.message("-----------------  Get next propertyProperty = ${propertyProperty} ")
                 serviceChoicePos += PropertyLengthValue
-                ** log.message("22222 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                log.message("5555555 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
 
-                // Property Identifier
-                if(bacnetRecvPacket[serviceChoicePos] != 0x4E)
+                // Error Property Identifier
+                if(bacnetRecvPacket[serviceChoicePos] == 0x5E)
                 {
-                   log.message("Error Opening Tag")
+                    serviceChoicePos++
+                    // error Class:  property
+                    int iErrorClassPropertyLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+                    serviceChoicePos++
+                    serviceChoicePos += iErrorClassPropertyLen
+                    // error Code:  unknown-property
+                    int iErrorCodePropertyLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+                    serviceChoicePos++
+                    serviceChoicePos += iErrorCodePropertyLen
+                }
+                // Property Identifier
+                else if(bacnetRecvPacket[serviceChoicePos] == 0x4E)
+                {
+                   serviceChoicePos++
+                   log.message("6666 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                   tagNumber = bacnetRecvPacket[serviceChoicePos]
+                   // We goto the start of this cycle to get the next property
+                   continue
+                }
+                
+                // When we arrive here we are at the end of Property Identifier List
+                if(bacnetRecvPacket[serviceChoicePos] == 0x5F)
+                {
+                   serviceChoicePos++
+                   log.message("End of Property Identifier List")
+                   serviceChoicePos++
+                   // We have to quit the cycle of Property Identifier List
+                   break
+                }
+                else 
+                {
+                   log.message("bacnetRecvPacket[serviceChoicePos] Error Opening Tag")
                    return -1
                 }
-                serviceChoicePos++
-                ** log.message("6666 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
-                tagNumber = bacnetRecvPacket[serviceChoicePos]
             }
         }
         log.message("77777 End of checkReadData. ")
@@ -1314,8 +1342,10 @@ class bacDevice
                          log.message("7777 Enable $i when iOperateType=$iOperateType and iObjectType=$iObjectType") 
                        ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = iLen
                         int j = 0
-                        for (int k = iStartPos + 1; k < iStartPos + iLen; k++)
+                        for (int k = iStartPos; k < iStartPos + iLen; k++)
                         {
+                            
+                            log.message("We will send ${iData[k]} in the bacReadPropertyMultiple which instanceNumber=${((bacReadPropertyMultiple)d).instanceNumber}") 
                             ((bacReadPropertyMultiple)d).bacnetReadMultipleList[j] = iData[k]
                             j++
                         }

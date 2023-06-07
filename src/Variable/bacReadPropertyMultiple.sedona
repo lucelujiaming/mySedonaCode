@@ -235,7 +235,7 @@ class bacReadPropertyMultiple
         {
             bacnetPacket[dataLength++] = 0x00
         }
-        bacnetPacket[dataLength++] = instanceNumber % 0x100
+        bacnetPacket[dataLength++] = bacnetReadMultipleList[i] % 0x100
         // listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
         bacnetPacket[dataLength++] = 0x1E
         // Property Identifier: required (105)
@@ -334,9 +334,9 @@ class bacReadPropertyMultiple
         case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
             bus.decodeFloat(data, bufFloat)
             out := (float)bufFloat[0]
-            ** log.message("-------------------------------------------------------------------------------")
-            ** log.message("--------------------------ReadPropertyMultipleFloat = $out--------------------")
-            ** log.message("-------------------------------------------------------------------------------")
+            log.message("-------------------------------------------------------------------------------")
+            log.message("--------------------------ReadPropertyMultipleFloat = $out--------------------")
+            log.message("-------------------------------------------------------------------------------")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
             bus.decodeDouble(data, bufDouble)
