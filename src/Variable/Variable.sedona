@@ -201,6 +201,11 @@ class Variable
                                 ** log.message("BacWritePropertyVar.name=${q.name}")
                                 ((BacWritePropertyVar)q).in := value
                             }
+                            else if (q.type.is(bacWritePropertyMultiple.type) 
+                                && ((bacWritePropertyMultiple)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("bacWritePropertyMultiple.name=${q.name}")
+                                ((bacWritePropertyMultiple)q).in := value
+                            }
                             else if (q.type.is(VarInput.type))  {
                                 log.message("VarInput.name=${q.name}")
                                 value := ((VarInput)q).out

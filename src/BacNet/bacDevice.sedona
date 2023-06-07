@@ -207,6 +207,8 @@ class bacDevice
                ((bacReadPropertyObjList)d).execute()
             } else if (d.type.is(bacReadPropertyMultiple.type))  {
                ((bacReadPropertyMultiple)d).execute()
+            } else if (d.type.is(bacWritePropertyMultiple.type))  {
+               ((bacWritePropertyMultiple)d).execute()
             } else if (d.type.is(BacWritePropertyVar.type))  {
                ((BacWritePropertyVar)d).execute()
             }
@@ -1084,9 +1086,9 @@ class bacDevice
            int iInstanceNumber = ((bacReadPropertyMultiple)d).instanceNumber
            bacnetMultipleReadArray[bacnetMultipleReadCount] = iObjectType * 0x400000 + iInstanceNumber
            bacnetMultipleReadCount++
-        } else if (d.type.is(BacWritePropertyVar.type))  {
-           int iObjectType = ((BacWritePropertyVar)d).objectType
-           int iInstanceNumber = ((BacWritePropertyVar)d).instanceNumber
+        } else if (d.type.is(bacWritePropertyMultiple.type))  {
+           int iObjectType = ((bacWritePropertyMultiple)d).objectType
+           int iInstanceNumber = ((bacWritePropertyMultiple)d).instanceNumber
            
            bacnetMultipleWriteArray[bacnetMultipleWriteCount] = iObjectType * 0x400000 + iInstanceNumber
            bacnetMultipleWriteCount++
@@ -1205,13 +1207,13 @@ class bacDevice
                  if(i != iStartPos)
                  {
                     // We use ReadMultiple and do nothing
-                    log.message("666 Disable $i when iOperateType=$iOperateType") 
+                    log.message("666 bacReadPropertyMultiple Disable $i when iOperateType=$iOperateType") 
                    ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = 0
                  }
                  else
                  {
                     // We use ReadMultiple and use instance number list
-                     log.message("7777 Enable $i when iOperateType=$iOperateType") 
+                     log.message("7777 bacReadPropertyMultiple Enable $i when iOperateType=$iOperateType") 
                    ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = iLen
                     int j = 0
                     for (int k = iStartPos; k < iStartPos + iLen; k++)
@@ -1225,10 +1227,10 @@ class bacDevice
               }
            }
         }
-        else if (d.type.is(BacWritePropertyVar.type)
+        else if (d.type.is(bacWritePropertyMultiple.type)
             && iOperateType == BACNET_PROPERTY_WRITE)  {
             // Assume We donot use WriteMultiple
-            ((BacWritePropertyVar)d).bacnetWriteMultipleCount = -1
+            ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = -1
            for (int i = iStartPos + 1; i < iStartPos + iLen; i++)
            {
               int iCmpOne = iData[i] % 0x400000
@@ -1237,16 +1239,19 @@ class bacDevice
                  if(i != iStartPos + 1)
                  {
                     // We use WriteMultiple and do nothing
-                    ((BacWritePropertyVar)d).bacnetWriteMultipleCount = 0
+                    log.message("666 bacWritePropertyMultiple Disable $i when iOperateType=$iOperateType") 
+                    ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = 0
                  }
                  else
                  {
                     // We use WriteMultiple and use instance number list
-                    ((BacWritePropertyVar)d).bacnetWriteMultipleCount = iLen
+                     log.message("7777 bacWritePropertyMultiple Enable $i when iOperateType=$iOperateType") 
+                    ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = iLen
                     int j = 0
                     for (int k = iStartPos + 1; k < iStartPos + iLen; k++)
                     {
-                        ((BacWritePropertyVar)d).bacnetWriteMultipleList[j] = iData[k]
+                        log.message("We will send ${iData[k]} in the bacWritePropertyMultiple which instanceNumber=${((BacWritePropertyVar)d).instanceNumber}") 
+                        ((bacWritePropertyMultiple)d).bacnetWriteMultipleList[j] = iData[k]
                         j++
                     }
                  }

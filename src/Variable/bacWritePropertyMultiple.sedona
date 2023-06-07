@@ -1,5 +1,5 @@
 @niagaraIcon="module://icons/x16/control/numericPoint.png"
-class BacWritePropertyVar
+class bacWritePropertyMultiple
   extends BacNetFieldBusIO
 {
   // Lujiaming add these at 23/02/24
@@ -90,23 +90,6 @@ class BacWritePropertyVar
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    // if(segmentedMsg == SEGMENTEDMSGENABLE)
-    //   bacnetPacket[0] = 0x08
-    // .... 0100 = PDU Flags: 0x4
-    // if(moreFllows != 0x00)
-    //    bacnetPacket[0] += 0x04
-    // if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
-    //    bacnetPacket[0] += 0x02
-    // .000 .... = Max Response Segments accepted: Unspecified (0)
-    // .... 0011 = Size of Maximum ADPU accepted: Up to 480 octets (fits in an ARCNET frame) (3)
-    // if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
-    // {
-    //    // maxSegments and maxAPDULength
-    //    // bacnetPacket[1] = maxSegments * 0x10 + maxAPDULength
-    //    bacnetPacket[1] = 0x00 * 0x10 + maxAPDULength
-    // }
-    // else 
-    // maxSegments and maxAPDULength
     bacnetPacket[1] = maxAPDULength
     
     // invokeID: Invoke ID: 9
@@ -115,19 +98,9 @@ class BacWritePropertyVar
     if(device.invokeID == 0xFF)
        device.invokeID = 0
     dataLength = 3
-    // if(segmentedMsg == SEGMENTEDMSGENABLE)
-    // {
-    //     bacnetPacket[3] = sequenceNumber
-    //     bacnetPacket[4] = proposedWindowSize
-    //     dataLength = 5
-    // }
-    // Service Choice: writeProperty (15)
-    bacnetPacket[dataLength++] = 0x0F
+    // Service Choice: writePropertyMultiple (16)
+    bacnetPacket[dataLength++] = 0x10
     // ObjectIdentifier: analog-value, 14
-    //   Context Tag: 0, Length/Value/Type: 4
-    //   .... 1... = Tag Class: Context Specific Tag
-    //   0000 .... = Context Tag Number: 0
-    //   Length Value Type: 4
     bacnetPacket[dataLength++] = 0x0C
     // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
     if(objectType > 4)
@@ -148,13 +121,15 @@ class BacWritePropertyVar
     {
         bacnetPacket[dataLength++] = 0x00
     }
-    bacnetPacket[dataLength++] = instanceNumber
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    // .... .110 = Named Tag: Opening Tag (6)
+    bacnetPacket[dataLength++] = 0x1E
     // Property Identifier: present-value (85)
-    bacnetPacket[dataLength++] = 0x19
+    bacnetPacket[dataLength++] = 0x09
     bacnetPacket[dataLength++] = propertyIdentifier
     
     // .... .110 = Named Tag: Opening Tag (6)
-    bacnetPacket[dataLength++] = 0x3E
+    bacnetPacket[dataLength++] = 0x2E
     // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
     bacnetPacket[dataLength++] = 0x44
     bufFloat[0] = (float)in
@@ -164,12 +139,10 @@ class BacWritePropertyVar
        bacnetPacket[dataLength++] = bufData[i]
     }
     // .... .111 = Named Tag: Closing Tag (7)
-    bacnetPacket[dataLength++] = 0x3F
+    bacnetPacket[dataLength++] = 0x2F
     // Priority: (Unsigned) 16
     // Context Tag: 4, Length/Value/Type: 1
-    bacnetPacket[dataLength++] = 0x49
-    // Priority: (Unsigned) 16
-    bacnetPacket[dataLength++] = 0x10
+    bacnetPacket[dataLength++] = 0x1F
     
     log.message("22222 bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
@@ -178,21 +151,21 @@ class BacWritePropertyVar
   
   virtual override void execute()
   {
-    ** log.message("BacWritePropertyVar::execute 11111 status=$status") 
+    ** log.message("bacWritePropertyMultiple::execute 11111 status=$status") 
     int iDelayCount = 0
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
     }
-    ** log.message("BacWritePropertyVar::execute 222222 status=$status") 
+    ** log.message("bacWritePropertyMultiple::execute 222222 status=$status") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
       ** log.message("23232323 sendInterval=$sendInterval") 
       if(lastInValue != in) {
           makePacket()
-          log.message("BacWritePropertyVar makePacket($dataLength)")
+          log.message("bacWritePropertyMultiple makePacket($dataLength)")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
             ** log.message("device.readReg")
           } else {
-            log.message("BacWritePropertyVar Error")
+            log.message("bacWritePropertyMultiple Error")
             status := STATUSOFFLINE
           }
           lastInValue = in
@@ -217,5 +190,10 @@ class BacWritePropertyVar
   private inline double[2] bufDouble
   static inline byte[8]    bufData
   
+  // -1                - We donot use ReadMultiple
+  // 0                 - We use ReadMultiple and do nothing
+  // Positive number   - We use ReadMultiple and use instance number list
+  int                     bacnetWriteMultipleCount = -1
+  inline int[128]  bacnetWriteMultipleList
 }
 
