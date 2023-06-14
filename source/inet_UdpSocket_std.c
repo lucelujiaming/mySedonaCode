@@ -533,7 +533,7 @@ int dealResponse(struct sockaddr_in user_addr, unsigned char * buffer, int iLen,
         iOffset = 9;
         int sourceNetworkAddress = convertShortFromBuffer(buffer + iOffset);
         iOffset += 2;
-        printf("sourceNetworkAddress: %d. ourceMACLayerAddressLength: %d.\r\n",
+        printf("sourceNetworkAddress: %d. sourceMACLayerAddressLength: %d.\r\n",
             sourceNetworkAddress, buffer[iOffset]);
         if(buffer[iOffset] == 0x01)
         {
@@ -724,7 +724,7 @@ int sendBroadcast(int iRetryCount, socket_t clientSendSocket, socket_t clientRec
 //    recv_2_addr.sin_port=htons(PORT);
 //    memset(&(recv_2_addr.sin_zero), 0x00, 8);
 
-    printf("Enter sendBroadcast \r\n");
+    // printf("Enter sendBroadcast \r\n");
     for(i=0; i<iRetryCount; i++)
     {
         memset(buf, 0x00, MAXDATASIZE);
@@ -736,7 +736,7 @@ int sendBroadcast(int iRetryCount, socket_t clientSendSocket, socket_t clientRec
 #else
         recvSleep(0);
 #endif
-        printf("send %d OK \r\n", iSendCount);
+        // printf("send %d OK \r\n", iSendCount);
         size = sizeof(struct sockaddr_in);
 
         current_time = now = time(NULL);
@@ -753,7 +753,7 @@ int sendBroadcast(int iRetryCount, socket_t clientSendSocket, socket_t clientRec
                 now = time(NULL);
                 if(now - current_time > RECV_TIMEOUT)
                 {
-                    printf("we detect %d clients.\r\n", iClientCount);
+                    // printf("we detect %d clients.\r\n", iClientCount);
                     break;
                 }
                 else
@@ -819,7 +819,7 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
     if (clientSendSocket > 0)
     {
         socket_t clientRecvSocket;
-        printf("Call sendBroadcast \r\n");
+        // printf("Call sendBroadcast \r\n");
         clientRecvSocket = initializeRecvSocket();
         iClientCount = sendBroadcast(SEND_BROADCAST_TIMES, 
             clientSendSocket, clientRecvSocket, my_addr, // recv_addr, 

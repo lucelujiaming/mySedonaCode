@@ -198,20 +198,49 @@ class bacDevice
         }
         // 
         ** log.message("bacDevice execute 33333 status=$status")
-        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            // ((BacNetFieldBusIO)d).device = this
-            // d.execute()
-            if (d.type.is(BacReadPropertyVar.type))  {
-               ((BacReadPropertyVar)d).execute()
-            } else if (d.type.is(bacReadPropertyObjList.type))  {
-               ((bacReadPropertyObjList)d).execute()
-            } else if (d.type.is(bacReadPropertyMultiple.type))  {
-               ((bacReadPropertyMultiple)d).execute()
-            } else if (d.type.is(bacWritePropertyMultiple.type))  {
-               ((bacWritePropertyMultiple)d).execute()
-            } else if (d.type.is(BacWritePropertyVar.type))  {
-               ((BacWritePropertyVar)d).execute()
+        if(execute_mode == BACNET_PROPERTY_READ)
+        {
+            for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                // ((BacNetFieldBusIO)d).device = this
+                // d.execute()
+                ** log.message("READ::execute_mode = $execute_mode and execute_counter= $execute_counter ")
+                if (d.type.is(BacReadPropertyVar.type))  {
+                   ((BacReadPropertyVar)d).execute()
+                } else if (d.type.is(bacReadPropertyObjList.type))  {
+                   ((bacReadPropertyObjList)d).execute()
+                } else if (d.type.is(bacReadPropertyMultiple.type))  {
+                   ((bacReadPropertyMultiple)d).execute()
+                }
             }
+            execute_counter = execute_counter + 1
+            if(execute_counter == BACNET_PROPERTY_READ_EXECUTE_TIMES)
+            {
+                execute_counter = 0
+                execute_mode    = BACNET_PROPERTY_WRITE
+            }
+        }
+        else if(execute_mode == BACNET_PROPERTY_WRITE)
+        {
+            for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                // ((BacNetFieldBusIO)d).device = this
+                // d.execute()
+                ** log.message("WRITE::execute_mode = $execute_mode and execute_counter= $execute_counter ")
+                if (d.type.is(bacWritePropertyMultiple.type))  {
+                   ((bacWritePropertyMultiple)d).execute()
+                } else if (d.type.is(BacWritePropertyVar.type))  {
+                   ((BacWritePropertyVar)d).execute()
+                }
+            }
+            execute_counter = execute_counter + 1
+            if(execute_counter == BACNET_PROPERTY_WRITE_EXECUTE_TIMES)
+            {
+                execute_counter = 0
+                execute_mode    = BACNET_PROPERTY_READ
+            }
+        }
+        else
+        {
+            log.message("ERROR: execute_mode = $execute_mode ")
         }
     }
     else
@@ -222,6 +251,7 @@ class bacDevice
   
   int fillHead()
   {
+      log.message("fillHead start")
     // BACnet Virtual Link Control
     // Type: BACnet/IP (Annex J) (0x81)
     bacnetPacket[0] = 0x81
@@ -240,6 +270,7 @@ class bacDevice
     }
     else 
     {   
+      log.message("fillHead error typeBVLCI")
       return -1
     }
     // Skip BVLC-Length: 4 of 18 bytes BACnet packet length
@@ -248,6 +279,7 @@ class bacDevice
     // Building Automation and Control Network NPDU
     // NPCI Version: 0x01 (ASHRAE 135-1995)
     bacnetPacket[4] = versionNPCI
+    log.message("fillHead::communicationMethod send communicationMethod =${communicationMethod}")
     // Control: 0x04, Expecting Reply
     if(communicationMethod == COMMUNICATIONBYSUBNET)
     {
@@ -258,7 +290,7 @@ class bacDevice
         // dnetNPCI
         bacnetPacket[6] = sourceNetworkAddress/256
         bacnetPacket[7] = sourceNetworkAddress%256
-        ** log.message("send sourceNetworkAddress =${sourceNetworkAddress}")
+        log.message("fillHead::COMMUNICATIONBYSUBNET send sourceNetworkAddress =${sourceNetworkAddress}")
     //  // Destination MAC Layer Address Length: 1
     //  bacnetPacket[8] = 0x01
     //  // DADR: 5
@@ -280,6 +312,7 @@ class bacDevice
     }
     else if(communicationMethod == COMMUNICATIONBYINSTANCE)
     {   
+        log.message("fillHead::COMMUNICATIONBYINSTANCE send ")
         bacnetPacket[5] = 0x00
         bacnetPacket[5] += 0x04
         return 6
@@ -294,11 +327,11 @@ class bacDevice
   override int writeReg(int deviceAddr, int addr, int iLen, float[] buf)
   { 
     int headLength = 0
-    ** log.message("headLength=$headLength") 
+    log.message("writeReg headLength=$headLength") 
     headLength = fillHead()
     if(headLength == -1)
         return headLength
-    ** log.message("headLength=$headLength") 
+    log.message("writeReg headLength=$headLength") 
     bacnetPacket[2] = (headLength + iLen)/256
     bacnetPacket[3] = (headLength + iLen)%256
 
@@ -1271,6 +1304,9 @@ class bacDevice
   define int BACNET_PROPERTY_READ  = 1
   define int BACNET_PROPERTY_WRITE = 2
   
+  define int BACNET_PROPERTY_READ_EXECUTE_TIMES   = 3
+  define int BACNET_PROPERTY_WRITE_EXECUTE_TIMES  = 9
+  
   FieldBusNet bus = null
   
   inline UdpSocket socket           // socket used for send/receive
@@ -1306,7 +1342,7 @@ class bacDevice
   
   private inline float[1024] buf
   static inline byte[1024] bacnetRecvPacket
-  int dataLength
+  private       int dataLength
   
   inline Buf(64) lastInstanceNumber = ""
 
@@ -1319,4 +1355,7 @@ class bacDevice
   inline static int[128]  bacnetMultipleWriteArray
   // 
   inline static int[1] iListOffset;
+  // 
+  private       int execute_mode = BACNET_PROPERTY_WRITE
+  private       int execute_counter = 0
 }
