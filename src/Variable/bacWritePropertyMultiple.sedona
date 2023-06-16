@@ -152,14 +152,16 @@ class bacWritePropertyMultiple
   int checkWritePropertyMultiple(int iMultipleObjectType, int iMultipleInstanceNumber)
   {
       for (Component d = Sys.app.lookup(device.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        ** log.message("5555  updateCache d.name=$d.name and type.name=$d.type.name");
         if (d.type.is(bacWritePropertyMultiple.type)) {
-          ** log.message("5555  updateCache bacWritePropertyMultiple d.name=$d.name and type.name=$d.type.name");
            int iObjectType = ((bacWritePropertyMultiple)d).objectType
            int iInstanceNumber = ((bacWritePropertyMultiple)d).instanceNumber
+           ** log.message("5555  updateCache bacWritePropertyMultiple iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber");
            if((iObjectType == iMultipleObjectType) && (iInstanceNumber == iMultipleInstanceNumber)) 
            {
               float iLastValue = ((bacWritePropertyMultiple)d).lastInValue
               currentInFloatValue = ((bacWritePropertyMultiple)d).in
+              ** log.message("5555  updateCache bacWritePropertyMultiple iLastValue=$iLastValue and currentInFloatValue=$currentInFloatValue");
               if(iLastValue != currentInFloatValue)
               {
                  ((bacWritePropertyMultiple)d).lastInValue = ((bacWritePropertyMultiple)d).in
@@ -203,6 +205,7 @@ class bacWritePropertyMultiple
         if(isChanged == 1)
         {
             iChangedValue = iChangedValue + 1
+            log.message("5555  makeMultipleWritePacket iChangedValue=$iChangedValue and bacnetWriteMultipleCount=$bacnetWriteMultipleCount");
             // ObjectIdentifier: analog-value, 0
             bacnetPacket[dataLength++] = 0x0C
             if(iMultipleObjectType > 4)
@@ -311,7 +314,7 @@ class bacWritePropertyMultiple
   static inline byte[1024] bacnetPacket
   int dataLength
   // Send interval counter
-  public float lastInValue = -1.0
+  public float lastInValue = 0.0
 
   private inline int[2]    bufInteger
   private inline float[2]  bufFloat

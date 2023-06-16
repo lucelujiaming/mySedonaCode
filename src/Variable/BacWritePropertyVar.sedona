@@ -210,7 +210,7 @@ class BacWritePropertyVar
   static inline byte[1024] bacnetPacket
   int dataLength
   // Send interval counter
-  float lastInValue = -1.0
+  float lastInValue = 0.0
 
   private inline int[2]    bufInteger
   private inline float[2]  bufFloat
