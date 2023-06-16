@@ -85,7 +85,7 @@ class bacWritePropertyMultiple
     }
   }
 
-  void makePacket()
+  void makeWritePacket()
   {
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
@@ -148,6 +148,116 @@ class bacWritePropertyMultiple
     for(int i =0 ; i < dataLength; i++)
         buf[i] = (float)bacnetPacket[i]
   }
+
+  int checkWritePropertyMultiple(int iMultipleObjectType, int iMultipleInstanceNumber)
+  {
+      for (Component d = Sys.app.lookup(device.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d.type.is(bacWritePropertyMultiple.type)) {
+          ** log.message("5555  updateCache bacWritePropertyMultiple d.name=$d.name and type.name=$d.type.name");
+           int iObjectType = ((bacWritePropertyMultiple)d).objectType
+           int iInstanceNumber = ((bacWritePropertyMultiple)d).instanceNumber
+           if((iObjectType == iMultipleObjectType) && (iInstanceNumber == iMultipleInstanceNumber)) 
+           {
+              float iLastValue = ((bacWritePropertyMultiple)d).lastInValue
+              currentInFloatValue = ((bacWritePropertyMultiple)d).in
+              if(iLastValue != currentInFloatValue)
+              {
+                 ((bacWritePropertyMultiple)d).lastInValue = ((bacWritePropertyMultiple)d).in
+                 return 1
+              }
+              else 
+              {
+                 return 0
+              }
+           }
+        }
+      }
+      return 0
+  }
+
+  int makeMultipleWritePacket()
+  {
+    int iChangedValue = 0
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    bacnetPacket[1] = maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = device.invokeID
+    device.invokeID = device.invokeID + 1
+    if(device.invokeID == 0xFF)
+       device.invokeID = 0
+    dataLength = 3
+    // Service Choice: writePropertyMultiple (16)
+    bacnetPacket[dataLength++] = 0x10
+    
+    for(int i = 0; i < bacnetWriteMultipleCount; i++)
+    {
+        // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+        int iMultipleObjectType = bacnetWriteMultipleList[i] / 0x400000
+        // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+        int iMultipleInstanceNumber = bacnetWriteMultipleList[i] % 0x400000
+        int isChanged = checkWritePropertyMultiple(
+                            iMultipleObjectType, iMultipleInstanceNumber)
+        if(isChanged == 1)
+        {
+            iChangedValue = iChangedValue + 1
+            // ObjectIdentifier: analog-value, 0
+            bacnetPacket[dataLength++] = 0x0C
+            if(iMultipleObjectType > 4)
+            {
+                bacnetPacket[dataLength++] = iMultipleObjectType / 4
+            }
+            else 
+            {
+                bacnetPacket[dataLength++] = 0x00
+            }
+            bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+            if(iMultipleInstanceNumber > 0x100)
+            {
+                bacnetPacket[dataLength++] = iMultipleInstanceNumber / 0x100
+            }
+            else 
+            {
+                bacnetPacket[dataLength++] = 0x00
+            }
+            bacnetPacket[dataLength++] = iMultipleInstanceNumber % 0x100
+            // .... .110 = Named Tag: Opening Tag (6)
+            bacnetPacket[dataLength++] = 0x1E
+            // Property Identifier: present-value (85)
+            bacnetPacket[dataLength++] = 0x09
+            bacnetPacket[dataLength++] = propertyIdentifier
+            
+            // .... .110 = Named Tag: Opening Tag (6)
+            bacnetPacket[dataLength++] = 0x2E
+            // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
+            bacnetPacket[dataLength++] = 0x44
+            // bufFloat[0] = (float)in
+            bufFloat[0] = (float)currentInFloatValue;
+            int iLen = bus.encodeFloat(bufFloat, bufData)
+            for(int j = 0; j < iLen; j++)
+            {
+               bacnetPacket[dataLength++] = bufData[j]
+            }
+            // .... .111 = Named Tag: Closing Tag (7)
+            bacnetPacket[dataLength++] = 0x2F
+            // Priority: (Unsigned) 16
+            // Context Tag: 4, Length/Value/Type: 1
+            bacnetPacket[dataLength++] = 0x1F
+        }
+    }
+
+    if(iChangedValue > 0)
+    {
+        log.message("22222 bacnetPacket[$dataLength]")
+        for(int i =0 ; i < dataLength; i++)
+        {
+            buf[i] = (float)bacnetPacket[i]
+        }
+    }
+    return iChangedValue
+  }
   
   virtual override void execute()
   {
@@ -156,20 +266,38 @@ class bacWritePropertyMultiple
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
     }
-    ** log.message("bacWritePropertyMultiple::execute 222222 status=$status") 
+    ** log.message("bacWritePropertyMultiple::execute 222222 bacnetWriteMultipleCount=$bacnetWriteMultipleCount") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
-      ** log.message("23232323 sendInterval=$sendInterval") 
-      if(lastInValue != in) {
-          makePacket()
-          log.message("bacWritePropertyMultiple makePacket($dataLength)")
-          if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
-            ** log.message("device.readReg")
-          } else {
-            log.message("bacWritePropertyMultiple Error")
-            status := STATUSOFFLINE
+       if(bacnetWriteMultipleCount == -1){
+          if(lastInValue != in) {
+              makeWritePacket()
+              log.message("bacWritePropertyMultiple makePacket($dataLength)")
+              if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+                ** log.message("device.readReg")
+              } else {
+                log.message("bacWritePropertyMultiple Error")
+                status := STATUSOFFLINE
+              }
+              lastInValue = in
           }
-          lastInValue = in
-      }
+       }
+       else if(bacnetWriteMultipleCount == 0){
+          ** log.message("WriteMultiple Disable")
+       }
+       else if(bacnetWriteMultipleCount > 0){
+          int iChangedValue = makeMultipleWritePacket()
+          ** log.message("bacWritePropertyMultiple makeMultipleWritePacket return $iChangedValue")
+          if(iChangedValue > 0)
+          {
+              log.message("bacWritePropertyMultiple makePacket($dataLength)")
+              if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+                 ** log.message("device.readReg")
+              } else {
+                 log.message("bacWritePropertyMultiple Error")
+                 status := STATUSOFFLINE
+              }
+          }
+       }
     }
     ** log.message("33333 status=$status") 
   }
@@ -183,7 +311,7 @@ class bacWritePropertyMultiple
   static inline byte[1024] bacnetPacket
   int dataLength
   // Send interval counter
-  float lastInValue = -1.0
+  public float lastInValue = -1.0
 
   private inline int[2]    bufInteger
   private inline float[2]  bufFloat
@@ -195,5 +323,7 @@ class bacWritePropertyMultiple
   // Positive number   - We use ReadMultiple and use instance number list
   int                     bacnetWriteMultipleCount = -1
   inline int[128]  bacnetWriteMultipleList
+  
+  float                    currentInFloatValue
 }
 
