@@ -271,7 +271,7 @@ class bacWritePropertyMultiple
     }
     ** log.message("bacWritePropertyMultiple::execute 222222 bacnetWriteMultipleCount=$bacnetWriteMultipleCount") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
-       if(bacnetWriteMultipleCount == -1){
+       if(bacnetWriteMultipleCount == BACNET_WRITEMULTIPLE_NOTUSED){
           if(lastInValue != in) {
               makeWritePacket()
               log.message("bacWritePropertyMultiple makePacket($dataLength)")
@@ -284,10 +284,10 @@ class bacWritePropertyMultiple
               lastInValue = in
           }
        }
-       else if(bacnetWriteMultipleCount == 0){
+       else if(bacnetWriteMultipleCount == BACNET_WRITEMULTIPLE_DONOTHING){
           ** log.message("WriteMultiple Disable")
        }
-       else if(bacnetWriteMultipleCount > 0){
+       else if(bacnetWriteMultipleCount > BACNET_WRITEMULTIPLE_DONOTHING){
           int iChangedValue = makeMultipleWritePacket()
           ** log.message("bacWritePropertyMultiple makeMultipleWritePacket return $iChangedValue")
           if(iChangedValue > 0)
@@ -309,6 +309,13 @@ class bacWritePropertyMultiple
   {
     return 0
   }
+  
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
+  define int BACNET_WRITEMULTIPLE_DONOTHING  = 0
+  
   define int SEND_INTERVAL = 10
   private inline float[1024] buf
   static inline byte[1024] bacnetPacket
@@ -321,10 +328,10 @@ class bacWritePropertyMultiple
   private inline double[2] bufDouble
   static inline byte[8]    bufData
   
-  // -1                - We donot use ReadMultiple
-  // 0                 - We use ReadMultiple and do nothing
-  // Positive number   - We use ReadMultiple and use instance number list
-  int                     bacnetWriteMultipleCount = -1
+  // -1                - We donot use WriteMultiple
+  // 0                 - We use WriteMultiple and do nothing
+  // Positive number   - We use WriteMultiple and use instance number list
+  int                     bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_NOTUSED
   inline int[128]  bacnetWriteMultipleList
   
   float                    currentInFloatValue

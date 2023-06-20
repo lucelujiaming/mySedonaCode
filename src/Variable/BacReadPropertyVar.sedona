@@ -202,7 +202,6 @@ class BacReadPropertyVar
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
-        if(bacnetReadMultipleCount == -1){
           makePacket()
           log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
@@ -211,14 +210,7 @@ class BacReadPropertyVar
             log.message("BacReadPropertyVar Error")
             status := STATUSOFFLINE
           }
-        }
-        else if(bacnetReadMultipleCount == 0){
-           log.message("ReadMultiple Disable")
-        }
-        else if(bacnetReadMultipleCount > 0){
-           
-        }
-        sendInterval = nowMilliSecond + (long)refreshTime
+          sendInterval = nowMilliSecond + (long)refreshTime
       }
     }
     ** log.message("33333 status=$status") 
@@ -311,9 +303,4 @@ class BacReadPropertyVar
   
   private inline Str(128)   strInfo
 
-  // -1                - We donot use ReadMultiple
-  // 0                 - We use ReadMultiple and do nothing
-  // Positive number   - We use ReadMultiple and use instance number list
-  int                     bacnetReadMultipleCount = -1
-  inline int[128]  bacnetReadMultipleList
 }

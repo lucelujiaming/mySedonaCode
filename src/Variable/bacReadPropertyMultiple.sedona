@@ -196,7 +196,7 @@ class bacReadPropertyMultiple
   void makeMultipleReadPacket()
   {
     dataLength = 0
-    if(bacnetReadMultipleCount <= 0)
+    if(bacnetReadMultipleCount <= BACNET_READMULTIPLE_DONOTHING)
     {
        return
     }
@@ -266,7 +266,7 @@ class bacReadPropertyMultiple
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
         log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
-        if(bacnetReadMultipleCount == -1){
+        if(bacnetReadMultipleCount == BACNET_READMULTIPLE_NOTUSED){
           makeReadPacket()
           ** log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
@@ -276,10 +276,10 @@ class bacReadPropertyMultiple
             status := STATUSOFFLINE
           }
         }
-        else if(bacnetReadMultipleCount == 0){
+        else if(bacnetReadMultipleCount == BACNET_READMULTIPLE_DONOTHING){
            log.message("ReadMultiple Disable")
         }
-        else if(bacnetReadMultipleCount > 0){
+        else if(bacnetReadMultipleCount > BACNET_READMULTIPLE_DONOTHING){
           makeMultipleReadPacket()
           ** log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
@@ -377,6 +377,12 @@ class bacReadPropertyMultiple
     }
   }
   
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  define int BACNET_READMULTIPLE_NOTUSED    = -1
+  define int BACNET_READMULTIPLE_DONOTHING  = 0
+  
   define int SEND_INTERVAL = 30
   
   private inline float[1024] buf
@@ -394,7 +400,7 @@ class bacReadPropertyMultiple
   // -1                - We donot use ReadMultiple
   // 0                 - We use ReadMultiple and do nothing
   // Positive number   - We use ReadMultiple and use instance number list
-  int                     bacnetReadMultipleCount = -1
+  int                     bacnetReadMultipleCount = BACNET_READMULTIPLE_NOTUSED
   inline int[128]  bacnetReadMultipleList
 
 }

@@ -1229,7 +1229,7 @@ class bacDevice
          if (d.type.is(bacReadPropertyMultiple.type)
             && iOperateType == BACNET_PROPERTY_READ)  {
             // Assume We donot use ReadMultiple
-            ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = -1
+            ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_NOTUSED
            log.message("44444 operateOneBlock when instanceNumber=${((bacReadPropertyMultiple)d).instanceNumber}") 
            for (int i = iStartPos ; i < iStartPos + iLen; i++)
            {
@@ -1240,7 +1240,7 @@ class bacDevice
                  {
                     // We use ReadMultiple and do nothing
                     log.message("666 bacReadPropertyMultiple Disable $i when iOperateType=$iOperateType") 
-                   ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = 0
+                   ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
                  }
                  else
                  {
@@ -1262,7 +1262,7 @@ class bacDevice
         else if (d.type.is(bacWritePropertyMultiple.type)
             && iOperateType == BACNET_PROPERTY_WRITE)  {
             // Assume We donot use WriteMultiple
-            ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = -1
+            ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_NOTUSED
            for (int i = iStartPos; i < iStartPos + iLen; i++)
            {
               int iCmpOne = iData[i] % 0x400000
@@ -1272,7 +1272,7 @@ class bacDevice
                  {
                     // We use WriteMultiple and do nothing
                     log.message("666 bacWritePropertyMultiple Disable $i when iOperateType=$iOperateType") 
-                    ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = 0
+                    ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_DONOTHING
                  }
                  else
                  {
@@ -1305,6 +1305,12 @@ class bacDevice
   
   define int BACNET_PROPERTY_READ_EXECUTE_TIMES   = 3
   define int BACNET_PROPERTY_WRITE_EXECUTE_TIMES  = 9
+  
+  define int BACNET_READMULTIPLE_NOTUSED    = -1
+  define int BACNET_READMULTIPLE_DONOTHING  = 0
+  
+  define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
+  define int BACNET_WRITEMULTIPLE_DONOTHING  = 0
   
   FieldBusNet bus = null
   
