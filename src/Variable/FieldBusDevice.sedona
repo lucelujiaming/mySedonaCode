@@ -46,4 +46,5 @@ abstract class FieldBusDevice
   
   // SADR: 5
   int sadr = 0
+  int maxAPDULength = 0
 }

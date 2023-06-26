@@ -981,6 +981,41 @@ class bacDevice
     return serviceChoicePos
   }
 
+  int convertmaxADPU(int imaxADPU)
+  {
+    // B'0000' Up to MinimumMessageSize (50 octets)
+    if(imaxADPU == 50)
+       return 0
+    // B'0001' Up to 128 octets
+    else if(imaxADPU == 128)
+       return 1
+    // B'0010' Up to 206 octets(fits in a LonTalk frame)
+    else if(imaxADPU == 206)
+       return 2
+    // B'0011' Up to 480 octets(fits in an ARCNET frame)
+    else if(imaxADPU == 480)
+       return 3
+    // B'0100' Up to 1024 octets
+    else if(imaxADPU == 1024)
+       return 4
+    // B'0101' Up to 1476 octets(fits in a ISO 8802-3 frame)
+    else if(imaxADPU == 1476)
+       return 5
+    // It is impossible,we use B'0011' Up to 480 octets as the default value
+    else 
+       return 3
+    // B'0110' reserved by ASHRAE
+    // B'0111' reserved by ASHRAE
+    // B'1000' reserved by ASHRAE
+    // B'1001' reserved by ASHRAE
+    // B'1010' reserved by ASHRAE
+    // B'1011' reserved by ASHRAE
+    // B'1100' reserved by ASHRAE
+    // B'1101' reserved by ASHRAE
+    // B'1110' reserved by ASHRAE
+    // B'1111' reserved by ASHRAE
+  }
+
   int setClientAddressBySNetAndMac(int sNetAddrID, int macID)
   {
     for(int i = 0 ; i < ((BIP)bus).iDeviceCount; i++)
@@ -996,7 +1031,9 @@ class bacDevice
             setClientAddress(addrClient.toStr())
             if((sourceNetworkAddress != 0) && (sadr != 0))
             {
-                log.message("Setting communicationMethod to COMMUNICATIONBYSUBNET")
+               maxAPDULength = convertmaxADPU(((BIP)bus).maxADPUList[i])
+               log.message("maxAPDULength = $maxAPDULength and ClientAddress= ${addrClient.toStr()}")
+               log.message("We are Setting communicationMethod into COMMUNICATIONBYSUBNET")
                return 2 // COMMUNICATIONBYSUBNET
             }
          //   else if((sourceNetworkAddress == 0) && (sadr == 0))
@@ -1006,7 +1043,7 @@ class bacDevice
          //   }
             else
             {
-                log.message("Error to setting communicationMethod to COMMUNICATIONNONE")
+                log.message("Error to setting communicationMethod into COMMUNICATIONNONE")
                return 0 // COMMUNICATIONNONE
             }
         }
@@ -1032,7 +1069,9 @@ class bacDevice
             sadr                 = ((BIP)bus).NPDUList[i] / 0x10000
             if((sourceNetworkAddress != 0) && (sadr != 0))
             {
-                log.message("Setting communicationMethod to COMMUNICATIONBYSUBNET")
+               maxAPDULength = convertmaxADPU(((BIP)bus).maxADPUList[i])
+               log.message("maxAPDULength = $maxAPDULength and ClientAddress= ${addrClient.toStr()}")
+               log.message("Setting communicationMethod to COMMUNICATIONBYSUBNET")
                return 2 // COMMUNICATIONBYSUBNET
             }
             else if((sourceNetworkAddress == 0) && (sadr == 0))

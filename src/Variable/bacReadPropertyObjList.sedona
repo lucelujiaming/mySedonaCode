@@ -17,25 +17,6 @@ class bacReadPropertyObjList
   define int MAXSEGMENTGREATERTHAN64 = 7
   define int MAXSEGMENTEND = 8
 
-  define Str MAXAPDULENGTHS = "50, 128, 206(LonTalk), 480, 1024, 1476(ISO8802), Reserved(6), Reserved(7), Reserved(8), Reserved(9), Reserved(10), Reserved(11), Reserved(12), Reserved(13), Reserved(14), Reserved(15), END"
-  define int MAXAPDULENGTH50 = 0
-  define int MAXAPDULENGTH128 = 1
-  define int MAXAPDULENGTH206 = 2
-  define int MAXAPDULENGTH480 = 3
-  define int MAXAPDULENGTH1024 = 4
-  define int MAXAPDULENGTH1476 = 5
-  define int MAXAPDULENGTHReserved6 = 6
-  define int MAXAPDULENGTHReserved7 = 7
-  define int MAXAPDULENGTHReserved8 = 8
-  define int MAXAPDULENGTHReserved9 = 9
-  define int MAXAPDULENGTHReserved10 = 10
-  define int MAXAPDULENGTHReserved11 = 11
-  define int MAXAPDULENGTHReserved12 = 12
-  define int MAXAPDULENGTHReserved13 = 13
-  define int MAXAPDULENGTHReserved14 = 14
-  define int MAXAPDULENGTHReserved15 = 15
-  define int MAXAPDULENGTHEND = 16
-  
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
@@ -55,19 +36,16 @@ class bacReadPropertyObjList
   ////////////////////////////////////////////////////////////////
   // config Properties
   ////////////////////////////////////////////////////////////////
-
-  @config
-  property int maxAPDULength = 3 // 480
   
   // Read Property Object
   
-  @config
-  property int arrayProperty = 5
+  // @config
+  // property int arrayProperty = 5
   // Lujiaming add these end at 23/02/24
 
   // 
   @readonly
-  property float out = 0.0f
+  property float present_value = 0.0f
   // property float in = 0.0f
 
   @summary=true
@@ -89,24 +67,7 @@ class bacReadPropertyObjList
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    // if(segmentedMsg == SEGMENTEDMSGENABLE)
-    //   bacnetPacket[0] = 0x08
-    // .... 0100 = PDU Flags: 0x4
-    // if(moreFllows != 0x00)
-    //    bacnetPacket[0] += 0x04
-    // if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
-    //    bacnetPacket[0] += 0x02
-    // .000 .... = Max Response Segments accepted: Unspecified (0)
-    // .... 0011 = Size of Maximum ADPU accepted: Up to 480 octets (fits in an ARCNET frame) (3)
-    // if(segmentedResponseAccepted == SEGMENTEDRESPONSEACCEPTEDENABLE)
-    // {
-    //    // maxSegments and maxAPDULength
-    //    // bacnetPacket[1] = maxSegments * 0x10 + maxAPDULength
-    //    bacnetPacket[1] = 0x00 * 0x10 + maxAPDULength
-    // }
-    // else 
-    // maxSegments and maxAPDULength
-    bacnetPacket[1] = maxAPDULength
+    bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = device.invokeID
@@ -223,9 +184,9 @@ class bacReadPropertyObjList
     {
         case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
             if(data[0] != 0x00)
-                out := 1.0
+                present_value := 1.0
             else
-                out := 0.0
+                present_value := 0.0
             break
         case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
             // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
@@ -235,25 +196,25 @@ class bacReadPropertyObjList
             instanceNumber = data[1] % 0x40
             instanceNumber = instanceNumber * 0x100 + data[2]
             instanceNumber = instanceNumber * 0x100 + data[3]
-            out := (float)instanceNumber
-            log.message("objectType = $objectType and instanceNumber=$out")
+            present_value := (float)instanceNumber
+            log.message("objectType = $objectType and instanceNumber=$present_value")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
         case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
             bus.decodeUnsigned(data, iLen, bufInteger)
-            out := (float)bufInteger[0]
+            present_value := (float)bufInteger[0]
             break
         case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
             bus.decodeUnsigned(data, iLen, bufInteger)
-            out := (float)bufInteger[0]
+            present_value := (float)bufInteger[0]
             break
         case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
             bus.decodeFloat(data, bufFloat)
-            out := (float)bufFloat[0]
+            present_value := (float)bufFloat[0]
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
             bus.decodeDouble(data, bufDouble)
-            out := (float)bufDouble[0]
+            present_value := (float)bufDouble[0]
             break
         // case BANET_PROPVAR_NULLAPPTAG:
         case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
@@ -287,6 +248,7 @@ class bacReadPropertyObjList
   }
   
   define int SEND_INTERVAL = 30
+  int arrayProperty = 5
   private inline float[1024] buf
   static inline byte[1024] bacnetPacket
   int dataLength

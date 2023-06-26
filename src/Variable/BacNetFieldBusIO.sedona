@@ -233,6 +233,11 @@ abstract class BacNetFieldBusIO
   static int BACNET_OBJERCTTYPE_BINARY_INPUT  =  3
   static int BACNET_OBJERCTTYPE_BINARY_OUTPUT =  4
   static int BACNET_OBJERCTTYPE_BINARY_VALUE  =  5
+  
+  static int BACNET_OBJERCTTYPE_MULTISTATE_INPUT  =  13
+  static int BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT =  14
+  static int BACNET_OBJERCTTYPE_MULTISTATE_VALUE  =  19
+  
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////
