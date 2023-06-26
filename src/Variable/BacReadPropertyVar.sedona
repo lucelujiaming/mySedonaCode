@@ -4,20 +4,6 @@ class BacReadPropertyVar
 {
   // Lujiaming add these at 23/02/24
   ////////////////////////////////////////////////////////////////
-  // Constants
-  ////////////////////////////////////////////////////////////////
-  define Str MAXSEGMENTS = "Unspecified, Segments2, Segments4, Segments8, Segments16, Segments32, Segments64, GreaterThan64, END"
-  define int MAXSEGMENTUNDEFED = 0
-  define int MAXSEGMENT2 = 1
-  define int MAXSEGMENT4 = 2
-  define int MAXSEGMENT8 = 3
-  define int MAXSEGMENT16 = 4
-  define int MAXSEGMENT32 = 5
-  define int MAXSEGMENT64 = 6
-  define int MAXSEGMENTGREATERTHAN64 = 7
-  define int MAXSEGMENTEND = 8
-
-  ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
   @config
@@ -62,7 +48,7 @@ class BacReadPropertyVar
     }
   }
 
-  void makePacket()
+  void makeReadPropertyPacket()
   {
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
@@ -163,8 +149,8 @@ class BacReadPropertyVar
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
-          makePacket()
-          log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+          makeReadPropertyPacket()
+          log.message("111111 makeReadPropertyPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
             ** log.message("device.readReg")
           } else {

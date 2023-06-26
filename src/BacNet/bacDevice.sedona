@@ -206,8 +206,6 @@ class bacDevice
                 ** log.message("READ::execute_mode = $execute_mode and execute_counter= $execute_counter ")
                 if (d.type.is(BacReadPropertyVar.type))  {
                    ((BacReadPropertyVar)d).execute()
-                } else if (d.type.is(bacReadPropertyObjList.type))  {
-                   ((bacReadPropertyObjList)d).execute()
                 } else if (d.type.is(bacReadPropertyMultiple.type))  {
                    ((bacReadPropertyMultiple)d).execute()
                 }
@@ -225,11 +223,9 @@ class bacDevice
                 // ((BacNetFieldBusIO)d).device = this
                 // d.execute()
                 ** log.message("WRITE::execute_mode = $execute_mode and execute_counter= $execute_counter ")
-                if (d.type.is(bacWritePropertyMultiple.type))  {
-                   ((bacWritePropertyMultiple)d).execute()
-                } else if (d.type.is(BacWritePropertyVar.type))  {
-                   ((BacWritePropertyVar)d).execute()
-                }
+                if (d.type.is(bacWriteProperty.type))  {
+                   ((bacWriteProperty)d).execute()
+                } 
             }
             execute_counter = execute_counter + 1
             if(execute_counter == BACNET_PROPERTY_WRITE_EXECUTE_TIMES)
@@ -1158,9 +1154,9 @@ class bacDevice
            int iInstanceNumber = ((bacReadPropertyMultiple)d).instanceNumber
            bacnetMultipleReadArray[bacnetMultipleReadCount] = iObjectType * 0x400000 + iInstanceNumber
            bacnetMultipleReadCount++
-        } else if (d.type.is(bacWritePropertyMultiple.type))  {
-           int iObjectType = ((bacWritePropertyMultiple)d).objectType
-           int iInstanceNumber = ((bacWritePropertyMultiple)d).instanceNumber
+        } else if (d.type.is(bacWriteProperty.type))  {
+           int iObjectType = ((bacWriteProperty)d).objectType
+           int iInstanceNumber = ((bacWriteProperty)d).instanceNumber
            
            bacnetMultipleWriteArray[bacnetMultipleWriteCount] = iObjectType * 0x400000 + iInstanceNumber
            bacnetMultipleWriteCount++
@@ -1298,10 +1294,10 @@ class bacDevice
               }
            }
         }
-        else if (d.type.is(bacWritePropertyMultiple.type)
+        else if (d.type.is(bacWriteProperty.type)
             && iOperateType == BACNET_PROPERTY_WRITE)  {
             // Assume We donot use WriteMultiple
-            ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_NOTUSED
+            ((bacWriteProperty)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_NOTUSED
            for (int i = iStartPos; i < iStartPos + iLen; i++)
            {
               int iCmpOne = iData[i] % 0x400000
@@ -1310,19 +1306,19 @@ class bacDevice
                  if(i != iStartPos)
                  {
                     // We use WriteMultiple and do nothing
-                    log.message("666 bacWritePropertyMultiple Disable $i when iOperateType=$iOperateType") 
-                    ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_DONOTHING
+                    log.message("666 bacWriteProperty Disable $i when iOperateType=$iOperateType") 
+                    ((bacWriteProperty)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_DONOTHING
                  }
                  else
                  {
                     // We use WriteMultiple and use instance number list
-                     log.message("7777 bacWritePropertyMultiple Enable $i when iOperateType=$iOperateType") 
-                    ((bacWritePropertyMultiple)d).bacnetWriteMultipleCount = iLen
+                     log.message("7777 bacWriteProperty Enable $i when iOperateType=$iOperateType") 
+                    ((bacWriteProperty)d).bacnetWriteMultipleCount = iLen
                     int j = 0
                     for (int k = iStartPos ; k < iStartPos + iLen; k++)
                     {
-                        log.message("We will send ${iData[k]} in the bacWritePropertyMultiple which instanceNumber=${((BacWritePropertyVar)d).instanceNumber}") 
-                        ((bacWritePropertyMultiple)d).bacnetWriteMultipleList[j] = iData[k]
+                        log.message("We will send ${iData[k]} in the bacWriteProperty which instanceNumber=${((bacWriteProperty)d).instanceNumber}") 
+                        ((bacWriteProperty)d).bacnetWriteMultipleList[j] = iData[k]
                         j++
                     }
                  }

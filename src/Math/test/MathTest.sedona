@@ -12,12 +12,8 @@
 class MathTest
   extends SSTest
 {
-  static inline Add2 add2
-  static inline Add4 add4
   static inline Sub2 sub2
   static inline Sub4 sub4
-  static inline Mul2 mul2
-  static inline Mul4 mul4
   static inline Div2 div2
   static inline Avg10 avg10
   static inline Min min
@@ -28,24 +24,6 @@ class MathTest
 
   static void test()
   {
-    add2.in1 := 1.0f
-    add2.in2 := 2.0f
-    add2.execute()
-    assert(add2.out == 3.0f)
-    add2.in2 := -1.0f
-    add2.execute()
-    assert(add2.out == 0.0f)
-
-    add4.in1 := 1.0f
-    add4.in2 := 2.0f
-    add4.in3 := 3.0f
-    add4.in4 := 4.0f
-    add4.execute()
-    assert(add4.out == 10.0f)
-    add4.in4 := -6.0f
-    add4.execute()
-    assert(add4.out == 0.0f)
-
     sub2.in1 := 2.0f
     sub2.in2 := 1.0f
     sub2.execute()
@@ -63,24 +41,6 @@ class MathTest
     sub4.in4 := 50.0f
     sub4.execute()
     assert(sub4.out == 0.0f)
-
-    mul2.in1 := 2.0f
-    mul2.in2 := 2.0f
-    mul2.execute()
-    assert(mul2.out == 4.0f)
-    mul2.in2 := -2.0f
-    mul2.execute()
-    assert(mul2.out == -4.0f)
-
-    mul4.in1 := 0.1f
-    mul4.in2 := 10.0f
-    mul4.in3 := 0.01f
-    mul4.in4 := 100.0f
-    mul4.execute()
-    assert(mul4.out == 1.0f)
-    mul4.in4 := 200.0f
-    mul4.execute()
-    assert(mul4.out == 2.0f)
 
     div2.in1 := 1.0f
     div2.in2 := 2.0f

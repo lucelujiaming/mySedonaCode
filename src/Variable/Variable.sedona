@@ -186,25 +186,15 @@ class Variable
                                 ** log.message("BacReadPropertyVar.name=${q.name}")
                                 value := ((BacReadPropertyVar)q).present_value
                             }
-                            else if (q.type.is(bacReadPropertyObjList.type) 
-                                && ((bacReadPropertyObjList)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("bacReadPropertyMultiple.name=${q.name}")
-                                value := ((bacReadPropertyMultiple)q).present_value
-                            }
                             else if (q.type.is(bacReadPropertyMultiple.type) 
                                 && ((bacReadPropertyMultiple)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("bacReadPropertyMultiple.name=${q.name}")
                                 value := ((bacReadPropertyMultiple)q).present_value
                             }
-                            else if (q.type.is(BacWritePropertyVar.type) 
-                                && ((BacWritePropertyVar)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("BacWritePropertyVar.name=${q.name}")
-                                ((BacWritePropertyVar)q).present_value := value
-                            }
-                            else if (q.type.is(bacWritePropertyMultiple.type) 
-                                && ((bacWritePropertyMultiple)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("bacWritePropertyMultiple.name=${q.name}")
-                                ((bacWritePropertyMultiple)q).present_value := value
+                            else if (q.type.is(bacWriteProperty.type) 
+                                && ((bacWriteProperty)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("bacWriteProperty.name=${q.name}")
+                                ((bacWriteProperty)q).present_value := value
                             }
                             else if (q.type.is(VarInput.type))  {
                                 log.message("VarInput.name=${q.name}")

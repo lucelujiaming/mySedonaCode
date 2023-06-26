@@ -4,20 +4,6 @@ class bacReadPropertyMultiple
 {
   // Lujiaming add these at 23/02/24
   ////////////////////////////////////////////////////////////////
-  // Constants
-  ////////////////////////////////////////////////////////////////
-  define Str MAXSEGMENTS = "Unspecified, Segments2, Segments4, Segments8, Segments16, Segments32, Segments64, GreaterThan64, END"
-  define int MAXSEGMENTUNDEFED = 0
-  define int MAXSEGMENT2 = 1
-  define int MAXSEGMENT4 = 2
-  define int MAXSEGMENT8 = 3
-  define int MAXSEGMENT16 = 4
-  define int MAXSEGMENT32 = 5
-  define int MAXSEGMENT64 = 6
-  define int MAXSEGMENTGREATERTHAN64 = 7
-  define int MAXSEGMENTEND = 8
-
-  ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
 
@@ -34,15 +20,6 @@ class bacReadPropertyMultiple
   ////////////////////////////////////////////////////////////////
   // config Properties
   ////////////////////////////////////////////////////////////////
-
-  
-  // Read Property Object
-  // @config
-  // property int objectReserveType = 8
-  // @config
-  // property int arrayProperty = 5
-  // Lujiaming add these end at 23/02/24
-
   // 
   @readonly
   property float present_value = 0.0f
@@ -227,7 +204,7 @@ class bacReadPropertyMultiple
         log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
         if(bacnetReadMultipleCount == BACNET_READMULTIPLE_NOTUSED){
           makeReadPacket()
-          ** log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+          ** log.message("111111 makeReadPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
             ** log.message("device.readReg")
           } else {
@@ -240,7 +217,7 @@ class bacReadPropertyMultiple
         }
         else if(bacnetReadMultipleCount > BACNET_READMULTIPLE_DONOTHING){
           makeMultipleReadPacket()
-          ** log.message("111111 makePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+          ** log.message("111111 makeMultipleReadPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
           if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
             ** log.message("device.readReg")
           } else {

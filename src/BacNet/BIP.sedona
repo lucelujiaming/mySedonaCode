@@ -178,15 +178,6 @@ class BIP
                //             " and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
               ((bacReadPropertyMultiple)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
            }
-           else if (r.type.is(bacReadPropertyObjList.type) 
-                   && ((bacReadPropertyObjList)r).propertyIdentifier == propertyVar
-                   && ((bacReadPropertyObjList)r).objectType == iObjectType
-                   && ((bacReadPropertyObjList)r).instanceNumber == iInstanceNumber) {
-               // log.message("CCC r.propertyIdentifier=0x").printHex(
-               //              ((bacReadPropertyObjList)r).propertyIdentifier).print(
-               //             " and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
-              ((bacReadPropertyObjList)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
-           }
         }
       }
     }
