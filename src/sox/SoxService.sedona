@@ -189,6 +189,7 @@ class SoxService
     // process the message just received
     if (size > 0)
     {
+      ** log.message("work = (size=$size)")
       in.rewind()
       packet.size = size
       dispatch()
@@ -251,6 +252,7 @@ class SoxService
     int numFields = msgType & 0xf
     msgType       = (msgType >> 4) & 0xf
 
+    ** log.message("dispatch = (sessionId=$sessionId and msgType=$msgType)")
     // log.message("dispatch seqNum=$seqNum")
     // if hello try to allocate new session, right
     // now we just ignore the hello when busy instead
@@ -262,8 +264,11 @@ class SoxService
       session = session(sessionId)
 
     // ignore messages for an invalid session id
-    if (session == null) return
-
+    if (session == null) 
+    {
+       log.message("session == null")
+       return
+    }
     // keep track of last time message is received
     session.lastReceiveTicks = Sys.ticks()
 
@@ -274,16 +279,19 @@ class SoxService
     {
       case Dasp.HELLO:
         session.challenge(this, numFields);
-        // log.message("Dasp.HELLO seqNum=$seqNum")
+        log.message("Dasp.HELLO seqNum=$seqNum")
         session.receiveWindow.init(seqNum);
         return
       case Dasp.AUTHENTICATE:
+        log.message("Dasp.AUTHENTICATE seqNum=$seqNum")
         session.welcome(this, numFields);
         return
       case Dasp.CLOSE:
+        log.message("Dasp.CLOSE seqNum=$seqNum")
         closeSession(session, "Recd cmd");
         return
       case Dasp.DISCOVER:
+        log.message("Dasp.DISCOVER seqNum=$seqNum")
         session.discoverResponse(this);
         closeSession(session, "Discovered");
         return
@@ -292,17 +300,22 @@ class SoxService
     // let send window check for acks, if the sending window
     // if full, then we can't accept this message b/c we won't
     // be able to send a response
-    if (!session.sendWindow.checkAckHeaders(this, numFields)) return
-
+    if (!session.sendWindow.checkAckHeaders(this, numFields)) 
+    {
+       log.message("checkAckHeaders failed and seqNum=$seqNum, sessionId=$sessionId, msgType=$msgType")
+       // We have to slide the recieve window in the failed circumstance.
+       session.receiveWindow.receive(seqNum)
+       return
+    }
     // if datagram message type
     if (msgType == Dasp.DATAGRAM)
     {
-        // log.message("Dasp.DATAGRAM   seqNum=$seqNum")
+        ** log.message("Dasp.DATAGRAM   seqNum=$seqNum and receiveWindow.seqNum=${session.receiveWindow.seqNum}")
         // if not within the receiving window then toss it,
         // otherwise do sox level processing
         if (session.receiveWindow.receive(seqNum))
         {
-             // log.message("session.receiveWindow msgType=$msgType")
+             ** log.message("session.receiveWindow msgType=$msgType")
              SoxCommands.process(this, session)
              ** log.message("Jiaming.lu :: session.receiveWindow msgType=$msgType")
         }

@@ -59,8 +59,8 @@ class SendWindow
 
   **
   ** If we have any ack headers then process them.  Return true if
-  ** the sending window isn't full - if we return false, then we
-  ** don't have room to store any additional outgoing messages.
+  ** the sending window isn't' full - if we return false, then we
+  ** don't' have room to store any additional outgoing messages.
   **
   bool checkAckHeaders(SoxService service, int numFields)
   {
@@ -98,8 +98,11 @@ class SendWindow
     }
 
     // if no ack header
-    if (ackNum < 0) return numUnacked < max
-
+    if (ackNum < 0) 
+    {
+       log.message("checkAckHeaders failed and ackNum < 0")
+       return numUnacked < max
+    }
     // create the new "unacked window" - anything outside
     // of start and end inclusive is now considered ack'ed
     int unackStart = (ackNum + 1) & 0xffff
@@ -115,7 +118,10 @@ class SendWindow
         numUnacked--
       }
     }
-
+    if(numUnacked >= max)
+    {
+       log.message("checkAckHeaders failed and numUnacked=$numUnacked, max=$max")
+    }
     // return if we have room left
     return numUnacked < max
   }
@@ -191,7 +197,8 @@ class SendWindow
 ////////////////////////////////////////////////////////////////
 // Fields
 ////////////////////////////////////////////////////////////////
-
+  define Log log
+  
   define int PKT_RETRY_INTERVAL = 1000    // (ms) if a packet goes unacked this long, send retry
   define int max = 8                      // max number of unacked messages we can store
 

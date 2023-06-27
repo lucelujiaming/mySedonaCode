@@ -506,16 +506,31 @@ class SoxCommands
 
     // lookup component
     Component comp = Sys.app.lookup(compId)
-    if (comp == null) { res.error("bad compId"); return }
+    if (comp == null) 
+    { 
+      res.error("bad compId"); 
+      log.message("bad compId=$compId")
+      return 
+    }
 
     // lookup slot
     Slot slot = comp.type.slot(slotId)
-    if (slot == null || !slot.isProp()) { res.error("bad slotId"); return }
+    if (slot == null || !slot.isProp()) 
+    { 
+       res.error("bad slotId"); 
+      log.message("bad slotId=$slotId")
+       return 
+    }
 
     // permission check
     int perm = slot.isOperator() ? User.ow : User.aw
-    if (!session.user.has(comp, perm)) { res.error("denied"); return }
-
+    if (!session.user.has(comp, perm)) 
+    { 
+       res.error("denied");       
+       log.message("denied")
+       return 
+    }     
+    log.message("comp.loadProp")
     // decode value and invoke
     comp.loadProp(in, slot)
   }

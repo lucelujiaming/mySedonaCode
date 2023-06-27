@@ -77,6 +77,7 @@ class ReceiveWindow
     {
       if (num <= start || num > end)
       {
+        log.message("ReceiveWindow::receive(1) num=$num, start=$start, end=$end, max=$max")
         acked = false           // force next outgoing msg to include ackNum
         return false
       }
@@ -86,6 +87,7 @@ class ReceiveWindow
       end -= 0xffff;
       if (num <= start && num > end)
       {
+        log.message("ReceiveWindow::receive(2) num=$num, start=$start, end=$end, max=$max")
         acked = false           // force next outgoing msg to include ackNum
         return false
       }

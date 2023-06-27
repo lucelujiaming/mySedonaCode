@@ -2,22 +2,20 @@
 class AlternativeCompare
   extends Component
 {
-    define Str COMPAREMETHOD        = "None, Greater, GreaterEqual, Less, LessEqual, Equal, NotEqual, END"
-    define int COMPARE_NONE           = 0
-    define int COMPARE_GREATER        = 1
-    define int COMPARE_GREATEREQUAL   = 2
-    define int COMPARE_LESS           = 3
-    define int COMPARE_LESSEQUAL      = 4
-    define int COMPARE_EQUAL          = 5
-    define int COMPARE_NOTEQUAL       = 6
-    define int COMPARE_END            = 7
+    define Str COMPAREMETHOD        = "Greater, GreaterEqual, Less, LessEqual, Equal, NotEqual"
+    define int COMPARE_GREATER        = 0
+    define int COMPARE_GREATEREQUAL   = 1
+    define int COMPARE_LESS           = 2
+    define int COMPARE_LESSEQUAL      = 3
+    define int COMPARE_EQUAL          = 4
+    define int COMPARE_NOTEQUAL       = 5
   // Lujiaming add these end at 23/05/22
 
   // dataExpectingReplyNPCI
   @config
   @range = COMPAREMETHOD
   @fieldWidth = 200
-  property int compareOperation = COMPARE_NONE
+  property int compareOperation = COMPARE_GREATER
   
   @readonly property float out
 
