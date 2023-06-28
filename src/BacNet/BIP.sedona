@@ -162,7 +162,7 @@ class BIP
            // }
            if (r.type.is(BacReadPropertyVar.type) 
                    && ((BacReadPropertyVar)r).propertyIdentifier == propertyVar
-                   && ((BacReadPropertyVar)r).objectType == iObjectType
+                   && ((BacReadPropertyVar)r).objectNodeType == iObjectType
                    && ((BacReadPropertyVar)r).instanceNumber == iInstanceNumber) {
                // log.message("CCC r.propertyIdentifier=0x").printHex(
                //              ((BacReadPropertyVar)r).propertyIdentifier).print(
@@ -171,7 +171,7 @@ class BIP
            }
            else if (r.type.is(bacReadPropertyMultiple.type) 
                    && ((bacReadPropertyMultiple)r).propertyIdentifier == propertyVar
-                   && ((bacReadPropertyMultiple)r).objectType == iObjectType
+                   && ((bacReadPropertyMultiple)r).objectNodeType == iObjectType
                    && ((bacReadPropertyMultiple)r).instanceNumber == iInstanceNumber) {
                // log.message("CCC r.propertyIdentifier=0x").printHex(
                //              ((bacReadPropertyMultiple)r).propertyIdentifier).print(
@@ -223,6 +223,10 @@ class BIP
                        0, // ((BacNetFieldBusIO)r).regId, 
                        0, // ((BacNetFieldBusIO)r).typeId, 
                        85, 0)
+              ((BacNetFieldBusIO)d).objectNodeType =
+                    ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
+                            ((BacNetFieldBusIO)d).objectType)
+              log.message("6666 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
               ((BacNetFieldBusIO)d).bus = this
             // ((BacNetFieldBusIO)d).device = (bacDevice)r
               ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY

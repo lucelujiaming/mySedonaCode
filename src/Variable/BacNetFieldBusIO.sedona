@@ -35,15 +35,18 @@ abstract class BacNetFieldBusIO
   // define int BANET_PROPVAR_RESERVEDAPPTAG14            = 0x0E
   // define int BANET_PROPVAR_RESERVEDAPPTAG15            = 0x0F
 
-  define int BACNET_CONFIRMED_REQUEST_PDU     = 0 //    [0] BACnet-Confirmed-Request-PDU,
-  define int BACNET_UNCONFIRMED_REQUEST_PDU = 1 //    [1] BACnet-Unconfirmed-Request-PDU,
-  define int BACNET_SIMPLEACK_PDU             = 2 //    [2] BACnet-SimpleACK-PDU,
-  define int BACNET_COMPLEXACK_PDU             = 3 //    [3] BACnet-ComplexACK-PDU,
-  define int BACNET_SEGMENTACK_PDU             = 4 //    [4] BACnet-SegmentACK-PDU,
-  define int BACNET_ERROR_PDU                 = 5 //    [5] BACnet-Error-PDU,
-  define int BACNET_REJECT_PDU                 = 6 //    [6] BACnet-Reject-PDU,
-  define int BACNET_ABORT_PDU                 = 7 //    [7] BACnet-Abort-PDU
-
+  define Str OBJECT_TYPE_RANGE = 
+        "AnalogInput, AnalogOutput, AnalogValue, BinaryInput, BinaryOutput, BinaryValue, MultiStateInput, MultiStateOutput, MultiStateValue"
+  define int OBJECT_TYPE_ANALOG_INPUT              = 0x00
+  define int OBJECT_TYPE_ANALOG_OUTPUT             = 0x01
+  define int OBJECT_TYPE_ANALOG_VALUE              = 0x02
+  define int OBJECT_TYPE_BINARY_INPUT              = 0x03
+  define int OBJECT_TYPE_BINARY_OUTPUT             = 0x04
+  define int OBJECT_TYPE_BINARY_VALUE              = 0x05
+  define int OBJECT_TYPE_BINARY_MULTISTATE_INPUT           = 0x06
+  define int OBJECT_TYPE_BINARY_MULTISTATE_OUTPUT          = 0x07
+  define int OBJECT_TYPE_BINARY_MULTISTATE_VALUE           = 0x08
+  
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
@@ -53,19 +56,10 @@ abstract class BacNetFieldBusIO
   @fieldWidth = 20
   property int status = STATUSNODEV
 
-  @summary=false
-  @readonly
-  @range = BANET_PROPVAR_RANGE
-  @fieldWidth = 20
-  property int object_type = BANET_PROPVAR_DOUBLEAPPTAG
-  
-  @asStr
   @config
-  property Buf(64) url = ""
-  
-  @config
-  property int objectType = 2
-  // P415 - BACnetObjectType
+  @range = OBJECT_TYPE_RANGE
+  @fieldWidth = 200
+  property int objectType = OBJECT_TYPE_ANALOG_VALUE
   
   @config
   property int instanceNumber = 0
@@ -101,16 +95,12 @@ abstract class BacNetFieldBusIO
   ////////////////////////////////////////////////////////////////
   void update()
   {
-    // devStr = url.toStr()
-    devStr.copyFromStr(url.toStr(), url.toStr().length() + 1)
-    log.message("111111 devStr=$devStr")
     busId = 0
     if (bus != null) {
       bus.notifyFlush()
     }
     status := STATUSNODEV
-    Str tmpBuf = url.toStr()
-    log.message("222222 url=$tmpBuf")
+    Str tmpBuf = ""
     FieldBusNet tmpBus = lookupNetByDeviceName(tmpBuf)
     if (tmpBus != null) {
         busId = tmpBus.busId
@@ -190,6 +180,7 @@ abstract class BacNetFieldBusIO
 
     return null
   }
+  
   /*
   private FieldBusDevice lookupDeviceByDeviceName(Str devName)
   {
@@ -220,6 +211,27 @@ abstract class BacNetFieldBusIO
     return null
   }
   */
+
+  int convertObjectTypeToBacNetObjectType(int iObjectType)
+  {
+     log.message("-----------  iObjectType=$iObjectType --------------------") 
+     if((iObjectType >= OBJECT_TYPE_ANALOG_INPUT) 
+     && (iObjectType <= OBJECT_TYPE_BINARY_VALUE))
+     {
+        return iObjectType
+     }
+     else
+     {
+        if(iObjectType == OBJECT_TYPE_BINARY_MULTISTATE_INPUT)
+           return BACNET_OBJERCTTYPE_MULTISTATE_INPUT
+        else if(iObjectType == OBJECT_TYPE_BINARY_MULTISTATE_OUTPUT)
+           return BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT
+        else if(iObjectType == OBJECT_TYPE_BINARY_MULTISTATE_VALUE)
+           return BACNET_OBJERCTTYPE_MULTISTATE_VALUE
+     }
+     log.message("----------- ERROR ObjectType --------------------") 
+     return -1
+  }
   
   // define Log log
   
@@ -246,7 +258,6 @@ abstract class BacNetFieldBusIO
   int cache = 0
 
   int busId = 0
-  inline Str(64) devStr
   int regId = 0
   // int typeId = 0
   // int dataLen = 0
@@ -257,5 +268,6 @@ abstract class BacNetFieldBusIO
   bool isEnableRPM = false;
   bool isEnableWPM = false;  
 
+  int objectNodeType = BACNET_OBJERCTTYPE_ANALOG_VALUE
   
 }

@@ -897,7 +897,6 @@ class bacDevice
             bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
-        // case BANET_PROPVAR_NULLAPPTAG:
         case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
             serviceChoicePos += iLen
             break
@@ -1150,12 +1149,12 @@ class bacDevice
      
      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(bacReadPropertyMultiple.type))  {
-           int iObjectType = ((bacReadPropertyMultiple)d).objectType
+           int iObjectType = ((bacReadPropertyMultiple)d).objectNodeType
            int iInstanceNumber = ((bacReadPropertyMultiple)d).instanceNumber
            bacnetMultipleReadArray[bacnetMultipleReadCount] = iObjectType * 0x400000 + iInstanceNumber
            bacnetMultipleReadCount++
         } else if (d.type.is(bacWriteProperty.type))  {
-           int iObjectType = ((bacWriteProperty)d).objectType
+           int iObjectType = ((bacWriteProperty)d).objectNodeType
            int iInstanceNumber = ((bacWriteProperty)d).instanceNumber
            
            bacnetMultipleWriteArray[bacnetMultipleWriteCount] = iObjectType * 0x400000 + iInstanceNumber

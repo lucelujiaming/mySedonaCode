@@ -6,21 +6,15 @@
 //   02 Feb 2011  Clif Turman    Creation
 //
 
-**
-** Max selects the highest of inputs to send to the output
-**
 @niagaraIcon="module://icons/x16/control/control.png"
-class MinMax
+class Avg
   extends Component
 {
     ** Enable count
     property int enableCount = 2
     
-    ** the computed min of all in's'
-    @readonly property float minOut
-
-    ** the computed max of all in's'
-    @readonly property float maxOut
+    ** the minimum of in1 and in2
+    @readonly property float out
 
     ** first value for comparison
     property float in1 = 0.0
@@ -329,18 +323,12 @@ class MinMax
   {
     if(enableCount >= 100)
        return 
-    setAllCompareValues()
-    float outMaxCompare = sampleValue[0];
-    float outMinCompare = sampleValue[0];
-    for(int i = 1; i < enableCount; i++)
+    float sumValue = 0.0;
+    for(int i = 0; i < enableCount; i++)
     {
-      if(outMaxCompare < sampleValue[i])
-        outMaxCompare = sampleValue[i]
-      if(outMinCompare > sampleValue[i])
-        outMinCompare = sampleValue[i]
+        sumValue = sumValue + sampleValue[i]
     }
-    minOut := outMinCompare
-    maxOut := outMaxCompare
+    out := sumValue / (float)enableCount
   }
 
   void setAllCompareValues()
@@ -449,5 +437,4 @@ class MinMax
   
   private inline float[100] sampleValue
 }
-
 

@@ -73,15 +73,15 @@ class bacWriteProperty
     // ObjectIdentifier: analog-value, 14
     bacnetPacket[dataLength++] = 0x0C
     // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
-    if(objectType > 4)
+    if(objectNodeType > 4)
     {
-        bacnetPacket[dataLength++] = objectType / 4
+        bacnetPacket[dataLength++] = objectNodeType / 4
     }
     else 
     {
         bacnetPacket[dataLength++] = 0x00
     }
-    bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
     // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
     if(instanceNumber > 0x00)
     {
@@ -101,9 +101,9 @@ class bacWriteProperty
     // .... .110 = Named Tag: Opening Tag (6)
     bacnetPacket[dataLength++] = 0x2E
     // Analog
-    if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
-    || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
-    || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+    if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
     {
         // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
         bacnetPacket[dataLength++] = 0x44
@@ -114,9 +114,9 @@ class bacWriteProperty
            bacnetPacket[dataLength++] = bufData[i]
         }
     }
-    else if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
     {
         // Application Tag: Enumerated, Length/Value/Type: 1
         bacnetPacket[dataLength++] = 0x91
@@ -125,9 +125,9 @@ class bacWriteProperty
         else
            bacnetPacket[dataLength++] = 1
     }
-    else if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
     {
         // Application Tag: Unsigned Integer, Length/Value/Type: 1
         bacnetPacket[dataLength++] = 0x21
@@ -154,7 +154,7 @@ class bacWriteProperty
       for (Component d = Sys.app.lookup(device.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         ** log.message("5555  updateCache d.name=$d.name and type.name=$d.type.name");
         if (d.type.is(bacWriteProperty.type)) {
-           int iObjectType = ((bacWriteProperty)d).objectType
+           int iObjectType = ((bacWriteProperty)d).objectNodeType
            int iInstanceNumber = ((bacWriteProperty)d).instanceNumber
            ** log.message("5555  updateCache bacWriteProperty iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber");
            if((iObjectType == iMultipleObjectType) && (iInstanceNumber == iMultipleInstanceNumber)) 
@@ -216,7 +216,7 @@ class bacWriteProperty
             {
                 bacnetPacket[dataLength++] = 0x00
             }
-            bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+            bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
             if(iMultipleInstanceNumber > 0x100)
             {
                 bacnetPacket[dataLength++] = iMultipleInstanceNumber / 0x100
@@ -235,9 +235,9 @@ class bacWriteProperty
             // .... .110 = Named Tag: Opening Tag (6)
             bacnetPacket[dataLength++] = 0x2E
            // Analog
-           if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
-           || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
-           || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+           if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
+           || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
+           || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
            {
                 // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
                 bacnetPacket[dataLength++] = 0x44
@@ -249,9 +249,9 @@ class bacWriteProperty
                    bacnetPacket[dataLength++] = bufData[j]
                 }
             }
-            else if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
-                 || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
-                 || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+            else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
+                 || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
+                 || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
             {
                 // Application Tag: Enumerated, Length/Value/Type: 1
                 bacnetPacket[dataLength++] = 0x91
@@ -260,9 +260,9 @@ class bacWriteProperty
                 else
                    bacnetPacket[dataLength++] = 1
             }
-            else if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
-             || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
-             || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+            else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
+             || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
+             || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
             {
                 // Application Tag: Unsigned Integer, Length/Value/Type: 1
                 bacnetPacket[dataLength++] = 0x21
@@ -312,15 +312,15 @@ class bacWriteProperty
     // ObjectIdentifier: analog-value, 14
     bacnetPacket[dataLength++] = 0x0C
     // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
-    if(objectType > 4)
+    if(objectNodeType > 4)
     {
-        bacnetPacket[dataLength++] = objectType / 4
+        bacnetPacket[dataLength++] = objectNodeType / 4
     }
     else 
     {
         bacnetPacket[dataLength++] = 0x00
     }
-    bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
     // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
     if(instanceNumber > 0x00)
     {
@@ -335,13 +335,13 @@ class bacWriteProperty
     bacnetPacket[dataLength++] = 0x19
     bacnetPacket[dataLength++] = propertyIdentifier
     
-    log.message("----------------- objectType = $objectType ----------------------")
+    log.message("----------------- objectNodeType = $objectNodeType ----------------------")
     // .... .110 = Named Tag: Opening Tag (6)
     bacnetPacket[dataLength++] = 0x3E
     // Analog
-    if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
-    || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
-    || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+    if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
     {
         // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
         bacnetPacket[dataLength++] = 0x44
@@ -352,9 +352,9 @@ class bacWriteProperty
            bacnetPacket[dataLength++] = bufData[i]
         }
     }
-    else if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
     {
         // Application Tag: Enumerated, Length/Value/Type: 1
         bacnetPacket[dataLength++] = 0x91
@@ -363,9 +363,9 @@ class bacWriteProperty
         else
            bacnetPacket[dataLength++] = 1
     }
-    else if((objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
-         || (objectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
     {
         // Application Tag: Unsigned Integer, Length/Value/Type: 1
         bacnetPacket[dataLength++] = 0x21

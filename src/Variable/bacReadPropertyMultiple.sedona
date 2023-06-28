@@ -67,15 +67,15 @@ class bacReadPropertyMultiple
     // 0000 .... = Context Tag Number: 0
     // Length Value Type: 4
     bacnetPacket[dataLength++] = 0x0C
-    if(objectType > 4)
+    if(objectNodeType > 4)
     {
-        bacnetPacket[dataLength++] = objectType / 4
+        bacnetPacket[dataLength++] = objectNodeType / 4
     }
     else 
     {
         bacnetPacket[dataLength++] = 0x00
     }
-    bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
     // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
     if(instanceNumber > 0x00)
     {
@@ -95,15 +95,15 @@ class bacReadPropertyMultiple
     bacnetPacket[dataLength++] = 0x1F
     // ObjectIdentifier: analog-value, 1
     bacnetPacket[dataLength++] = 0x0C
-    if(objectType > 4)
+    if(objectNodeType > 4)
     {
-        bacnetPacket[dataLength++] = objectType / 4
+        bacnetPacket[dataLength++] = objectNodeType / 4
     }
     else 
     {
         bacnetPacket[dataLength++] = 0x00
     }
-    bacnetPacket[dataLength++] = (objectType % 4) * 0x40
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
     // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
     if(instanceNumber > 0x00)
     {
@@ -244,14 +244,13 @@ class bacReadPropertyMultiple
             break
         case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
             // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
-            // int objectType = (data[0] * 0x100 + data[1]) / 0x40
             // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
             int instanceNumber = 0x00
             instanceNumber = data[1] % 0x40
             instanceNumber = instanceNumber * 0x100 + data[2]
             instanceNumber = instanceNumber * 0x100 + data[3]
             present_value := (float)instanceNumber
-            log.message("objectType = $objectType and instanceNumber=$present_value")
+            log.message("objectNodeType = $objectNodeType and instanceNumber=$present_value")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
         case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:

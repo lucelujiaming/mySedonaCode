@@ -12,79 +12,14 @@
 class MathTest
   extends SSTest
 {
-  static inline Sub2 sub2
-  static inline Sub4 sub4
-  static inline Div2 div2
-  static inline Avg10 avg10
   static inline Min min
   static inline Max max
-  static inline MinMax minmax
+  static inline SequenceMinMax seqMinMax
   static inline FloatOffset foff
   static inline Round rnd
 
   static void test()
   {
-    sub2.in1 := 2.0f
-    sub2.in2 := 1.0f
-    sub2.execute()
-    assert(sub2.out == 1.0f)
-    sub2.in2 := 2.0f
-    sub2.execute()
-    assert(sub2.out == 0.0f)
-
-    sub4.in1 := 100.0f
-    sub4.in2 := 25.0f
-    sub4.in3 := 25.0f
-    sub4.in4 := 25.0f
-    sub4.execute()
-    assert(sub4.out == 25.0f)
-    sub4.in4 := 50.0f
-    sub4.execute()
-    assert(sub4.out == 0.0f)
-
-    div2.in1 := 1.0f
-    div2.in2 := 2.0f
-    div2.execute()
-    assert(div2.out == 0.5f)
-    div2.in2 := -2.0f
-    div2.execute()
-    assert(div2.out == -0.5f)
-
-
-    avg10.start()     // not in an app, so call this explicitly
-
-    avg10.maxTime := 40
-    doAvg(1.0)
-    assert(avg10.out == 1.0)
-    doAvg(2.0)
-    doAvg(3.0)
-    doAvg(4.0)
-    doAvg(5.0)
-    doAvg(6.0)
-    doAvg(7.0)
-    doAvg(8.0)
-    doAvg(9.0)
-    doAvg(10.0)
-    assert(avg10.out == 5.5)
-    doAvg(11.0)
-    assert(avg10.out == 6.5)
-    long startTime = Sys.ticks()
-    while( (Sys.ticks() - startTime) < 500ms )
-    {
-      avg10.execute()
-    }
-    assert(avg10.out == 11.0)
-
-    avg10.maxTime := 0
-    doAvg(1.0)
-    float value = avg10.out
-    startTime = Sys.ticks()
-    while( (Sys.ticks() - startTime) < 500ms )
-    {
-      avg10.execute()
-    }
-    assert(avg10.out == value)
-
 
     min.in1 := 10f
     min.in2 := 9f
@@ -126,23 +61,18 @@ class MathTest
   }
 
 
-   static void doAvg(float value)
-   {
-     avg10.in := value
-     avg10.execute()
-   }
 
 
   static void doMinMax(float f)
   {
-    minmax.in := f
-    minmax.execute()
+    seqMinMax.in := f
+    seqMinMax.execute()
   }
 
   static void checkMinMax(float n, float x)
   {
-    assert(minmax.minOut == n)
-    assert(minmax.maxOut == x)
+    assert(seqMinMax.minOut == n)
+    assert(seqMinMax.maxOut == x)
   }
 
 
@@ -150,7 +80,7 @@ class MathTest
   {
     waitForSteadyState()
 
-    minmax.reset()
+    seqMinMax.reset()
     doMinMax(10f)
     checkMinMax(10f, 10f)       // 1
 
@@ -165,25 +95,13 @@ class MathTest
     doMinMax(1000f)
     checkMinMax(-1000f, 1000f)  // 3
 
-    minmax.reset()
-    minmax.execute()
+    seqMinMax.reset()
+    seqMinMax.execute()
     checkMinMax(1000f, 1000f)   // 4
 
     doMinMax(1f)
     doMinMax(-10f)
     checkMinMax(-10f, 1000f)    // 5
-
-    minmax.r := true
-    minmax.execute()
-    checkMinMax(-10f, -10f)     // 6
-
-    minmax.r := false
-    doMinMax(1f)
-    checkMinMax(-10f, 1f)       // 7
-
-    minmax.r := true
-    minmax.execute()
-    checkMinMax(1f, 1f)         // 8
   }
 
 
