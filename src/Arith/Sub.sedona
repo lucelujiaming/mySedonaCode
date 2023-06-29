@@ -17,6 +17,7 @@ class Sub
   extends Component
 {
     ** Enable count
+    @config
     property int enableCount = 2
     
     ** result o subracting

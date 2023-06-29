@@ -11,6 +11,7 @@ class Avg
   extends Component
 {
     ** Enable count
+    @config
     property int enableCount = 2
     
     ** the minimum of in1 and in2

@@ -14,6 +14,7 @@
   <depend on="sox 0.1" />
 
   <!-- These replace control kit as of 0.1 -->
+  <depend on="Arith 0.1"   />
   <depend on="Schedule 0.1"   />
   <depend on="Variable 0.1"   />
   <depend on="ModBus 0.1"   />

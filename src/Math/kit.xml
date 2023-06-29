@@ -17,7 +17,6 @@
 
   <!-- Source Directories -->
   <source dir="." />
-  <source dir="test" testonly="true"/>
 
 </sedonaKit>
 

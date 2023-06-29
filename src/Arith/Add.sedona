@@ -17,10 +17,11 @@ class Add
   extends Component
 {
     ** Enable count
+    @config
     property int enableCount = 2
 
-  ** out is the sum of all inputs
-  @readonly property float out
+    ** out is the sum of all inputs
+    @readonly property float out
   
     ** input 1
     property float in1 = 0.0
@@ -327,22 +328,123 @@ class Add
   **
   virtual override void execute()
   {
-    float outTwentyth = 0.0 
-    float outFortyth  = 0.0 
-    float outSixtyth  = 0.0 
-    float outEightyth = 0.0 
-    float outLastth   = 0.0 
-    outTwentyth  =  in1 +  in2 +  in3 +  in4 +  in5 +  in6 +  in7 +  in8 +  in9 + in10 
-                 + in11 + in12 + in13 + in14 + in15 + in16 + in17 + in18 + in19 + in20
-    outFortyth   = in21 + in22 + in23 + in24 + in25 + in26 + in27 + in28 + in29 + in30
-                 + in31 + in32 + in33 + in34 + in35 + in36 + in37 + in38 + in39 + in40
-    outSixtyth   = in41 + in42 + in43 + in44 + in45 + in46 + in47 + in48 + in49 + in50
-                 + in51 + in52 + in53 + in54 + in55 + in56 + in57 + in58 + in59 + in60
-    outEightyth  = in61 + in62 + in63 + in64 + in65 + in66 + in67 + in68 + in69 + in70 
-                 + in71 + in72 + in73 + in74 + in75 + in76 + in77 + in78 + in79 + in80
-    outLastth    = in81 + in82 + in83 + in84 + in85 + in86 + in87 + in88 + in89 + in90
-                 + in91 + in92 + in93 + in94 + in95 + in96 + in97 + in98 + in99 + in100
-    out := outTwentyth + outFortyth + outSixtyth + outEightyth + outLastth
+    if(enableCount >= 100)
+       return 
+    setAllValues()
+    float outSum = sampleValue[0];
+    ** log.message("outSum=$outSum ") 
+    for(int i = 1; i < enableCount; i++)
+    {
+        ** log.message("outSum=$outSum and sampleValue[$i] = ${sampleValue[i]}") 
+        outSum += sampleValue[i]
+    }
+    ** log.message("outSum=$outSum ") 
+    out := outSum
   }
 
+  void setAllValues()
+  {
+    sampleValue[0] = in1
+    sampleValue[1] = in2
+    sampleValue[2] = in3
+    sampleValue[3] = in4
+    sampleValue[4] = in5
+    sampleValue[5] = in6
+    sampleValue[6] = in7
+    sampleValue[7] = in8
+    sampleValue[8] = in9
+    sampleValue[9] = in10
+    sampleValue[10] = in11
+    sampleValue[11] = in12
+    sampleValue[12] = in13
+    sampleValue[13] = in14
+    sampleValue[14] = in15
+    sampleValue[15] = in16
+    sampleValue[16] = in17
+    sampleValue[17] = in18
+    sampleValue[18] = in19
+    sampleValue[19] = in20
+    sampleValue[20] = in21
+    sampleValue[21] = in22
+    sampleValue[22] = in23
+    sampleValue[23] = in24
+    sampleValue[24] = in25
+    sampleValue[25] = in26
+    sampleValue[26] = in27
+    sampleValue[27] = in28
+    sampleValue[28] = in29
+    sampleValue[29] = in30
+    sampleValue[30] = in31
+    sampleValue[31] = in32
+    sampleValue[32] = in33
+    sampleValue[33] = in34
+    sampleValue[34] = in35
+    sampleValue[35] = in36
+    sampleValue[36] = in37
+    sampleValue[37] = in38
+    sampleValue[38] = in39
+    sampleValue[39] = in40
+    sampleValue[40] = in41
+    sampleValue[41] = in42
+    sampleValue[42] = in43
+    sampleValue[43] = in44
+    sampleValue[44] = in45
+    sampleValue[45] = in46
+    sampleValue[46] = in47
+    sampleValue[47] = in48
+    sampleValue[48] = in49
+    sampleValue[49] = in50
+    sampleValue[50] = in51
+    sampleValue[51] = in52
+    sampleValue[52] = in53
+    sampleValue[53] = in54
+    sampleValue[54] = in55
+    sampleValue[55] = in56
+    sampleValue[56] = in57
+    sampleValue[57] = in58
+    sampleValue[58] = in59
+    sampleValue[59] = in60
+    sampleValue[60] = in61
+    sampleValue[61] = in62
+    sampleValue[62] = in63
+    sampleValue[63] = in64
+    sampleValue[64] = in65
+    sampleValue[65] = in66
+    sampleValue[66] = in67
+    sampleValue[67] = in68
+    sampleValue[68] = in69
+    sampleValue[69] = in70
+    sampleValue[70] = in71
+    sampleValue[71] = in72
+    sampleValue[72] = in73
+    sampleValue[73] = in74
+    sampleValue[74] = in75
+    sampleValue[75] = in76
+    sampleValue[76] = in77
+    sampleValue[77] = in78
+    sampleValue[78] = in79
+    sampleValue[79] = in80
+    sampleValue[80] = in81
+    sampleValue[81] = in82
+    sampleValue[82] = in83
+    sampleValue[83] = in84
+    sampleValue[84] = in85
+    sampleValue[85] = in86
+    sampleValue[86] = in87
+    sampleValue[87] = in88
+    sampleValue[88] = in89
+    sampleValue[89] = in90
+    sampleValue[90] = in91
+    sampleValue[91] = in92
+    sampleValue[92] = in93
+    sampleValue[93] = in94
+    sampleValue[94] = in95
+    sampleValue[95] = in96
+    sampleValue[96] = in97
+    sampleValue[97] = in98
+    sampleValue[98] = in99
+    sampleValue[99] = in100
+  }
+  // define Log log
+  private inline float[100] sampleValue
 }
