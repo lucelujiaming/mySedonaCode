@@ -60,62 +60,6 @@ Exception in thread "main" java.lang.ClassCastException:
 ¸½Â¼ MiniJavaÓïÑÔ²Î¿¼ÊÖ²á
 ²Î¿¼ÎÄÏ×
 
-[root@ez9260 /]# find . -name "*.so"
-./lib/ld-2.4.90.so
-./lib/libBrokenLocale-2.4.90.so
-./lib/libSegFault.so
-./lib/libanl-2.4.90.so
-./lib/libc-2.4.90.so
-./lib/libcidn-2.4.90.so
-./lib/libcrypt-2.4.90.so
-./lib/libdl-2.4.90.so
-./lib/libgcc_s.so
-./lib/libm-2.4.90.so
-./lib/libncurses.so
-./lib/libnsl-2.4.90.so
-./lib/libnss_compat-2.4.90.so
-./lib/libnss_dns-2.4.90.so
-./lib/libnss_files-2.4.90.so
-./lib/libnss_hesiod-2.4.90.so
-./lib/libnss_nis-2.4.90.so
-./lib/libnss_nisplus-2.4.90.so
-./lib/libpthread-2.4.90.so
-./lib/libresolv-2.4.90.so
-./lib/librt-2.4.90.so
-./lib/libstdc++.so
-./lib/libthread_db-1.0.so
-./lib/libutil-2.4.90.so
-./usr/lib/libmodbus.so
-[root@ez9260 /]# 
-[root@ez9260 /]# 
-[root@ez9260 /]# 
-[root@ez9260 /]#  find . -name "*.so" | sed "s/.*lib\/lib//"
-./lib/ld-2.4.90.so
-BrokenLocale-2.4.90.so
-SegFault.so
-anl-2.4.90.so
-c-2.4.90.so
-cidn-2.4.90.so
-crypt-2.4.90.so
-dl-2.4.90.so
-gcc_s.so
-m-2.4.90.so
-ncurses.so
-nsl-2.4.90.so
-nss_compat-2.4.90.so
-nss_dns-2.4.90.so
-nss_files-2.4.90.so
-nss_hesiod-2.4.90.so
-nss_nis-2.4.90.so
-nss_nisplus-2.4.90.so
-pthread-2.4.90.so
-resolv-2.4.90.so
-rt-2.4.90.so
-stdc++.so
-thread_db-1.0.so
-util-2.4.90.so
-modbus.so
-[root@ez9260 /]# 
 
         boolean errorStatus;
         boolean moreToDo;
@@ -342,9 +286,6 @@ BE = 10111110
 
 
 
-Enumerated 93 + 
-+	cBuffer	0x0019fe30 "ÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌÌ"
-
 	
 ±¾ÖÜ¹¤×÷£º
 Ñ§Ï°BACnet¡£¡£
@@ -366,7 +307,11 @@ cd ..
 tftp -p -l app.sab 192.168.168.180
 C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
 
-cd linux/sedona
+cd ~/linux/mySedonaCode/
+
+
+96480
+
 
 ./bin/sedonac.sh src/sys/
 cd source
@@ -379,58 +324,641 @@ cd ..
 ./bin/sedonac.sh src/Variable/
 
 ./bin/sedonac.sh src/inet/
+
+./bin/sedonac.sh src/Arith/
+
+./bin/sedonac.sh src/sys/
+
+./bin/sedonac.sh src/sox/
+
+./bin/sedonac.sh src/Math/
+./bin/sedonac.sh src/Compare/
+cd source
+../bin/sedonac.sh app.xml
+cd -
+
+
+./bin/sedonac.sh src/inet/
+./bin/sedonac.sh src/Variable/
+
+./bin/sedonac.sh src/Math/
+
+./bin/sedonac.sh src/Compare/
 ./bin/sedonac.sh src/Variable/
 ./bin/sedonac.sh src/BacNet/
+cd source
+../bin/sedonac.sh app.xml
+cd -
 
+
+./bin/sedonac.sh src/BitLogic/
+cd source
+../bin/sedonac.sh app.xml
+cd -
+
+
+./bin/sedonac.sh src/Arith/
+./bin/sedonac.sh src/Math/
 cd source
 ../bin/sedonac.sh app.xml
 cd -
 
 cd source
-export PATH=$PATH:/opt/timesys/toolchains/armv5l-linux/bin/
 make
+cd -
+
+export PATH=$PATH:/opt/timesys/toolchains/armv5l-linux/bin/
+
+
+readPropertyMultiple 
+bacReadPropertyObjList.sedona (variable)	10910	2023/5/17
+
+
 
 ---------------------------------------------------------------------------------------------
 
 ps | grep svm
 cd /data/svm/
 
-ps | grep svm | sed "s/ root.*//" | sed "s/^/kill -9/" | sh
 ps | grep svm
+ps | grep svm | sed "s/ root.*//" | sed "s/^/kill -9/" | sh
+sleep 1
+ps | grep svm
+
+tftp -g -r app.scode 192.168.168.180
+
+tftp -g -r svm 192.168.168.180
+
+./svm app.scode  app.sab
 
 tftp -g -r app.sab 192.168.168.180
 tftp -g -r app.scode 192.168.168.180
 tftp -g -r svm 192.168.168.180
+tftp -p -l app.sab 192.168.168.180
 
 ./svm app.scode  app.sab
 
 tftp -g -r test_arm51 192.168.168.180
 
-tftp -p -l app.sab 192.168.168.180
+tftp -g -r app_0703.sab 192.168.168.180
 
 ./svm app.scode  app.sab
 
-C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
-C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
+/tools/svm /data/svm/app.scode /data/svm/app.sab 
+
+#   ./svm app_last.scode  app_last.sab
+#   tftp -p -l app_last.sab 192.168.168.180
+#   tftp -p -l app_last.scode 192.168.168.180
+
+./svm app_lujiaming.scode app_WPM.sab
+
+./svm app_lujiaming.scode app.sab
+
+tftp -g -r app_lujiaming.scode 192.168.168.180
+
+------------/tools/svm /data/svm/app.scode /data/svm/app.sab
+
+tftp -g -r app.sab 192.168.168.180
+tftp -g -r app.scode 192.168.168.180
+tftp -g -r svm 192.168.168.180
+
+F:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
+F:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
  
 d:
 cd SeconaDownload
 
 /tools/svm /data/svm/app.scode /data/svm/app.sab 
 
+tftp -g -r app_0524.sab 192.168.168.180
+
+tftp -g -r app_WPM.sab 192.168.168.180
+
+ 
+
 ---------------------------------------------------------------------------------------------
+
+PhongLightingBiquatricBezierSphereGraph
+ID_TOOLBAR_PHONG_LIGHTING_BIQUATRIC_BEZIER_SPHERE_GRAPH
+
+
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
+
+
+		printf("private bool isSlotLinkToIN%d()\r\n", i);
+		printf("property float in%d\r\n", i);
+		printf("\r\n", i);
+
+		printf("    private bool isSlotLinkToIN1()
+		printf("    {
+		printf("        for (Link link = linksTo; link != null; link = link.nextTo) {
+		printf("        Slot slot = type.slot(link.toSlot)
+		printf("            if (slot == And4.in1) {
+		printf("                return true
+		printf("            }
+		printf("        }
+		printf("        return false
+		printf("    }
+
+
+
+	CMainFrame *pMain=(CMainFrame *)AfxGetApp()->m_pMainWnd; // ÏÈ»ñÈ¡¿ò¼ÜÖ¸Õë
+	CDrawFlowChartView *pView=(CDrawFlowChartView *)pMain->GetActiveView(); 
+	
+float calculatePower(float u,int i)
+
+
+				Str nameComponentStr = ((Variable)n).name
+                ** log.message("VarInput nameComponentStr=$nameComponentStr and name=$name")
+                if (n.type.is(VarInput.type) && ((VarInput)n).alias.toStr().equals(aliasStr))  {
+                   value := ((VarInput)n).out
+                   ** log.message("VarInput::out_value=$value")
+                   return
+                } else if (n.type.is(VarOutput.type) && ((VarOutput)n).alias.toStr().equals(aliasStr))  {
+                   value := ((VarOutput)n).out
+                   ** log.message("VarOutput::out_value=$value")
+                   return
+                } else if (n.type.is(Variable.type) && ((Variable)n).alias.toStr().equals(aliasStr))  {
+                   value := ((Variable)n).value
+                   ** log.message("Variable:: value=$value")
+                   return
+                }
+
+				
+				
+				
+//			// Make strStatusBar
+//			tempFocus->GetStartPoint(ptStart);
+//			tempFocus->GetEndPoint(ptEnd);
+//			strName = tempFocus->GetTypeName();
+//			strStatusBar.Format(_T("[%d, %d] - We selected [(%d, %d), (%d, %d)] with "), 
+//				point.x, point.y, ptStart.x, ptStart.y, ptEnd.x, ptEnd.y);
+//			strStatusBar += strName;
+//			GetParent()->GetDescendantWindow(AFX_IDW_STATUS_BAR)->SetWindowText(strStatusBar);
+//			strStatusBar += "\r\n";
+//			// TRACE(strStatusBar);
+
+
+	else 
+	{
+		CGraph* tempFocus = pDoc->m_GraphManager.GetFocusGraph();
+		if(tempFocus != NULL)
+		{
+			tempFocus->GetStartPoint(ptStart);
+			tempFocus->GetEndPoint(ptEnd);
+			strName = tempFocus->GetTypeName();
+			strStatusBar.Format(_T("[%d, %d] - We selected [(%d, %d), (%d, %d)] with "), 
+				point.x, point.y, ptStart.x, ptStart.y, ptEnd.x, ptEnd.y);
+			strStatusBar += strName;
+			GetParent()->GetDescendantWindow(AFX_IDW_STATUS_BAR)->SetWindowText(strStatusBar);
+			strStatusBar += "\r\n";
+			// TRACE(strStatusBar);
+			// It would cause the flash of graph
+			// Invalidate();
+		}
+	}
+
+
+		CString strStatusBar;
+		strStatusBar.Format(_T("We selected previousGraph at %d with "), iConnPoint);
+		strStatusBar += previousGraph->GetTypeName() + "(" + m_text + ")" + ". \r\n";
+		TRACE(strStatusBar);
+
+	
+			iAverage = (startPos.ptPosition.x + endPos.ptPosition.x) / 2;
+			m_ptBend[0].ptPosition.x = (int)(m_fBendPercent * (startPos.ptPosition.x + endPos.ptPosition.x) / 2);
+			m_ptBend[1].ptPosition.x = (int)((1 - m_fBendPercent) * (startPos.ptPosition.x + endPos.ptPosition.x) / 2);
+
+#ifdef DRAW_FRAME
+	// »­±ÊÎªÐéÏß£¬Ïß¿íÎª1£¬ÑÕÉ«ÎªºÚÉ«¡£
+	CPen pen( PS_DOT, 1, RGB(0, 0, 0) );
+	CBrush *pBrush=CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH));
+	CPen* oldpen = pdc->SelectObject(&pen);
+	CBrush* oldbrush = pdc->SelectObject( pBrush );
+#endif
+
+#ifdef DRAW_FRAME
+	pdc->SelectObject(oldpen);
+	pdc->SelectObject(oldbrush);
+#endif
+
+
+
+				CPen myDotPen( PS_DOT, 1, RGB(0, 0, 0) );
+				CBrush *pmyDotBrush=CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH));
+				CPen* oldDotPen = pdc->SelectObject(&myDotPen);
+				CBrush* oldDotBrush = pdc->SelectObject( pmyDotBrush );
+				
+
+				pdc->SelectObject(&oldDotPen);
+				pdc->SelectObject( oldDotBrush );
+				
+				pdc->Rectangle(CRect(CPoint(),
+					CPoint()));
+
+					
+
+	// Save all of AdjustPoint
+	cJSON * jsonAdjustPointList = cJSON_CreateObject();
+	int iSeq = 0;
+	CString strAdjustPointName;
+	std::vector<CAdjustPoint *>::iterator iter;
+	for (iter = m_Points.begin(); iter != m_Points.end(); iter++)
+	{
+		CAdjustPoint * objAdjustPoint  = *iter;
+		cJSON * jsonAdjustPoint = cJSON_CreateObject();
+		objAdjustPoint->SaveParamsToJSON(jsonAdjustPoint);
+		
+		strAdjustPointName.Format("%d", iSeq++);
+		cJSON_AddItemToObject(jsonAdjustPointList, strAdjustPointName, jsonAdjustPoint);
+	}
+	cJSON_AddItemToObject(jsonGraph, "AdjustPoint", jsonAdjustPointList);
+	// End of save all of AdjustPoint
+	
+±¾ÖÜ¹¤×÷£º
+Íê³ÉÊôÐÔ¶ÁÐ´¹¦ÄÜ¡£
+ÐÞ¸Ä´úÂëÊµÏÖÊ¹ÓÃInstanceNUmberºÍsNet/MAC·½Ê½Ñ¡ÔñÉè±¸¡£
+ÐÞ¸Ä´úÂëÊµÏÖ¸üÐÂService¶ø²»ÊÇPlayÏÂÃæµÄ½Úµã¡£
+
+±¾ÖÜ¹¤×÷£º
+Íê³ÉÊ¹ÓÃInstanceNUmberºÍsNet/MAC·½Ê½Ñ¡ÔñÉè±¸¡£
+Íê³ÉBacNet¸üÐÂService¶ø²»ÊÇPlayÏÂÃæµÄ½Úµã¡£
+ÐÞ¸Ä´úÂëÊµÏÖRPMºÍWPM¡£
+
+
+±¾ÖÜ¹¤×÷£º
+Íê³ÉRPM¡£¼ÌÐøÊµÏÖWPM¡£
+¸ù¾ÝÌÖÂÛ£¬ÐÞ¸ÄÉè±¸ÏÂÃæµÄ½Úµã¸üÐÂ²ßÂÔ¡£¸ÄÎªÐ´Èý´Î£¬¶Á¾Å´Î¡£
+
+xungao@ubuntu:/source/my_git/fstinterpreter$ vi ./src/launch_code_mgr.cpp
+xungao@ubuntu:/source/my_git/fstinterpreter$ 
+
+ÔÚÎÒ¿´À´ÄÐÅ®È·ÊµÓ¦¸ÃÆ½µÈ¶Ô´ý¡£´ó¼ÒÒª´ï³É¹²Ê¶ Ô­ÔòÉÏ£¬Ó¦¸Ã´ïµ½Õâ¸öÄ¿±ê¡£ÎÒÊ®·ÖÔÞÍ¬Õâ¸öÏë·¨£¬ÎÒÃÇ±ØÐë¶ÔÅ®ÐÔÌØ±ðÓÅ´ý¡£
+µ«ÔÚÍâ½»²¿ÐÐ²»Í¨£¬²»ÄÜÅÉÅ®ÐÔ´óÊ¹µ½ÒÁÀÊÄÇÑùµÄÄÂË¹ÁÖ¹ú¼Ò£¬±ÈÎÒÃÇÂäºóµÄµÚÈýÊÀ½çÒ²²»ÐÐ¡£¡£
+Å®ÐÔ´¦ÀíÄ³Ð©ÊÂÓÐ¶Àµ½Ö®´¦¡£ºÁÎÞÒÉÎÊ¡£µ«ÄÚÎñ²¿ÊÇ¸öÀýÍâ£¬Å®ÈË²»ÊÊºÏ¿´¼àÓü£¬×ö¾¯²ì¡£ºÜÓÐ¿ÉÄÜËýÃÇ×Ô¼ºÒ²²»Ïë×ö¡£
+¹ú·À²¿Ò²Ò»Ñù¹ÜµÄÈ«ÊÇÂ½º£¾ü´ó½«£¬Å®ÈË×ö²»ÁË°²È«²¿µÄÍ·Ä¿¡£¹ú·À²¿ÊÇÄÐÈËµÄÌìÏÂ£¬¹¤ÒµºÍ¾ÍÒµ²¿Ò²Ò»Ñù¡£
+ÎÀÉú²¿¸ß²ãÅ®ÐÔ¹»¶àÁË£¬ËýÃÇ²»¹»¸ñ×ö³£ÎñÃØÊé£¬¶¼ÊÇ¸±×ÜÒ½Îñ¹Ù¡£¶øÇÒÎÒÃÇ80%Êé¼ÇÔ± 99%´ò×ÖÔ±¶¼ÊÇÅ®ÐÔ¡£
+
+Ô­ÔòÉÏËµ£¬ÎÒÖ§³ÖËýÃÇ½øÈë¸ß²ã£¬´ÓÔ­Ôò³ö·¢£¬ÎÒÃÇ¶¼ÔÞ³ÉÅ®Ê¿ÃÇµÄÆ½µÈÈ¨Òæ¡£µ«ÌØ¶¨²¿ÃÅÀïÓÐÌØÊâ¾³¿ö¡£
+ÎÒ×÷ÎªÒ»¸öÈÈ³ÀµÄÅ®È¨Ö÷ÒåÕß£¬¾õµÃÎÊÌâÔÚÓÚÕÐÊÕÄÄÖÖÅ®ÐÔ¡£
+ÒÑ»éÓÐ¼ÒÊÒµÄ¾Í²»ÐÐ£¬ËýÃÇ²»ÄÜÈ«ÉíÐÄÍ¶Èëµ½¹¤×÷ÖÐÈ¥¡£Î´»éÎÞ×ÓÅ®µÄ£¬²»¹»³ÉÊì£¬ÉæÊÀÎ´Éî¡£
+Êµ¼ùÖÐ²»¿ÉÄÜÕÒµ½³ÉÊìµÄ£¬ÒÑ»éÓýÓÐÈý¸öº¢×Ó£¬È«ÐÄÈ«Òâ¹¤×÷µÄÅ®ÐÔ¡£¾ÍÊÇ 22 Ìõ¾ü¹æµÚÒ»Ïî£º¾«Éñ²»½¡È«¿ÉÒÔÃâ³öÇÚ¡£
+µ«¸÷¼¶²¿ÃÅ¶¼Òª´ÓÔ­ÔòÉÏÔÞÍ¬£¬Ö»Ðè¸÷×Ô½²Çå¸÷²¿ÌØÊâÇé¿ö¼´¿É¡£¡£
+
+
+
+// Õâ¸öËã·¨µÄË¼ÏëÊÇÕâÑùµÄ¡£¾ÍÊÇÎÒÃÇÔÚ»æÖÆÒ»ÌõÖ±ÏßµÄÊ±ºò£¬
+// »áÊ¹ÓÃROUND½øÐÐÅÐ¶Ï£¬Ò²¾ÍÊÇÅÐ¶ÏÐ±ÂÊÊÇ·ñ´óÓÚ0.5¡£
+// ÎÒÃÇÊ×ÏÈ¼ÙÉèdx > dy£¬Ð±ÂÊÊÇ·ñ´óÓÚ0.5¾ÍÏàµ±ÓÚÊÇÅÐ¶Ïdx/dyÊÇ·ñ´óÓÚ0.5¡£
+// ÄÇÃ´¾ÍÏàµ±ÓÚÅÐ¶Ï2 * dx / dyÊÇ·ñ´óÓÚ1¡£
+
+/************************************************************************/
+/* Õâ¸öËã·¨µÄË¼ÏëÆäÊµ»¹ÊÇÃ»ÓÐÍÑÀëÕâÁ½¸öÔ­Ôò¡£¼´£º                       */
+/*     Ã¿Ò»²½¡£ÎÞÂÛÈçºÎ£¬ÎÒÃÇ¶¼»áÑØµÝÔö·½ÏòÃ¿µÝÔöÒ»¸öµ¥Î»£¬             */
+/*     Õâ»áµ¼ÖÂÎó²îÀÛ¼Ó2 * dy¡£                                         */
+/*     µ±Îó²î´óÓÚÁãµÄÊ±ºò£¬ÎÒÃÇÑØµÝÔö·½ÏòµÄ´¹Ö±·½ÏòµÝÔöÒ»¸öµ¥Î»£¬       */
+/*     Õâ»áµ¼ÖÂÎó²î¼õÈ¥2 * dx¡£                                         */
+/************************************************************************/
+/* ÖÐµãËã·¨×ÛºÏÕâÁ½ÖÖÇé¿ö£¬Í¬Ê±×öÁË·´Ïò¡£¾ÍÊÇ£º                         */
+/*     Ã¿Ò»²½¡£ÎÞÂÛÈçºÎ£¬ÎÒÃÇ¶¼»áÑØµÝÔö·½ÏòÃ¿µÝÔöÒ»¸öµ¥Î»£¬             */
+/*     Èç¹ûÉÏÒ»ÂÖµÄÎó²îÐ¡ÓÚÁã£¬Ôò±¾ÂÖ»áÍ¬Ê±¼õÉÙ2 * dyºÍÔö¼Ó2 * dx¡£     */
+/*     Èç¹ûÉÏÒ»ÂÖµÄÎó²î´óÓÚÁã£¬Ôò±¾ÂÖÖ»»á¼õÉÙ2 * dy¡£                   */
+/************************************************************************/
+
+
+
+ConnectPoint
+#define ORTHOGONALWIRE_LEAVE_EAST               1    // ?¨°??3?¡¤¡é
+#define ORTHOGONALWIRE_LEAVE_WEST               2    // ?¨°?¡Â3?¡¤¡é
+#define ORTHOGONALWIRE_LEAVE_SOUTH              3    // ?¨°??3?¡¤¡é
+#define ORTHOGONALWIRE_LEAVE_NORTH              4    // ?¨°¡À¡À3?¡¤¡é
+// #define ORTHOGONALWIRE_LEAVE_MAX             5  
+#define ORTHOGONALWIRE_ENTER_EAST               5    // ?¨°????¨¨?
+#define ORTHOGONALWIRE_ENTER_WEST               6    // ?¨°?¡Â??¨¨?
+#define ORTHOGONALWIRE_ENTER_SOUTH              7    // ?¨°????¨¨?
+#define ORTHOGONALWIRE_ENTER_NORTH              8    // ?¨°¡À¡À??¨¨?
+
+	pdc->MoveTo(CPoint(m_Start.x, m_End.y));
+	pdc->LineTo(m_Start);
+	pdc->LineTo(CPoint(m_End.x, m_Start.y));
+	pdc->LineTo(m_End);
+
+	bool isFlatGraph = false;
+	int iWidth =0, iHeight = 0;
+	iWidth  = m_End.x - m_Start.x;
+	iHeight = m_End.y - m_Start.y;
+	int  iRadius =  (int)(iWidth / 2.4);
+	int  iArcHeight = iRadius - (int)sqrt(iRadius * iRadius - (iWidth/4) * (iWidth/4));
+	if(iHeight > 0)
+	{
+		if(iArcHeight > iHeight/2)
+		{
+			// We have to recalculate the radius to prevent to cross the topline.
+			iRadius = iHeight/4 + iWidth * iWidth/(16 * iHeight);
+		}
+
+		// We minus one to let the graph close.
+		int iCosofRadius = (int)sqrt(iRadius * iRadius - (iWidth/4) * (iWidth/4)) - 1;
+		CPoint objFirstCircle = CPoint(m_Start.x + (int)((m_End.x - m_Start.x)/4), m_End.y - iCosofRadius);
+		CRect objFirstCircleRect = CRect(CPoint(objFirstCircle - CPoint(iRadius, iRadius)), 
+								CPoint(objFirstCircle + CPoint(iRadius, iRadius)));
+		//	pdc->Ellipse(m_FirstCircleRect);
+		pdc->Arc(objFirstCircleRect, 
+					CPoint(m_Start.x, m_End.y), 
+					CPoint(m_Start.x + (int)((m_End.x - m_Start.x)/2), m_End.y));
+		
+		CPoint objSecondCircle = CPoint(m_End.x - (int)((m_End.x - m_Start.x)/4), m_End.y + iCosofRadius);
+		CRect objSecondCircleRect = CRect(CPoint(objSecondCircle - CPoint(iRadius, iRadius)), 
+								CPoint(objSecondCircle + CPoint(iRadius, iRadius)));
+		pdc->Arc(objSecondCircleRect, 
+					m_End, 
+					CPoint(m_Start.x + (int)((m_End.x - m_Start.x)/2), m_End.y));
+	}
+	else
+	{
+		pdc->LineTo(CPoint(m_Start.x, m_End.y));
+	}
+
+
+IsConnectOn(CConnectPoint *pt)·µ»ØÏÂ±ê¡£
 
 cd /source/my_git/
 cd mySedonaCode/
 cp -r ~/linux/sedona/* .
 git status 
-git add src
+git add *
 git status 
-git commit -m "Add some logic about BIP"
+git commit -m "Finish getBacnetDeviceList process"
 git push
 
+ez9260.xga.com login: root
+warning: cannot change to home directory
+[root@ez9260 /]# md5sum /tools/svm 
+1b97897124bc7f19a72f97ff14c4664d  /tools/svm
+[root@ez9260 /]# md5sum /data/
+/data/lost+found/  /data/svm/
+[root@ez9260 /]# md5sum /data/svm/svm
+cb814bf20f1dc384e79cbc288b2ab10e  /data/svm/svm
+[root@ez9260 /]# 
+Á¬½Ó³¬Ê±
 
 
+
+./tcpsvd -vE 0.0.0.0 21 ftpd -w /data/svm/ &
+
+[root@ez9260 /data/svm]# ln -s /bin/busybox ftpd     
+[root@ez9260 /data/svm]# ln -s /bin/busybox tcpsvd     
+[root@ez9260 /data/svm]# 
+[root@ez9260 /data/svm]# ./tcpsvd -vE 0.0.0.0 21 ftpd -w ./ &
+tcpsvd: applet not found
+[root@ez9260 /data/svm]# 
+
+-- MESSAGE [sys::Component] 123456789 
+set ioctl(FIONBIO). 
+  Error joining multicast group 239.255.18.76: No such device
+-- MESSAGE [sys::Component] DASP Discovery not enabled
+Enter inet_UdpSocket_getBacnetDeviceList(192.168.168.2) 
+set ioctl(FIONBIO). 
+set user_addr to networkIP and bind to clientSocket. 
+Call sendBroadcast 
+set ioctl(FIONBIO). 
+Enter sendBroadcast 
+send 12 OK 
+we Receive 25 .
+IP = 192.168.168.242. we Receive 25 .
+Type: 81. Function: B. BVLC-Length: 19.
+Version: 1. Control: 20.
+Unconfirmed Service Choice: 0.
+Object Type: 8. Instance Number: 3A981.
+maxADPU: 1476.
+we Receive 25 .
+IP = 192.168.168.241. we Receive 25 .
+Type: 81. Function: A. BVLC-Length: 19.
+Version: 1. Control: 20.
+Unconfirmed Service Choice: 0.
+Object Type: 8. Instance Number: 3A985.
+maxADPU: 480.
+we Receive 28 .
+IP = 192.168.168.241. we Receive 28 .
+Type: 81. Function: B. BVLC-Length: 1C.
+Version: 1. Control: 28.
+sourceNetworkAddress: 2401. ourceMACLayerAddressLength: 1.
+SADR: 12.
+Hop Count: 254.
+Unconfirmed Service Choice: 0.
+Object Type: 8. Instance Number: 3A98C.
+maxADPU: 480.
+we detect 3 clients.
+-------------------(1)----------------------- 
+-- MESSAGE [sys::Component] iDeviceCount = 3 .
+
+	int snd_size = 0;
+	int optSndLen = sizeof(snd_size);
+	int err = getsockopt(clientSocket, SOL_SOCKET, SO_SNDBUF, &snd_size, (socklen_t *)&optSndLen);
+	if(err >= 0)
+	{
+		printf("SO_SNDBUF = %d. \r\n", snd_size);
+	}
+
+	int rcv_size = 0;
+	int optRecvLen = sizeof(rcv_size);
+	err = getsockopt(clientSocket, SOL_SOCKET, SO_RCVBUF, &rcv_size, (socklen_t *)&optRecvLen);
+	if(err >= 0)
+	{
+		printf("SO_RCVBUF = %d. \r\n", rcv_size);
+	}
+
+	struct sockaddr_in  recv_2_addr;
+	bzero((char *)&recv_2_addr, sizeof(recv_2_addr));
+	recv_2_addr.sin_family=AF_INET;
+	recv_2_addr.sin_addr.s_addr=inet_addr("192.168.168.2");
+	recv_2_addr.sin_port=htons(PORT);
+	memset(&(recv_2_addr.sin_zero), 0x00, 8);
+
+	struct sockaddr_in  recv_255_addr;
+	bzero((char *)&recv_255_addr, sizeof(recv_255_addr));
+	recv_255_addr.sin_family=AF_INET;
+	recv_255_addr.sin_addr.s_addr=inet_addr("192.168.168.255");
+	recv_255_addr.sin_port=htons(PORT);
+	memset(&(recv_255_addr.sin_zero), 0x00, 8);
+
+	struct sockaddr_in  recv_any_addr;
+	bzero((char *)&recv_any_addr, sizeof(recv_any_addr));
+	recv_any_addr.sin_family=AF_INET;
+	recv_any_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	recv_any_addr.sin_port=htons(PORT);
+	memset(&(recv_any_addr.sin_zero), 0x00, 8);
+	
+			
+			if (errno == EAGAIN)
+			{
+				printf("recvfrom return EAGAIN because of (%d):(%s) \r\n",
+					errno, strerror(errno));
+				recvSleep(1);
+				continue;
+			}
+			printf("--------------------BBBBB----------------- \r\n");
+			
+			
+				iRecvCount = recvfrom(clientSocket, (char *)buf, 
+					MAXDATASIZE, 0, (struct sockaddr *)&recv_any_addr, (socklen_t *)&size);
+				if (iRecvCount == -1)
+				{
+					printf("recvfrom return -1 because of (%d):(%s) \r\n",
+						errno, strerror(errno));
+					recvSleep(1);
+					iRecvCount = recvfrom(clientSocket, (char *)buf, 
+						MAXDATASIZE, 0, (struct sockaddr *)&recv_2_addr, (socklen_t *)&size);
+					if (iRecvCount == -1)
+					{
+						printf("recvfrom return -1 because of (%d):(%s) \r\n",
+							errno, strerror(errno));
+					}
+				}
+				
+				
+Click left - bottom 
+
+[2023-05-18 17:14:27] pt(29, 360) is in the [(25, 355), (37, 367)]. 
+[2023-05-18 17:14:27] We click on the 1th CConnectPoint.
+[2023-05-18 17:14:27] pt(29, 360) is in the [(25, 355), (37, 367)]. 
+[2023-05-18 17:14:27] The m_Start and m_End is [(31, 26), (673, 361)]. [2023-05-18 17:14:27] Switch m_Start and m_End is [(31, 361), (673, 26)].
+[2023-05-18 17:14:27] The m_Start and m_End is [(31, 361), (673, 26)]. [2023-05-18 17:14:27] Recalc m_Start and m_End is [(673, 361), (31, 26)].
+[2023-05-18 17:14:27] pt(29, 360) is in the [(25, 355), (37, 367)]. 
+[2023-05-18 17:14:27] We click on the 2th CConnectPoint.
+[2023-05-18 17:14:27] pt(29, 360) is in the [(25, 355), (37, 367)]. 
+[2023-05-18 17:14:27] The m_Start and m_End is [(673, 361), (31, 26)]. [2023-05-18 17:14:27] Switch m_Start and m_End is [(673, 26), (31, 361)].
+
+
+[2023-05-18 17:14:39] The m_Start and m_End is [(673, 26), (31, 361)]. [2023-05-18 17:14:39] Recalc m_Start and m_End is [(31, 26), (673, 361)].
+[2023-05-18 17:14:39] pt(672, 25) is in the [(667, 20), (679, 32)]. 
+[2023-05-18 17:14:39] We click on the 2th CConnectPoint.
+[2023-05-18 17:14:39] pt(672, 25) is in the [(667, 20), (679, 32)]. 
+[2023-05-18 17:14:39] The m_Start and m_End is [(31, 26), (673, 361)]. [2023-05-18 17:14:39] Switch m_Start and m_End is [(31, 361), (673, 26)].
+[2023-05-18 17:14:39] The m_Start and m_End is [(31, 361), (673, 26)]. [2023-05-18 17:14:39] Recalc m_Start and m_End is [(673, 361), (31, 26)].
+[2023-05-18 17:14:39] pt(672, 25) is in the [(667, 20), (679, 32)]. 
+[2023-05-18 17:14:39] We click on the 1th CConnectPoint.
+[2023-05-18 17:14:39] pt(672, 25) is in the [(667, 20), (679, 32)]. 
+[2023-05-18 17:14:39] The m_Start and m_End is [(673, 361), (31, 26)]. [2023-05-18 17:14:39] Switch m_Start and m_End is [(673, 26), (31, 361)].
+
+
+---------------------------------------------------------------------------------------------
+
+Ö»Ðè·­ÔÄÇå»ªÐ£ÓÑ×Ü»á¹«²¼µÄÊý¾Ý£¬¾ÍÄÜ·¢ÏÖÔÚ2002ÄêÖÁ2011Äê¼äÁôÑ§¹é¹úµÄÇå»ªÐ£ÓÑÖÐ£¬ÒÑÓÐ³¬¹ýÒ»°ëÑ¡Ôñ»Ø¹ú¹¤×÷£¬²¢ÇÒÕâÒ»±ÈÀý»¹ÔÚ³ÖÐøÔö³¤¡£
+
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ grep -Rns "\<manifestInclude\>" .
+./XG_AUTO/platform.xml:29:  <manifestInclude>
+./XG_AUTO/platform.xml:34:  </manifestInclude>
+./src/sedonac/src/sedonac/steps/InitStagePlatform.java:122:    parseManifestIncludes(plat, xml.elems("manifestInclude"));
+./platforms/src/generic/unix/generic-unix.xml:31:  <manifestInclude>
+./platforms/src/generic/unix/generic-unix.xml:36:  </manifestInclude>
+./platforms/src/generic/win32/generic-win32.xml:30:  <manifestInclude>
+./platforms/src/generic/win32/generic-win32.xml:35:  </manifestInclude>
+./doc/deviceSim.html:216:If the platform definition file uses the <code>&lt;manifestInclude&gt;</code> tag, 
+./doc/platDef.html:123:  &lt;manifestInclude path="more_metadata.xml" /&gt;
+./doc/platDef.html:124:  &lt;manifestInclude&gt;
+./doc/platDef.html:130:  &lt;/manifestInclude&gt;
+./doc/platDef.html:222:<p><b>&lt;manifestInclude></b> (optional) is used to include arbitrary XML
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ ls src/sys/native
+nonstd  runtime.c  std  sys_Component.c  sys_Str.c  sys_Sys.c  sys_Test.c  sys_Type.c  unix  win32
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ ls src/sys/native/unix/
+sys_PlatformService_unix.c  sys_Sys_unix.c
+sedona_dev@ubuntu:~/sedona_dev$ ls src/sys/native/unix/sys_Sys_unix.c 
+src/sys/native/unix/sys_Sys_unix.c
+sedona_dev@ubuntu:~/sedona_dev$ vi src/sys/native/unix/sys_Sys_unix.c 
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ 
+sedona_dev@ubuntu:~/sedona_dev$ vi platform
+platformdb.py  platforms/     
+sedona_dev@ubuntu:~/sedona_dev$ vi platforms/
+db/  src/ 
+sedona_dev@ubuntu:~/sedona_dev$ vi platforms/src/
+generic/    XunGaoAuto/ 
+sedona_dev@ubuntu:~/sedona_dev$ vi platforms/src/generic/
+unix/  win32/ 
+sedona_dev@ubuntu:~/sedona_dev$ vi platforms/src/generic/unix/
+generic-unix.xml            kit.xml                     UnixPlatformService.sedona  UnixProvDbFileStore.sedona  
+sedona_dev@ubuntu:~/sedona_dev$ vi platforms/src/generic/unix/generic-unix.xml 
+sedona_dev@ubuntu:~/sedona_dev$ ls src/BacNet/native/
+bacnet.c  bacnet.c~  bip.c  mstp.c
+sedona_dev@ubuntu:~/sedona_dev$ 
+
+
+---------------------------------------------------------------------------------------------
+
+                    0            4            2
+                    +------------+------------+
+                    |                         |
+                    |                         |
+                    + 7                       + 5
+                    |                         |
+                    |                         |
+                    +------------+------------+
+                    1            6            3
+
+
+gcc -D__UNIX__=1 -DSOCKET_FAMILY_INET=1 -DPLAT_BUILD_VERSION=\"0.1.0\" /home/sedona_dev/sedonadev/temp/generic-unix/*.c -O2 -o /home/sedona_dev/sedonadev/bin/svm
+
+xungao@ubuntu:~/linux/sedona/source$ make
+armv5l-linux-gcc -D__UNIX__ *.c -Wall -O2 -Imodbus/ -Lmodbus/ -lmodbus -lpthread -lm -o svm
+xungao@ubuntu:~/linux/sedona/source$ 
+
+			for(int i = 0; i < GetGraphSum(); i++)
+			{
+				CGraph* temp = GetGraphAt(i);
+				// Èç¹ûµ±Ç°Í¼Ôª¶ÔÏóµÄÇ°Í¼Ôª¶ÔÏóÊÇµ±Ç°Ñ¡ÖÐÍ¼Ôª¶ÔÏó¡£
+				if(temp->GetPreviousGraph() == tempFocus)
+				{
+					if(temp->m_iPreviousConnPointIdx != CCONNECTPOINT_INVALID_OPTION)
+					{
+						// tempFocus->AdjustFocusPoint();
+						CConnectPoint *pNewStart = (CConnectPoint*)tempFocus->m_Points.GetAt(temp->m_iPreviousConnPointIdx);
+						if(pNewStart)
+						{
+							temp->SetStartPoint(pNewStart->GetPoint());
+						}
+					}
+				}
+				// Èç¹ûµ±Ç°Í¼Ôª¶ÔÏóµÄºóÍ¼Ôª¶ÔÏóÊÇµ±Ç°Ñ¡ÖÐÍ¼Ôª¶ÔÏó¡£
+				if(temp->GetNextgraph() == tempFocus)
+				{
+					if(temp->m_iNextConnPointIdx != CCONNECTPOINT_INVALID_OPTION)
+					{
+						CConnectPoint *pNewEnd = (CConnectPoint*)tempFocus->m_Points.GetAt(temp->m_iNextConnPointIdx);
+						if(pNewEnd)
+						{
+							temp->SetEndPoint(pNewEnd->GetPoint());
+						}
+					}
+				}
+			}
+
+
+
+git commit -m "Use scode magic code"
+
+
+%:s/print /print(/
+%:s/print\(.*\)/print\1\)/
+
+	marginX = marginY = CCONNECTPOINT_POSITIVE_X_MARGIN;
+	CPoint        middlePoint = pMiddleConnPoint->GetPoint();
+	
+	points[0] = m_Start                           + CPoint(0, CCONNECTPOINT_NEGATIVE_Y_MARGIN);
+	points[1] = CPoint(middlePoint.x, m_Start.y) + CPoint(CCONNECTPOINT_POSITIVE_X_MARGIN, CCONNECTPOINT_NEGATIVE_Y_MARGIN);
+	points[2] = CPoint(middlePoint.x,   m_End.y) + CPoint(CCONNECTPOINT_POSITIVE_X_MARGIN, CCONNECTPOINT_NEGATIVE_Y_MARGIN);
+	points[3] = m_End                            + CPoint(0, CCONNECTPOINT_NEGATIVE_Y_MARGIN);
+	points[4] = m_End                            + CPoint(0, CCONNECTPOINT_POSITIVE_Y_MARGIN);
+	points[5] = CPoint(middlePoint.x,   m_End.y) + CPoint(CCONNECTPOINT_NEGATIVE_X_MARGIN, CCONNECTPOINT_POSITIVE_Y_MARGIN);
+	points[6] = CPoint(middlePoint.x, m_Start.y) + CPoint(CCONNECTPOINT_NEGATIVE_X_MARGIN, CCONNECTPOINT_POSITIVE_Y_MARGIN);
+	points[7] = m_Start                           + CPoint(0, CCONNECTPOINT_POSITIVE_Y_MARGIN);
 
 	./bin/sedonac.sh src/math/
 
@@ -445,6 +973,24 @@ Vp(VO)-Vp(VI)
 	./bin/sedonac.sh src/math/
 	0000   62 61 63 32 31 31 76 20 31 30 30 31              bac211v 1001
 
+	
+±»É¾³ýÁË¡£¡£ÄÇÎÒ¾ÍÎÒÔÙ·¢Ò»´Î¡£¡£
+
+ºÇºÇºÇ¡£¡£ÎÒÕâÃ´Ëµ°É¡£¡£
+
+¸ãÖ÷Ê³Èë²ËµÄÈ«ÊÇ´Ö²ÚµÄÒûÊ³¡£ÓÃ·ÛË¿Íè×Ó×ö²ËµÄÈ«ÊÇÇîÈËµÄÒûÊ³¡£ÏÂ¹Ý×Ó³ÔÌÀÌÀË®Ë®¹à´ó¶ÇµÄÈ«ÊÇºýÅªÊÂµÄÒûÊ³¡£
+Äã¿´¿´ÌÆÈÊ½ÜµÄÂåÑôÌ½µê¡£Ê²Ã´Õæ²»Í¬£¬¹Ü¼Ç¡£Íè×ÓÌÀÓÃµÄÊÇ·ÛË¿Íè×Ó¡£ÈüÐÜÕÆÆäÊµ¾ÍÊÇËÄÏ²Íè×Ó¡£Ñà²Ë¾ÍÊÇÂÜ²·Ë¿ºÍµ°Æ¤¡£
+»¹ÓÐÂåÑôË®Ï¯¡£²»¾ÍÊÇÇÐ³ÉÏ¸Ë¿£¬Î±×°³ÉÑàÎÑµÄ°×ÂÜ²·£»·ÛÌõºÏÃæÓÍÕ¨£¬Î±×°³ÉÈâÍè×ÓÅÝÔÚËáÀ±ÌÀÀï£»ºìÊí·Û´ê³É´ÖÌõ£¬ÓÃÒ»¶¡µãÈâÄ©µ÷Î¶£¬Î±×°³Éº£²Î£»¹´ÁËÅ¨ÜÍ£¬³Ô×Å¶¥¶Ç×ÓµÄÃæÌõ¡­¡­Ò»¿´¾ÍÊÇÖÐÔ­Çî¿à°ÙÐÕ²Ù°ìºì°×Ï²ÊÂ£¬ËØ²Ë»ç×ö¡¢´ó¹ø³öÆ·µÄÁ÷Ë®Ï¯¡£
+ÖÁÓÚÊ²Ã´Ê²Ã´ÀðÓã¡£¾Í¸üÊÇÀÏ»ÆÀúÁË¡£¡£ÒªÊÇÉÏÊÀ¼Í°ËÊ®Äê´ú£¬»¹ÓÐÈË³ÔÀðÓã¡£ÕâÄêÍ·£¬Ë­»¹³ÔÍÁÐÈÎ¶ÕâÃ´´óµÄÀðÓã¡£¡£
+¾ÍÕâ¡£¡£¡£ÂåÑô¾Æ¼Ò»¹¾¹È»×Ô³ÆÈ«¹úÊ®¼Ñ·¹µê¡£ÕæÊÇ×ø¾®¹ÛÌì°¡¡£¡£¾ÍËûÄÇ¸ö²ËÉ«£¬È«¹ú´ó²¿·Ö²ËÊÐ³¡µÄ²ÔÓ¬¹Ý×Ó¶¼±ÈËûÈâ¶à¡£¡£
+
+ÄÇ¿É²»¡£µØ·½Õþ¸®µÄ³ÇÍ¶¹«Ë¾½èÁËÇ®²»»¹¡£ÒøÐÐÊ²Ã´°ì·¨¶¼Ã»ÓÐ¡£Ö»ÄÜ°Ñ³ÇÍ¶¹«Ë¾ÁÐÈëºÚÃûµ¥¡£¡£È»ºóµØ·½Õþ¸®ÔÙ³ÉÁ¢Ò»¼Ò³ÇÍ¶¹«Ë¾½Ó×Å½è¡£¡£ÒøÐÐÃ÷Ã÷ÖªµÀÕâ¼Ò³ÇÍ¶¹«Ë¾ºÍºÍºÚÃûµ¥ÉÏµÄÇ°Ò»¼ÒÆäÊµÊÇÒ»¼Ò¹«Ë¾¡£Ò²Ö»ÄÜÄó×Å±Ç×Ó½èÇ®¡£¡£
+
+	
+±¾ÖÜ¹¤×÷£º
+ÊµÏÖÐÞ¸ÄÉè±¸Ãû³Ædevice-nameµÄ¹¦ÄÜ¡£ÔÚWindowsÆ½Ì¨ÉÏµ÷²éSedonaÐéÄâ»úÖ´ÐÐ±¨´íÎÊÌâºÍWorkbanchÉý¼¶ÎÊÌâ¡£
+	
+	
 ±¾ÖÜ¹¤×÷£º
 Íê³ÉÔÚSedonaÖÐÊ¹ÓÃ¹ã²¥°ü·¢ÏÖÉè±¸µÄ´úÂë¡£Íê³ÉÊ¹ÓÃ¹ã²¥°ü·µ»ØµÄÉè±¸µØÖ·½øÐÐÍ¨ÐÅµÄ¹¦ÄÜ¡£
 Íê³É¶ÁÈ¡Éè±¸Ãû³Ædevice-nameµÄ¹¦ÄÜ¡£ÏÂÖÜ×¼±¸ÊµÏÖÐÞ¸ÄÉè±¸Ãû³Ædevice-nameµÄ¹¦ÄÜ¡£
@@ -461,6 +1007,48 @@ Vp(VO)-Vp(VI)
 
 ±¾ÖÜ¹¤×÷£º
 ±àÐ´Ê¹ÓÃ¹ã²¥°ü·¢ÏÖÉè±¸µÄ´úÂë¡£ÔÚPC²àµ÷ÊÔÍ¨¹ý¡£×¼±¸ÏÂÖÜÒÆÖ²µ½SedonaÖÐ£¬½øÐÐ²âÊÔ¡£
+
+±¾ÖÜ¹¤×÷£º
+ÔÚWindowsÆ½Ì¨ÉÏÒÆÖ²SedonaÐéÄâ»ú¡£µ÷²éSedonacµÄ±àÒë¹ý³Ì¡£
+
+±¾ÖÜ¹¤×÷£º
+ÔÚWindowsÆ½Ì¨ÉÏµ÷²éSedonaÐéÄâ»úÖ´ÐÐ±¨´íÎÊÌâºÍWorkbanchÉý¼¶ÎÊÌâ¡£ÅäºÏÍ¬ÊÂÐÞ¸ÄÉÏÎ»»úºÍÉè±¸Í¨ÐÅµÄ´úÂë¡£
+
+
+±¾ÖÜ¹¤×÷£º
+µ÷²éSedonaÆ½Ì¨µÄ±àÒë¹¤¾ßSedonacµÄ±àÒë¹ý³Ì¡£È·ÈÏ¿ÉÒÔÍ¨¹ýÐÞ¸Ä´úÂë£¬¸Ä±äSedonacµÄÐÐÎª¡£
+µ÷²éÕûÀí±àÒë¹¤¾ßSedonac£¬Sedona»ù´¡°üºÍÆäËû´úÂëµÄ¹ØÏµ¡£
+
+
+
+¶àÏîÊ½µÄ³Ë·¨Âú×ã½áºÏÂÉºÍ½»»»ÂÉ
+
+
+ÈýÂ¹½«16¸öÑùÆ·ËÍÈ¥¼ì²â£¬·¢ÏÖÔÚ15¸öÑùÆ·ÖÐ·¢ÏÖÁËÈý¾ÛÇè°·µÄ³É·Ö£¬²¢È·ÈÏÊÇÈËÎªÏòÔ­ÁÏÈéÖÐ²ôÈëÁËÈý¾ÛÇè°·¡£ ×÷ÎªÈýÂ¹¼¯ÍÅµÄÍâ×Ê¹É¶«£¬ÐÂÎ÷À¼ºãÌìÈ»ÔÚ»ñÏ¤¸ÃÇé¿öºó£¬ÒªÇóÈýÂ¹ÂíÉÏÕÙ»ØÊÜµ½Èý¾ÛÇè°·ÎÛÈ¾µÄÄÌ·Û£¬¶øÇÒÒªÏòÖÐ¹úÓÐ¹Ø²¿ÃÅ±¨¸æ¡£ µ«ÊÇ ÈýÂ¹¼¯ÍÅ´ÓÎ´Ïò¾­ÏúÉÌËµÃ÷²úÆ·ÓÐÖÊÁ¿ÎÊÌâ£¬¶øÊÇÒÔ¸÷ÖÖ½è¿ÚÕÙ»Ø²úÆ·£¬µ¼ÖÂÊÜÎÛÈ¾µÄÄÌ·Û³Ù³ÙÎ´±»ÕÙ»Ø¡£ ºóÀ´£¬ºãÌìÈ»Ö»ºÃÏòÐÂÎ÷À¼Õþ¸®±¨¸æ£¬ÐÂÎ÷À¼Õþ¸®ÔÚµÃÖªÏûÏ¢ºó£¬Ö±½ÓÏòÎÒ¹úÖÐÑëÕþ¸®±¨¸æ¸ÃÊÂ¼þ£¬Èý¾ÛÇè°·µÄÎÊÌâ³¹µ×±¬·¢¡£ ÔÚ2008Äê9ÔÂ£¬ÖÐ¹ú¹úÎñÔºÆô¶¯ÁË¹ú¼Ò°²È«ÊÂ¹ÊµÄI¼¶ÏìÓ¦»úÖÆ£¬Ò²¾ÍÊÇ°´ÕÕ×î¸ß¼¶±ð¡¢ÌØ±ðÖØ´óµÄÊ³Æ·°²È«ÊÂ¹ÊÀ´´¦ÖÃÈýÂ¹ÄÌ·ÛÈý¾ÛÇè°·ÎÛÈ¾ÊÂ¼þ¡£
+
+
+Ï°Ô¶Æ½£¨1956Äê11ÔÂ¡ª£©£¬ÄÐ£¬ÉÂÎ÷¸»Æ½ÈË£¬ÖÐ¹²ÔªÀÏÏ°ÖÙÑ«¡¢ÆëÐÄ´Î×Ó£¬ÊÇÖÐ¹ú¹²²úµ³ÖÐÑëÎ¯Ô±»á×ÜÊé¼ÇÏ°½üÆ½°ûµÜ¡£
+ÔøÈÎ¹ú¼Ê½ÚÄÜ»·±£Ð­»á»á³¤¡£¸ÃÐ­»áÒÑÓÚ2014ÄêÖØ×éÎª¹ú¼ÊÉúÌ¬¾­¼ÃÐ­»á£¨IEEPA£©
+ÕÅÀ½À½£¨1980Äê9ÔÂ23ÈÕ¡ª£©[2]£¬Ô­ÃûÕÅÏþÑ©[10]£¬ÖÐ¹úÅ®¸èÊÖ¡¢ÑÝÔ±¼°Ö÷³ÖÈË£¬ÓÐ¡°¾üÖÐµÚÒ»ÃÀÅ®¡±¡¢ÖÐ¹ú´óÂ½µÄ¡°ÂêÀöÁ«¡¤ÃÎÂ¶¡±Ö®³Æ[11]¡£
+2008ÄêÇÄÈ»ÍË³öÑÝÒÕÈ¦£¬²¢ÓÚÍ¬Äê8ÔÂ7ÈÕ³ÉÎªÏ°Ô¶Æ½Ö®ÆÞ£¬¼´ÏÖÈÎÖÐ¹²ÖÐÑë×ÜÊé¼ÇÏ°½üÆ½µÄµÜÏ±
+
+¿ÂÁáÁá£¨1951Äê¡ª £©£¬ÓÖÃû¿ÂÐ¡Ã÷£¬Å®£¬¹ã¶«ÆÕÄþÈË£¬ÖÐ¹úÇ°×¤Ó¢¹ú´óÊ¹¿Â»ªÅ®¶ù£¬ÖÐ¹²ÖÐÑë×ÜÊé¼ÇÏ°½üÆ½µÚ1ÈÎÆÞ×Ó¡£
+1975Äê£¬ÉÏÉ½ÏÂÏç7Äêºó£¬Ï°½üÆ½¾­ÓÉ¹¤Å©±øÑ§Ô±ÍÆ¼öÖÆ£¬½øÈëÇå»ª´óÑ§»¯¹¤Ïµ»ù±¾ÓÐ»úºÏ³É×¨ÒµÑ§Ï°[19]¡£
+
+¶ø¡¶ÖÐ¹úÊ±±¨¡·µÄ±¨µÀÔòÖ¸£¬Î»ÓÚÕý¶¨ÏØ¶«ÃæÇÒÍ¬ÊôÊ¯¼Ò×¯µØÇøµÄÎÞ¼«ÏØµÄÏØÎ¯Êé¼ÇÀõÕ½ÊéÔÚÕâÒ»Ê±ÆÚÓëÏ°½üÆ½½áÊ¶£¬Ôì¾ÍÁËÎ´À´Ë«·½µÄºÏ×÷
+
+Ï°½üÆ½»¹ÔÚºÓ±±Ê±£¬×éÖ¯²¿¼Æ»®Ìá°ÎËû¡£Æä¸¸Ï°ÖÙÑ«ÌØµØÍÐµ±Ê±µÄÖÐ¹²ºÓ±±Ê¡Î¯Êé¼Ç¸ßÑï¹ØÕÕ£¬
+¸ßÑï²»·Þ£¬·´½«´ËÊÂÔÚÊ¡Î¯³£Î¯»áÉÏ½ÒÂ¶£¬ÁîÏ°½üÆ½ÄÑÔÚµ±µØÐøÈÎ¡£Ê±ÈÎ×éÖ¯²¿ÃØÊé³¤ºÎÔØÓëÏ°ÖÙÑ«ÓÐÍ¬ÏçÖ®Òê£¬
+ËûÁË½âºó£¬ÇëÖÐ¹²¸£½¨Ê¡Î¯Êé¼ÇÏîÄÏ½«Ï°½üÆ½µ÷ÈÎÖÁ¸£½¨ÏÃÃÅ¡£
+
+²»Ò»»á¶ù£¬ÍõºéÎÄÀ´ÁË¡£ÍõºéÎÄ¸Õ½øÔº×ÓÊ±£¬ËæÉí¾¯ÎÀ¼´±»ÁôÔÚÔºÍâ¡£ÍõºéÎÄ¸Ðµ½ÊÂÇé²»´ó¶ÔÍ·¡£µ±ÍõºéÎÄ¿ì×ß½üÕýÌü´óÃÅÊ±£¬×¨ÃÅ¶Ô¸¶ËûµÄÐÐ¶¯Ð¡×éÁ¢¼´×ßÁË¹ýÀ´¡£
+
+ÍõºéÎÄÓÐÒ»µãÕõÔú£¬µ±ÐÐ¶¯×éµÄ¼¸¸öÎÀÊ¿ÔÚ×ßÀÈÀï°ÑËûÅ¤×¡µÄÊ±ºò£¬ÍõºéÎÄÒ»±ß´óÉùËµ ¡°ÎÒÊÇÀ´¿ª»áµÄ£¬ÄãÃÇÒª¸ÉÊ²Ã´£¿¡±Ò»±ßÈ­´ò½ÅÌß£¬Æ´Ãü½øÐÐ·´¿¹¡£µ«ÊÇÍõºéÎÄºÜ¿ì¾Í±»ÐÐ¶¯Ð¡×éÖÆ·þÁË£¬±»Å¤×ÅË«±ÛÑºµ½´óÌüÀï¡£»ª¹ú·æ°Ñ¡°¾ö¶¨¡±ÓÖÄîÁËÒ»±é¡£
+
+»¹Ã»µÈ»ª¹ú·æÄîÍê£¬ÍõºéÎÄÍ»È»´óºðÒ»Éù£¬ÕõÍÑ¾¯ÎÀÈËÔ±µÄÅ¤¸¿£¬ÓÉÎåÁùÃ×Ô¶µÄµØ·½ÏòÒ¶½£Ó¢ÃÍÆË¹ýÈ¥¡£
+
+ÔÚÕâ¸ö½ôÒªÊ±¿Ì£¬Ò»ÅÔµÄ¾¯ÎÀÃÍ³åÉÏÈ¥°ÑËûÆËµ¹£¬ËÀËÀµØÞô×¡£¬¸øËû´÷ÉÏÊÖîí¡£
+
 
 t11=0;t12=1;t21=0;t22=2;
 t1=t11:0.001:t12;
@@ -485,11 +1073,18 @@ https://zhuanlan.zhihu.com/p/526374353
 https://www.zhihu.com/question/568394563/answer/2776676187
 
 
+git status 
+git add test_svm
+git status 
+git commit -m "Omit some warning"
+git push
+
 
 
 ¶¬¹Ï: white gourd
 ÄÏ¹Ï: pumpkin
 
+¸¾Å®Ö®±¦£¬¶Å¸¦ÄÜ¶¯£¬Ìú¶ø²»ºÏ£¬Éú¼åÖÐÐÄºÍºÃ¹·±ßÉÏÆ®¡£
 
 0x0019fe3a
 0019FE3A  40 93 4A 47 AE 14 7A E1 CC CC CC CC CC CC  @“JG..záÌÌÌÌÌ.
@@ -873,8 +1468,7 @@ macµçÂ·Ä£ÄâÈí¼þ
 Í¨ÍùÌìÌÃµÄÂ·ÍùÍùÊÇÓÃµØÓüÆÌ¾ÍµÄ¡£
 ¡¾ÐìÖ¾Ä¦ÆÀËÕ¹²£ºÓÐÑªº£²ÅÓÐÌìÌÃ ËûÃÇÏÈ¸ãÑªº£¡¿
 ÐìÖ¾Ä¦ÕâÑùÆÀÂÛËÕ¶íÈËÉ¢²¼µ½ÖÐ¹úÀ´µÄÄÇ¸öÖ÷Òå£º
-¡°ÎÒ¾õµÃÕâÊÀ½çµÄ×ïÄõÊµÔÚÌ«ÉîÁË£¬Ö¦Ò¶µÄ¸Ä±ä£¬ÊÇÒª²»µ½µÄ£¬
-ÈËÃÇ²»¸ù±¾»ÚÎòµÄÊ±ºò£¬²»ÃâÔâ´ó½Ù£¬
+¡°ÎÒ¾õµÃÕâÊÀ½çµÄ×ïÄõÊµÔÚÌ«ÉîÁË£¬Ö¦Ò¶µÄ¸Ä±ä£¬ÊÇÒª²»µ½µÄ£¬ÈËÃÇ²»¸ù±¾»ÚÎòµÄÊ±ºò£¬²»ÃâÔâ´ó½Ù£¬
 µ«Ö´ÐÐ´ó½ÙµÄÊ¹Õß£¬²»ÊÇ°²ç÷¶ù£¬Ò²²»ÊÇÄ§¹í£¬»¹ÊÇÈËÀà×Ô¼º¡£ÄªË¹¿Æ¾Í·Â·ð¸ºÓÐÄÇÑùµÄÊ¹Ãü¡£
 ËûÃÇÏàÐÅÌìÌÃÊÇÓÐµÄ£¬¿ÉÒÔÊµÏÖµÄ£¬µ«ÔÚÏÖÊÀ½çÓëÄÇÌìÌÃµÄÖÐ¼ä¸ô×ÅÒ»×ùº££¬Ò»×ùÑªÎÛº£¡£
 ÈËÀàÇöµÃ¹ýÕâÑªº££¬²ÅÄÜµÇ±Ë°¶£¬ËûÃÇ¾ö¶¨ÏÈÊµÏÖÄÇÑªº£¡£
@@ -891,6 +1485,28 @@ macµçÂ·Ä£ÄâÈí¼þ
 ¸ïÓ¢¹úÃüµÄÊÇ¿ËÀÉÍþ¶û£»¸ï·¨¹úÃüµÄÊÇÂ¬É§¡¢µ¤µ±¡¢ÂÞÅåÊ¿ÅûÑÇ¡¢ÂÞÀ¼·òÈË£»
 ¸ïÒâ´óÀûÃüµÄÊÇÂíÖ¾Äá¡¢¼ÓÀû°ü¶ûÌá£»¸ï¶í¹úÃüµÄÊÇÁÐÄþ¡ª¡ª
 ÄãÃÇÒª¼Ç×Å£¬¼ÙÈç¸ïÖÐ¹úÃüµÄÊÇËïÖÐÉ½£¬ÄãÃÇÒªÐ¡ÐÄÁË£¬²»ÒªÈÃÍâ¹úÀ´µÄÒ°¹í×ê½øÁËÖÐÉ½ÏÈÉúµÄ¹×²ÄÀïÈ¥£¡
+
+
+
+Å×¿ªÕÔ¾ÅÕÂ¡¢Ò¦Í©±ó¡¢ÌÀ·É·²¡¢Ïô¹âçü¡¢µËÊåÈº¡¢¶­Ìú±¦¡¢ÖÜÊÙÏÜ¡¢ÓÝ¹âÔ£¡¢¶­¼áÒã¡¢¸µ×÷¹§¡¢³ÂÉÜå¢¡¢Ò¶ä¾Åæ¡¢ÕÅ×ÚìÝ¡¢Áõ³çÀÖ¡¢ÂíÃ÷µÂ¡¢³Â»ÀïÞ¡¢ÖÜÈÊ¡¢ÐÜÇìÀ´¡¢ÐìË´ÊÙ¡¢ôå²®ÔÞ¡¢ºÎË¼¾´¡¢ÍõÊØÈÚ¡¢¹ËØ¹Õä¡¢Àî¹ãÌï¡¢ÈÄØ¹Ì©¡¢ÁõÅÎËì¡¢Ò¶ÆóËï¡¢ÕÅ²ýÉÜ¡¢ÂíÌØ¡¢ÖÜ»ªÕÂ¡¢ÁÖºèÝ¥¡¢³ÌÊÀìï¡¢³ÂÌì³Ø¡¢ÐìÈðÔÆ¡¢Íõ¬Q¡¢³ÂÒúã¡¡¢³ÂÔ«¡¢ÔøÕÑÂÕ¡¢ÎÌÎÄå°¡¢Ç®½ú¡¢ÎÌÐÄÔ´¡¢³ÂÃÎ¼Ò¡¢·á×Óâý¡¢Ð»¼ÒÈÙ¡¢Àîè±¡¢Ë¾Ó×¶«¡¢Õ²°²Ì©¡¢ÍõÈÙ­p¡¢Îâåµ¡¢ÊøÐÇ±±¡¢¶¡è¶¡¢²ÜÈÕ²ý¡¢Óà°ØÄê¡¢À×ºêÊå¡¢ÎéÇÕÈÙ¡¢Ðí±¦òJ¡¢³ÌÊöÃú¡¢Ò¦Æô¾û¡¢ÂíÓ×Ô´¡¢ÀîÆäè¡¡¢Ã«ÇàÏ×¡¢Ã«ÆôË¬¡¢ÍõÃ¯ÈÙ¡¢Îâºè¼ó¡¢Òó´óÃô¡¢ÓàÆôÔË¡¢ºúÏÈóX¡¢Îâ¶¨Á¼¡¢¸µÁ¬•À¡¢ÑÕ¸£Çì¡¢Í¿ÓðÇä¡¢»Æ¹úè°¡­¡­²»Ì¸£¬ÃÀ¹ú¾ÍÃ»Ò»µãÔðÈÎÂð£¿
+
+
+ÕÅ³ÌµÄ¡¶ÑÃÃÅ¿Ú£ºÎª¹ÙÖÐ¹úÇ§ÄêÊ·¡·Ò»ÊéÈç´ËÐ´µÀ£º
+
+¡°ÔÚÇå³¯£¬áò¼ËÊÇÑÏ½ûµÄ£¬µ«¡®áòÓÅ¿ÉÒÔÍ¨ÈÚ£¬¹ÙÀô¿ÉÒÔÕÐÁæÈËÅã¾Æ³ªÇú¡£ÓÚÊÇºõ£¬ÓÅÁæÔÚºÜ´ó³Ì¶ÈÉÏÈ¡´úÁË¼ËÅ®µÄ½ÇÉ«¡£ËûÃÇ´ó¶àÎªÄêÉÙÕß£¬¶àÔÚ20ËêÒÔÏÂ£¬Ò²³ÆÎªæ®Í¯¡¢ÓÅÍ¯¡¢¸èÍ¯µÈ¡£ÒòÎªÓÅÁæÏàÃ²ÇåÐã¡¢¿áËÆ¹ÃÄï£¬¹Ê³ÆÏñ¹Ã£¬Ë×³ÆÍÃ×Ó¡£¡±
+
+
+ÃÀ¹úÓÐÒ»¸öÌØµã£¬¾ÍÊÇ¶ÔÊÖ´µ³öµÄÅ£±Æ£¬ËûÕæµÄ»áÐÅÅäºÏÉÏËÕÏµ¹ú¼ÒÌØÓÐµÄÒ»Æþ²±×Ó¾Í·­°×ÑÛ£¬Ò»ËÉÊÖ¾Í´µÅ£±ÆµÄÏ°¹ß¡£
+ÄãËµÄãµÄÁ¦Á¿Ò»¸öÔÂµ½´óÎ÷Ñó£¬ÄÇÎÒ¾ÍÔÚÅ·ÖÞ²¼ÖÃ²»±ÈÄãÉÙ¶àÉÙµÄÁ¦Á¿¡£
+µÈ´ó³±ÍËÈ¥²Å·¢ÏÖ£¬Ô­À´¸ÖÌúºéÁ÷Î¨Ò»µÄ×÷ÓÃ¾ÍÊÇÈëÇÖÁË×Ô¼ºµÄÁ½¸öÆÍ´Ó¹ú£¬ÒÔ¼°°¢¸»º¹¾ÅÊ®Äê´úÃÀ¹ú½Ì¸øÁËÈ«ÊÀ½çÕÌ¸ÃÔõÃ´´ò£¬µ½ÁË½ñÌì»¹ÔÚÑÐ¾¿¡£
+ËÕÁª½Ì¸øÁËÈ«ÊÀ½çÔõÑùÔÚÂãÓ¾µÄÊ±ºòÒÀÈ»´µÅ£±Æµ½ÁË2022Äê£¬¶íÂÞË¹µÄÒ»³¡³ÜÈèÖ®Õ½£¬ÕæÕæÇÐÇÐÃðµôÁËÈËÃÇ¶ÔËùÎ½ËÕÏµ¸ÖÌúºéÁ÷µÄ×îºóÒ»µã»ÃÏë¡£
+
+
+ÄãÖ»Òª¿´¹ýÕÅÑ©·åµÄ°ËÁ¬ÎÊ¾ÍÃ÷°×ÁË¡£¡£
+°ËÁ¬ÎÊ£º
+Ñ§Ò½Âð£¿£¿Ñ§Ò½¹¤×÷ÎÈ¶¨£¬Ô½ÀÏÔ½³ÔÏã¡£¡£È±µãÊÇ£ºÒªÑ§ºÜ¶àÄê¡£5Äê¼ÓÈýÄê¡£»¹ÓÐ¾ÍÊÇÃ¿¸öÆÚÄ©¶¼Ïñ¸ß¿¼Ò»Ñù¡£¡£ÐèÒª±³µÄÊé´ÓµØÃæ¶Ñµ½·¿¶¥¡£¡£
+Ñ§Å©Âð£¿£¿£¿¹ãÀ«Å©´å£¬¹¤×÷»ú»á´ó°Ñ¡£¡£Ñ§¸ö¸øÅ£ÖÎ²¡µÄÊÞÒ½¡£Äã¾ø¶ÔÊÇÊ®Àï°ËÏç×îö¦µÄ×Ð¡£¡£´ÓÀ´²»ÓÃ»¨Ç®³ÔÎç·¹¡£Ã¿Ò»»§´åÃñ¼Ò¶¼ÊÇÄãµÄÊ³ÌÃ¡£¡£¡£ÀÏÏç¼ÒÀïÓÐÉ¶ÍÁÌØ²ú£¬Ëæ±ãÄÃ¡£¡£
+Ñ§ÎÄÀí¼æÕÐÂð£¿£¿Ñ§·¨Ñ§ºÍººÓïÑÔ¿ÉÒÔ¿¼¹«ÎñÔ±¡£Ò»²½µÇÌì¡£½øÈëÌåÖÆ¡£
 
 
 typedef struct _SOX_FILEOPEN_MESSAGE
@@ -1099,12 +1715,6 @@ make -C src -f projects/goahead-linux-static.mk \
 
 export PATH=${PATH}:~/bin/timesys/toolchains/armv5l-linux/bin/
 
-±¾ÖÜ¹¤×÷£º
-Ñ§Ï°ModBusÐ­Òé¡£¡£
-µ÷²éVariable/VariableIn/OutÄ£¿éµÄÂß¼­¡£µ÷²éVariableIn/OutÈçºÎ´«µ½WorkbanchÖÐ¡£
-·¢ÏÖÂß¼­Î»ÓÚModBusÄ£¿éÖÐ¡£
-ÏÂÖÜ¹¤×÷£º
-µ÷²éModBusÄ£¿éµÄÂß¼­¡£
 
 ³ÂÔÆ·´¶ÔÔÚÉÏº£½¨¾­¼ÃÌØÇø£¬²»½öÒòÎªÕâÓÐ¿ÉÄÜ¸ø¹ú¼Ò¼ÈÓÐµÄÖØ¹¤ÒµºÍË°ÊÕ»ù´¡Ôì³É·çÏÕ£¬»¹ÒòÎª×÷ÎªÒ»¸öÔÚ1920ºÍ1930Äê´úÔÚÄÇÀï¹¤×÷¹ýµÄÈË£¬ËûÉîÖª×Ê±¾Ö÷ÒåµÄ×ï¶ñºÍÉÏº£ÉÌÈËÄÇÖÖÔÚËû¿´À´¶ÔÑóÈË¹ý·Ö±°¹ªÇüÏ¥µÄ¡°Âò°ìÏ°Æø¡±¡£Òò´Ë£¬³ÂÔÆµ£ÐÄÍâ¹ú×â½çËÀ»Ò¸´È¼¡£
 
@@ -1232,16 +1842,6 @@ x86linux/x86/alpha/sparc/mips.c
 				, bufOutput[1], i, pDoubleValue[i]);
 		}
 
-git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
-sleep 5
-git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
-sleep 5
-git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
-sleep 5
-git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
-sleep 5
-git clone git@github.com:lucelujiaming/Quectel_Android_RIL.git
-sleep 5
 
 ±í7.5½ÚÍ·³ÉÔ±±äÁ¿ËµÃ÷
 
@@ -1310,8 +1910,101 @@ goahead: 2: GET /action/status HTTP/1.1
 £¨4£©Ãæ°ü°å130¸öÊµÑé×ÊÁÏhttps://pan.baidu.com/s/1ueSQeyRJnyYmCDqRJ6Emgw 
         ÌáÈ¡Âë£ºo2m1
 		
-
 		
+		
+		
+
+PhongLightingBiquatricBezierSphereGraph
+ID_TOOLBAR_PHONG_LIGHTING_BIQUATRIC_BEZIER_SPHERE_GRAPH
+
+
+
+ID_TOOLBAR_LIGHTING_SPHERE_GRAPH
+LightingSphereGraph
+GouraudLightingBicubicBezierSphereGraph
+ID_TOOLBAR_GOURAUD_LIGHTING_SPHERE_GRAPH
+ID_TOOLBAR_GOURAUD_LIGHTING_BICUBIC_BEZIER_SPHERE_GRAPH
+
+
+GouraudLightingRationalBiquatricBezierSphereGraph
+ID_TOOLBAR_GOURAUD_LIGHTING_RATIONAL_BIQUATRIC_BEZIER_SPHERE_GRAPH
+
+
+Cube for saving data only
+
+ID_TOOLBAR_SPATIAL_ARRANGED_CUBE
+SpatialArrangedCube
+
+
+
+BackfaceCull
+
+ID_TOOLBAR_BACKFACE_CULL_ROTATE_CUBE
+BackfaceCullRotateCube
+
+
+ID_TOOLBAR_THREE_CROSS_ROTATE_CUBE
+ThreeCrossRotateCube
+
+
+ID_TOOLBAR_SMOOTHCOLOR_TRIANGLE
+SmoothColorTriangle
+// Í°±íµ±Ç°½áµãÖ¸Õë
+EdgeTableFillPolygon
+
+Fence
+FenceFillPolygon
+ScanLineFillPolygon
+RotatePentagram
+
+ID_TOOLBAR_ROTATE_PENTAGRAM
+ID_TOOLBAR_SCANLINE_FILL_POLYGON
+ID_TOOLBAR_EDGETABLE_FILL_POLYGON
+
+
+ID_TOOLBAR_COHENSUTHERLAND_CLIP_LINE
+CCohenSutherlandClipLine
+
+ID_TOOLBAR_MIDPOINT_DIVID_LINE
+MidPointDividLine
+
+ID_TOOLBAR_LIANGBARSKY_CLIP_LINE
+LiangBarskyClipLine
+
+ID_TOOLBAR_ARBITRARY_ROTATE_CUBE
+ArbitraryRotateCube
+
+ID_TOOLBAR_ORTHOGONAL_ROTATE_CUBE
+OrthogonalRotateCube
+
+ID_TOOLBAR_PERSPECTIVE_ROTATE_CUBE
+PerspectiveRotateCube
+
+ID_TOOLBAR_CABINET_ROTATE_CUBE
+CabinetRotateCube
+
+ID_TOOLBAR_BICUBIC_BEZIER_PATCH
+BicubicBezierPatch
+
+
+ID_TOOLBAR_RATIONAL_QUADRATIC_BEZIER_CIRCLE_GRAPH
+RationalQuadraticBezierCircle
+RationalQuadraticBezierCurve
+
+ID_TOOLBAR_RATIONALQUADRATIC_BEZIER_SPHERE_GRAPH
+RationalQuadraticBezierSphere
+
+
+ID_TOOLBAR_BICUBIC_BEZIER_SPHERE_GRAPH
+BicubicBezierSphereGraph
+
+ID_TOOLBAR_CUBIC_BEZIER_CURVE
+CubicBezierCurve
+
+ID_TOOLBAR_BICUBIC_BEZIER_PATCH_GRAPH
+ID_TOOLBAR_BICUBIC_BEZIER_PATCH
+BicubicBezierPatch
+BicubicBezierPatchGraph
 		
 		
 ÔÚLink.sedonaÖÐµÄpropagate·½·¨ÖÐ£¬×¢ÊÍÈçÏÂ£º
@@ -1499,4 +2192,172 @@ class Link
 Ò²¾ÍÊÇÎªÃ¿Ò»¸öÀàÖ¸¶¨Êä³öµÄÊý¾ÝÀàÐÍ¡£
 µÚÒ»ÖÖÊÇ¶ÔÓÚBacReadPropertyVarÀàÐÍµÄÊäÈëÄ£¿é£¬¸ÃÄ£¿éÖ¸¶¨ÁË¶ÁÈ¡µÄÊý¾ÝÀàÐÍ¡£
 
-1.	Ê×ÏÈÔÚComponentÖÐÌí¼ÓLinkÀàÐÍÐÅÏ¢ÊôÐÔ¡£ÆäÖÐ¸ß8Î»±íÊ
+1.	Ê×ÏÈÔÚComponentÖÐÌí¼ÓLinkÀàÐÍÐÅÏ¢ÊôÐÔ¡£ÆäÖÐ¸ß8Î»±íÊ¾¶Á»¹ÊÇÐ´¡£µÍ8Î»±íÊ¾Êý¾ÝÀàÐÍ¡£Ä¿Ç°¸ß8Î»ÔÝÊ±Ã»ÓÐÊ¹ÓÃ¡£
+
+
+    if(from.link_type / Component.LINK_TYPE_FACTOR 
+    			== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR
+    	&& to.link_type / Component.LINK_TYPE_FACTOR 
+    			== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
+    {
+        ** log.message("1111 from.name=$from.name and to.name=$to.name ");
+        to.link_type = Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
+    }
+    else if(from.link_type / Component.LINK_TYPE_FACTOR 
+    		== Component.LINK_TYPE_READ / Component.LINK_TYPE_FACTOR)
+    {
+        ** log.message("33333 from.name=$from.name");
+        to.link_type =Component.LINK_TYPE_WRITE + from.link_type / Component.LINK_TYPE_FACTOR
+    }
+    else if(to.link_type / Component.LINK_TYPE_FACTOR
+    		== Component.LINK_TYPE_WRITE / Component.LINK_TYPE_FACTOR)
+    {
+        ** log.message("55555 to.name=$to.name");
+	    if (fromSlot.isProp())
+	    {
+	        switch (fromSlot.type.id)
+	        {
+	          case Type.boolId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_BOOLEANAPPTAG
+	          	break
+	          case Type.byteId: 
+	          case Type.shortId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_UNSIGNEDINTAPPTAG
+	          	break 
+	          case Type.intId:    
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
+	          	break
+	          case Type.longId:   
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_INTEGERAPPTAG
+	          	break
+	          case Type.floatId:  
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_REALAPPTAG
+	          	break
+	          case Type.doubleId: 
+	          	to.link_type = Component.LINK_TYPE_WRITE + Component.COMP_PROPVAR_DOUBLEAPPTAG
+	          	break
+	          // TODO: buf props
+	        }
+	    }
+    }
+
+	
+×÷Õß£ºSabrevale
+Á´½Ó£ºhttps://www.zhihu.com/question/599578786/answer/3021854853
+À´Ô´£ºÖªºõ
+Öø×÷È¨¹é×÷ÕßËùÓÐ¡£ÉÌÒµ×ªÔØÇëÁªÏµ×÷Õß»ñµÃÊÚÈ¨£¬·ÇÉÌÒµ×ªÔØÇë×¢Ã÷³ö´¦¡£
+ÕâÊÇÎÒÔÙÖªºõÉÙÓÐ¿´µ½µÄºÃÎÊÌâÁË£¬¿ÉÒÔËµÖÐÎ÷»°ÌâÒ»ÇÐÔ¨Ô´¾ÍÔÚ´Ë´¦ÁË¡£µ«´ÓÕâ¸öÌáÎÊµÄ½Ç¶È¶øÑÔ£¬Á½¾ä»°ÊÇ½²²»ÇåµÄ£¬ÎÒ¾¡Á¿¡£×ÜµÄÀ´ËµÎªÁ½µã¡£ÔËÆøºÍÎÄÃ÷´«³Ð¸üÓÆ¾Ã
+ÔËÆø£º1 ¹ÅµäÕÜÑ§µÄÇ°ÉíÊ¼»ùÑ§ÖÐ³öÏÖÁËÎ§ÈÆ¡°Êý¡±µÄ±Ï´ï¸çÀ­Ë¹Ñ§ÅÉ ¡£2 µØÖÐº£ÎÄÃ÷È±·¦Ç¿ÐÐ´óÒ»Í³µÄµØÀí»·¾³
+ÎÄÃ÷´«³Ð¸üÓÆ¾Ã£ºÏóÐÎÎÄ×Ö->ÌõÐÎÎÄ×Ö->×ÖÄ¸ÎÄ×Ö¡£
+²»¹ýÒÔÏÂ²ÅÊÇÕýÎÄ£º
+ÉèÒ»¸öÈËÔÚÕÅÖ½ÉÏ»­ÁËÒ»¸ö³¤·½ÐÎS£¬Ò»°ëÍ¿ºÚA, Ò»°ëÍ¿°×B¡£
+¡°·ÇºÚ¼´°×£¨·ÇA=B£©¡± Õâ¸ö½áÂÛ£¬ ¶ÔÓÚÉú»îÔÚ³¤·½ÐÎSÀïµÄÍ¼ÐÎÐ¡ÈËp0¶øÑÔÊÇÖ±¾õ£¬ÊÇÌì¾­µØÒåµÄ¡£
+¡°ÔÚÕâ¸ö³¤·½ÐÎS×÷ÓÃÓòÄÚ£¬·ÇºÚ¼´°×²Å³ÉÁ¢¡°£¬ Õâ¶ÔÓÚÍ¼ÐÎÈË¶øÑÔ¾ÍÊÇ¾­µäÂß¼­£¬¼ÇÎªL1. ¶ÔÓÚÍâ²¿µÄÖ½Æ¬ÈËp1»òÉí´¦¡°¸ü¸ßÎ¬¡±µÄÎÒÃÇ£¬ÕâÒÀ¾ÉÊÇÖ±¾õ£¬ÒòÎª³¤·½ÐÎS¶ÔÓÚÎÒÃÇÎÒÃÇÊÇÖ±¾õ¿ÉÖªµÄ¡£
+Âß¼­µÄÐÎ³É£ºÖ±¾õ+¶Ô´ËÖ±¾õ±¾ÉíµÄ³éÏó±ß½çÈÏÖª£¬p0Ð¡ÈËÖ»ÓÐ²»¶Ï¶Ô³¤·½ÐÎS½øÐÐÖ±¾õÌ½Ë÷£¬²»¶Ï¶ÔÕâÐ©ÇøÓò½øÐÐ·ÇºÚ¼´°×µÄÅÐ¶¨£¬Ö±µ½ÅªÇå×ÔÉíÔ­ÓÐÈÏÖªÓîÖæ£¨³¤·½ÐÎS£©²»¹ýÊÇÖ½ÉÏÒ»¿éÇøÓò£¬·ÇºÚ¼´°×½öÔÚSÖ®ÄÚ²Å³ÉÁ¢Ê±£¬²Å»áµ®ÉúÂß¼­¡£ Òò´ËÌâÖ÷µÄÎÊÌâ¸üÍ¸³¹µÄÒÉÎÊ¾ÍÊÇ£¬ÎªºÎÎ÷·½µÄp0Ð¡ÈËÎªºÎÍê³É¶ÔÖ±¾õµÄ²¹Íê£¬¶øÎÒ¹ú¹Å´úÃ»ÓÐ¡£
+1 ¹Å´úÈ±·¦Ò»Ö±³ÖÐøÐÔÌ½Ë÷±ß½çµÄ¿Í¹ÛÌõ¼þ¡£
+·½Ïò´íÁË¡£Ê¼»ùÑ§µÄ¶ÔÏóÆäÊµÓÐºÜ¶àÖÖ£¬±ÈÈçÍòÎï±¾ÖÊÊÇ»ð¡¢ÊÇË®¡¢ÊÇÍÁµÈµÈ£¬µ«²»ÇÉÖ»ÓÐÊý²ÅÄÜÒýµ¼ÈËÀàÒ»Ö±Ì½Ë÷ÏÂÈ¥£¬ÒòÎªÊýÊÇÈËÀà¶ÔÓÚÀíÐÔÈÏÖªµÄ¾ßÏÖ£º³éÏóµÄÒâÒå¡£ÖÐ¹ú¹Å´ú×î½Ó½üÕâ¸ö¸ÅÄîµÄÊÇµÀÉúÒ»¡¢Ò»Éú¶þ¡¢ÈýÉúÍòÎï¡£ µ«ÒÅº¶µÄÊÇ²¢Î´¸ü½øÒ»²½¶ÀÁ¢³öÊýÊ¼»ùµÄ¸ÅÄî£¬¸üÎªÁ÷ÐÐµÄÊÇ¸üÆ«ÏòÖ±¸ÐµÄÎåÐÐËµµÈ¡£ÎªÊ²Ã´Ã»ÓÐ½øÒ»²½ÄØ? ¿ÉÄÜÊÇ´ó»·¾³²»ÔÊÐí¡£
+2 ÄÚÂ½ÖÐÔ­µØÀí»·¾³ÖÐ´óÒ»Í³¶ÔÂß¼­Ñ§·¢Õ¹µÄÑ¹ÖÆ¡£
+Âß¼­Ñ§·¢Õ¹£¬ÔÚÉú²úÁ¦¼«¶ÈÈ±·¦µÄ¹Å´ú£¬ÊÇÒ»¸ö¼«ÆäÉÝ³ÞµÄÊÂÇé¡£¶ÔÉç»áÌåÏÖ²»ÁËÁ¢¸Í¼ûÓ°µÄÍ»ÆÆ£¬ÐèÒª¼«³¤Ò»¶ÎÐÂÎÄÃ÷µÄÔÐÓý¡£ ÖÐ¹úÀúÊ·ÉÏ´ó¹æÄ£¼¯ÖÐ¶ÔÖ±¾õÌ½Ë÷ÌÖÂÛÓÐÈý´Î ´ºÇïÕ½¹úÖ®¼ÊµÄ°Ù¼ÒÕùÃù¡¢Îº½úÈý¹úÊ±ÆÚµÄÇåÌ¸ÐþÌ¸¡¢Á½ËÎÖ®¼ÊµÄÀíÑ§·¢Õ¹¡£²¢·ÇÊÇÖÐ¹úÊ¥ÈËÏ²»¶ÅÄÄÔ´üÆ¾Ö±¾õ£¬¶øÊÇ°Ñ´óÁ¿Ê±¼äºÄ·ÑÔÚÌÖÂÛ±æÎöÖ±¾õµÄÃû¼Ò ÎÞÒ»ÀýÍâµÄ±»ÏÖÊµµÄ¾­Ñé¶·Õù£¨±©Á¦£©Ö±½ÓÌÔÌ­£¬ÉõÖÁºóÇØÒàÈçÊÇ¡££¨¿´Ò»¿´ÉÌ¾ýÊé¾ÍÃ÷°×ÁË£©¡£Âß¼­µÄ×÷ÓÃÊÇ½â¾öÏÖÓÐÎÊÌâ£¬·¢ÏÖ¸ü¸ß²ã´ÎÎÊÌâ¡£´óÒ»Í³ÐèÇóÊÇ¾¡¿ÉÄÜÅÅ³ýÒ»ÇÐÎÊÌâ£¬Òò´Ë½â¾ö°ì·¨ÒªÇó¼ÈÎÞÂß¼­¡¢Ò²ÎÞÖ±¾õ£¬¶øÊÇµ¥´¿µÄ·þ´Ó£º ÔÚÈ·¶¨µÄÃüÌâÀï£¬°´ÕÕÈ·¶¨µÄ¹æÔòÖ´ÐÐÈ·¶¨µÄÊÂ¡£¼òµ¥µØËµ£¬ÖÐ¹úµÄp0Ð¡ÈË²»Ì½Ë÷ÁË£¬¸É´à»­ÁËÒ»¸öÈ¦£¬¹æ¶¨×Ó×ÓËïËï¾ÍÔÚÈ¦ÀïÅÜ£¬¾Í²»»á²úÉúÎ´ÖªµÄÎÊÌâ¡£ËùÓÐµÄ¾«Á¦¶¼ÒªÓÃÀ´Í¨¹ý±©Á¦½â¾öÍ³Ò»ÓëÎ¬Ïµ¡£²»½öÅÅ³âµÄÊÇÂß¼­£¬ÉõÖÁÅÅ³âSÍâµÄÖ±¾õ£¬ËùÓÐÖ±¾õ¡¢Áé¸Ð±ØÐëÂäÓÚÕâ¸öSÄÚ¡£ ¹ÛÖÐ¹úµÄ¹Å´úÀúÊ·£¬ÉÏÊöÈý´ÎÃÈÑ¿£¬ÓëÆäËµÊÇÃÈÑ¿²»ÈçËµÊÇÈËÐÔ±»¼«¶ÈÑ¹ÒÖºóµÄÌìÈ»ÊÍ·Å£¬²»¹ýÁ¦¶ÈÊÇÒ»´Î±ÈÒ»´ÎÈõ¡£ÇåÌ¸ÐþÌ¸Îó¹ú£¬ÕâÊÇºÜ¶àÈËÐÅÒÔÎªÕæµÄÕæÀí£¬µ«¸ù±¾²»ÖªµÀ¶ÔÓÚ¶Ô´í±ß½çµÄ²¹Íê²ÅÄÜÐÎ³ÉÂß¼­£¬Ë¼¿¼µÄ³ö·¢µã²»Í¬£¬½áÂÛ²»Í¬¡£ÕâÖÖ¶Ô±ß½çµÄÌ½Ë÷£¬ÊÇ¶«·½ÕâÆ¬ÍÁµØËù²»ÄÜÈÝÈÌµÄ¡£ËùÒÔÎÒ¹ÛÁ½ËÎÀíÑ§¶¼ÓÐÒ»ÖÖ¿´Ö½Æ¬ÈËµÄ¾øÍû¸Ð£ºÎÒÖªµÀËûÃÇÒ²ºÜÏë»ñÏ¤ÓîÖæµÄ°ÂÃØ£¬µ«Ë¼Î¬ÔçÒÑ±»Èå½Ìèäèô½µÎ¬£¬ÆäÈÏÖªÊÀ½çµÄ¹¤¾ß¶¼ÒÑ¸¯Ðà¡£ ¸ñÎïÖÂÖª£¬Èç¹û¡°¸ñ¡±±¾Éí¾ÍÓÐÎÊÌâ£¿»á½á³öÊ²Ã´ÑùµÄ¹ûÊµ£¿ Êµ²»ÏàÂ÷£¬Èç½ñÎÒ¹ÛºóÇØÒ²ÓÐÕâÖÖ¸Ð¾õ¡£
+
+3 Èå¼ÒÎÄ»¯¹æÔòÏÂµÄ¸¯ÐàÈÏÖª¹¤¾ß: ÏóÐÎ±íÒâÎÄ×ÖÏµÍ³¹ÅººÓï¡£
+ÎÒÔøÐ´¹ýÒ»Æª³¤ÎÄÂÛÊöÎÄ×ÖµÄ±¾ÖÊ£ºÖ±¸ÐÓëÂß¼­µÄÔØÌå¡£¼òµ¥µÄ½²£¬ÎÄ×ÖµÄÐÅÏ¢²ã¼¶¾ö¶¨ÁËÊ¹ÓÃÕßÆðµãÊÇÍ¼ÐÎÐ¡ÈËP0£¬»¹ÊÇÖ½Æ¬ÈËP1£¬¾ö¶¨ÁË³õÊ¼ÈÏÖªµÄ´ó»·¾³¡£ºÜ¶àÈË¶Ô´ËÃ»ÓÐ·¢¾õµÄÔ­ÒòÊÇ¸÷Î»Éú»îÔÚÏÖ´ú£¬ÓÃ×ÅÏÖ´úººÓï+×ÖÄ¸ÓïÑÔ+·ûºÅ¹«Ê½µÄ»ìºÏÎÄ×ÖÏµÍ³£¬ÒÑ¾­ÄÜ¹»¸²¸Ç¾ø´ó²¿·ÖÂß¼­µÄ±í´ï¡£ ÓÃ´¿¹ÅººÓïÊÔÊÔ£¿ÎÄ×ÖÃèÊö£¬ÑÝÒïÒ»ÏÂ¸÷ÖÖ¡°Á¿±äÈçºÎÖÊ±ä¡±£¬ÃèÊöÏÂÎ¢·Ö£¿ÕâÊÇÃ»ÓÐ¿ÉÄÜµÄ¡£ 
+ÒòÎªÏóÐÎ±íÒâÎÄ×ÖÏµÍ³ÖÐÃ¿Ò»¸ö×Ö¶¼ÓÐ×î»ù±¾µÄ±íÒâM{}£¬ ¶øÂß¼­±¾ÖÊÊÇ±ß½ç£¬ÒªµÄ¾ÍÊÇÇø·ÖÊÇM1{} ºÍM2{} ÓÐºÎ²»Í¬£¬Èç¹ûÈ±·¦Âß¼­¹¤¾ßÀ´¶Ô¹¹³ÉMµÄ{}½øÐÐ¸ÅÄîÓ³Éä£¬ÊÇÃ»·¨ÉîÈëÑÐ¾¿µÄ¡£ Èç¹ûÓÐÒ»¸öÐÂµÄ¸ÅÄîXµ®Éú£¬¶ÔÓÚ¹ÅººÓïÔòÊÇÔÚ[M]ÏµÍ³ÖÐÑ°ÕÒ¸øÈË¸Ð¾õ²î²»¶àµÄ×Ö½øÐÐÖØ¸´Ó³Éä¡£ Æä½á¹û¾ÍÊÇ±íÒâµÄ¡°ÔëÒôÎÛÈ¾¡£±ÈÈç Radio£¬ ÏÖ´úººÓï·­ÒëÎªÊÕÒô»ú£¬Èç¹ûÔÚ¹ÅººÓï¹¹´Ê·¨£¬¾Í½ÐÒô£¬×î¶à½ÐÒô»ú¡£´ËÀà½¨Á¢ÓÚ±íÒâÊÇ·Ç³£ÄÑÒÔÇåÎú¸ÅÀ¨Radio ×÷ÎªÀûÓÃÎÞÏßµç´«Ñ¶½ÓÊÕÏµÍ³ÕâÒ»±¾ÖÊ¡£Æä½á¹û¾ÍÊÇÍûÎÄÉúÒå£¬ÄãÖ»ÐèÒªÈÏÊ¶¡°ÊÕ¡±¡¢¡°Òô¡±¡¢¡°»ú¡± Èý¸öºº×Ö¾ÍÄÜÐÎ³ÉÒ»¸ö¹ØÓÚRadioµÄÒâÒåÓ³Éä£¬¶øÎÞÐèÉîÈëÁË½âRadioµÄÑÏËàÔ¶ÀëºÍ¶¨Òå¡£ 
+¸ü½øÒ»²½µÄ£¬ÔÚÓï·¨ÏµÍ³½á¹¹ÉÏµÄ»ìÂÒ£º {M1 M2 M3 M4} ºÍ {M1 M4 M2 M3} Çø²»´ó±ð£¬¶¼¿´µÃ¶®¡£ 
+ÎªÁË½²ÊöÕâÒ»¸ÅÄî£¬ÎÒ¶¼²»µÃ²»ÏÖ´úººÓï+×ÖÄ¸ÓïÑÔ+·ûºÅ½øÐÐ²ûÊÍ£¬¶øÔÚ¹Å´úÄØ£¿½ûÖ¹×ÔÓÉ´´ÔìÎÄ×ÖµÄ¹Å´úÄØ£¿Õû¸öÖªÊ¶ÏµÍ³¶¼×ñÑ­¸´¹ÅµÄ¹Å´úÄØ£¿£¬Ã»ÓÐÒ»Ë¿¿ÉÄÜ¡£ £¨BTW 2023Äê ¹ú¿¼¾ÓÈ»»¹ÓÐÒ»µÀÌâ»¹ÊÇºÅÕÙ·´¶ÔÍøÂçÔì´ÊµÄ£© 
+
+¿ÉÒÔËµ×Ô´Ë·ÖµÀÑïïð£º
+Î÷·½Âß¼­Ñ§L0->L1->L2 ²»¶ÏÔÚÍê³É±ß½çµÄÊÕÊøºóµÄÆÆ±Ú¡£ 
+¶«·½ÖªÊ¶·Ö×Ó£¬ÒÀÈ»ÔÚ»­µØÎªÀÎµÄÔ²È¦ÖÐÑ­»·¡£
+
+
+
+
+
+ÐÞ¸ÄÁË.gitignore Ò²»áÌá½»ÉÏÈ¥
+¿ÉÒÔÍ¨¹ýÐÞ¸Ä .git/info/exclude ºöÂÔÎÄ¼þ£¬¶øÇÒ»¹²»»áÌá½»ÉÏÈ¥Ó°Ïìµ½±ðÈË
+
+ÏÂÃæÊÇÎÒÔÚ¹«Ë¾¿ª·¢µÄ.git/info/excludeÅäÖÃ£¬#ºÅ¿ªÍ·ÊÇ×¢ÊÍ£¬¿ÉÒÔÉ¾³ý
+
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+
+**/config/bootstrap.yml
+**/target/
+**/test/http-request/
+**/lombok.config
+
+*.class
+*.log
+rebal.xml
+
+ict-service-lxj.*
+ict-service-*.log.*
+
+banner.jpg
+
+
+
+
+[root@ez9260 /]# find . -name "*.so"
+./lib/ld-2.4.90.so
+./lib/libBrokenLocale-2.4.90.so
+./lib/libSegFault.so
+./lib/libanl-2.4.90.so
+./lib/libc-2.4.90.so
+./lib/libcidn-2.4.90.so
+./lib/libcrypt-2.4.90.so
+./lib/libdl-2.4.90.so
+./lib/libgcc_s.so
+./lib/libm-2.4.90.so
+./lib/libncurses.so
+./lib/libnsl-2.4.90.so
+./lib/libnss_compat-2.4.90.so
+./lib/libnss_dns-2.4.90.so
+./lib/libnss_files-2.4.90.so
+./lib/libnss_hesiod-2.4.90.so
+./lib/libnss_nis-2.4.90.so
+./lib/libnss_nisplus-2.4.90.so
+./lib/libpthread-2.4.90.so
+./lib/libresolv-2.4.90.so
+./lib/librt-2.4.90.so
+./lib/libstdc++.so
+./lib/libthread_db-1.0.so
+./lib/libutil-2.4.90.so
+./usr/lib/libmodbus.so
+[root@ez9260 /]# 
+[root@ez9260 /]# 
+[root@ez9260 /]# 
+[root@ez9260 /]#  find . -name "*.so" | sed "s/.*lib\/lib//"
+./lib/ld-2.4.90.so
+BrokenLocale-2.4.90.so
+SegFault.so
+anl-2.4.90.so
+c-2.4.90.so
+cidn-2.4.90.so
+crypt-2.4.90.so
+dl-2.4.90.so
+gcc_s.so
+m-2.4.90.so
+ncurses.so
+nsl-2.4.90.so
+nss_compat-2.4.90.so
+nss_dns-2.4.90.so
+nss_files-2.4.90.so
+nss_hesiod-2.4.90.so
+nss_nis-2.4.90.so
+nss_nisplus-2.4.90.so
+pthread-2.4.90.so
+resolv-2.4.90.so
+rt-2.4.90.so
+stdc++.so
+thread_db-1.0.so
+util-2.4.90.so
+modbus.so
+[root@ez9260 /]# 
+
+
+
