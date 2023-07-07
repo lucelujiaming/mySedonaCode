@@ -396,6 +396,10 @@ class bacWriteProperty
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
     }
+    if(device == null){
+        log.message("bacWriteProperty:: device == null")  // status=4 -> STATUSNODEV
+        return
+    }
     ** log.message("bacWriteProperty::execute 222222 bacnetWriteMultipleCount=$bacnetWriteMultipleCount") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
        if(isWriteMultiple == WRITE_PROPERTY)

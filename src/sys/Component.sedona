@@ -421,9 +421,9 @@ class Component
     children    = in.readU2()
     nextSibling = in.readU2()
 
-    ** complog.message("name=$name ")
-    ** complog.message("parent=$parent and children=$children and nextSibling=$nextSibling")
-    ** complog.message("--------------------------------------------------------------- ")
+    ** log.message("name=$name ")
+    ** log.message("parent=$parent and children=$children and nextSibling=$nextSibling")
+    ** log.message("--------------------------------------------------------------- ")
     // load config properties
     loadProps(in, 'c')
 
@@ -462,51 +462,51 @@ class Component
     {
       case Type.boolId:   
         bool boolTmp = in.readBool()
-    	log.message("setBool : $boolTmp")
-      	setBool(slot, boolTmp);     
-      	break
+        log.message("setBool : $boolTmp")
+        setBool(slot, boolTmp);     
+        break
       case Type.byteId: 
         // int byteTmp = (byte)in.read()
-    	// log.message("setInt : $byteTmp")
-      	// setInt(slot, (byte)byteTmp);   
-      	setInt(slot, (byte)in.read());   
-      	break
+        // log.message("setInt : $byteTmp")
+        // setInt(slot, (byte)byteTmp);   
+        setInt(slot, (byte)in.read());   
+        break
       case Type.shortId:  
         // short shortTmp = (short)in.readU2()
-    	// log.message("setInt : $shortTmp")
-      	// setInt(slot, shortTmp);  
-      	setInt(slot, (short)in.readU2());   
-      	break
+        // log.message("setInt : $shortTmp")
+        // setInt(slot, shortTmp);  
+        setInt(slot, (short)in.readU2());   
+        break
       case Type.intId:    
         int intTmp = in.readS4()
-    	// log.message("setInt : $intTmp")
+        // log.message("setInt : $intTmp")
         if(intTmp == -1)
-        	return
-      	setInt(slot, intTmp);        
-      	break
+            return
+        setInt(slot, intTmp);        
+        break
       case Type.longId:   
         long longTmp = in.readS8()
-    	// log.message("setLong : $longTmp")
-      	setLong(slot, longTmp);       
-      	break
+        // log.message("setLong : $longTmp")
+        setLong(slot, longTmp);       
+        break
       case Type.floatId:  
         float floatTmp = in.readF4()
-    	// log.message("setFloat : $floatTmp")
-      	setFloat(slot, floatTmp);      
-      	break
+        // log.message("setFloat : $floatTmp")
+        setFloat(slot, floatTmp);      
+        break
       case Type.doubleId: 
         double doubleTmp = in.readF8()
-    	// log.message("setDouble : $doubleTmp")
-      	setDouble(slot, doubleTmp);     
-      	break
+        // log.message("setDouble : $doubleTmp")
+        setDouble(slot, doubleTmp);     
+        break
       case Type.bufId:
         Buf b = getBuf(slot)
         int size = b.size = in.readU2()
         if (size > b.bytesLen) 
-        	b.size = b.bytesLen
-    	// log.message("bufId::size = $size and b.bytesLen = ${b.bytesLen}")
+            b.size = b.bytesLen
+        // log.message("bufId::size = $size and b.bytesLen = ${b.bytesLen}")
         if(size == -1)
-        	return
+            return
         in.readBytes(b.bytes, 0, b.size)
         in.skip(size - b.size)
         if (slot.isAsStr()) 
@@ -515,8 +515,8 @@ class Component
         }
         // for (int idx =0; idx < b.size; idx++)
         // {
-		// 		log.message("b.bytes[").printInt(idx).print("] = 0x").printHex(
-	    //         			b.bytes[idx]).print(". ").nl()
+        //         log.message("b.bytes[").printInt(idx).print("] = 0x").printHex(
+        //                     b.bytes[idx]).print(". ").nl()
         // }
         slotChanged(slot) // must explicitly call
         break

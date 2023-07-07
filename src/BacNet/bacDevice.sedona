@@ -532,13 +532,13 @@ class bacDevice
       {
           sourceNetworkAddress = bacnetRecvPacket[9] * 256 + bacnetRecvPacket[10]
           // bacnetRecvPacket[11] is Source MAC Layer Address Length: 1
-          sadr                 = bacnetRecvPacket[12]
+          // sadr                 = bacnetRecvPacket[12]
       }
       else
       {
           sourceNetworkAddress = bacnetRecvPacket[6] * 256 + bacnetRecvPacket[7]
           // bacnetRecvPacket[8] is Source MAC Layer Address Length: 1
-          sadr                 = bacnetRecvPacket[9]
+          // sadr                 = bacnetRecvPacket[9]
       }
       ** log.message("sourceNetworkAddress is ${sourceNetworkAddress} ")
       ** log.message("sadr is ${sadr} ")

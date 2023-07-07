@@ -143,6 +143,10 @@ class BacReadPropertyVar
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
     }
+    if(device == null){
+        log.message("BacReadPropertyVar:: device == null")  // status=4 -> STATUSNODEV
+        return
+    }
     ** log.message("BacReadPropertyVar::execute 222222 status=$status") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
       long nowNanoSecond  = Sys.ticks()
