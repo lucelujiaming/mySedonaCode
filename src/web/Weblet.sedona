@@ -49,7 +49,7 @@ abstract class Weblet
   }
 
   **
-  ** Get the weblet's prefix which should be a simple
+  ** Get the weblet's' prefix which should be a simple
   ** name (no slash) used for routing URIs to this Weblet.
   **
   abstract Str prefix()
@@ -121,6 +121,6 @@ abstract class Weblet
 // Fields
 //////////////////////////////////////////////////////////////////////////
 
-  ** Used for WebService's linked list of weblets
+  ** Used for WebService's' linked list of weblets
   Weblet nextWeblet
 }

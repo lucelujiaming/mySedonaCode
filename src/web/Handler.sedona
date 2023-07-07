@@ -60,7 +60,7 @@ internal class Handler
   **
   ** Service this request.  Return true if we do
   ** any work or false if no work is pending.  We return
-  ** true if we can't process a complete HTTP request so
+  ** true if we can't' process a complete HTTP request so
   ** that on the next pass we read more into our buffer.
   **
   bool work()

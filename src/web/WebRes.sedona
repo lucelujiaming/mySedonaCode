@@ -120,7 +120,7 @@ class WebRes
   }
 
   **
-  ** Print the component's current value of the specified property.
+  ** Print the component's' current value of the specified property.
   **
   WebRes printProp(Component c, Slot prop)
   {

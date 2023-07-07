@@ -81,7 +81,7 @@ class WebService
   }
 
   **
-  ** Find the specified Weblet for the current request's URI
+  ** Find the specified Weblet for the current request's' URI
   **
   internal Weblet findWeblet(Path path)
   {
@@ -102,7 +102,7 @@ class WebService
 // Fields
 ////////////////////////////////////////////////////////////////
 
-  define Log log
+//  define Log log
 
   define int handlersLen = 4
 
