@@ -196,7 +196,7 @@ class AppDbg
   }
 
   **
-  ** Calculate and cache previous scan's times every scan
+  ** Calculate and cache previous scan's' times every scan
   **
   virtual override void execute()
   {

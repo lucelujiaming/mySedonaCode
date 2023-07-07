@@ -79,7 +79,8 @@ abstract class FieldBusNet
   {
       return -1;
   }
-  virtual void setBacReadPropertyVarByProperty(int propertyVar, int iObjectType, int iInstanceNumber,
+  virtual void setBacReadPropertyVarByProperty(FieldBusDevice device, 
+                int propertyVar, int iObjectType, int iInstanceNumber,
                   int tagNumber, byte[] data, int iLen)
   {
   }

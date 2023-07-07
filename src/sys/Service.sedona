@@ -74,7 +74,7 @@ abstract class Service
 // Fields
 ////////////////////////////////////////////////////////////////
 
-  ** Used for App's linked list of services
+  ** Used for App's' linked list of services
   Service nextService
 
 }

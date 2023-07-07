@@ -17,7 +17,7 @@ class PlatformService
 {
   **
   ** Lookup the platform service for this VM.  Return null
-  ** if the application hasn't booted yet or is missing
+  ** if the application hasn't' booted yet or is missing
   ** a platform service.
   **
   static PlatformService lookup()
@@ -138,7 +138,7 @@ class PlatformService
   **
   ** For Apps with long scanPeriods (greater than 50ms), this allows Services 
   ** to respond to network traffic or other asynchronous events multiple times 
-  ** during a single scanPeriod - even if the service didn't have any immediate 
+  ** during a single scanPeriod - even if the service didn't' have any immediate 
   ** work to do.  
   ** 
   ** i.e. - Sox services responds to a poll request, but then has no further

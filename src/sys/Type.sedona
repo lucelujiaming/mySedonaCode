@@ -41,7 +41,7 @@ const class Type
 
   **
   ** Allocate the memory required to store an instance of
-  ** this type and execute the type's instance initializer.
+  ** this type and execute the type's' instance initializer.
   ** NOTE: this method is currently for sys use only!
   **
   internal native Obj malloc()
@@ -91,7 +91,7 @@ const class Type
 // Fields
 //////////////////////////////////////////////////////////////////////////
 
-  ** Unique id within this type's kit; index into kit.types.
+  ** Unique id within this type's' kit; index into kit.types.
   const byte id
 
   ** Simple name string of this type which unique within the kit.
@@ -106,10 +106,10 @@ const class Type
   ** Number of bytes in memory an instance of this type requires.
   const short sizeof
 
-  ** Block index of the type's instance initializer method.
+  ** Block index of the type's' instance initializer method.
   private const short instanceInitMethod
 
-  ** The list of this type's reflective slots (properties
+  ** The list of this type's' reflective slots (properties
   ** and actions) including inherited slots.
   const inline Slot[] slots
 

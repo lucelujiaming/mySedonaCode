@@ -9,7 +9,7 @@
 **
 ** User models a user account used for network authentication 
 ** and authorization.  Users are stored as children of the UserService.
-** The user name is the component's name (limited to 7 chars).
+** The user name is the component's' name (limited to 7 chars).
 **
 @niagaraIcon="module://icons/x16/user.png"
 class User

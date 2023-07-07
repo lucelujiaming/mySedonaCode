@@ -14,10 +14,10 @@
 class MinMax
   extends Component
 {
-  ** the computed min of all in's
+  ** the computed min of all in's'
   @readonly property float minOut
 
-  ** the computed max of all in's
+  ** the computed max of all in's'
   @readonly property float maxOut
 
   ** the value on which to track the min and max value

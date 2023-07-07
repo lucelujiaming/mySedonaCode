@@ -45,7 +45,7 @@ final class Buf
   }         
   
   **
-  ** Copy the specified buffer bytes into this buffer's bytes and 
+  ** Copy the specified buffer bytes into this buffer's' bytes and 
   ** update size.  If the specified buffer contains more than 
   ** bytesLen bytes then the copy is truncated.
   **
@@ -56,7 +56,7 @@ final class Buf
 
   
   **
-  ** Copy the specified byte array into this buffer's bytes and 
+  ** Copy the specified byte array into this buffer's' bytes and 
   ** update size.  If the specified length is greater than 
   ** bytesLen bytes then the copy is truncated.
   **

@@ -858,7 +858,7 @@ class bacDevice
     {
         case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
             bufData[0] = iLen
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 1)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 1)
             break
         case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
         case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
@@ -867,7 +867,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
@@ -875,7 +875,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
@@ -883,7 +883,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
@@ -894,7 +894,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
@@ -913,7 +913,7 @@ class bacDevice
             strInfo.set(iLen, '\0')
             ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
             
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
@@ -933,7 +933,7 @@ class bacDevice
             strInfo.set(iLen, '\0')
             ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
             
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
@@ -949,7 +949,7 @@ class bacDevice
             log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
             bufData[3] = bacnetRecvPacket[serviceChoicePos]
             serviceChoicePos++
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
             break
         case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
             log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
@@ -964,7 +964,7 @@ class bacDevice
             log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
             bufData[3] = bacnetRecvPacket[serviceChoicePos]
             serviceChoicePos++
-            bus.setBacReadPropertyVarByProperty(propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
+            bus.setBacReadPropertyVarByProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
             break
         // case BANET_PROPVAR_RESERVEDAPPTAG13:
         // case BANET_PROPVAR_RESERVEDAPPTAG14:

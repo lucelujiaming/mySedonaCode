@@ -12,7 +12,7 @@
 **   Non-recoverable:
 **     [C code: 1-39]
 **     [Sedona: 40-99]
-**     - don't attempt to auto-restart application because 
+**     - don't' attempt to auto-restart application because 
 **       the vm, scode, or app itself is invalid
 **
 **   Recoverable: 

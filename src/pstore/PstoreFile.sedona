@@ -59,14 +59,14 @@
   @readonly property byte status = statusInactive           
           
   **     
-  ** Offset of this file's storage reservation relative to the
+  ** Offset of this file's' storage reservation relative to the
   ** storage device modeled by the parent PstoreService.
   **
   @defaultOnClone
   @config property int resvOffset
 
   **     
-  ** Size of this file's reservation in bytes.
+  ** Size of this file's' reservation in bytes.
   **
   @config property int resvSize
 
@@ -107,8 +107,8 @@
   }
 
   **
-  ** Get the backing store file's pointer relative to this 
-  ** PstoreFile's reserved offset.  This PstoreFile must
+  ** Get the backing store file's' pointer relative to this 
+  ** PstoreFile's' reserved offset.  This PstoreFile must
   ** the current owner.  Return -1 on error.
   **
   int tell()
@@ -118,8 +118,8 @@
   }  
 
   **
-  ** Seek to a specific byte offset position in the service's
-  ** backing store file relative to this PstoreFile's reserved
+  ** Seek to a specific byte offset position in the service's'
+  ** backing store file relative to this PstoreFile's' reserved
   ** offset.  This PstoreFile must the current owner.  Return false
   ** on error.
   **
@@ -131,11 +131,11 @@
   }
     
   **
-  ** Get the input stream used to read this PstoreFile's reserved
+  ** Get the input stream used to read this PstoreFile's' reserved
   ** range from the backing store file.  If this PstoreFile is
   ** not the current owner, then return <code>Sys.nullIn</code>.
   ** No validation is performed to prevent reading past the
-  ** end of this PstoreFile's reserved range.
+  ** end of this PstoreFile's' reserved range.
   **
   InStream in() 
   {              
@@ -144,11 +144,11 @@
   }
 
   **
-  ** Get an output stream to write this PstoreFile's reserved
+  ** Get an output stream to write this PstoreFile's' reserved
   ** range to the backing store file.  If this PstoreFile is
   ** not the current owner, then return <code>Sys.nullOut</code>.
   ** No validation is performed to prevent writing past the
-  ** end of this PstoreFile's reserved range.
+  ** end of this PstoreFile's' reserved range.
   **
   OutStream out() 
   {              
@@ -184,7 +184,7 @@
   } 
   
   **
-  ** Validate this file's reservation range and update its status.
+  ** Validate this file's' reservation range and update its status.
   **
   virtual void validate()
   {               
@@ -241,7 +241,7 @@
   
   **
   ** If the given component is a PstoreFile, then 
-  ** compute if this file's range overlaps with it.
+  ** compute if this file's' range overlaps with it.
   **
   private bool overlaps(Component c)
   {                                

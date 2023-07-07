@@ -90,9 +90,11 @@ class bacReadPropertyMultiple
     bacnetPacket[dataLength++] = 0x1E
     // Property Identifier: required (105)
     bacnetPacket[dataLength++] = 0x09
-    bacnetPacket[dataLength++] = 0x69
+    // Replace into Property Identifier: present-value (85)
+    bacnetPacket[dataLength++] = 0x55
     // .... .111 = Named Tag: Closing Tag (7)
     bacnetPacket[dataLength++] = 0x1F
+/*
     // ObjectIdentifier: analog-value, 1
     bacnetPacket[dataLength++] = 0x0C
     if(objectNodeType > 4)
@@ -121,6 +123,7 @@ class bacReadPropertyMultiple
     bacnetPacket[dataLength++] = 0x1C
     // .... .111 = Named Tag: Closing Tag (7)
     bacnetPacket[dataLength++] = 0x1F
+ */
     ** log.message("22222 bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
