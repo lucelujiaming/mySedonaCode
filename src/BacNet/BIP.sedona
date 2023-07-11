@@ -280,7 +280,7 @@ class BIP
 
   int bacnet_open(int port, int device_instance, int retry_delay)
   {
-    bool bRet = false;
+    // getBacnetCurrentDevice for each device
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       log.message("d.type  = $d.type.name")
       if (d.type.is(bacDevice.type) && ((bacDevice)d).status != bacDevice.STATUSEND) {
@@ -288,6 +288,18 @@ class BIP
          {
             ((bacDevice)d).bus = this
          }
+         ((bacDevice)d).bacnetCurrentDeviceRet = ((bacDevice)d).getBacnetCurrentDevice()
+         if(((bacDevice)d).bacnetCurrentDeviceRet == 0)
+         {
+            return 0
+         }
+      }
+    }
+  
+    bool bRet = false;
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      log.message("openPort::d.type  = $d.type.name")
+      if (d.type.is(bacDevice.type) && ((bacDevice)d).status != bacDevice.STATUSEND) {
          bRet = ((bacDevice)d).openPort(true)
          if(bRet == false)
          {
