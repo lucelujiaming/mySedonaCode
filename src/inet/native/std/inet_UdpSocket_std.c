@@ -413,6 +413,17 @@ Cell inet_UdpSocket_close(SedonaVM* vm, Cell* params)
 #define PORT 47808
 #define MAXDATASIZE 256
 
+
+#define SEND_WHOIS_PACKET                     1
+#define SEND_WHOIS_ROUTER_To_NETWORK_PACKET   2
+
+// 0000 C0 A8 A8 EB BA C0 81 0A 00 07 01 80 00
+#define WHOIS_ROUTER_To_NETWORK_PACKET "\x81\x0a\x00\x07\x01\x80\x00"
+#define WHOIS_ROUTER_To_NETWORK_LENGTH 7
+
+
+// 0000 C0 A8 A8 02 BA C0 81 0A 00 0C 01 20 FF FF 00 FF 
+// 0010 10 08
 #define WHOIS_PACKET "\x81\x0a\x00\x0c\x01\x20\xff\xff\x00\xff\x10\x08"
 #define WHOIS_LENGTH 12
 
@@ -462,7 +473,7 @@ unsigned short convertShortFromBuffer(unsigned char * buffer)
 
 
 #define SERVICE_CHOICE_IAM    0x00
-int dealResponse(struct sockaddr_in user_addr, unsigned char * buffer, int iLen, 
+int dealWhoIsResponse(struct sockaddr_in user_addr, unsigned char * buffer, int iLen, 
                  unsigned int  * ipArrayList, 
                  unsigned int  * controlDstSpecList, 
                  unsigned int  * NPDUList, 
@@ -698,7 +709,8 @@ socket_t initializeRecvSocket()
 }
 
 #define RECV_TIMEOUT    0x02
-int sendBroadcast(int iRetryCount, socket_t clientSendSocket, socket_t clientRecvSocket, 
+int sendWhoIsBroadcast(int iRetryCount, int iSendContent, 
+                     socket_t clientSendSocket, socket_t clientRecvSocket, 
                      struct sockaddr_in my_addr, 
                      unsigned int  * ipArrayList, 
                      unsigned int  * controlDstSpecList, 
@@ -772,7 +784,7 @@ int sendBroadcast(int iRetryCount, socket_t clientSendSocket, socket_t clientRec
             else if (iRecvCount > 0)
             {
                 // printf("we Receive %d .\r\n", iRecvCount);
-                iListLen = dealResponse(recv_addr, buf, iRecvCount, 
+                iListLen = dealWhoIsResponse(recv_addr, buf, iRecvCount, 
                          ipArrayList, 
                          controlDstSpecList, 
                          NPDUList, 
@@ -821,7 +833,7 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
         socket_t clientRecvSocket;
         // printf("Call sendBroadcast \r\n");
         clientRecvSocket = initializeRecvSocket();
-        iClientCount = sendBroadcast(SEND_BROADCAST_TIMES, 
+        iClientCount = sendWhoIsBroadcast(SEND_BROADCAST_TIMES, 
             clientSendSocket, clientRecvSocket, my_addr, // recv_addr, 
             ipArrayList, 
             controlDstSpecList, 
@@ -836,6 +848,180 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
     ret.ival = iClientCount;  
     return ret;
 }
+
+#define SERVICE_CHOICE_IAM_ROUTER    0x01
+int dealWhoIsRouterResponse(struct sockaddr_in user_addr, unsigned char * buffer, int iLen, 
+                 unsigned int  * ipArrayList, 
+                 unsigned int  * networkNumberList,
+                 unsigned int  iListIdx)
+{
+    int iOffset = 0;
+    printf("IP = %s. we Receive %d .\r\n", inet_ntoa(user_addr.sin_addr), iLen);
+    ipArrayList[iListIdx] = (unsigned int)(user_addr.sin_addr.s_addr);
+    printf("Type: %X. Function: %X. BVLC-Length: %X. ", 
+        buffer[0], buffer[1], (int)convertShortFromBuffer(buffer + 2));
+    printf("Version: %X. Control: %X.\r\n", buffer[4], buffer[5]);
+    
+    // Source specifier: SNET, SLEN and SADR absent
+    if((buffer[5] & 0x08) == 0x00)   // 0x80
+    {
+        iOffset = 6;
+        if(buffer[iOffset] == SERVICE_CHOICE_IAM_ROUTER)
+        {
+            int iNetworkNumberCount = iLen - iOffset - 1;
+            if(iNetworkNumberCount % 2 == 0)
+            {
+                iNetworkNumberCount = iNetworkNumberCount / 2;
+                for(int i =0; i < iNetworkNumberCount; i++)
+                {
+                    int iNetworkNumber = (int)convertShortFromBuffer(buffer + iOffset + 2 * i);
+                    printf("Network Number: %X. ", iNetworkNumber);
+                    networkNumberList[iListIdx] = iNetworkNumber;
+                }
+            }
+            else
+            {
+                printf("Error iNetworkNumberCount with 0x%X.\r\n", iNetworkNumberCount);
+                objectIdentifierList[iListIdx] = -1;
+                return 0;
+            }
+        }
+        else
+        {
+            printf("Error SERVICE_CHOICE with 0x%X.\r\n", buffer[iOffset]);
+            return 0;
+        }
+    }
+    else if((buffer[5] & 0x08) == 0x08)   // 0x88
+    {
+        printf("Error Control: %X.\r\n", buffer[4], buffer[5]);
+    }
+    return iOffset;
+}
+
+int sendWhoIsRouterBroadcast(int iRetryCount, int iSendContent, 
+                     socket_t clientSendSocket, socket_t clientRecvSocket, 
+                     struct sockaddr_in my_addr, 
+                     unsigned int  * ipArrayList, 
+                     unsigned int  * networkNumberList)
+{
+    int i = 0;
+    int iSendCount = 0;
+    int iRecvCount = 0;
+    unsigned char buf[MAXDATASIZE];
+    unsigned int size;
+    int iListLen = 0;
+    
+    int iClientCount = 0;
+
+    time_t current_time, now;
+    
+    struct sockaddr_in  recv_addr;
+    bzero((char *)&recv_addr, sizeof(recv_addr));
+    // printf("Enter sendBroadcast \r\n");
+    for(i=0; i<iRetryCount; i++)
+    {
+        memset(buf, 0x00, MAXDATASIZE);
+        memcpy(buf, WHOIS_ROUTER_To_NETWORK_PACKET, WHOIS_ROUTER_To_NETWORK_LENGTH);
+        iSendCount = sendto(clientSendSocket, (char *)buf, WHOIS_LENGTH, 0, 
+            (struct sockaddr *)&my_addr, sizeof(my_addr));
+#ifdef _WIN32
+        recvSleep(1);
+#else
+        recvSleep(0);
+#endif
+        // printf("send %d OK \r\n", iSendCount);
+        size = sizeof(struct sockaddr_in);
+
+        current_time = now = time(NULL);
+        while(1)
+        {
+            memset(buf, 0x00, MAXDATASIZE);
+            // printf("------------------try to  recvfrom------------------ \r\n");
+            iRecvCount = recvfrom(clientRecvSocket, (char *)buf, 
+                MAXDATASIZE, 0, (struct sockaddr *)&recv_addr, (socklen_t *)&size);
+            if (iRecvCount == -1)
+            {
+            //    printf("recvfrom return -1 because of (%d):(%s) \r\n",
+            //        errno, strerror(errno));
+                now = time(NULL);
+                if(now - current_time > RECV_TIMEOUT)
+                {
+                    // printf("we detect %d clients.\r\n", iClientCount);
+                    break;
+                }
+                else
+                {
+                    recvSleep(1);
+                    continue;
+                }
+            }
+            
+            if((iRecvCount == iSendCount)
+                && (memcmp(buf, WHOIS_PACKET, WHOIS_LENGTH) == 0))
+            {
+                printf("Omit broadcast sent to me \r\n");
+                continue;
+            }
+            else if (iRecvCount > 0)
+            {
+                // printf("we Receive %d .\r\n", iRecvCount);
+                iListLen = dealWhoIsRouterResponse(recv_addr, buf, iRecvCount, 
+                         ipArrayList, 
+                         networkNumberList,
+                         iClientCount);
+                iClientCount++;
+                recvSleep(1);
+            }
+        }
+        printf("-------------------(%d)----------------------- \r\n", i + 1);
+    }
+    return iClientCount;
+}
+
+
+Cell inet_UdpSocket_getBacnetRouterDeviceList(SedonaVM* vm, Cell* params)
+{
+    int iClientCount = 0;
+  // void* self              = params[0].aval;
+  char*     ipAddress               = params[1].aval;
+  uint32_t* ipArrayList             = params[2].aval;
+  uint32_t* networkNumberList       = params[3].aval;
+  
+  
+    printf("Enter inet_UdpSocket_getBacnetDeviceList(%s) \r\n", ipAddress);
+    // unsigned int iListLen = 0;
+    // unsigned int ipArrayList[10];
+    // unsigned int objIDList[10];
+    memset(ipArrayList, 0x00, sizeof(int) * 10);
+    memset(controlDstSpecList, 0x00, sizeof(int) * 10);
+    memset(NPDUList, 0x00, sizeof(int) * 10);
+    memset(objectIdentifierList, 0x00, sizeof(int) * 10);
+    memset(maxADPUList, 0x00, sizeof(int) * 10);
+
+
+    socket_t clientSendSocket;
+    struct sockaddr_in  my_addr;
+    // struct sockaddr_in  recv_addr;
+    clientSendSocket = initializeSendSocket(ipAddress, &my_addr); // , &recv_addr);
+    if (clientSendSocket > 0)
+    {
+        socket_t clientRecvSocket;
+        // printf("Call sendBroadcast \r\n");
+        clientRecvSocket = initializeRecvSocket();
+        iClientCount = sendWhoIsRouterBroadcast(SEND_BROADCAST_TIMES, 
+            clientSendSocket, clientRecvSocket, my_addr, // recv_addr, 
+            ipArrayList, 
+            networkNumberList);
+        closesocket(clientRecvSocket);
+    }
+    closesocket(clientSendSocket);
+    
+    Cell ret;
+    ret.ival = iClientCount;  
+    return ret;
+}
+
 
 
 

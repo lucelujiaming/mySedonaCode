@@ -37,6 +37,12 @@
   <native qname="inet::UdpSocket.join"            id="2::16" />
   <native qname="inet::UdpSocket.getBacnetDeviceList"
                                                   id="2::17" />
+  <native qname="inet::UdpSocket.getBacnetRouterDeviceList"
+                                                  id="2::18" />
+  <native qname="inet::UdpSocket.getBacnetDevice"
+                                                  id="2::19" />
+  <native qname="inet::UdpSocket.getBacnetRouterDevice"
+                                                  id="2::20" />
 
 </sedonaKit>
 

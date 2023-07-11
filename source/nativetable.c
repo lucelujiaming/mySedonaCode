@@ -400,18 +400,27 @@ Cell inet_UdpSocket_join(SedonaVM* vm, Cell* params);
 // bool UdpSocket.join()
 Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params);
 
+// bool UdpSocket.join()
+Cell inet_UdpSocket_getBacnetRouterDeviceList(SedonaVM* vm, Cell* params);
+
+// bool UdpSocket.join()
+Cell inet_UdpSocket_getBacnetDevice(SedonaVM* vm, Cell* params);
+
+// bool UdpSocket.join()
+Cell inet_UdpSocket_getBacnetRouterDevice(SedonaVM* vm, Cell* params);
+
 // native table for kit 2
 NativeMethod kitNatives2[] = 
 {
-  inet_TcpSocket_connect,         // 2::0
-  inet_TcpSocket_finishConnect,   // 2::1
-  inet_TcpSocket_write,           // 2::2
-  inet_TcpSocket_read,            // 2::3
-  inet_TcpSocket_close,           // 2::4
-  inet_TcpServerSocket_bind,      // 2::5
-  inet_TcpServerSocket_accept,    // 2::6
-  inet_TcpServerSocket_close,     // 2::7
-  inet_UdpSocket_open,            // 2::8
+  inet_TcpSocket_connect,                     // 2::0
+  inet_TcpSocket_finishConnect,               // 2::1
+  inet_TcpSocket_write,                       // 2::2
+  inet_TcpSocket_read,                        // 2::3
+  inet_TcpSocket_close,                       // 2::4
+  inet_TcpServerSocket_bind,                  // 2::5
+  inet_TcpServerSocket_accept,                // 2::6
+  inet_TcpServerSocket_close,                 // 2::7
+  inet_UdpSocket_open,                        // 2::8
   inet_UdpSocket_bind,            // 2::9
   inet_UdpSocket_send,            // 2::10
   inet_UdpSocket_receive,         // 2::11
@@ -421,6 +430,9 @@ NativeMethod kitNatives2[] =
   inet_Crypto_sha1,               // 2::15
   inet_UdpSocket_join,            // 2::16
   inet_UdpSocket_getBacnetDeviceList,            // 2::17
+  inet_UdpSocket_getBacnetRouterDeviceList,      // 2::18
+  inet_UdpSocket_getBacnetDevice,                // 2::19
+  inet_UdpSocket_getBacnetRouterDevice,          // 2::20
 };
 
 ////////////////////////////////////////////////////////////////
@@ -653,7 +665,7 @@ int isNativeIdValid(int kitId, int methodId)
       if (methodId >= 82) return 0;
       else return kitNatives0[methodId] != NULL;
     case 2:
-      if (methodId >= 18) return 0;
+      if (methodId >= 21) return 0;
       else return kitNatives2[methodId] != NULL;
     case 3:
       if (methodId >= 20) return 0;

@@ -138,7 +138,7 @@ class BacReadPropertyVar
   
   virtual override void execute()
   {
-    log.message("BacReadPropertyVar::execute 11111 status=$status") 
+    ** log.message("BacReadPropertyVar::execute 11111 status=$status") 
     int iDelayCount = 0
     if (bus != null) {
         ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV

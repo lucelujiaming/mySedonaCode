@@ -184,7 +184,7 @@ class BIP
     }
   }
   
-  private bool updateCache()
+  public bool updateCache()
   {
 //    Component root
     Component p = this
@@ -193,7 +193,7 @@ class BIP
     // add device node.
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR) {
-        if (bacnet_add(ctx, ((bacDevice)d).deviceInstance, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
+        if (bacnet_add(ctx, 0, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
           log.message("11111 updateCache d.status=bacDevice.STATUSEINNER");
           ((bacDevice)d).status := bacDevice.STATUSEINNER
         } else {
@@ -280,34 +280,6 @@ class BIP
 
   int bacnet_open(int port, int device_instance, int retry_delay)
   {
-    iDeviceCount = socket.getBacnetDeviceList(ipLocalAddress.bytes, 
-                                ipArrayList, controlDstSpecList, 
-                                NPDUList, objectIdentifierList, 
-                                maxADPUList)
-    log.message("iDeviceCount = $iDeviceCount .")
-    log.message("----------------------------------------------------------")
-    for(int i = 0; i < iDeviceCount; i++)
-    {
-        bufInteger[0] = ipArrayList[i]
-        encodeUnsigned(bufInteger, bufData)
-        log.message(
-                "ipArrayList[$i] is 0x").printHex(ipArrayList[i]).print(
-                " and can decode into (").printInt(bufData[0]).print(
-                    ".").printInt(bufData[1]).print(
-                    ".").printInt(bufData[2]).print(
-                    ".").printInt(bufData[3]).print(
-                    ") and controlDstSpecList[$i] = 0x").printHex(controlDstSpecList[i]).nl()
-        if(NPDUList[i] != 0x00)
-        {
-            log.message("NPDUList[$i] = (SourceNetworkAddress: ").printInt(NPDUList[i] % 0x10000).print(
-                    ", SADR:").printInt(NPDUList[i] / 0x10000).print(").").nl()
-        }
-        log.message("objectIdentifierList[$i] = (Instance Number:").printInt(objectIdentifierList[i] % 0x400000).print(
-                ", ObjectType:").printInt(objectIdentifierList[i] / 0x400000).print(
-                ") and maxADPUList[$i] = ${maxADPUList[i]}.").nl()
-        log.message("----------------------------------------------------------")
-    }
-
     bool bRet = false;
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       log.message("d.type  = $d.type.name")
@@ -399,21 +371,7 @@ class BIP
   // define Log log
   private int ctx = -1
 
-  ////////////////////////////////////////////////////////////////
-  // Socket Fields
-  ////////////////////////////////////////////////////////////////
 
-  inline UdpSocket socket           // socket used for send/receive
-  private inline int[2]    bufInteger
-  static inline byte[8]    bufData
-
-   int               iDeviceCount = 0
-    
-   inline int[10]    ipArrayList
-   inline int[10]    controlDstSpecList
-   inline int[10]    NPDUList
-   inline int[10]    objectIdentifierList
-   inline int[10]    maxADPUList
 
   native int dO(int port, int device_instance, int retry_delay)
 

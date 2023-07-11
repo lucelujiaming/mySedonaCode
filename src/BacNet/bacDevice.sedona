@@ -52,44 +52,7 @@ class bacDevice
   @asStr
   @config
   property Buf(64) InstanceNumber = ""
-    
-  // Lujiaming add these at 23/05/22
-  @config
-  @range = BVLCISTATUSRANGE
-  @fieldWidth = 200
-  property int typeBVLCI = BVLCISTATUSUNICAST
 
-  // NPCI
-  @config
-  property int versionNPCI = 1
-
-  // DNET/DLEN/DADR Present
-  @readonly
-  @range = NPCIRANGE
-  @fieldWidth = 200
-  property int dnetPresentNPCI = DNETENABLE
-  
-//  @config
-//  property int dnetNPCI = 2401
-  @config
-  property int hopCountNPCI = 255
-  
-  // SNET/SLEN/SADR Present
-  @readonly
-  @range = NPCIRANGE
-  @fieldWidth = 200
-  property int snetPresentNPCI = SNETDISABLE
-  
-//  // Data Expecting Reply
-//  @config
-//  @range = NPCIRANGE
-//  @fieldWidth = 200
-//  property int dataExpectingReplyNPCI = DATAREPLYDISABLE
-  
-  @config
-  property int priorityNPCI = 0
-  // Lujiaming add these end at 23/05/22
-  
   ////////////////////////////////////////////////////////////////
   // Life cycle
   ////////////////////////////////////////////////////////////////
@@ -100,7 +63,7 @@ class bacDevice
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == bacDevice.deviceName || slot == bacDevice.deviceInstance || slot == bacDevice.refreshTime) {
+    if (slot == bacDevice.deviceName || slot == bacDevice.refreshTime) {
       update()
     }
   }
@@ -119,6 +82,12 @@ class bacDevice
   ////////////////////////////////////////////////////////////////
   void update()
   {
+    if (bus != null) {
+        if(bus.type.is(BIP.type))
+        {
+            ((BIP)bus).updateCache()
+        }
+    }
     log.message("bacDevice update 1111 status=$status") 
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
          if(((BacNetFieldBusIO)d).device == null)
@@ -160,37 +129,13 @@ class bacDevice
                    setClientAddress(dataRecvGramAddr)
                 }
             }
-       //     else 
-       //     {
-       //         log.message("communicationMethod =$communicationMethod We need set it ")
-       //     }
             
             ** log.message("Setting communicationMethod with ($lastInstanceNumber, $InstanceNumber)")
             if(lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false)
             {
-               bool isSubNetMac = false
-               Str sNetBuf = ""
-               Str macBuf  = ""
-               for (int i=0; i<InstanceNumber.toStr().length(); i++) {
-                  int c = InstanceNumber.toStr().get(i)
-                  if (c == "/".get(0)) {
-                     isSubNetMac = true
-                     sNetBuf.copyFromStr(InstanceNumber.toStr(), i+1);
-                     macBuf = InstanceNumber.toStr().suffix(i + 1)
-                     log.message("-------Get with ($sNetBuf, $macBuf)--------------")
-                     break
-                  }
-               }
-               if(isSubNetMac) {
-                   communicationMethod := setClientAddressBySNetAndMac(
-                                             sNetBuf.parseInt(), macBuf.parseInt())
-               }
-               else {
-                   communicationMethod := setClientAddressByInstanceNumber(
-                                                        InstanceNumber.toStr().parseInt())
-               }
-               lastInstanceNumber.copyFromBuf(InstanceNumber)
+               getBacnetCurrentDevice()
             }
+         
         }
         else 
         {
@@ -517,14 +462,14 @@ class bacDevice
     // ex: Control: 0x25, Destination Specifier, Expecting Reply, Priority
     serviceChoicePos += 2
     
-    // DNET£¬ DLEN£¬ DAD R&Hop Count Present
+    // DNET, DLEN, DAD R&Hop Count Present
     int dnetSupport = bacnetRecvPacket[5] & 0x20
     if(dnetSupport == 0x20)
     {
       serviceChoicePos += 4
     }
     
-    // SNET£¬ SLEN£¬ &SADR Present 
+    // SNET, SLEN, &SADR Present 
     int snetSupport = bacnetRecvPacket[5] & 0x08
     if(snetSupport == 0x08)
     {
@@ -760,7 +705,8 @@ class bacDevice
                    log.message("34343434 Error serviceChoicePos ")
                    return -1
                 }
-                log.message("444444 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                log.message("444444 bacnetRecvPacket at $serviceChoicePos")
+                log.message("444444 bacnetRecvPacket[$serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
                 if(bacnetRecvPacket[serviceChoicePos] != 0x4F)
                 {
                    log.message("Error Closing Tag")
@@ -1010,7 +956,7 @@ class bacDevice
     // B'1110' reserved by ASHRAE
     // B'1111' reserved by ASHRAE
   }
-
+/*
   int setClientAddressBySNetAndMac(int sNetAddrID, int macID)
   {
     for(int i = 0 ; i < ((BIP)bus).iDeviceCount; i++)
@@ -1084,7 +1030,7 @@ class bacDevice
     log.message("Failed to Setting communicationMethod to COMMUNICATIONNONE")
     return 0 // COMMUNICATIONNONE
   }
-  
+ */  
   int setClientAddress(Str ipClientAddress)
   {
     addrSendLocal.addr.parse(ipClientAddress)
@@ -1093,12 +1039,154 @@ class bacDevice
     return 0
   }
 
+  int makeDevice4194303PropertyIdentifier()
+  {
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    bacnetPacket[1] = maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = invokeID
+    invokeID = invokeID + 1
+    if(invokeID == 0xFF)
+       invokeID = 0
+    dataLength = 3
+    // if(segmentedMsg == SEGMENTEDMSGENABLE)
+    // {
+    //     bacnetPacket[3] = sequenceNumber
+    //     bacnetPacket[4] = proposedWindowSize
+    //     dataLength = 5
+    // }
+    // Service Choice: readProperty (12)
+    bacnetPacket[dataLength++] = 0x0C
+    // Context Tag: 0, Length/Value/Type: 4
+    // .... 1... = Tag Class: Context Specific Tag
+    // 0000 .... = Context Tag Number: 0
+    // Length Value Type: 4
+    bacnetPacket[dataLength++] = 0x0C
+    // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+    int objectNodeType = 8
+    if(objectNodeType > 4)
+    {
+        bacnetPacket[dataLength++] = objectNodeType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength] = (objectNodeType % 4) * 0x40
+    // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
+    int instanceNumber = 4194303
+    bacnetPacket[dataLength] += 0x3F
+    dataLength++
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
+    // Property Identifier: object-identifier (75)
+    int propertyIdentifier = 75
+    log.message("BacReadPropertyVar::propertyIdentifier = $propertyIdentifier")
+    bacnetPacket[dataLength++] = 0x18 + 1
+    bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+
+    log.message("22222 bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+    return dataLength
+  }
+  
+  int getBacnetCurrentDevice()
+  {
+       bool isSubNetMac = false
+       Str sNetBuf = ""
+       Str macBuf  = ""
+       for (int i=0; i<InstanceNumber.toStr().length(); i++) {
+          int c = InstanceNumber.toStr().get(i)
+          if (c == "/".get(0)) {
+             isSubNetMac = true
+             sNetBuf.copyFromStr(InstanceNumber.toStr(), i+1);
+             macBuf = InstanceNumber.toStr().suffix(i + 1)
+             log.message("-------Get with ($sNetBuf, $macBuf)--------------")
+             break
+          }
+       }  
+       if(isSubNetMac) {
+            int iRouterDeviceCount = socketDetect.getBacnetRouterDevice((((BIP)bus).ipLocalAddress).bytes, 
+                                sNetBuf.parseInt(), 
+                                ipRouterArrayList, networkNumberList)
+     
+            log.message("iRouterDeviceCount = $iRouterDeviceCount")
+            if(iRouterDeviceCount > 0)
+            {
+                bufInteger[0] = ipRouterArrayList[0]
+                bus.encodeUnsigned(bufInteger, bufData)
+                addrClientBuf.copyFromBytes(bufData, 0, 4)
+                addrClient.loadBuf(addrClientBuf)
+                setClientAddress(addrClient.toStr())
+                log.message("addrClient.toStr() = ${addrClient.toStr()}")
+
+                sourceNetworkAddress = sNetBuf.parseInt()
+                log.message("sourceNetworkAddress = $sourceNetworkAddress")
+                sadr                 = macBuf.parseInt()
+                log.message("sourceNetworkAddress = $sourceNetworkAddress")
+                
+                communicationMethod := COMMUNICATIONBYSUBNET
+            }
+            else
+            {
+                log.message("-------getBacnetRouterDevice Failed--------------")
+            }
+            lastInstanceNumber.copyFromBuf(InstanceNumber)
+            return 2
+       }
+       else {
+            int iDeviceCount = socketDetect.getBacnetDevice((((BIP)bus).ipLocalAddress).bytes, 
+                                InstanceNumber.toStr().parseInt(), 
+                                ipArrayList, controlDstSpecList, 
+                                NPDUList, objectIdentifierList, 
+                                maxADPUList)
+                         
+            if(iDeviceCount > 0)
+            {
+                bufInteger[0] = ipArrayList[0]
+                bus.encodeUnsigned(bufInteger, bufData)
+                addrClientBuf.copyFromBytes(bufData, 0, 4)
+                addrClient.loadBuf(addrClientBuf)
+                setClientAddress(addrClient.toStr())
+
+                sourceNetworkAddress = NPDUList[0] % 0x10000
+                sadr                 = NPDUList[0] / 0x10000
+                
+                communicationMethod := COMMUNICATIONBYINSTANCE
+            }
+            else
+            {
+                log.message("-------getBacnetDevice Failed--------------")
+            }
+            
+            lastInstanceNumber.copyFromBuf(InstanceNumber)
+            return 1
+       }
+  }
+
   **
   ** Open the UDP port using the configured port field.
   ** Return true on success.
   **
   override bool openPort(bool logError)
-  {
+  { 
+    // We have to bind first before calling the socket.bind which is in the below.
+    int iDetectRet = getBacnetCurrentDevice()
+    
     log.message("openPorts")
     if (socket.isClosed() && !socket.open())
     {
@@ -1122,13 +1210,24 @@ class bacDevice
 
     Sys.app.platform.notify("BIP", Sys.intStr(((BIP)bus).port))
 
-    addrSendLocal.addr.parse("0.0.0.0")
-    addrSendLocal.port = 0
+    // addrSendLocal.addr.parse("0.0.0.0")
+    // addrSendLocal.port = 0
     dataSendGram.setSocketAddr(addrSendLocal)
     
     addrRecvLocal.addr.parse(((BIP)bus).ipLocalAddress.toStr())
     addrRecvLocal.port = ((BIP)bus).port
     dataRecvGram.setSocketAddr(addrRecvLocal)
+
+    if(iDetectRet == 2)
+    {
+        log.message("Send makeDevice4194303PropertyIdentifier")
+        int iLen = makeDevice4194303PropertyIdentifier()
+        if(iLen > 0)
+        {
+           log.message("writeReg makeDevice4194303PropertyIdentifier($iLen)")
+           writeReg(0, 0, iLen, buf)
+        }
+    }
     return isPortOpen = true
   }
 
@@ -1397,4 +1496,24 @@ class bacDevice
   // 
   private       int execute_mode = BACNET_PROPERTY_WRITE
   private       int execute_counter = 0
+
+  
+  private int typeBVLCI = BVLCISTATUSUNICAST
+  private int versionNPCI = 1
+  private int hopCountNPCI = 255
+  private int priorityNPCI = 0
+
+  
+   inline UdpSocket socketDetect           // socket used for send/receive
+//   private inline int[2]    bufInteger
+//   static inline byte[8]    bufData
+
+   inline int[10]    ipArrayList
+   inline int[10]    controlDstSpecList
+   inline int[10]    NPDUList
+   inline int[10]    objectIdentifierList
+   inline int[10]    maxADPUList
+
+   inline int[10]    ipRouterArrayList
+   inline int[10]    networkNumberList
 }
