@@ -1032,7 +1032,7 @@ class bacDevice
     log.message("Failed to Setting communicationMethod to COMMUNICATIONNONE")
     return 0 // COMMUNICATIONNONE
   }
- */  
+ */ 
   int setClientAddress(Str ipClientAddress)
   {
     addrSendLocal.addr.parse(ipClientAddress)
@@ -1137,9 +1137,9 @@ class bacDevice
                 log.message("addrClient.toStr() = ${addrClient.toStr()}")
 
                 sourceNetworkAddress = sNetBuf.parseInt()
-                log.message("sourceNetworkAddress = $sourceNetworkAddress")
+                log.message("SubNetMac::sourceNetworkAddress = $sourceNetworkAddress")
                 sadr                 = macBuf.parseInt()
-                log.message("sourceNetworkAddress = $sourceNetworkAddress")
+                log.message("SubNetMac::sadr = $sadr")
                 
                 communicationMethod := COMMUNICATIONBYSUBNET
             }
@@ -1166,9 +1166,17 @@ class bacDevice
                 setClientAddress(addrClient.toStr())
 
                 sourceNetworkAddress = NPDUList[0] % 0x10000
+                log.message("InstanceNumber::sourceNetworkAddress = $sourceNetworkAddress")
                 sadr                 = NPDUList[0] / 0x10000
-                
-                communicationMethod := COMMUNICATIONBYINSTANCE
+                log.message("InstanceNumber::sadr = $sadr")
+                if((sourceNetworkAddress != 0) && (sadr != 0))
+				{
+					communicationMethod := COMMUNICATIONBYSUBNET
+				}
+				else if((sourceNetworkAddress == 0) && (sadr == 0))
+				{
+					communicationMethod := COMMUNICATIONBYINSTANCE
+				}
             }
             else
             {
