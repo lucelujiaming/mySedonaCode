@@ -1136,6 +1136,9 @@ class bacDevice
                 setClientAddress(addrClient.toStr())
                 log.message("addrClient.toStr() = ${addrClient.toStr()}")
 
+                // B'0011' Up to 480 octets(fits in an ARCNET frame)
+                maxAPDULength = 3
+                ** log.message("SubNetMac::maxAPDULength = $maxAPDULength")
                 sourceNetworkAddress = sNetBuf.parseInt()
                 log.message("SubNetMac::sourceNetworkAddress = $sourceNetworkAddress")
                 sadr                 = macBuf.parseInt()
@@ -1165,18 +1168,21 @@ class bacDevice
                 addrClient.loadBuf(addrClientBuf)
                 setClientAddress(addrClient.toStr())
 
+                maxAPDULength = convertmaxADPU(maxADPUList[0])
+                ** log.message("SubNetMac::maxAPDULength = $maxAPDULength")
                 sourceNetworkAddress = NPDUList[0] % 0x10000
                 log.message("InstanceNumber::sourceNetworkAddress = $sourceNetworkAddress")
                 sadr                 = NPDUList[0] / 0x10000
                 log.message("InstanceNumber::sadr = $sadr")
+                 
                 if((sourceNetworkAddress != 0) && (sadr != 0))
-				{
-					communicationMethod := COMMUNICATIONBYSUBNET
-				}
-				else if((sourceNetworkAddress == 0) && (sadr == 0))
-				{
-					communicationMethod := COMMUNICATIONBYINSTANCE
-				}
+                {
+                    communicationMethod := COMMUNICATIONBYSUBNET
+                }
+                else if((sourceNetworkAddress == 0) && (sadr == 0))
+                {
+                    communicationMethod := COMMUNICATIONBYINSTANCE
+                }
             }
             else
             {
@@ -1252,7 +1258,7 @@ class bacDevice
      log.message("-------------------------------------------------------------------------------")
      bacnetMultipleReadCount = 0
      bacnetMultipleWriteCount = 0
-     
+     // Get all bacReadPropertyMultiple and bacWriteProperty
      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(bacReadPropertyMultiple.type))  {
            int iObjectType = ((bacReadPropertyMultiple)d).objectNodeType
@@ -1340,10 +1346,10 @@ class bacDevice
      iListOffset[0] = 0;
      sortArray(iInstanceNumberList, iLen)
      
-    for (int i = 0; i < iLen; i++)
-    {
+     for (int i = 0; i < iLen; i++)
+     {
         log.message("iInstanceNumberList[$i] = ${iInstanceNumberList[i]}")
-    }
+     }
      log.message("-------------------------bacDevice update operateMultipleProperty-------------------------") 
      while (iBlockLen != -1)
      {

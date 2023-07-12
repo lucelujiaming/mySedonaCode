@@ -141,6 +141,7 @@ class bacReadPropertyMultiple
     }
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
+    log.message("makeMultipleReadPacket::maxAPDULength = ${device.maxAPDULength}")
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
@@ -178,9 +179,9 @@ class bacReadPropertyMultiple
         bacnetPacket[dataLength++] = iMultipleInstanceNumber % 0x100
         // listOfPropertyReferences  .... .110 = Named Tag: Opening Tag (6)
         bacnetPacket[dataLength++] = 0x1E
-        // Property Identifier: required (105)
+        // Property Identifier: present-value (85)
         bacnetPacket[dataLength++] = 0x09
-        bacnetPacket[dataLength++] = 0x69
+        bacnetPacket[dataLength++] = 0x55
         // .... .111 = Named Tag: Closing Tag (7)
         bacnetPacket[dataLength++] = 0x1F
     }
