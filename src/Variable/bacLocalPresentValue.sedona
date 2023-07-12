@@ -1,0 +1,84 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class bacLocalPresentValue
+  extends Component
+{
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+
+  property float value = 0.0f
+
+  override void start()
+  {
+  }
+
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    ** log.message("changed")
+    
+  }
+
+  override void execute()
+  {
+      Str aliasStr = alias.toStr()
+      ** log.message("111111111 Variable name=$name")
+      // find bus and dev
+      Component p = Sys.app.lookup(this.parent)
+      Component root = null
+      while (p != null) {
+        root = p
+      **  if(p.name.equals("play"))
+      **  {
+      **       ** log.message("Not deal play node and return with name=$name")
+      **       return
+      **  }
+        p = Sys.app.lookup(p.parent)
+      }
+      if (root != null) {
+        // log.message("root:: aliasStr=$aliasStr")
+        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr")
+        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+          if (f.type.is(Folder.type) && f.name.equals("service")) {
+             for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                if (n.type.is(FieldBusNet.type))  {
+                   for (Component r = Sys.app.lookup(n.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                      if (r.type.is(FieldBusDevice.type))  {
+                         for (Component q = Sys.app.lookup(r.children); q != null; q = Sys.app.lookup(q.nextSibling)) {
+                            if (q.type.is(BacReadPropertyVar.type) 
+                                && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("BacReadPropertyVar.name=${q.name}")
+                                value := ((BacReadPropertyVar)q).present_value
+                            }
+                            else if (q.type.is(bacReadPropertyMultiple.type) 
+                                && ((bacReadPropertyMultiple)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("bacReadPropertyMultiple.name=${q.name}")
+                                value := ((bacReadPropertyMultiple)q).present_value
+                            }
+                            else if (q.type.is(bacWriteProperty.type) 
+                                && ((bacWriteProperty)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("bacWriteProperty.name=${q.name}")
+                                ((bacWriteProperty)q).present_value := value
+                            }
+                            else if (q.type.is(VarInput.type))  {
+                                log.message("VarInput.name=${q.name}")
+                                value := ((VarInput)q).out
+                            }
+                            else if (q.type.is(VarOutput.type))  {
+                                log.message("VarOutput.name=${q.name}")
+                                ((VarOutput)q).in := value
+                            }
+                         }
+                      }
+                   }
+                }
+             }
+          }
+        }
+      }
+  }
+
+  // define Log log
+  inline float[8] buffer
+}
