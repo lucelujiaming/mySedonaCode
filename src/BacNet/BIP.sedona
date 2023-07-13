@@ -163,23 +163,23 @@ class BIP
            // }
            
            ** log.message("AAAA bus.setBacReadPropertyVarByProperty with propertyIdentifier=${((BacReadPropertyVar)r).propertyIdentifier}, objectNodeType=${((BacReadPropertyVar)r).objectNodeType} and instanceNumber=${((BacReadPropertyVar)r).instanceNumber}")
-           if (r.type.is(BacReadPropertyVar.type) 
-                   && ((BacReadPropertyVar)r).propertyIdentifier == propertyVar
-                   && ((BacReadPropertyVar)r).objectNodeType == iObjectType
-                   && ((BacReadPropertyVar)r).instanceNumber == iInstanceNumber) {
+       //    if (r.type.is(BacReadPropertyVar.type) 
+       //            && ((BacReadPropertyVar)r).propertyIdentifier == propertyVar
+       //            && ((BacReadPropertyVar)r).objectNodeType == iObjectType
+       //            && ((BacReadPropertyVar)r).instanceNumber == iInstanceNumber) {
+       //        // log.message("CCC r.propertyIdentifier=0x").printHex(
+       //        //              ((BacReadPropertyVar)r).propertyIdentifier).print(
+       //        //             " and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
+       //       ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
+       //    } else
+           if (r.type.is(bacReadProperty.type) 
+                   && ((bacReadProperty)r).propertyIdentifier == propertyVar
+                   && ((bacReadProperty)r).objectNodeType == iObjectType
+                   && ((bacReadProperty)r).instanceNumber == iInstanceNumber) {
                // log.message("CCC r.propertyIdentifier=0x").printHex(
-               //              ((BacReadPropertyVar)r).propertyIdentifier).print(
+               //              ((bacReadProperty)r).propertyIdentifier).print(
                //             " and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
-              ((BacReadPropertyVar)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
-           }
-           else if (r.type.is(bacReadPropertyMultiple.type) 
-                   && ((bacReadPropertyMultiple)r).propertyIdentifier == propertyVar
-                   && ((bacReadPropertyMultiple)r).objectNodeType == iObjectType
-                   && ((bacReadPropertyMultiple)r).instanceNumber == iInstanceNumber) {
-               // log.message("CCC r.propertyIdentifier=0x").printHex(
-               //              ((bacReadPropertyMultiple)r).propertyIdentifier).print(
-               //             " and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
-              ((bacReadPropertyMultiple)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
+              ((bacReadProperty)r).setBacReadPropertyVarByProperty(tagNumber, data, iLen)
            }
         }
       }

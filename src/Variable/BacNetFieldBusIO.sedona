@@ -104,7 +104,7 @@ abstract class BacNetFieldBusIO
     FieldBusNet tmpBus = lookupNetByDeviceName(tmpBuf)
     if (tmpBus != null) {
         busId = tmpBus.busId
-        log.message("444444 busId=$busId")
+        ** log.message("444444 busId=$busId")
         // trigger notify flush.
         if (busId != 0) {
           log.message("55555 busId=$busId")

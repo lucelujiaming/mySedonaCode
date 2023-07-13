@@ -1,5 +1,5 @@
 @niagaraIcon="module://icons/x16/control/numericPoint.png"
-class bacReadPropertyMultiple
+class bacReadProperty
   extends BacNetFieldBusIO
 {
   // Lujiaming add these at 23/02/24

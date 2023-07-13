@@ -46,15 +46,15 @@ class bacLocalPresentValue
                    for (Component r = Sys.app.lookup(n.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
                       if (r.type.is(FieldBusDevice.type))  {
                          for (Component q = Sys.app.lookup(r.children); q != null; q = Sys.app.lookup(q.nextSibling)) {
-                            if (q.type.is(BacReadPropertyVar.type) 
-                                && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("BacReadPropertyVar.name=${q.name}")
-                                value := ((BacReadPropertyVar)q).present_value
-                            }
-                            else if (q.type.is(bacReadPropertyMultiple.type) 
-                                && ((bacReadPropertyMultiple)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("bacReadPropertyMultiple.name=${q.name}")
-                                value := ((bacReadPropertyMultiple)q).present_value
+                            // if (q.type.is(BacReadPropertyVar.type) 
+                            //    && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
+                            //    ** log.message("BacReadPropertyVar.name=${q.name}")
+                            //    value := ((BacReadPropertyVar)q).present_value
+                            // } else 
+                            if (q.type.is(bacReadProperty.type) 
+                                && ((bacReadProperty)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("bacReadProperty.name=${q.name}")
+                                value := ((bacReadProperty)q).present_value
                             }
                             else if (q.type.is(bacWriteProperty.type) 
                                 && ((bacWriteProperty)q).alias.toStr().equals(aliasStr))  {

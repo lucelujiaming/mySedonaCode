@@ -178,10 +178,11 @@ class bacDevice
                 // ((BacNetFieldBusIO)d).device = this
                 // d.execute()
                 ** log.message("READ::execute_mode = $execute_mode and execute_counter= $execute_counter ")
-                if (d.type.is(BacReadPropertyVar.type))  {
-                   ((BacReadPropertyVar)d).execute()
-                } else if (d.type.is(bacReadPropertyMultiple.type))  {
-                   ((bacReadPropertyMultiple)d).execute()
+                // if (d.type.is(BacReadPropertyVar.type))  {
+                //   ((BacReadPropertyVar)d).execute()
+                // } else 
+                if (d.type.is(bacReadProperty.type))  {
+                   ((bacReadProperty)d).execute()
                 }
             }
             execute_counter = execute_counter + 1
@@ -215,7 +216,7 @@ class bacDevice
     }
     else
     {
-       log.message("bus is null ")
+       log.message("bus is null. I am $name and type is ${type.name}")
     }
   }
   
@@ -1937,15 +1938,15 @@ class bacDevice
      log.message("-------------------------------------------------------------------------------")
      bacnetMultipleReadCount = 0
      bacnetMultipleWriteCount = 0
-     // Get all bacReadPropertyMultiple and bacWriteProperty
+     // Get all bacReadProperty and bacWriteProperty
      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-        if (d.type.is(bacReadPropertyMultiple.type))  {
+        if (d.type.is(bacReadProperty.type))  {
            // Update objectNodeType
-           ((bacReadPropertyMultiple)d).objectNodeType = 
-                ((bacReadPropertyMultiple)d).convertObjectTypeToBacNetObjectType(
-                        ((bacReadPropertyMultiple)d).objectType)
-           int iObjectType = ((bacReadPropertyMultiple)d).objectNodeType
-           int iInstanceNumber = ((bacReadPropertyMultiple)d).instanceNumber
+           ((bacReadProperty)d).objectNodeType = 
+                ((bacReadProperty)d).convertObjectTypeToBacNetObjectType(
+                        ((bacReadProperty)d).objectType)
+           int iObjectType = ((bacReadProperty)d).objectNodeType
+           int iInstanceNumber = ((bacReadProperty)d).instanceNumber
            bacnetMultipleReadArray[bacnetMultipleReadCount] = iObjectType * 0x400000 + iInstanceNumber
            log.message("AAAA createRPMAndWPM with iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
            log.message("AAAA createRPMAndWPM with bacnetMultipleReadArray[$bacnetMultipleReadCount]=${bacnetMultipleReadArray[bacnetMultipleReadCount]}")
@@ -2048,33 +2049,33 @@ class bacDevice
   {
      log.message("111 operateOneBlock Enter") 
      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-         if (d.type.is(bacReadPropertyMultiple.type)
+         if (d.type.is(bacReadProperty.type)
             && iOperateType == BACNET_PROPERTY_READ)  {
             // Assume We donot use ReadMultiple
-            ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_NOTUSED
-           log.message("44444 operateOneBlock when instanceNumber=${((bacReadPropertyMultiple)d).instanceNumber}") 
+            ((bacReadProperty)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_NOTUSED
+           log.message("44444 operateOneBlock when instanceNumber=${((bacReadProperty)d).instanceNumber}") 
            for (int i = 0 ; i < iLen; i++)
            {
               int iCmpOne = iData[i] % 0x400000
-              if(iCmpOne == ((bacReadPropertyMultiple)d).instanceNumber)
+              if(iCmpOne == ((bacReadProperty)d).instanceNumber)
               {
                  if(i != 0)
                  {
                     // We use ReadMultiple and do nothing
-                    log.message("666 bacReadPropertyMultiple Disable $i when iOperateType=$iOperateType") 
-                   ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
+                    log.message("666 bacReadProperty Disable $i when iOperateType=$iOperateType") 
+                   ((bacReadProperty)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
                  }
                  else
                  {
                     // We use ReadMultiple and use instance number list
-                     log.message("7777 bacReadPropertyMultiple Enable $i when iOperateType=$iOperateType") 
-                   ((bacReadPropertyMultiple)d).bacnetReadMultipleCount = iLen
+                     log.message("7777 bacReadProperty Enable $i when iOperateType=$iOperateType") 
+                   ((bacReadProperty)d).bacnetReadMultipleCount = iLen
                     // int j = 0
                     for (int k = 0; k < iLen; k++)
                     {
                         
-                        log.message("We will send ${iData[k]} in the bacReadPropertyMultiple which instanceNumber=${((bacReadPropertyMultiple)d).instanceNumber}") 
-                        ((bacReadPropertyMultiple)d).bacnetReadMultipleList[k] = iData[k]
+                        log.message("We will send ${iData[k]} in the bacReadProperty which instanceNumber=${((bacReadProperty)d).instanceNumber}") 
+                        ((bacReadProperty)d).bacnetReadMultipleList[k] = iData[k]
                     }
                  }
               }
