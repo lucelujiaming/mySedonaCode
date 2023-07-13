@@ -221,7 +221,7 @@ class bacDevice
   
   int fillHead()
   {
-      log.message("fillHead start")
+    ** log.message("fillHead start")
     // BACnet Virtual Link Control
     // Type: BACnet/IP (Annex J) (0x81)
     bacnetPacket[0] = 0x81
@@ -249,7 +249,7 @@ class bacDevice
     // Building Automation and Control Network NPDU
     // NPCI Version: 0x01 (ASHRAE 135-1995)
     bacnetPacket[4] = versionNPCI
-    log.message("fillHead::communicationMethod send communicationMethod =${communicationMethod}")
+    ** log.message("fillHead::communicationMethod send communicationMethod =${communicationMethod}")
     // Control: 0x04, Expecting Reply
     if(communicationMethod == COMMUNICATIONBYSUBNET)
     {
@@ -260,7 +260,7 @@ class bacDevice
         // dnetNPCI
         bacnetPacket[6] = sourceNetworkAddress/256
         bacnetPacket[7] = sourceNetworkAddress%256
-        log.message("fillHead::COMMUNICATIONBYSUBNET send sourceNetworkAddress =${sourceNetworkAddress}")
+        ** log.message("fillHead::COMMUNICATIONBYSUBNET send sourceNetworkAddress =${sourceNetworkAddress}")
     //  // Destination MAC Layer Address Length: 1
     //  bacnetPacket[8] = 0x01
     //  // DADR: 5

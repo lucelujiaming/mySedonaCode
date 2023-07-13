@@ -151,7 +151,7 @@ class BIP
                   int propertyVar, int iObjectType, int iInstanceNumber,
                   int tagNumber, byte[] data, int iLen)
   {
-    log.message("AAAA bus.setBacReadPropertyVarByProperty with propertyVar=$propertyVar, iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
+    ** log.message("AAAA bus.setBacReadPropertyVarByProperty with propertyVar=$propertyVar, iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
     for (Component f = Sys.app.lookup(children); f != null; f = Sys.app.lookup(f.nextSibling)) {
       if (f.type.is(bacDevice.type) && (bacDevice)f == (bacDevice)device) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
@@ -162,7 +162,7 @@ class BIP
            //                " and propertyVar= 0x").printHex(propertyVar).print(". ").nl()
            // }
            
-           log.message("AAAA bus.setBacReadPropertyVarByProperty with propertyIdentifier=${((BacReadPropertyVar)r).propertyIdentifier}, objectNodeType=${((BacReadPropertyVar)r).objectNodeType} and instanceNumber=${((BacReadPropertyVar)r).instanceNumber}")
+           ** log.message("AAAA bus.setBacReadPropertyVarByProperty with propertyIdentifier=${((BacReadPropertyVar)r).propertyIdentifier}, objectNodeType=${((BacReadPropertyVar)r).objectNodeType} and instanceNumber=${((BacReadPropertyVar)r).instanceNumber}")
            if (r.type.is(BacReadPropertyVar.type) 
                    && ((BacReadPropertyVar)r).propertyIdentifier == propertyVar
                    && ((BacReadPropertyVar)r).objectNodeType == iObjectType

@@ -302,7 +302,7 @@ class bacReadPropertyMultiple
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
-         log.message("23232323 device.readPropertyMultipleSupport=${device.readPropertyMultipleSupport}")
+         ** log.message("23232323 device.readPropertyMultipleSupport=${device.readPropertyMultipleSupport}")
          if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_NOT_SUPPORT)
          {
             makeReadPropertyPacket()
@@ -316,7 +316,7 @@ class bacReadPropertyMultiple
          }
          else if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORTED)
          {
-            log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
+            ** log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
             if(bacnetReadMultipleCount == BACNET_READMULTIPLE_NOTUSED){
               makeReadPropertyMultiplePacket()
               ** log.message("111111 makeReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
