@@ -143,6 +143,33 @@ class bacDevice
         {
             log.message("We needFlush ")
         }
+
+        if(maxAPDULength == -1)
+        {
+            log.message("Sending makeDevice4194303MaxAPDULengthAccepted")
+            // Get max-apdu-length-accepted by <B'0000' Up to MinimumMessageSize (50 octets)>
+            maxAPDULength = 0
+            int iLen = makeDevice4194303MaxAPDULengthAccepted()
+            maxAPDULength = -1
+            if(iLen > 0)
+            {
+               log.message("writeReg makeDevice4194303MaxAPDULengthAccepted($iLen)")
+               writeReg(0, 0, iLen, buf)
+            }
+            return 
+        }
+        if(readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
+        {
+            log.message("Sending makeDevice4194303ProtocolServicesSupported")
+            // Get device information
+            int iLen = makeDevice4194303ProtocolServicesSupported()
+            if(iLen > 0)
+            {
+               log.message("writeReg makeDevice4194303ProtocolServicesSupported($iLen)")
+               writeReg(0, 0, iLen, buf)
+            }
+            return 
+        }
         // 
         ** log.message("bacDevice execute 33333 status=$status")
         if(execute_mode == BACNET_PROPERTY_READ)
@@ -554,67 +581,458 @@ class bacDevice
             
             serviceChoicePos++
             // Context Tag: 0, Length/Value/Type: 4
-            int iObjectType = bacnetRecvPacket[serviceChoicePos] & 0x07
-            log.message("LengthValueType = ${iObjectType} ")
-            serviceChoicePos += 2
+            int iObjectTypeLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+            log.message("LengthValueType = ${iObjectTypeLen} ")
+            
+            serviceChoicePos += 1
+            int iObjectType = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos += 1
+            // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+            // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
+            iObjectType = iObjectType * 0x04 + (bacnetRecvPacket[serviceChoicePos] / 0x40)
+            log.message("iObjectType = ${iObjectType} ")
+            
             int iInstanceNumber = bacnetRecvPacket[serviceChoicePos] * 0x10000 
                                 + bacnetRecvPacket[serviceChoicePos + 1] * 0x100
                                 + bacnetRecvPacket[serviceChoicePos + 2]
+            log.message("iInstanceNumber = ${iInstanceNumber} ")
             serviceChoicePos += 3
-            // Instance Number: 99
-            log.message("Instance Number = $iInstanceNumber ")
-            // Property Identifier : Length Value Type: 1
-            int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
-            log.message("PropertyLengthValue = ${PropertyLengthValue} ")
-            
-            // int  propertyProperty = 0x00
-            // Include SD Context Tag
-            // int  propertyProperty = bacnetRecvPacket[serviceChoicePos]
-            // log.message("Start propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
-            int  propertyProperty = 0
-            serviceChoicePos++
-            
-            for(int i = 0 ; i < PropertyLengthValue; i++)
+            // Object information
+            if((iObjectType == 8) && (iInstanceNumber == 4194303))
             {
-               propertyProperty = propertyProperty * 0x100
-                                   + bacnetRecvPacket[serviceChoicePos + i]
-               ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
-               **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
-            }
-            log.message("End propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
-            serviceChoicePos += PropertyLengthValue
-            // We have <property Array Index (Unsigned) 8>
-            if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
-            {
-               serviceChoicePos += 2;
-            }
-            if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
-            {
-               log.message("ERROR: Can not find start Tag ")
-            }
-            
-            // .... .110 = Named Tag: Opening Tag (6)
-            log.message("Opening Tag = ${bacnetRecvPacket[serviceChoicePos]} ")
-            serviceChoicePos++
-            int tagNumber = bacnetRecvPacket[serviceChoicePos]
-            log.message("Old tagNumber=$tagNumber")
-            while (tagNumber != 0x3F)
-            {
-                tagNumber = tagNumber/0x10
-                int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
-                log.message("iLen = $iLen and tagNumber=$tagNumber")
+                // Property Identifier : Length Value Type: 1
+                int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
+                log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+                
+                int  propertyProperty = 0
                 serviceChoicePos++
-                serviceChoicePos = decode_one_tag(bacnetRecvPacket, serviceChoicePos, 
-                                                    propertyProperty, iObjectType, iInstanceNumber, tagNumber, iLen)
-                if(serviceChoicePos == -1)
+                
+                for(int i = 0 ; i < PropertyLengthValue; i++)
                 {
-                   log.message("34343434 Error serviceChoicePos ")
-                   return -1
+                   propertyProperty = propertyProperty * 0x100
+                                       + bacnetRecvPacket[serviceChoicePos + i]
+                   ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
+                   **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
                 }
-                tagNumber = bacnetRecvPacket[serviceChoicePos]
+                log.message("End propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
+                serviceChoicePos += PropertyLengthValue
+
+                // Property Identifier: max-apdu-length-accepted (62)
+                log.message("Property Identifier: max-apdu-length-accepted (62) ")
+                if(propertyProperty == 62)
+                {
+                    if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
+                    {
+                       log.message("ERROR: Can not find start Tag ")
+                    }
+                    serviceChoicePos += 1
+                    // Application Tag: Unsigned Integer, Length/Value/Type: 2
+                    serviceChoicePos += 1
+                    int iAPDULen = bacnetRecvPacket[serviceChoicePos]
+                    serviceChoicePos += 1
+                    iAPDULen = iAPDULen * 0x100 + bacnetRecvPacket[serviceChoicePos]
+                    maxAPDULength = convertmaxADPU(iAPDULen)
+                    log.message("max-apdu-length-accepted set maxAPDULength = $maxAPDULength")
+                }
+                // Property Identifier: protocol-services-supported (97)
+                else if(propertyProperty == 97)
+                {
+                    if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
+                    {
+                       log.message("ERROR: Can not find start Tag ")
+                    }
+                    serviceChoicePos += 1
+                    int bitStringLen = bacnetRecvPacket[serviceChoicePos]
+                    log.message("bitStringLen = $bitStringLen ")
+                    serviceChoicePos += 1
+                    // Unused bits: 0
+                    serviceChoicePos += 1
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x80) == 0x80)
+                    {
+                       log.message("acknowledgeAlarm = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("acknowledgeAlarm = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x40) == 0x40)
+                    {
+                       log.message("confirmedCOVNotification = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("confirmedCOVNotification = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x20) == 0x20)
+                    {
+                       log.message("confirmedEventNotification = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("confirmedEventNotification = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x10) == 0x10)
+                    {
+                       log.message("getAlarmSummary = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("getAlarmSummary = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x08) == 0x08)
+                    {
+                       log.message("getEnrollmentSummary = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("getEnrollmentSummary = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x04) == 0x04)
+                    {
+                       log.message("subscribeCOV = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("subscribeCOV = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x02) == 0x02)
+                    {
+                       log.message("atomicReadFile = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("atomicReadFile = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x01) == 0x01)
+                    {
+                       log.message("atomicWriteFile = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("atomicWriteFile = FALSE ")
+                    }
+                    serviceChoicePos += 1
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x80) == 0x80)
+                    {
+                       log.message("addListElement = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("addListElement = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x40) == 0x40)
+                    {
+                       log.message("removeListElement = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("removeListElement = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x20) == 0x20)
+                    {
+                       log.message("createObject = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("createObject = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x10) == 0x10)
+                    {
+                       log.message("deleteObject = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("deleteObject = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x08) == 0x08)
+                    {
+                       log.message("readProperty = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("readProperty = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x04) == 0x04)
+                    {
+                       log.message("readPropertyConditional = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("readPropertyConditional = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x02) == 0x02)
+                    {
+                       readPropertyMultipleSupport = READ_PROPERTY_MULTIPLE_SUPPORTED
+                       log.message("readPropertyMultiple = TRUE ")
+                    }
+                    else
+                    {
+                       readPropertyMultipleSupport = READ_PROPERTY_MULTIPLE_NOT_SUPPORT
+                       log.message("readPropertyMultiple = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x01) == 0x01)
+                    {
+                       log.message("writeProperty = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("writeProperty = FALSE ")
+                    }
+                    serviceChoicePos += 1
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x80) == 0x80)
+                    {
+                       log.message("writePropertyMultiple = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("writePropertyMultiple = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x40) == 0x40)
+                    {
+                       log.message("deviceCommunicationControl = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("deviceCommunicationControl = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x20) == 0x20)
+                    {
+                       log.message("confirmedPrivateTransfer = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("confirmedPrivateTransfer = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x10) == 0x10)
+                    {
+                       log.message("confirmedTextMessage = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("confirmedTextMessage = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x08) == 0x08)
+                    {
+                       log.message("reinitializeDevice = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("reinitializeDevice = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x04) == 0x04)
+                    {
+                       log.message("vtOpen = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("vtOpen = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x02) == 0x02)
+                    {
+                       log.message("vtClose = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("vtClose = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x01) == 0x01)
+                    {
+                       log.message("vtData = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("vtData = FALSE ")
+                    }
+                    serviceChoicePos += 1
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x80) == 0x80)
+                    {
+                       log.message("authenticate = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("authenticate = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x40) == 0x40)
+                    {
+                       log.message("requestKey = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("requestKey = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x20) == 0x20)
+                    {
+                       log.message("i-Am = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("i-Am = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x10) == 0x10)
+                    {
+                       log.message("i-Have = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("i-Have = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x08) == 0x08)
+                    {
+                       log.message("unconfirmedCOVNotification = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("unconfirmedCOVNotification = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x04) == 0x04)
+                    {
+                       log.message("unconfirmedEventNotification = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("unconfirmedEventNotification = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x02) == 0x02)
+                    {
+                       log.message("unconfirmedPrivateTransfer = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("unconfirmedPrivateTransfer = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x01) == 0x01)
+                    {
+                       log.message("unconfirmedTextMessage = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("unconfirmedTextMessage = FALSE ")
+                    }
+                    serviceChoicePos += 1
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x80) == 0x80)
+                    {
+                       log.message("timeSynchronization = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("timeSynchronization = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x40) == 0x40)
+                    {
+                       log.message("who-Has = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("who-Has = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x20) == 0x20)
+                    {
+                       log.message("who-Is = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("who-Is = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x10) == 0x10)
+                    {
+                       log.message("readRange = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("readRange = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x08) == 0x08)
+                    {
+                       log.message("utcTimeSynchronization = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("utcTimeSynchronization = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x04) == 0x04)
+                    {
+                       log.message("lifeSafetyOperation = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("lifeSafetyOperation = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x02) == 0x02)
+                    {
+                       log.message("subscribeCOVProperty = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("subscribeCOVProperty = FALSE ")
+                    }
+                    if((bacnetRecvPacket[serviceChoicePos] & 0x01) == 0x01)
+                    {
+                       log.message("getEventInformation = TRUE ")
+                    }
+                    else
+                    {
+                       log.message("getEventInformation = FALSE ")
+                    }
+                }
+                return serviceChoicePos
             }
-            log.message("End of checkReadData .")
-            return serviceChoicePos
+            else 
+            {
+                // Instance Number: 99
+                log.message("Instance Number = $iInstanceNumber ")
+                // Property Identifier : Length Value Type: 1
+                int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
+                log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+                
+                // int  propertyProperty = 0x00
+                // Include SD Context Tag
+                // int  propertyProperty = bacnetRecvPacket[serviceChoicePos]
+                // log.message("Start propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
+                int  propertyProperty = 0
+                serviceChoicePos++
+                
+                for(int i = 0 ; i < PropertyLengthValue; i++)
+                {
+                   propertyProperty = propertyProperty * 0x100
+                                       + bacnetRecvPacket[serviceChoicePos + i]
+                   ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
+                   **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
+                }
+                log.message("End propertyProperty = 0x").printHex(propertyProperty).print(". ").nl()
+                serviceChoicePos += PropertyLengthValue
+                // We have <property Array Index (Unsigned) 8>
+                if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
+                {
+                   serviceChoicePos += 2;
+                }
+                if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
+                {
+                   log.message("ERROR: Can not find start Tag ")
+                }
+                
+                // .... .110 = Named Tag: Opening Tag (6)
+                log.message("Opening Tag = ${bacnetRecvPacket[serviceChoicePos]} ")
+                serviceChoicePos++
+                int tagNumber = bacnetRecvPacket[serviceChoicePos]
+                log.message("Old tagNumber=$tagNumber")
+                while (tagNumber != 0x3F)
+                {
+                    tagNumber = tagNumber/0x10
+                    int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+                    log.message("iLen = $iLen and tagNumber=$tagNumber")
+                    serviceChoicePos++
+                    serviceChoicePos = decode_one_tag(bacnetRecvPacket, serviceChoicePos, 
+                                                        propertyProperty, iObjectType, iInstanceNumber, tagNumber, iLen)
+                    if(serviceChoicePos == -1)
+                    {
+                       log.message("34343434 Error serviceChoicePos ")
+                       return -1
+                    }
+                    tagNumber = bacnetRecvPacket[serviceChoicePos]
+                }
+                log.message("End of checkReadData .")
+                return serviceChoicePos
+            }
         }
     }
     else if(bacnetRecvPacket[serviceChoicePos] == 0x00)
@@ -1170,6 +1588,138 @@ class bacDevice
     return dataLength
   }
 
+
+  int makeDevice4194303MaxAPDULengthAccepted()
+  {
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    bacnetPacket[1] = maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = invokeID
+    invokeID = invokeID + 1
+    if(invokeID == 0xFF)
+       invokeID = 0
+    dataLength = 3
+    // if(segmentedMsg == SEGMENTEDMSGENABLE)
+    // {
+    //     bacnetPacket[3] = sequenceNumber
+    //     bacnetPacket[4] = proposedWindowSize
+    //     dataLength = 5
+    // }
+    // Service Choice: readProperty (12)
+    bacnetPacket[dataLength++] = 0x0C
+    // Context Tag: 0, Length/Value/Type: 4
+    // .... 1... = Tag Class: Context Specific Tag
+    // 0000 .... = Context Tag Number: 0
+    // Length Value Type: 4
+    bacnetPacket[dataLength++] = 0x0C
+    // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+    int objectNodeType = 8
+    if(objectNodeType > 4)
+    {
+        bacnetPacket[dataLength++] = objectNodeType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength] = (objectNodeType % 4) * 0x40
+    // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
+    int instanceNumber = 4194303
+    bacnetPacket[dataLength] += 0x3F
+    dataLength++
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
+    // Property Identifier: max-apdu-length-accepted (62)
+    int propertyIdentifier = 62
+    log.message("BacReadPropertyVar::propertyIdentifier = $propertyIdentifier")
+    bacnetPacket[dataLength++] = 0x18 + 1
+    bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+
+    log.message("22222 bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+    return dataLength
+  }
+  
+
+  int makeDevice4194303ProtocolServicesSupported()
+  {
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    bacnetPacket[1] = maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = invokeID
+    invokeID = invokeID + 1
+    if(invokeID == 0xFF)
+       invokeID = 0
+    dataLength = 3
+    // if(segmentedMsg == SEGMENTEDMSGENABLE)
+    // {
+    //     bacnetPacket[3] = sequenceNumber
+    //     bacnetPacket[4] = proposedWindowSize
+    //     dataLength = 5
+    // }
+    // Service Choice: readProperty (12)
+    bacnetPacket[dataLength++] = 0x0C
+    // Context Tag: 0, Length/Value/Type: 4
+    // .... 1... = Tag Class: Context Specific Tag
+    // 0000 .... = Context Tag Number: 0
+    // Length Value Type: 4
+    bacnetPacket[dataLength++] = 0x0C
+    // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+    int objectNodeType = 8
+    if(objectNodeType > 4)
+    {
+        bacnetPacket[dataLength++] = objectNodeType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength] = (objectNodeType % 4) * 0x40
+    // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
+    int instanceNumber = 4194303
+    bacnetPacket[dataLength] += 0x3F
+    dataLength++
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
+    //Property Identifier: protocol-services-supported (97)
+    int propertyIdentifier = 97
+    log.message("BacReadPropertyVar::propertyIdentifier = $propertyIdentifier")
+    bacnetPacket[dataLength++] = 0x18 + 1
+    bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+
+    log.message("22222 bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+    return dataLength
+  }
+  
   int makeDevice4194303PropertyIdentifier()
   {
     dataLength = 0
@@ -1265,8 +1815,8 @@ class bacDevice
                 setClientAddress(addrClient.toStr())
                 log.message("addrClient.toStr() = ${addrClient.toStr()}")
 
-                // B'0011' Up to 480 octets(fits in an ARCNET frame)
-                maxAPDULength = 3
+                // Set maxAPDULength to -1 and call makeDevice4194303MaxAPDULengthAccepted later
+                maxAPDULength = -1
                 ** log.message("SubNetMac::maxAPDULength = $maxAPDULength")
                 sourceNetworkAddress = sNetBuf.parseInt()
                 log.message("SubNetMac::sourceNetworkAddress = $sourceNetworkAddress")
@@ -1362,7 +1912,7 @@ class bacDevice
 
     if(bacnetCurrentDeviceRet == 2)
     {
-        log.message("Send makeDevice4194303PropertyIdentifier")
+        log.message("Sending makeDevice4194303PropertyIdentifier")
         int iLen = makeDevice4194303PropertyIdentifier()
         if(iLen > 0)
         {
@@ -1581,7 +2131,7 @@ class bacDevice
   
   define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
   define int BACNET_WRITEMULTIPLE_DONOTHING  = 0
-  
+    
   FieldBusNet bus = null
   
   inline UdpSocket socket           // socket used for send/receive

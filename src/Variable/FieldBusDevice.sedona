@@ -39,6 +39,11 @@ abstract class FieldBusDevice
   ////////////////////////////////////////////////////////////////
   // Fields
   ////////////////////////////////////////////////////////////////
+  define int READ_PROPERTY_MULTIPLE_SUPPORT_NONE    = 0
+  define int READ_PROPERTY_MULTIPLE_CHECKING        = 1
+  define int READ_PROPERTY_MULTIPLE_NOT_SUPPORT     = 2
+  define int READ_PROPERTY_MULTIPLE_SUPPORTED       = 3
+  
   Str dataRecvGramAddr
   int objectIdentifier
   int sourceNetworkAddress
@@ -47,4 +52,6 @@ abstract class FieldBusDevice
   // SADR: 5
   int sadr = 0
   int maxAPDULength = 0
+  
+  int readPropertyMultipleSupport = READ_PROPERTY_MULTIPLE_SUPPORT_NONE
 }

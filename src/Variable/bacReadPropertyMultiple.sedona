@@ -38,13 +38,101 @@ class bacReadPropertyMultiple
       update()
     }
   }
-
-  void makeReadPacket()
+  
+  void makeReadPropertyPacket()
   {
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    log.message("makeReadPacket::maxAPDULength = ${device.maxAPDULength}")
+    bacnetPacket[1] = device.maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = device.invokeID
+    device.invokeID = device.invokeID + 1
+    if(device.invokeID == 0xFF)
+       device.invokeID = 0
+    dataLength = 3
+    // if(segmentedMsg == SEGMENTEDMSGENABLE)
+    // {
+    //     bacnetPacket[3] = sequenceNumber
+    //     bacnetPacket[4] = proposedWindowSize
+    //     dataLength = 5
+    // }
+    // Service Choice: readProperty (12)
+    bacnetPacket[dataLength++] = 0x0C
+    // Context Tag: 0, Length/Value/Type: 4
+    // .... 1... = Tag Class: Context Specific Tag
+    // 0000 .... = Context Tag Number: 0
+    // Length Value Type: 4
+    bacnetPacket[dataLength++] = 0x0C
+    if(objectNodeType > 4)
+    {
+        bacnetPacket[dataLength++] = objectNodeType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
+    // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
+    // Property Identifier: (374) Reserved for Use by ASHRAE (374)
+    // Property Type: access-credential (32)
+    log.message("BacReadPropertyVar::propertyIdentifier = $propertyIdentifier")
+    if(propertyIdentifier/0x1000000 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 4
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x01000000)
+        bacnetPacket[dataLength++] = (propertyIdentifier /(0x010000))%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier /   0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else if(propertyIdentifier/0x10000 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 3
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
+        bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else if(propertyIdentifier/0x100 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 2
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
+        bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x18 + 1
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+//    // property Array Index (Unsigned) 5
+//    // Array Information
+    bacnetPacket[dataLength++] = 0x29
+    bacnetPacket[dataLength++] = arrayProperty
+
+    log.message("22222 bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+  }
+
+  void makeReadPropertyMultiplePacket()
+  {
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    log.message("makeReadPropertyMultiplePacket::maxAPDULength = ${device.maxAPDULength}")
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
@@ -132,7 +220,7 @@ class bacReadPropertyMultiple
   }
 
   
-  void makeMultipleReadPacket()
+  void makeMultipleReadPropertyMultiplePacket()
   {
     dataLength = 0
     if(bacnetReadMultipleCount <= BACNET_READMULTIPLE_DONOTHING)
@@ -141,7 +229,7 @@ class bacReadPropertyMultiple
     }
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    log.message("makeMultipleReadPacket::maxAPDULength = ${device.maxAPDULength}")
+    log.message("makeMultipleReadPropertyMultiplePacket::maxAPDULength = ${device.maxAPDULength}")
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
@@ -191,7 +279,7 @@ class bacReadPropertyMultiple
         buf[i] = (float)bacnetPacket[i]
     }
   }
-  
+
   virtual override void execute()
   {
     ** log.message("bacreadPropertyMultiple::execute 11111 status=$status") 
@@ -205,35 +293,55 @@ class bacReadPropertyMultiple
     }
     ** log.message("bacreadPropertyMultiple::execute 222222 status=$status") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
+      if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
+      {
+         log.message("bacreadPropertyMultiple:: device.readPropertyMultipleSupport == READ_PROPERTY_MULTIPLE_SUPPORT_NONE") 
+         return 
+      }
       long nowNanoSecond  = Sys.ticks()
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
-        log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
-        if(bacnetReadMultipleCount == BACNET_READMULTIPLE_NOTUSED){
-          makeReadPacket()
-          ** log.message("111111 makeReadPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
-          if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
-            ** log.message("device.readReg")
-          } else {
-            log.message("BacReadPropertyVar Error")
-            status := STATUSOFFLINE
-          }
-        }
-        else if(bacnetReadMultipleCount == BACNET_READMULTIPLE_DONOTHING){
-           log.message("ReadMultiple Disable")
-        }
-        else if(bacnetReadMultipleCount > BACNET_READMULTIPLE_DONOTHING){
-          makeMultipleReadPacket()
-          ** log.message("111111 makeMultipleReadPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
-          if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
-            ** log.message("device.readReg")
-          } else {
-            log.message("BacReadPropertyVar Error")
-            status := STATUSOFFLINE
-          }
-        }
-        sendInterval = nowMilliSecond + (long)refreshTime
+         log.message("23232323 device.readPropertyMultipleSupport=${device.readPropertyMultipleSupport}")
+         if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_NOT_SUPPORT)
+         {
+            makeReadPropertyPacket()
+            ** log.message("111111 makeReadPropertyPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+            if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+              ** log.message("device.readReg")
+            } else {
+              log.message("Send ReadPropertyPacket Error")
+              status := STATUSOFFLINE
+            }
+         }
+         else if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORTED)
+         {
+            log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
+            if(bacnetReadMultipleCount == BACNET_READMULTIPLE_NOTUSED){
+              makeReadPropertyMultiplePacket()
+              ** log.message("111111 makeReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+              if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+                ** log.message("device.readReg")
+              } else {
+                log.message("Send ReadPropertyMultiplePacket Error")
+                status := STATUSOFFLINE
+              }
+            }
+            else if(bacnetReadMultipleCount == BACNET_READMULTIPLE_DONOTHING){
+               log.message("ReadMultiple Disable")
+            }
+            else if(bacnetReadMultipleCount > BACNET_READMULTIPLE_DONOTHING){
+              makeMultipleReadPropertyMultiplePacket()
+              ** log.message("111111 makeMultipleReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+              if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+                ** log.message("device.readReg")
+              } else {
+                log.message("Send MultipleReadPropertyMultiplePacket Error")
+                status := STATUSOFFLINE
+              }
+            }
+         }
+         sendInterval = nowMilliSecond + (long)refreshTime
       }
     }
     ** log.message("33333 status=$status") 
@@ -327,6 +435,7 @@ class bacReadPropertyMultiple
   define int BACNET_READMULTIPLE_DONOTHING  = 0
   
   define int SEND_INTERVAL = 30
+  int arrayProperty = 5
   
   private inline float[1024] buf
   static inline byte[1024] bacnetPacket
