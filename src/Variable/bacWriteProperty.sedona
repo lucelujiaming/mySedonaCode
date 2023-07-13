@@ -388,16 +388,49 @@ class bacWriteProperty
     for(int i =0 ; i < dataLength; i++)
         buf[i] = (float)bacnetPacket[i]
   }
+
+  void getParentDevice()
+  {
+    if(Sys.app.lookup(this.parent) != null)
+    {
+        log.message("bacreadProperty:: get this.parent as Device") 
+        Component objDevice = Sys.app.lookup(this.parent)
+        if(objDevice.type.is(FieldBusDevice.type)) {
+            log.message("bacreadProperty:: set this.parent as Device") 
+            device = (FieldBusDevice)objDevice
+        }
+    }
+  }
+  
+  void getParentBus()
+  {
+    if(device != null)
+    {
+        if(Sys.app.lookup(device.parent) != null)
+        {
+            log.message("bacreadProperty:: get device.parent as Bus") 
+            Component objBus = Sys.app.lookup(device.parent)
+            if(objBus.type.is(FieldBusNet.type)) {
+                log.message("bacreadProperty:: set device.parent as Bus") 
+                bus = (FieldBusNet)objBus
+                update()
+            }
+        }
+    }
+  }
   
   virtual override void execute()
   {
     ** log.message("bacWriteProperty::execute 11111 status=$status") 
     int iDelayCount = 0
-    if (bus != null) {
-        ** log.message("12121212 status=$status")  // status=4 -> STATUSNODEV
+    if (bus == null) {
+        log.message("bacWriteProperty:: bus == null and status=$status")  // status=4 -> STATUSNODEV
+        getParentBus()
+        return
     }
     if(device == null){
-        log.message("bacWriteProperty:: device == null")  // status=4 -> STATUSNODEV
+        log.message("bacWriteProperty:: device == null and status=$status")  // status=4 -> STATUSNODEV
+        getParentDevice()
         return
     }
     ** log.message("bacWriteProperty::execute 222222 bacnetWriteMultipleCount=$bacnetWriteMultipleCount") 
