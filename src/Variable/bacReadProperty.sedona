@@ -33,7 +33,7 @@ class bacReadProperty
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == VarInput.url) {
+    if (slot == BacNetFieldBusIO.objectType || slot == BacNetFieldBusIO.instanceNumber) {
       log.message("changed slot.name=$slot.name")
       update()
     }

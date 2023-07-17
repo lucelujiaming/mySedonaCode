@@ -13,7 +13,7 @@ class VarInput
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == VarInput.url) {
+    if (slot == VarInput.device_name || slot == VarInput.io_type || slot == VarInput.Address) {
       log.message("changed slot.name=$slot.name")
       update()
     }

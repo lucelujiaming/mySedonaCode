@@ -103,15 +103,15 @@ class rtuMaster
   
   private void updateVariable()
   {
-      log.message("updateVariable name=$name")
-	  // log.message("root:: aliasStr=$aliasStr")
-	  for (Component f = Sys.app.lookup(this.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-	    if (f.type.is(Variable.type) && !f.name.equals("service")) {
-	      Str nameComponentStr = ((Variable)f).name
-	      log.message("updateVariable nameComponentStr=$nameComponentStr and name=$name")
-	      f.execute()
-	    }
-	  }
+     ** log.message("updateVariable name=$name")
+     // log.message("root:: aliasStr=$aliasStr")
+     for (Component f = Sys.app.lookup(this.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+       if (f.type.is(Variable.type) && !f.name.equals("service")) {
+         Str nameComponentStr = ((Variable)f).name
+         log.message("updateVariable nameComponentStr=$nameComponentStr and name=$name")
+         f.execute()
+       }
+     }
   }
   
   ////////////////////////////////////////////////////////////////

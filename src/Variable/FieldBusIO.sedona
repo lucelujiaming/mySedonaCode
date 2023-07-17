@@ -14,6 +14,21 @@ abstract class FieldBusIO
   define int STATUSEURL = 6
   define int STATUSEND = 7
 
+  
+  define Str IO_TYPE_RANGE = "AnalogInput, AnalogOutput, AnalogValue, BinaryIInput, BinaryIOutput, BinaryIValue, Int, Word, DInt, DWord, Real, END"
+  define int IO_TYPE_AI     = 0
+  define int IO_TYPE_AO     = 1
+  define int IO_TYPE_AV     = 2
+  define int IO_TYPE_BI     = 3
+  define int IO_TYPE_BO     = 4
+  define int IO_TYPE_BV     = 5
+  define int IO_TYPE_INT    = 6
+  define int IO_TYPE_WORD   = 7
+  define int IO_TYPE_DINT   = 8
+  define int IO_TYPE_DWORD  = 9
+  define int IO_TYPE_REAL   = 10
+  define int IO_TYPE_END    = 11
+
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
@@ -25,8 +40,16 @@ abstract class FieldBusIO
 
   @asStr
   @config
-  property Buf(64) url = ""
+  property Buf(64) device_name = ""
 
+  @range = IO_TYPE_RANGE
+  @fieldWidth = 20
+  property int io_type = IO_TYPE_AI
+  
+  @asStr
+  @config
+  property Buf(64) Address = "" 
+  
   override void loaded()
   {
     update()
@@ -54,76 +77,70 @@ abstract class FieldBusIO
     regId = 0
     typeId = 0
     dataLen = 0
-    Str tmp = url.toStr()
-    ** log.message("11111 url=$tmp")
-    if (url.toStr().length() > 0) {
-      int findState = 0
-      int findIdx = 0
-      Str urlStr = url.toStr()
-      Str tmpBuf = ""
-      int aLen = 0
-      bool isModBus = false
-      for (int i=0; i<urlStr.length(); i++) {
-        int c = urlStr.get(i)
-        if (c == "/".get(0)) {
-          if (tmpBuf.length() > 0) {
-            if (findState == 0) {
-              // dev name
-              aLen = i
-            } else if (findState == 1) {
-              if (tmpBuf.equals("int")) {
-                typeId = 1
-                dataLen = 1
-                isModBus = true
-              } else if (tmpBuf.equals("word")) {
-                typeId = 2
-                dataLen = 1
-                isModBus = true
-              } else if (tmpBuf.equals("dint")) {
-                typeId = 3
-                dataLen = 2
-                isModBus = true
-              } else if (tmpBuf.equals("dword")) {
-                typeId = 4
-                dataLen = 2
-                isModBus = true
-              } else if (tmpBuf.equals("real")) {
-                typeId = 5
-                dataLen = 2
-                isModBus = true
-              } else if (tmpBuf.equals("ai")) {
-                typeId = 0
-                dataLen = 1
-              } else if (tmpBuf.equals("ao")) {
-                typeId = 1
-                dataLen = 1
-              } else if (tmpBuf.equals("av")) {
-                typeId = 2
-                dataLen = 1
-              } else if (tmpBuf.equals("bi")) {
-                typeId = 3
-                dataLen = 1
-              } else if (tmpBuf.equals("bo")) {
-                typeId = 4
-                dataLen = 1
-              } else if (tmpBuf.equals("bv")) {
-                typeId = 5
-                dataLen = 1
-              }
-            }
-          }
-          findState ++
-          findIdx = 0
-          tmpBuf.set(findIdx, 0)
-          continue
-        }
-        tmpBuf.set(findIdx, c)
-        findIdx ++
-        tmpBuf.set(findIdx, 0)
-      }
-      ** log.message("222222 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
-      if (aLen > 0 && findState == 2 && tmpBuf.length() > 0) {
-        int tmpInt = tmpBuf.parseInt()
+    
+    int aLen = device_name.bytesLen
+    bool isModBus = false
+
+    switch(io_type)
+    {
+    case IO_TYPE_AI:
+      typeId = 0
+      dataLen = 1
+      break
+    case IO_TYPE_AO:
+      typeId = 1
+      dataLen = 1
+      break
+    case IO_TYPE_AV:
+      typeId = 2
+      dataLen = 1
+      break
+    case IO_TYPE_BI:
+      typeId = 3
+      dataLen = 1
+      break
+    case IO_TYPE_BO:
+      typeId = 4
+      dataLen = 1
+      break
+    case IO_TYPE_BV:
+      typeId = 5
+      dataLen = 1
+      break
+    case IO_TYPE_INT:
+      typeId = 1
+      dataLen = 1
+      isModBus = true
+      break
+    case IO_TYPE_WORD:
+      typeId = 2
+      dataLen = 1
+      isModBus = true
+      break
+    case IO_TYPE_DINT:
+      typeId = 3
+      dataLen = 2
+      isModBus = true
+      break
+    case IO_TYPE_DWORD:
+      typeId = 4
+      dataLen = 2
+      isModBus = true
+      break
+    case IO_TYPE_REAL:
+      typeId = 5
+      dataLen = 2
+      isModBus = true
+      break
+    default:
+    ** use IO_TYPE_AI as default
+      typeId = 0
+      dataLen = 1
+      break
+    }
+    ** log.message("222222 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+    if (aLen > 0 && Address.bytesLen > 0) {
+        int tmpInt = Address.toStr().parseInt()
         if (tmpInt != -1) {
           if (isModBus) {
             if ((tmpInt == 0) ||
@@ -141,13 +158,8 @@ abstract class FieldBusIO
             }
           }
           ** log.message("33333 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
-          for (int i=0; i<aLen; i++) {
-            int c = urlStr.get(i)
-            tmpBuf.set(i, c)
-            tmpBuf.set(i+1, 0)
-          }
           // find device and bus id.
-          FieldBusNet tmpBus = lookupNetByDeviceName(tmpBuf)
+          FieldBusNet tmpBus = lookupNetByDeviceName(device_name.toStr())
           if (tmpBus != null) {
             ** log.message("444444 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
             busId = tmpBus.busId
@@ -161,7 +173,7 @@ abstract class FieldBusIO
             } else {
               tmpBus.notifyFlush()
             }
-            devStr.copyFromStr(tmpBuf, 64)
+            devStr.copyFromStr(device_name.toStr(), 64)
             devStr.set(aLen, 0)
             regId = tmpInt
           }
@@ -169,10 +181,9 @@ abstract class FieldBusIO
           ** log.message("10101010 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
           status := STATUSEURL
         }
-      } else {
+    } else {
         ** log.message("123123123 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
         status := STATUSEURL
-      }
     }
     if(bus != null)
     {

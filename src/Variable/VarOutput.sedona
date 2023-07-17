@@ -20,7 +20,8 @@ class VarOutput
         buf[0] = in
         bus.writeReg(cache, regId, typeId, buf)
       }
-    } else if (slot == VarOutput.url) {
+    } 
+    if (slot == VarOutput.device_name || slot == VarOutput.io_type || slot == VarOutput.Address) {
       update()
       needUpdate = true
     }
