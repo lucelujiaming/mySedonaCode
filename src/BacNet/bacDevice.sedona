@@ -291,6 +291,7 @@ class bacDevice
     else 
     {   
       log.message("Error dataExpectingReplyNPCI with (${sourceNetworkAddress}, ${sadr})") 
+      log.message("I am $name and type is ${type.name}")
       return -1
     }
   }
@@ -391,8 +392,8 @@ class bacDevice
        log.message("111111 writeReg")
        return -1;
     }
-    ** log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
-    ** log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
+    log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
+    log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
     
     for(int i =0; i < iLen; i++)
     {
@@ -1891,7 +1892,7 @@ class bacDevice
     if (!socket.bind(((BIP)bus).port))
     {
       if (logError) log.error("cannot bind to port=${((BIP)bus).port}")
-      return false
+      // return false
     }
 
     log.message("started port=${((BIP)bus).port}")
@@ -2063,13 +2064,13 @@ class bacDevice
                  {
                     // We use ReadMultiple and do nothing
                     log.message("666 bacReadProperty Disable $i when iOperateType=$iOperateType") 
-                   ((bacReadProperty)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
+                    ((bacReadProperty)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
                  }
                  else
                  {
                     // We use ReadMultiple and use instance number list
-                     log.message("7777 bacReadProperty Enable $i when iOperateType=$iOperateType") 
-                   ((bacReadProperty)d).bacnetReadMultipleCount = iLen
+                    ** log.message("7777 bacReadProperty Enable $i when iOperateType=$iOperateType") 
+                    ((bacReadProperty)d).bacnetReadMultipleCount = iLen
                     // int j = 0
                     for (int k = 0; k < iLen; k++)
                     {
