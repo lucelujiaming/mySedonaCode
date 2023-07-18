@@ -2,9 +2,6 @@
 class bacDevice
   extends FieldBusDevice
 {
-  @config
-  property int deviceInstance = 0
-
   // Lujiaming add these at 23/05/22
   define Str BVLCISTATUSRANGE = "NoBVLCI, DistributeBroadcastToNetWork, Unicast, Broadcast, ForwardNPDU_WT, END"
   define int BVLCISTATUSNOBVLCI = 0
@@ -13,19 +10,6 @@ class bacDevice
   define int BVLCISTATUSBROADCAST = 3
   define int BVLCISTATUSFORARDNPDU = 4
   define int BVLCISTATUSEND = 5
-
-  define Str NPCIRANGE = "Disable, Enable, END"
-  define int DNETDISABLE = 0
-  define int DNETENABLE = 1
-  
-  define int SNETDISABLE = 0
-  define int SNETENABLE = 1
-  
-  define int DATAREPLYDISABLE = 0
-  define int DATAREPLYENABLE = 1
-  
-  define int NPCIEND = 2
-
   
   define Str COMMUNICATIONMETHOD = "None, InstanceNumber, SubNetAndMAC, END"
   define int COMMUNICATIONNONE       = 0
@@ -120,13 +104,12 @@ class bacDevice
                 int iRet = checkReadData(bacnetRecvPacket, dataLength)
                 if(iRet == 0)
                 {
-                   log.message("We readReg and return (${objectIdentifier}, ${sourceNetworkAddress})")
+                   log.message("We readReg and return ${sourceNetworkAddress})")
                    log.message("          from ${dataRecvGramAddr}")
                 //   objectIdentifier = 240012
                 //   dataRecvGramAddr = "192.168.168.241"
 
-                   log.message("We use ${objectIdentifier} temply")
-                   setClientAddress(dataRecvGramAddr)
+                //   setClientAddress(dataRecvGramAddr)
                 }
             }
             
@@ -353,7 +336,7 @@ class bacDevice
        ** log.message("readReg failed with len=${dataRecvGram.len} and port=${dataRecvGram.port} ")
        return -1
     }
-    ** log.message("socket.receive($iLen) ${dataRecvGram.len} bytes from ${dataRecvGram.addr.toStr()}")
+    log.message("socket.receive($iLen) ${dataRecvGram.len} bytes from ${dataRecvGram.addr.toStr()}")
     dataRecvGramAddr = dataRecvGram.addr.toStr()
     headLength = checkBacnetHead()
     if(headLength < 0)
@@ -436,8 +419,8 @@ class bacDevice
     }
     else if(apduType == 0x01)
     {
-       log.message("BACnet-Unconfirmed-Request-PDU")
-       return 0
+       log.message("BACnet-Unconfirmed-Request-PDU and changed from 0 to 1 at 0718")
+       return 1
     }
     else if(apduType == 0x02)
     {
@@ -524,7 +507,7 @@ class bacDevice
     // APDU Type
     int apduType = bacnetRecvPacket[serviceChoicePos] & 0x70
     apduType = apduType / 0x10
-    log.message("---------- apduType is $apduType ------------------")
+    log.message("---------- apduType is $apduType at ------------------")
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     if(apduType == 0)
     { 
@@ -546,7 +529,7 @@ class bacDevice
     int apduTypeExtraLength = checkAPNUData(apduType)
     serviceChoicePos += apduTypeExtraLength
 
-    ** log.message("Service Choice is ${bacnetRecvPacket[serviceChoicePos]} ")
+    log.message("Service Choice is ${bacnetRecvPacket[serviceChoicePos]} ")
     int objectIdentifierAndType = 0
     // ex: Service Choice: read Property (12)
     // ex: Service Choice: read Property ACK (12)
@@ -1072,10 +1055,49 @@ class bacDevice
             objectIdentifierAndType = objectIdentifierAndType * 0x100 + 
                                       bacnetRecvPacket[serviceChoicePos + 5]
         }
-        log.message("objectIdentifierAndType = ${objectIdentifierAndType}")
-        objectIdentifier = objectIdentifierAndType % 0x400000
-        log.message("BIP::objectIdentifier = ${objectIdentifier}")
+        log.message("WhoAmI::objectIdentifierAndType = ${objectIdentifierAndType}")
+        // objectIdentifier = objectIdentifierAndType % 0x400000
+        log.message("WhoAmI::objectIdentifier = ${objectIdentifierAndType % 0x400000}")
         return 0
+    }
+    else if(bacnetRecvPacket[serviceChoicePos] == 0x08)
+    {
+        // No Device Instance Range
+        if(serviceChoicePos + 1 == iPacketLen)
+        {
+          log.message("Unconfirmed Service Choice: who-Is (8) without Device Instance Range")
+          
+          int iLen = makeBACnetIAmPDU()
+          if(iLen > 0)
+          {
+             log.message("writeReg makeBACnetIAmPDU($iLen)")
+             writeReg(0, 0, iLen, buf)
+          }
+        }
+        else
+        {
+          serviceChoicePos += 1
+          int iDeviceInstanceRangeLen = bacnetRecvPacket[serviceChoicePos] % 0x08
+          serviceChoicePos++
+          int iFromRange = 0x00
+          for(int i = 0 ; i < iDeviceInstanceRangeLen; i++)
+          {
+             iFromRange = iFromRange * 0x100
+                                   + bacnetRecvPacket[serviceChoicePos + i]
+          }
+          serviceChoicePos += iDeviceInstanceRangeLen
+          iDeviceInstanceRangeLen = bacnetRecvPacket[serviceChoicePos] % 0x08
+          serviceChoicePos++
+          int iToRange = 0x00
+          for(int i = 0 ; i < iDeviceInstanceRangeLen; i++)
+          {
+             iToRange = iToRange * 0x100
+                                   + bacnetRecvPacket[serviceChoicePos + i]
+          }
+          serviceChoicePos += iDeviceInstanceRangeLen
+          log.message("Unconfirmed Service Choice: who-Is (8) from $iFromRange to $iToRange")
+        }
+        return serviceChoicePos
     }
     else if(bacnetRecvPacket[serviceChoicePos] == 0x09)
     {
@@ -1434,6 +1456,42 @@ class bacDevice
     // B'1110' reserved by ASHRAE
     // B'1111' reserved by ASHRAE
   }
+
+  
+  int createmaxADPU(int iOption)
+  {
+    // B'0000' Up to MinimumMessageSize (50 octets)
+    if(iOption == 0)
+       return 50
+    // B'0001' Up to 128 octets
+    else if(iOption == 1)
+       return 128
+    // B'0010' Up to 206 octets(fits in a LonTalk frame)
+    else if(iOption == 2)
+       return 206
+    // B'0011' Up to 480 octets(fits in an ARCNET frame)
+    else if(iOption == 3)
+       return 480
+    // B'0100' Up to 1024 octets
+    else if(iOption == 4)
+       return 1024
+    // B'0101' Up to 1476 octets(fits in a ISO 8802-3 frame)
+    else if(iOption == 5)
+       return 1476 
+    // It is impossible,we use B'0011' Up to 480 octets as the default value
+    else 
+       return 3
+    // B'0110' reserved by ASHRAE
+    // B'0111' reserved by ASHRAE
+    // B'1000' reserved by ASHRAE
+    // B'1001' reserved by ASHRAE
+    // B'1010' reserved by ASHRAE
+    // B'1011' reserved by ASHRAE
+    // B'1100' reserved by ASHRAE
+    // B'1101' reserved by ASHRAE
+    // B'1110' reserved by ASHRAE
+    // B'1111' reserved by ASHRAE
+  }
 /*
   int setClientAddressBySNetAndMac(int sNetAddrID, int macID)
   {
@@ -1526,6 +1584,58 @@ class bacDevice
     return 3
   }
   
+  int makeBACnetIAmPDU()
+  {
+    bacLocalDevice localDevice = null
+    if(Sys.app.lookup(this.parent) != null)
+    {
+        log.message("makeBACnetIAmPDU:: find the BIP") 
+        Component objBus = Sys.app.lookup(this.parent)
+        for (Component f = Sys.app.lookup(objBus.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if(f.type.is(bacLocalDevice.type)) {
+                log.message("makeBACnetIAmPDU:: find the bacLocalDevice") 
+                localDevice = (bacLocalDevice)f
+            }
+        }
+    }
+    if(localDevice != null)
+    {
+       // 0001 .... = APDU Type: Unconfirmed-REQ (1)
+       bacnetPacket[0] = 0x10
+       // Unconfirmed Service Choice: i-Am (0)
+       bacnetPacket[1] = 0x00
+       // Application Tag: BACnetObjectIdentifier, Length/Value/Type: 4
+       bacnetPacket[2] = 0xC4
+       // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+       bacnetPacket[3] = (0x08 / 4)
+       int iInstanceNumber = localDevice.InstanceNumber.toStr().parseInt()
+       log.message("22222 localDevice.InstanceNumber =  ${iInstanceNumber}")
+       bacnetPacket[4] =  iInstanceNumber / 0x10000
+       bacnetPacket[5] = (iInstanceNumber % 0x10000) / 0x100
+       bacnetPacket[6] = (iInstanceNumber % 0x10000) % 0x100
+       // Application Tag: Unsigned Integer, Length/Value/Type: 2
+       bacnetPacket[7] = 0x22
+       // Maximum ADPU Length Accepted: (Unsigned) 480
+      log.message("22222 localDevice.maxADPULength = ${localDevice.maxADPULength}")
+       bacnetPacket[8]  = createmaxADPU(localDevice.maxADPULength) / 0x100
+       bacnetPacket[9] = createmaxADPU(localDevice.maxADPULength) % 0x100
+       // Segmentation Supported:  no-segmentation
+       bacnetPacket[10] = 0x91
+       bacnetPacket[11] = 0x03
+       // Vendor ID: Shanghai Cellcons Controls Co., Ltd (853)
+       bacnetPacket[12] = 0x22
+       bacnetPacket[13] = 0x03
+       bacnetPacket[14] = 0x55
+       
+      log.message("22222 22222222222222222222222")
+      for(int i =0 ; i < 14; i++)
+      {
+          buf[i] = (float)bacnetPacket[i]
+      }
+      return 15
+    }
+    return 0
+  }
   
   int makeBACnetComplexACKPDU(int iObjectIdentifier)
   {
@@ -1534,7 +1644,7 @@ class bacDevice
     bool bFound = false
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(bacLocalPresentValue.type))  {
-            myFloatPresentValue = ((bacLocalPresentValue)d).value
+            myFloatPresentValue = ((bacLocalPresentValue)d).present_value
             bFound = true
             break
         }

@@ -15,6 +15,7 @@
   <source dir="BIP.sedona" />
   <source dir="MSTP.sedona" />
   <source dir="bacDevice.sedona" />
+  <source dir="bacLocalDevice.sedona" />
   <source dir="bacSchedule.sedona" />
 
   <!-- Natives -->

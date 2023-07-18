@@ -1,13 +1,33 @@
 @niagaraIcon="module://icons/x16/control/numericPoint.png"
 class bacLocalPresentValue
-  extends Component
+  extends BacNetFieldBusIO
 {
+  // Lujiaming add these at 23/02/24
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+
+  @config
+  @defaultOnClone
+  @unit = Units.millisecond
+  @min = 100
+  property int refreshTime = 2000
+
+  @readonly
+  @unit = Units.millisecond
+  property int elapsedTime = -1
+
+  ////////////////////////////////////////////////////////////////
+  // config Properties
+  ////////////////////////////////////////////////////////////////
+  // 
+  property float present_value = 0.0f
+  // property float in = 0.0f
+
   @summary=true
   @config
   @asStr
   property Buf(64) alias = ""
-
-  property float value = 0.0f
 
   override void start()
   {
@@ -29,11 +49,6 @@ class bacLocalPresentValue
       Component root = null
       while (p != null) {
         root = p
-      **  if(p.name.equals("play"))
-      **  {
-      **       ** log.message("Not deal play node and return with name=$name")
-      **       return
-      **  }
         p = Sys.app.lookup(p.parent)
       }
       if (root != null) {
@@ -54,20 +69,20 @@ class bacLocalPresentValue
                             if (q.type.is(bacReadProperty.type) 
                                 && ((bacReadProperty)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("bacReadProperty.name=${q.name}")
-                                value := ((bacReadProperty)q).present_value
+                                present_value := ((bacReadProperty)q).present_value
                             }
                             else if (q.type.is(bacWriteProperty.type) 
                                 && ((bacWriteProperty)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("bacWriteProperty.name=${q.name}")
-                                ((bacWriteProperty)q).present_value := value
+                                ((bacWriteProperty)q).present_value := present_value
                             }
                             else if (q.type.is(VarInput.type))  {
                                 log.message("VarInput.name=${q.name}")
-                                value := ((VarInput)q).out
+                                present_value := ((VarInput)q).out
                             }
                             else if (q.type.is(VarOutput.type))  {
                                 log.message("VarOutput.name=${q.name}")
-                                ((VarOutput)q).in := value
+                                ((VarOutput)q).in := present_value
                             }
                          }
                       }

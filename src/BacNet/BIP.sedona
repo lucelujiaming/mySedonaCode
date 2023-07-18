@@ -116,7 +116,9 @@ class BIP
       log.message("clean schedule")
     // clean schedule
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR && ((bacDevice)d).deviceInstance == deviceInstance) {
+      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR
+                 // && ((bacDevice)d).deviceInstance == deviceInstance
+         ) {
           for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
               if (s.type.is(bacSchedule.type)) {
                 ((bacSchedule)s).index = -1
@@ -213,6 +215,9 @@ class BIP
     // bacDevice dev = null
     for (Component r = Sys.app.lookup(children); r != null; r = Sys.app.lookup(r.nextSibling)) {
         log.message("22222 updateCache r.name=$r.name and r.type.name=$r.type.name");
+        if (r.type.is(bacLocalDevice.type)) {
+          ((bacLocalDevice)r).bus = this
+        }
         if (r.type.is(bacDevice.type)) {
           log.message("SetBus: 3333 updateCache r.name=$r.name and type.name=$r.type.name");
           // dev = (bacDevice)r

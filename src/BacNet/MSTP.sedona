@@ -59,13 +59,15 @@ class MSTP
     if (status == STATUSOK) {
       for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(bacDevice.type) && ((bacDevice)d).status <= bacDevice.STATUSREADY) {
-          if (readReg(((bacDevice)d).deviceInstance, 0, 10000, buffer) == 1) {
+          if (readReg( // ((bacDevice)d).deviceInstance, 
+                       deviceInstance, 0, 10000, buffer) == 1) {
             ((bacDevice)d).elapsedTime := (int)buffer[0]
             ((bacDevice)d).status := bacDevice.STATUSOK
           } else {
             ((bacDevice)d).elapsedTime := -1
             ((bacDevice)d).status := bacDevice.STATUSOFFLINE
           }
+          /*
           // update schedule
           if (((bacDevice)d).deviceInstance == deviceInstance) {
             for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
@@ -81,6 +83,7 @@ class MSTP
               }
             }
           }
+          */
         }
       }
     }
@@ -125,7 +128,9 @@ class MSTP
 
     // clean schedule
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR && ((bacDevice)d).deviceInstance == deviceInstance) {
+      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR 
+                   // && ((bacDevice)d).deviceInstance == deviceInstance
+         ) {
           for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
               if (s.type.is(bacSchedule.type)) {
                 ((bacSchedule)s).index = -1
@@ -167,7 +172,8 @@ class MSTP
     // add device node.
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR) {
-        if (dA(ctx, ((bacDevice)d).deviceInstance, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
+        if (dA(ctx, // ((bacDevice)d).deviceInstance, 
+               deviceInstance, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
           ((bacDevice)d).status := bacDevice.STATUSEINNER
         } else {
           ((bacDevice)d).status := bacDevice.STATUSNOREG
@@ -193,7 +199,8 @@ class MSTP
               }
             }
             if (dev != null) {
-              ((FieldBusIO)r).cache = dA(ctx, dev.deviceInstance, ((FieldBusIO)r).typeId, ((FieldBusIO)r).regId, 85, 0)
+              ((FieldBusIO)r).cache = dA(ctx, // dev.deviceInstance, 
+                   deviceInstance, ((FieldBusIO)r).typeId, ((FieldBusIO)r).regId, 85, 0)
               if (((FieldBusIO)r).cache >= 0) {
                 if (((FieldBusIO)r).bus == null) {
                   ((FieldBusIO)r).bus = this
@@ -214,7 +221,9 @@ class MSTP
 
     // add schedule
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR && ((bacDevice)d).deviceInstance == deviceInstance) {
+      if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR 
+                     // && ((bacDevice)d).deviceInstance == deviceInstance
+         ) {
           for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
               if (s.type.is(bacSchedule.type) && ((bacSchedule)s).configToBuf()) {
                 ((bacSchedule)s).index = dS(ctx, ((bacSchedule)s).urlBuf.toBytes(), ((bacSchedule)s).timeBuf, ((bacSchedule)s).valueBuf)

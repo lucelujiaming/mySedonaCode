@@ -45,7 +45,7 @@ abstract class FieldBusDevice
   define int READ_PROPERTY_MULTIPLE_SUPPORTED       = 3
   
   Str dataRecvGramAddr
-  int objectIdentifier
+  // int objectIdentifier
   int sourceNetworkAddress
   int invokeID = 1
   
