@@ -367,20 +367,36 @@ class bacDevice
   { 
     if(dataRecvGram.addr != null)
     {
-         log.message("writeBusReg::dataRecvGram.addr = ${dataRecvGram.addr.toStr()} and dataRecvGram.port=${dataRecvGram.port}")
+        if(dataRecvGram.addr.isIPv4() == true)
+        {
+           log.message("writeBusReg use dataRecvGram.addr = ${dataRecvGram.addr.toStr()} and dataRecvGram.port=${dataRecvGram.port}")
+        }
+        else
+        {
+            // Init sockReadAddr
+            sockReadAddr.addr.parse("0.0.0.0")
+            sockReadAddr.port = 0
+            dataSendGram.getSocketAddr(sockReadAddr)
+            log.message("11111 writeReg with sockReadAddr.port=${sockReadAddr.port}")
+            log.message("11111 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
+
+        }
     }
-    // Init sockReadAddr
-    sockReadAddr.addr.parse("0.0.0.0")
-    sockReadAddr.port = 0
-    dataSendGram.getSocketAddr(sockReadAddr)
+    else
+    {
+        // Init sockReadAddr
+        sockReadAddr.addr.parse("0.0.0.0")
+        sockReadAddr.port = 0
+        dataSendGram.getSocketAddr(sockReadAddr)
+        log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
+        log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
+    }
     // Get Addr and port from dataSendGram
     if(sockReadAddr.port == 0)
     {
        log.message("111111 writeReg")
        return -1;
     }
-    log.message("22222 writeReg with sockReadAddr.port=${sockReadAddr.port}")
-    log.message("22222 writeReg with sockReadAddr.addr=${sockReadAddr.addr.toStr()}")
     
     for(int i =0; i < iLen; i++)
     {
