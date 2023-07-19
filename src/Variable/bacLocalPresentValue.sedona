@@ -7,16 +7,6 @@ class bacLocalPresentValue
   // Properties
   ////////////////////////////////////////////////////////////////
 
-  @config
-  @defaultOnClone
-  @unit = Units.millisecond
-  @min = 100
-  property int refreshTime = 2000
-
-  @readonly
-  @unit = Units.millisecond
-  property int elapsedTime = -1
-
   ////////////////////////////////////////////////////////////////
   // config Properties
   ////////////////////////////////////////////////////////////////
@@ -31,6 +21,7 @@ class bacLocalPresentValue
 
   override void start()
   {
+    status := STATUSREADY
   }
 
   override void changed(Slot slot)

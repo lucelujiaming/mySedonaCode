@@ -61,10 +61,10 @@ class MSTP
         if (d.type.is(bacDevice.type) && ((bacDevice)d).status <= bacDevice.STATUSREADY) {
           if (readReg( // ((bacDevice)d).deviceInstance, 
                        deviceInstance, 0, 10000, buffer) == 1) {
-            ((bacDevice)d).elapsedTime := (int)buffer[0]
+            // ((bacDevice)d).elapsedTime := (int)buffer[0]
             ((bacDevice)d).status := bacDevice.STATUSOK
           } else {
-            ((bacDevice)d).elapsedTime := -1
+            // ((bacDevice)d).elapsedTime := -1
             ((bacDevice)d).status := bacDevice.STATUSOFFLINE
           }
           /*
@@ -173,7 +173,7 @@ class MSTP
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR) {
         if (dA(ctx, // ((bacDevice)d).deviceInstance, 
-               deviceInstance, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
+               deviceInstance, 0, 0, 0, 0) != 0) {
           ((bacDevice)d).status := bacDevice.STATUSEINNER
         } else {
           ((bacDevice)d).status := bacDevice.STATUSNOREG

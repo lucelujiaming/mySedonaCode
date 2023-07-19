@@ -197,7 +197,7 @@ class BIP
     // add device node.
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       if (d.type.is(bacDevice.type) && ((bacDevice)d).status < bacDevice.STATUSEADDR) {
-        if (bacnet_add(ctx, 0, 0, 0, 0, ((bacDevice)d).refreshTime) != 0) {
+        if (bacnet_add(ctx, 0, 0, 0, 0, 0) != 0) {
           log.message("11111 updateCache d.status=bacDevice.STATUSEINNER");
           ((bacDevice)d).status := bacDevice.STATUSEINNER
         } else {

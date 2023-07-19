@@ -13,21 +13,13 @@ class bacLocalDevice
   define int MAX_ADPU_LENGTH_END  = 6
 
   // Lujiaming add these end at 23/05/22
-  
-  @config
-  @defaultOnClone
-  @unit = Units.millisecond
-  @min = 100
-  property int refreshTime = 500
 
-  @readonly
-  @unit = Units.millisecond
-  property int elapsedTime = -1
-
+/*  
   // dataExpectingReplyNPCI
   @range=MAX_ADPU_LENGTH_RANGE
-  property int maxADPULength = MAX_ADPU_LENGTH_480
-
+  property int maxADPULength = MAX_ADPU_LENGTH_1024
+ */
+ 
   // InstanceNumber
   @asStr
   @config
@@ -43,7 +35,7 @@ class bacLocalDevice
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == bacDevice.deviceName || slot == bacDevice.refreshTime) {
+    if (slot == bacDevice.deviceName) {
       update()
     }
   }
@@ -76,6 +68,7 @@ class bacLocalDevice
          }
          ** log.message("bacDevice update 22222 status=$status") 
     } 
+    status := STATUSREADY
     log.message("bacDevice update 3333 status=$status") 
   }
 
@@ -103,4 +96,5 @@ class bacLocalDevice
   // Fields
   ////////////////////////////////////////////////////////////////
   FieldBusNet bus = null
+  int maxADPULength = MAX_ADPU_LENGTH_1024
 }

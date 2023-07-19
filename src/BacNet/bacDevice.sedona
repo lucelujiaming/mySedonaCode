@@ -18,24 +18,15 @@ class bacDevice
   define int COMMUNICATIONEND = 3
   // Lujiaming add these end at 23/05/22
   
-  @config
-  @defaultOnClone
-  @unit = Units.millisecond
-  @min = 100
-  property int refreshTime = 500
-
-  @readonly
-  @unit = Units.millisecond
-  property int elapsedTime = -1
-
-  // dataExpectingReplyNPCI
-  @range=COMMUNICATIONMETHOD
-  @readonly property int communicationMethod = COMMUNICATIONNONE   
-
   // InstanceNumber
   @asStr
   @config
   property Buf(64) InstanceNumber = ""
+  
+  // dataExpectingReplyNPCI
+  @range=COMMUNICATIONMETHOD
+  @readonly property int communicationMethod = COMMUNICATIONNONE   
+
 
   ////////////////////////////////////////////////////////////////
   // Life cycle
@@ -47,7 +38,7 @@ class bacDevice
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == bacDevice.deviceName || slot == bacDevice.refreshTime) {
+    if (slot == bacDevice.deviceName) {
       update()
     }
   }
@@ -1136,17 +1127,17 @@ class bacDevice
             log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
             serviceChoicePos++
             
-            int iObjectIdentifier = 0
+            int iObjectIdentifierAndType = 0
             for(int i = 0 ; i < iObjectIdentifierLen; i++)
             {
-               iObjectIdentifier = iObjectIdentifier * 0x100
+               iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
                                    + bacnetRecvPacket[serviceChoicePos + i]
             }
-            log.message("00011 iObjectIdentifier = 0x").printHex(iObjectIdentifier).print(". ").nl()
+            log.message("00011 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
             // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
-            int iObjectType = iObjectIdentifier/0x400000
+            int iObjectType = iObjectIdentifierAndType/0x400000
             // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
-            int iInstanceNumber = iObjectIdentifier % 0x400000
+            int iInstanceNumber = iObjectIdentifierAndType % 0x400000
             
             serviceChoicePos = serviceChoicePos + iObjectIdentifierLen
             if(bacnetRecvPacket[serviceChoicePos] == 0x1E)
@@ -1167,7 +1158,7 @@ class bacDevice
                // Property Identifier: present-value (85)
                if(iPropIdentifier == 0x55)
                {
-                  int iLen = makeBACnetPresentValueComplexACKPDU(iObjectIdentifier)
+                  int iLen = makeBACnetPresentValueComplexACKPDU(iObjectIdentifierAndType)
                   if(iLen > 0)
                   {
                      log.message("writeReg makeBACnetPresentValueComplexACKPDU($iLen)")
@@ -1176,7 +1167,7 @@ class bacDevice
                }
                else
                {
-                  int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifier)
+                  int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
                   if(iLen > 0)
                   {
                      log.message("writeReg makeBACnetAccessErrorComplexACKPDU($iLen)")
@@ -1200,17 +1191,17 @@ class bacDevice
                 log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
                 serviceChoicePos++
                 
-                int iObjectIdentifier = 0
+                int iObjectIdentifierAndType = 0
                 for(int i = 0 ; i < iObjectIdentifierLen; i++)
                 {
-                   iObjectIdentifier = iObjectIdentifier * 0x100
+                   iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
                                        + bacnetRecvPacket[serviceChoicePos + i]
                 }
-                ** log.message("00011 iObjectIdentifier = 0x").printHex(iObjectIdentifier).print(". ").nl()
+                ** log.message("00011 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
                 // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
-                int iObjectType = iObjectIdentifier/0x400000
+                int iObjectType = iObjectIdentifierAndType/0x400000
                 // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
-                int iInstanceNumber = iObjectIdentifier % 0x400000
+                int iInstanceNumber = iObjectIdentifierAndType % 0x400000
                 log.message("iObjectType = ${iObjectType} and iInstanceNumber = ${iInstanceNumber} ")
                 serviceChoicePos += iObjectIdentifierLen
                 log.message("11111 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
@@ -1690,10 +1681,16 @@ class bacDevice
     return 0
   }
   
-  int makeBACnetPresentValueComplexACKPDU(int iObjectIdentifier)
+  int makeBACnetPresentValueComplexACKPDU(int iObjectIdentifierAndType)
   {
     dataLength = 0
     float myFloatPresentValue = 0.0
+    
+    // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+    int iObjectType = iObjectIdentifierAndType/0x400000
+    // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+    int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+            
     bool bFound = false
     if(Sys.app.lookup(this.parent) != null)
     {
@@ -1702,9 +1699,13 @@ class bacDevice
             if(f.type.is(bacLocalDevice.type)) {
                 for (Component d = Sys.app.lookup(f.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
                     if (d.type.is(bacLocalPresentValue.type))  {
-                        myFloatPresentValue = ((bacLocalPresentValue)d).present_value
-                        bFound = true
-                        break
+                        if((((bacLocalPresentValue)d).objectType == iObjectType) && 
+                          (((bacLocalPresentValue)d).instanceNumber == iInstanceNumber))
+                        {
+                            myFloatPresentValue = ((bacLocalPresentValue)d).present_value
+                            bFound = true
+                            break
+                        }
                     }
                 }
             }
@@ -1712,8 +1713,9 @@ class bacDevice
     }
     if(bFound == false)
     {
-        log.message("No bacLocalPresentValue to use in the  makeBACnetPresentValueComplexACKPDU")
-        return 0
+        log.message("No bacLocalPresentValue to use in the makeBACnetPresentValueComplexACKPDU with $iObjectType and iInstanceNumber")
+        int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
+        return iLen
     }
     // 0011 .... = APDU Type: Complex-ACK (3)
     // .... 0000 = PDU Flags: 0x0
@@ -1723,10 +1725,10 @@ class bacDevice
     bacnetPacket[2] = 0x0E
     // ObjectIdentifier: analog-value, 1
     bacnetPacket[3] = 0x0C
-    bacnetPacket[4] = iObjectIdentifier/(0x01000000)
-    bacnetPacket[5] = (iObjectIdentifier /(0x010000))%0x0100
-    bacnetPacket[6] = (iObjectIdentifier /   0x0100)%0x0100
-    bacnetPacket[7] = (iObjectIdentifier)%0x0100
+    bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
+    bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
+    bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
+    bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
     // listOfResults
     // {[1]
     bacnetPacket[8] = 0x1E
@@ -1763,7 +1765,7 @@ class bacDevice
   }
 
   
-  int makeBACnetAccessErrorComplexACKPDU(int iObjectIdentifier)
+  int makeBACnetAccessErrorComplexACKPDU(int iObjectIdentifierAndType)
   {
     dataLength = 0
     // 0011 .... = APDU Type: Complex-ACK (3)
@@ -1774,10 +1776,10 @@ class bacDevice
     bacnetPacket[2] = 0x0E
     // ObjectIdentifier: analog-value, 1
     bacnetPacket[3] = 0x0C
-    bacnetPacket[4] = iObjectIdentifier/(0x01000000)
-    bacnetPacket[5] = (iObjectIdentifier /(0x010000))%0x0100
-    bacnetPacket[6] = (iObjectIdentifier /   0x0100)%0x0100
-    bacnetPacket[7] = (iObjectIdentifier)%0x0100
+    bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
+    bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
+    bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
+    bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
     // listOfResults
     // {[1]
     bacnetPacket[8] = 0x1E
