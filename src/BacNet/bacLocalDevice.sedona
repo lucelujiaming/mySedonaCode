@@ -23,7 +23,7 @@ class bacLocalDevice
   // InstanceNumber
   @asStr
   @config
-  property Buf(64) InstanceNumber = ""
+  property Buf(64) deviceInstance = ""
 
   ////////////////////////////////////////////////////////////////
   // Life cycle
@@ -77,11 +77,18 @@ class bacLocalDevice
     ** log.message("bacDevice execute 11111 status=$status") 
     if (bus != null) {
         if (bus.needFlush == false) {
-        
+            
         }
         else 
         {
             log.message("We needFlush ")
+        }
+        ** log.message("111111111 execute name=$name")
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(bacLocalPresentValue.type))  {
+               ** log.message("111111111 bacLocalPresentValue.execute name=$name")
+               ((bacLocalPresentValue)d).execute()
+            }
         }
     }
     else

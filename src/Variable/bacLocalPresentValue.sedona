@@ -44,42 +44,23 @@ class bacLocalPresentValue
       }
       if (root != null) {
         // log.message("root:: aliasStr=$aliasStr")
-        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr")
+        ** log.message("222222222 Variable name=$name and aliasStr=$aliasStr")
         for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-          if (f.type.is(Folder.type) && f.name.equals("service")) {
-             for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-                if (n.type.is(FieldBusNet.type))  {
-                   for (Component r = Sys.app.lookup(n.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                      if (r.type.is(FieldBusDevice.type))  {
-                         for (Component q = Sys.app.lookup(r.children); q != null; q = Sys.app.lookup(q.nextSibling)) {
-                            // if (q.type.is(BacReadPropertyVar.type) 
-                            //    && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
-                            //    ** log.message("BacReadPropertyVar.name=${q.name}")
-                            //    value := ((BacReadPropertyVar)q).present_value
-                            // } else 
-                            if (q.type.is(bacReadProperty.type) 
-                                && ((bacReadProperty)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("bacReadProperty.name=${q.name}")
-                                present_value := ((bacReadProperty)q).present_value
-                            }
-                            else if (q.type.is(bacWriteProperty.type) 
-                                && ((bacWriteProperty)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("bacWriteProperty.name=${q.name}")
-                                ((bacWriteProperty)q).present_value := present_value
-                            }
-                            else if (q.type.is(VarInput.type))  {
-                                log.message("VarInput.name=${q.name}")
-                                present_value := ((VarInput)q).out
-                            }
-                            else if (q.type.is(VarOutput.type))  {
-                                log.message("VarOutput.name=${q.name}")
-                                ((VarOutput)q).in := present_value
-                            }
-                         }
-                      }
-                   }
-                }
-             }
+          ** log.message("3333 Variable f.name=${f.name}")
+          if (f.type.is(Folder.type) && f.name.equals("play")) {
+               ** log.message("4444 Variable f.name=${f.name}")
+               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                    ** log.message("5555 Variable r.name=${r.name}")
+                    if (r.type.is(Variable.type))
+                    {
+                        ** log.message("5555 Variable r.alias=${((Variable)r).alias.toStr()}")
+                        ** log.message("5555 Variable aliasStr=$aliasStr")
+                        if(((Variable)r).alias.toStr().equals(aliasStr))  {
+                            ** log.message("6666 r.value=${((Variable)r).value}")
+                            present_value := ((Variable)r).value
+                        }
+                    }
+               }
           }
         }
       }

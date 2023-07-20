@@ -542,19 +542,65 @@ class bacDevice
 
     log.message("Service Choice is ${bacnetRecvPacket[serviceChoicePos]} ")
     int objectIdentifierAndType = 0
-    // ex: Service Choice: read Property (12)
-    // ex: Service Choice: read Property ACK (12)
+    // ex: Service Choice: readProperty (12)
+    // ex: Service Choice: readProperty ACK (12)
     if(bacnetRecvPacket[serviceChoicePos] == 0x0C)
     {
         // BACnet-Confirmed-Request-PDU
         if(apduType == 0)
         {
-            int iLen = makeBACnetSimpleACKPDU()
-            if(iLen > 0)
+            serviceChoicePos++
+            int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+            log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
+            serviceChoicePos++
+            
+            int iObjectIdentifierAndType = 0
+            for(int i = 0 ; i < iObjectIdentifierLen; i++)
             {
-               log.message("writeReg makeBACnetSimpleACKPDU($iLen)")
-               writeReg(0, 0, iLen, buf)
+               iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
+                                   + bacnetRecvPacket[serviceChoicePos + i]
             }
+            log.message("00011 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
+            // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+            int iObjectType = iObjectIdentifierAndType/0x400000
+            // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+            int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+            
+            serviceChoicePos = serviceChoicePos + iObjectIdentifierLen
+            
+            // Property Identifier: present-value (85)
+            int iPropIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+            serviceChoicePos++
+            int iPropIdentifier = 0
+            for(int i = 0 ; i < iPropIdentifierLen; i++)
+            {
+               log.message("000111 iPropIdentifier = 0x").printHex(iPropIdentifier).print(". ").nl()
+               iPropIdentifier = iPropIdentifier * 0x100
+                                    + bacnetRecvPacket[serviceChoicePos + i]
+               log.message("00012 iPropIdentifier = 0x").printHex(iPropIdentifier).print(". ").nl()
+            }
+            log.message("00022 iPropIdentifier = 0x").printHex(iPropIdentifier).print(". ").nl()
+            // Property Identifier: present-value (85)
+            if(iPropIdentifier == 0x55)
+            {
+               int iLen = makeBACnetPresentValueComplexACKPDU(iObjectIdentifierAndType)
+               if(iLen > 0)
+               {
+                  log.message("writeReg makeBACnetPresentValueComplexACKPDU($iLen)")
+                  writeReg(0, 0, iLen, buf)
+               }
+            }
+            else
+            {
+               int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
+               if(iLen > 0)
+               {
+                  log.message("writeReg makeBACnetAccessErrorComplexACKPDU($iLen)")
+                  writeReg(0, 0, iLen, buf)
+               }
+            }
+            serviceChoicePos = serviceChoicePos + iPropIdentifierLen
+            // if(bacnetRecvPacket[serviceChoicePos] == 0x1F)
             return iPacketLen
         }
         // BACnet-SimpleACK-PDU
@@ -1117,6 +1163,7 @@ class bacDevice
         return -1
     }
     // Service Choice: readPropertyMultiple (14)
+    // Service Choice: readPropertyMultiple ACK (12)
     else if(bacnetRecvPacket[serviceChoicePos] == 0x0E)
     {
         // BACnet-Confirmed-Request-PDU
@@ -1652,11 +1699,11 @@ class bacDevice
        bacnetPacket[2] = 0xC4
        // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
        bacnetPacket[3] = (0x08 / 4)
-       int iInstanceNumber = localDevice.InstanceNumber.toStr().parseInt()
-       ** log.message("22222 localDevice.InstanceNumber =  ${iInstanceNumber}")
-       bacnetPacket[4] =  iInstanceNumber / 0x10000
-       bacnetPacket[5] = (iInstanceNumber % 0x10000) / 0x100
-       bacnetPacket[6] = (iInstanceNumber % 0x10000) % 0x100
+       int iDeviceInstance = localDevice.deviceInstance.toStr().parseInt()
+       ** log.message("22222 localDevice.deviceInstance =  ${iDeviceInstance}")
+       bacnetPacket[4] =  iDeviceInstance / 0x10000
+       bacnetPacket[5] = (iDeviceInstance % 0x10000) / 0x100
+       bacnetPacket[6] = (iDeviceInstance % 0x10000) % 0x100
        // Application Tag: Unsigned Integer, Length/Value/Type: 2
        bacnetPacket[7] = 0x22
        // Maximum ADPU Length Accepted: (Unsigned) 480
