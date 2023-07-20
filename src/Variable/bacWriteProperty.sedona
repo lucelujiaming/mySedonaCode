@@ -129,14 +129,17 @@ class bacWriteProperty
          || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
          || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
     {
-        // Application Tag: Unsigned Integer, Length/Value/Type: 1
-        bacnetPacket[dataLength++] = 0x21
         bufInteger[0] = (int)present_value
+        log.message("MULTISTATE present_value=$present_value");
         int iLen = bus.encodeUnsigned(bufInteger, bufData)
+        
+        // Application Tag: Unsigned Integer, Length/Value/Type: 1
+        bacnetPacket[dataLength++] = 0x20 + iLen
         for(int i = 0; i < iLen; i++)
         {
-           bacnetPacket[dataLength++] = bufData[i]
+           bacnetPacket[dataLength + iLen - i - 1] = bufData[i]
         }
+        dataLength += iLen
     }
     // .... .111 = Named Tag: Closing Tag (7)
     bacnetPacket[dataLength++] = 0x2F
@@ -264,14 +267,15 @@ class bacWriteProperty
              || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
              || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
             {
-                // Application Tag: Unsigned Integer, Length/Value/Type: 1
-                bacnetPacket[dataLength++] = 0x21
-                bufInteger[0] = (int)currentInFloatValue
+                bufInteger[0] = (int)present_value
                 int iLen = bus.encodeUnsigned(bufInteger, bufData)
+                // Application Tag: Unsigned Integer, Length/Value/Type: 1
+                bacnetPacket[dataLength++] = 0x20 + iLen
                 for(int j = 0; j < iLen; j++)
                 {
-                   bacnetPacket[dataLength++] = bufData[j]
+                   bacnetPacket[dataLength + iLen - j - 1] = bufData[j]
                 }
+                dataLength += iLen
             }
             // .... .111 = Named Tag: Closing Tag (7)
             bacnetPacket[dataLength++] = 0x2F
@@ -367,14 +371,15 @@ class bacWriteProperty
          || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
          || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
     {
-        // Application Tag: Unsigned Integer, Length/Value/Type: 1
-        bacnetPacket[dataLength++] = 0x21
         bufInteger[0] = (int)present_value
         int iLen = bus.encodeUnsigned(bufInteger, bufData)
+        // Application Tag: Unsigned Integer, Length/Value/Type: 1
+        bacnetPacket[dataLength++] = 0x20 + iLen
         for(int i = 0; i < iLen; i++)
         {
-           bacnetPacket[dataLength++] = bufData[i]
+           bacnetPacket[dataLength + iLen - i - 1] = bufData[i]
         }
+        dataLength += iLen
     }
     // .... .111 = Named Tag: Closing Tag (7)
     bacnetPacket[dataLength++] = 0x3F

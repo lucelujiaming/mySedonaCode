@@ -43,9 +43,9 @@ abstract class BacNetFieldBusIO
   define int OBJECT_TYPE_BINARY_INPUT              = 0x03
   define int OBJECT_TYPE_BINARY_OUTPUT             = 0x04
   define int OBJECT_TYPE_BINARY_VALUE              = 0x05
-  define int OBJECT_TYPE_BINARY_MULTISTATE_INPUT           = 0x06
-  define int OBJECT_TYPE_BINARY_MULTISTATE_OUTPUT          = 0x07
-  define int OBJECT_TYPE_BINARY_MULTISTATE_VALUE           = 0x08
+  define int OBJECT_TYPE_MULTISTATE_INPUT           = 0x06
+  define int OBJECT_TYPE_MULTISTATE_OUTPUT          = 0x07
+  define int OBJECT_TYPE_MULTISTATE_VALUE           = 0x08
   
   ////////////////////////////////////////////////////////////////
   // Properties
@@ -222,11 +222,11 @@ abstract class BacNetFieldBusIO
      }
      else
      {
-        if(iObjectType == OBJECT_TYPE_BINARY_MULTISTATE_INPUT)
+        if(iObjectType == OBJECT_TYPE_MULTISTATE_INPUT)
            return BACNET_OBJERCTTYPE_MULTISTATE_INPUT
-        else if(iObjectType == OBJECT_TYPE_BINARY_MULTISTATE_OUTPUT)
+        else if(iObjectType == OBJECT_TYPE_MULTISTATE_OUTPUT)
            return BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT
-        else if(iObjectType == OBJECT_TYPE_BINARY_MULTISTATE_VALUE)
+        else if(iObjectType == OBJECT_TYPE_MULTISTATE_VALUE)
            return BACNET_OBJERCTTYPE_MULTISTATE_VALUE
      }
      log.message("----------- ERROR ObjectType --------------------") 

@@ -377,11 +377,12 @@ Cell BacNet_BIP_eF(SedonaVM* vm, Cell* params)
 
 Cell BacNet_BIP_eUI(SedonaVM* vm, Cell* params)
 {
+    int i = 0;
     unsigned int * bufInput = params[1].aval;
     char * bufOutput = params[2].aval;
     
-//    printf("[%s:%s:%d] bufInput = %u\n",
-//                 __FILE__, __FUNCTION__, __LINE__, bufInput[0]);
+    printf("[%s:%s:%d] bufInput = %u\n",
+                 __FILE__, __FUNCTION__, __LINE__, bufInput[0]);
     
     Cell ret;
     ret.ival = -1;
@@ -390,11 +391,28 @@ Cell BacNet_BIP_eUI(SedonaVM* vm, Cell* params)
     bufOutput[1] = pCharValue[1];
     bufOutput[2] = pCharValue[2];
     bufOutput[3] = pCharValue[3];
-    ret.ival = 4;
     
-//    printf("[%s:%s:%d] BacNet_BIP_eD Fill [%02d:%02d:%02d:%02d]\n",
-//             __FILE__, __FUNCTION__, __LINE__, 
-//             bufOutput[0], bufOutput[1], bufOutput[2], bufOutput[3]);    
+    printf("[%s:%s:%d] BacNet_BIP_eUI Fill [%02X:%02X:%02X:%02X]\n",
+             __FILE__, __FUNCTION__, __LINE__, 
+             bufOutput[0], bufOutput[1], bufOutput[2], bufOutput[3]);
+     
+    ret.ival = 4;
+    // Remove zero in the tail.
+    for(i = 2; i >= 0; i--)
+    {
+        printf("[%s:%s:%d] bufOutput[%d] = %02d\n",
+             __FILE__, __FUNCTION__, __LINE__, i, pCharValue[i]);
+        if(pCharValue[i] == 0x00)
+        {
+           ret.ival = ret.ival - 1;
+        }
+        else
+        {
+           break;
+        }
+    }
+    printf("[%s:%s:%d] BacNet_BIP_eUI return %d\n",
+             __FILE__, __FUNCTION__, __LINE__, ret.ival);
     return ret;
 }
 
