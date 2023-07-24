@@ -160,6 +160,10 @@ Cell inet_UdpSocket_open(SedonaVM* vm, Cell* params)
 #else
   if (sock < 0) return falseCell;
 #endif
+  
+  int so_broadcast=1;
+  setsockopt(sock, SOL_SOCKET, SO_BROADCAST, 
+      (char *)&so_broadcast, sizeof(so_broadcast));
 
   // make socket non-blocking
   if (inet_setNonBlocking(sock) != 0)
@@ -628,7 +632,6 @@ socket_t initializeSendSocket(char * networkIP,
     socket_t clientSendSocket;
     struct sockaddr_in user_addr;
     
-    int so_broadcast=1;
 #ifdef _WIN32
     WSADATA wsadata;
     if (0 == WSAStartup(MAKEWORD(2, 2), &wsadata))
@@ -648,6 +651,7 @@ socket_t initializeSendSocket(char * networkIP,
     my_addr->sin_addr.s_addr=inet_addr("255.255.255.255");
     memset(&(my_addr->sin_zero), 0x00, 8);
 
+    int so_broadcast=1;
     setsockopt(clientSendSocket, SOL_SOCKET, SO_BROADCAST, 
         (char *)&so_broadcast, sizeof(so_broadcast));
 
@@ -1140,8 +1144,8 @@ Cell inet_UdpSocket_getBacnetRouterDevice(SedonaVM* vm, Cell* params)
     }
     closesocket(clientSendSocket);
     
-    printf("clientSendSocket ipArrayList[0] = %u \r\n", ipArrayList[0]);
-    printf("clientSendSocket networkNumberList[0] = %d \r\n", networkNumberList[0]);
+//    printf("clientSendSocket ipArrayList[0] = %u \r\n", ipArrayList[0]);
+//    printf("clientSendSocket networkNumberList[0] = %d \r\n", networkNumberList[0]);
     Cell ret;
     ret.ival = iClientCount - 1;  
     return ret;

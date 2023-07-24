@@ -103,5 +103,5 @@ class bacLocalDevice
   // Fields
   ////////////////////////////////////////////////////////////////
   FieldBusNet bus = null
-  int maxADPULength = MAX_ADPU_LENGTH_1024
+  int maxADPULength = MAX_ADPU_LENGTH_480
 }
