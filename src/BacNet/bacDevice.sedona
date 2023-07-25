@@ -72,6 +72,7 @@ class bacDevice
          ** log.message("bacDevice update 22222 status=$status") 
     } 
     createRPMAndWPM()
+    getBacLocalDevice()
     log.message("bacDevice update 3333 status=$status") 
   }
 
@@ -666,7 +667,6 @@ class bacDevice
                if(iPropArrayIdx == 0x00)
                {
                   iLen = makeBACnetObjectListCountComplexACKPDU(iObjectIdentifierAndType)
-                  
                }
                // Object List Device
                else if(iPropArrayIdx == 0x01)
@@ -1850,9 +1850,8 @@ class bacDevice
     return 3
   }
   
-  int makeBACnetIAmPDU(int iStartIdx, int iEndIdx)
+  void getBacLocalDevice()
   {
-    bacLocalDevice localDevice = null
     if(Sys.app.lookup(this.parent) != null)
     {
         log.message("makeBACnetIAmPDU:: find the BIP") 
@@ -1861,19 +1860,25 @@ class bacDevice
             if(f.type.is(bacLocalDevice.type)) {
                 int iDeviceInstance = ((bacLocalDevice)f).deviceInstance.toStr().parseInt()
                 log.message("makeBACnetIAmPDU:: find the bacLocalDevice with $iDeviceInstance") 
-                if((iStartIdx == 0) && (iEndIdx == 0))
-                {
-                   localDevice = (bacLocalDevice)f
-                }
-                else if((iDeviceInstance >= iStartIdx) && (iDeviceInstance <= iEndIdx))
-                {
-                   localDevice = (bacLocalDevice)f
-                }
+                localBacnetDevice = (bacLocalDevice)f
             }
         }
     }
-    if(localDevice != null)
+  }
+  
+  int makeBACnetIAmPDU(int iStartIdx, int iEndIdx)
+  {
+    if(localBacnetDevice != null)
     {
+       int iDeviceInstance = localBacnetDevice.deviceInstance.toStr().parseInt()
+       if((iStartIdx != 0) && (iEndIdx != 0))
+       {
+           if((iDeviceInstance < iStartIdx) || (iDeviceInstance > iEndIdx))
+           {
+              log.message("makeBACnetIAmPDU: $iDeviceInstance is not in the ($iStartIdx, $iEndIdx)")
+              return 0
+           }
+       }
        // 0001 .... = APDU Type: Unconfirmed-REQ (1)
        bacnetPacket[0] = 0x10
        // Unconfirmed Service Choice: i-Am (0)
@@ -1882,17 +1887,16 @@ class bacDevice
        bacnetPacket[2] = 0xC4
        // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
        bacnetPacket[3] = (0x08 / 4)
-       int iDeviceInstance = localDevice.deviceInstance.toStr().parseInt()
-       ** log.message("22222 localDevice.deviceInstance =  ${iDeviceInstance}")
+       ** log.message("22222 localBacnetDevice.deviceInstance =  ${iDeviceInstance}")
        bacnetPacket[4] =  iDeviceInstance / 0x10000
        bacnetPacket[5] = (iDeviceInstance % 0x10000) / 0x100
        bacnetPacket[6] = (iDeviceInstance % 0x10000) % 0x100
        // Application Tag: Unsigned Integer, Length/Value/Type: 2
        bacnetPacket[7] = 0x22
        // Maximum ADPU Length Accepted: (Unsigned) 480
-       ** log.message("22222 localDevice.maxADPULength = ${localDevice.maxADPULength}")
-       bacnetPacket[8]  = createmaxADPU(localDevice.maxADPULength) / 0x100
-       bacnetPacket[9] = createmaxADPU(localDevice.maxADPULength) % 0x100
+       ** log.message("22222 localBacnetDevice.maxADPULength = ${localBacnetDevice.maxADPULength}")
+       bacnetPacket[8]  = createmaxADPU(localBacnetDevice.maxADPULength) / 0x100
+       bacnetPacket[9] = createmaxADPU(localBacnetDevice.maxADPULength) % 0x100
        // Segmentation Supported:  no-segmentation
        bacnetPacket[10] = 0x91
        bacnetPacket[11] = 0x03
@@ -1913,33 +1917,35 @@ class bacDevice
   
   int makeBACnetObjectListCountComplexACKPDU(int iObjectIdentifierAndType)
   {
-    // Start with one as device,XXXX object-list device,XXXX 
-    int iListCount = 1
     bool bFound = false
     log.message("makeBACnetObjectListCountComplexACKPDU search start")
-    if(Sys.app.lookup(this.parent) != null)
+    if(localBacnetDevice != null)
     {
-        Component objBus = Sys.app.lookup(this.parent)
-        for (Component f = Sys.app.lookup(objBus.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-            if(f.type.is(bacLocalDevice.type)) {
-                int iDeviceInstance = ((bacLocalDevice)f).deviceInstance.toStr().parseInt()
-                log.message("makeBACnetIAmPDU:: find the bacLocalDevice with $iDeviceInstance") 
-                for (Component d = Sys.app.lookup(f.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-                    if (d.type.is(bacLocalPresentValue.type))  {
-                        int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType(
-                                    ((bacLocalPresentValue)d).objectType)
-                        log.message("Found bacLocalPresentValue with ${((bacLocalPresentValue)d).objectType}->$iBacNetObjectType")
-                        iListCount = iListCount + 1
-                        // iListCount start with 2, but localObjectListProperty start with 0
-                        localObjectListProperty[iListCount - 2] = iBacNetObjectType * 0x400000 + 
-                                        ((bacLocalPresentValue)d).instanceNumber
-                        bFound = true
-                    }
-                }
+        localBacnetDevice.localObjectListCount = 0
+        int iDeviceInstance = localBacnetDevice.deviceInstance.toStr().parseInt()
+        log.message("makeBACnetIAmPDU:: find the bacLocalDevice with $iDeviceInstance") 
+        for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(bacLocalPresentValue.type))  {
+                int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType(
+                            ((bacLocalPresentValue)d).objectType)
+                log.message("I Found bacLocalPresentValue with ${((bacLocalPresentValue)d).objectType}->$iBacNetObjectType")
+                log.message("We are at ${localBacnetDevice.localObjectListCount}")
+                // localObjectListCount start with 2, but localObjectListPropertyID start with 0
+                localBacnetDevice.localObjectListPropertyID[localBacnetDevice.localObjectListCount]
+                                 = iBacNetObjectType * 0x400000 + ((bacLocalPresentValue)d).instanceNumber
+                log.message("I Found bacLocalPresentValue.alias with ${((bacLocalPresentValue)d).alias.toStr()}")
+                localBacnetDevice.localObjectListName[localBacnetDevice.localObjectListCount]
+                                 = ((bacLocalPresentValue)d).alias.toStr()
+                log.message("I Found bacLocalPresentValue.present_value with ${((bacLocalPresentValue)d).present_value}")
+                localBacnetDevice.localObjectListPresentValue[localBacnetDevice.localObjectListCount]
+                                 = ((bacLocalPresentValue)d).present_value
+                localBacnetDevice.localObjectListCount = localBacnetDevice.localObjectListCount + 1
+                log.message("We move to ${localBacnetDevice.localObjectListCount}")
+                bFound = true
             }
         }
     }
-    log.message("makeBACnetObjectListCountComplexACKPDU search end")
+    log.message("makeBACnetObjectListCountComplexACKPDU search end")  
     if(bFound == false)
     {
         log.message("No bacLocalPresentValue to use in the makeBACnetObjectListCountComplexACKPDU")
@@ -1948,32 +1954,36 @@ class bacDevice
     }
     log.message("makeBACnetObjectListCountComplexACKPDU send start")
     
-    // 0011 .... = APDU Type: Complex-ACK (3)
-    // .... 0000 = PDU Flags: 0x0
-    bacnetPacket[0] = 0x30
-    bacnetPacket[1] = iRecvInvokeID
-    // Service Choice: readProperty (12)
-    bacnetPacket[2] = 0x0C
-    // ObjectIdentifier: device, 1004
-    bacnetPacket[3] = 0x0C
-    bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
-    bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
-    bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
-    bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
-    // Property Identifier: object-list (76)
-    bacnetPacket[8] = 0x19
-    bacnetPacket[9] = 0x4C
-    // property Array Index (Unsigned) 0
-    bacnetPacket[10] = 0x29
-    bacnetPacket[11] = 0x00
-    // {[3]
-    bacnetPacket[12] = 0x3E
-    // object-list: (Unsigned) 53
-    bacnetPacket[13] = 0x21
-    bacnetPacket[14] = iListCount
-    // }[3]
-    bacnetPacket[15] = 0x3F
-    dataLength = 16
+    if(localBacnetDevice != null)
+    {
+        // 0011 .... = APDU Type: Complex-ACK (3)
+        // .... 0000 = PDU Flags: 0x0
+        bacnetPacket[0] = 0x30
+        bacnetPacket[1] = iRecvInvokeID
+        // Service Choice: readProperty (12)
+        bacnetPacket[2] = 0x0C
+        // ObjectIdentifier: device, 1004
+        bacnetPacket[3] = 0x0C
+        bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
+        bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
+        bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
+        bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
+        // Property Identifier: object-list (76)
+        bacnetPacket[8] = 0x19
+        bacnetPacket[9] = 0x4C
+        // property Array Index (Unsigned) 0
+        bacnetPacket[10] = 0x29
+        bacnetPacket[11] = 0x00
+        // {[3]
+        bacnetPacket[12] = 0x3E
+        // object-list: (Unsigned) 53
+        bacnetPacket[13] = 0x21  
+        // Start with one as device,XXXX object-list device,XXXX 
+        bacnetPacket[14] = localBacnetDevice.localObjectListCount + 1
+        // }[3]
+        bacnetPacket[15] = 0x3F
+        dataLength = 16
+    }
     
     log.message("22222 bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
@@ -2025,35 +2035,39 @@ class bacDevice
   
   int makeBACnetObjectListPropertyComplexACKPDU(int iObjectIdentifierAndType, int iPropertyIdx)
   {
-    // 0011 .... = APDU Type: Complex-ACK (3)
-    // .... 0000 = PDU Flags: 0x0
-    bacnetPacket[0] = 0x30
-    bacnetPacket[1] = iRecvInvokeID
-    // Service Choice: readProperty (12)
-    bacnetPacket[2] = 0x0C
-    // ObjectIdentifier: device, 1004
-    bacnetPacket[3] = 0x0C
-    bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
-    bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
-    bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
-    bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
-    // Property Identifier: object-list (76)
-    bacnetPacket[8] = 0x19
-    bacnetPacket[9] = 0x4C
-    // property Array Index (Unsigned) XX
-    bacnetPacket[10] = 0x29
-    bacnetPacket[11] = iPropertyIdx
-    // {[3]
-    bacnetPacket[12] = 0x3E
-    // ObjectIdentifier: analog-input, 0
-    bacnetPacket[13] = 0xC4
-    bacnetPacket[14] = localObjectListProperty[iPropertyIdx]/(0x01000000)
-    bacnetPacket[15] = (localObjectListProperty[iPropertyIdx] /(0x010000))%0x0100
-    bacnetPacket[16] = (localObjectListProperty[iPropertyIdx] /   0x0100)%0x0100
-    bacnetPacket[17] = (localObjectListProperty[iPropertyIdx])%0x0100
-    // }[3]
-    bacnetPacket[18] = 0x3F
-    dataLength = 19
+    if(localBacnetDevice != null)
+    {
+        // 0011 .... = APDU Type: Complex-ACK (3)
+        // .... 0000 = PDU Flags: 0x0
+        bacnetPacket[0] = 0x30
+        bacnetPacket[1] = iRecvInvokeID
+        // Service Choice: readProperty (12)
+        bacnetPacket[2] = 0x0C
+        // ObjectIdentifier: device, 1004
+        bacnetPacket[3] = 0x0C
+        bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
+        bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
+        bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
+        bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
+        // Property Identifier: object-list (76)
+        bacnetPacket[8] = 0x19
+        bacnetPacket[9] = 0x4C
+        // property Array Index (Unsigned) XX
+        bacnetPacket[10] = 0x29
+        bacnetPacket[11] = iPropertyIdx
+        // {[3]
+        bacnetPacket[12] = 0x3E
+        // ObjectIdentifier: analog-input, 0
+        bacnetPacket[13] = 0xC4
+        // iPropertyIdx start with 2, but localObjectListPropertyID start with 0
+        bacnetPacket[14] = localBacnetDevice.localObjectListPropertyID[iPropertyIdx - 2]/(0x01000000)
+        bacnetPacket[15] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx - 2] /(0x010000))%0x0100
+        bacnetPacket[16] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx - 2] /   0x0100)%0x0100
+        bacnetPacket[17] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx - 2])%0x0100
+        // }[3]
+        bacnetPacket[18] = 0x3F
+        dataLength = 19
+    }
     
     log.message("22222 bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
@@ -2063,9 +2077,134 @@ class bacDevice
     return dataLength
   }
   
+  int findLocalProperty(int iObjectIdentifierAndType)
+  {
+    if(localBacnetDevice != null)
+    {
+        log.message("localBacnetDevice.localObjectListCount = ${localBacnetDevice.localObjectListCount}")
+        for(int i = 0; i < localBacnetDevice.localObjectListCount; i++)
+        {
+            log.message("We check localBacnetDevice.localObjectListPropertyID[$i]=${localBacnetDevice.localObjectListPropertyID[i]}")
+            if(localBacnetDevice.localObjectListPropertyID[i] == iObjectIdentifierAndType)
+            {
+                log.message("We found localBacnetDevice.localObjectListPropertyID[$i]")
+                return i;
+            }
+        }
+    }
+    log.message("We found nothing!")
+    return -1;
+  }
+  
   int makeBACnetPropertyRequiredComplexACKPDU(int iObjectIdentifierAndType)
   {
-      
+      if(localBacnetDevice != null)
+      {
+          // 0011 .... = APDU Type: Complex-ACK (3)
+          // .... 0000 = PDU Flags: 0x0
+          bacnetPacket[0] = 0x30
+          bacnetPacket[1] = iRecvInvokeID
+          // Service Choice: readPropertyMultiple (14)
+          bacnetPacket[2] = 0x0E
+          // ObjectIdentifier: device, 1004
+          bacnetPacket[3] = 0x0C
+          bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
+          bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
+          bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
+          bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
+          // {[1]
+          bacnetPacket[8] = 0x1E
+          // The Property list consist by <Property Identifier> {[4] <VALUE> }[4]
+          // I have to seperate them by empty line because I will add them later.
+          // Just see below:
+          int iPropertyIdx = findLocalProperty(iObjectIdentifierAndType)
+          if(iPropertyIdx == -1)
+          {
+             return -1;
+          }
+          // Property Identifier: object-identifier (75)
+          bacnetPacket[9] = 0x29
+          bacnetPacket[10] = 0x4b
+          // {[4]
+          bacnetPacket[11] = 0x4E
+          // ObjectIdentifier: analog-input, 0
+          bacnetPacket[12] = 0xC4
+          bacnetPacket[13] = localBacnetDevice.localObjectListPropertyID[iPropertyIdx]/(0x01000000)
+          bacnetPacket[14] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /(0x010000))%0x0100
+          bacnetPacket[15] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /   0x0100)%0x0100
+          bacnetPacket[16] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx])%0x0100
+          // }[4]
+          bacnetPacket[17] = 0x4F
+          
+          // Property Identifier: object-name (77)
+          bacnetPacket[18] = 0x29
+          bacnetPacket[19] = 0x4d
+          // {[4]
+          bacnetPacket[20] = 0x4E
+          // object-name: UTF-8 'vav_duct_dp'
+          // Application Tag: Character String, 
+          bacnetPacket[21] = 0x75
+          // Length/Value/Type: 12
+          int iObjectNameLen = localBacnetDevice.localObjectListName[iPropertyIdx].length()
+          log.message("Length/Value/Type = $iObjectNameLen")
+          // Included String Character Set
+          bacnetPacket[22] = iObjectNameLen + 1
+          log.message("bacnetPacket[22] = ${bacnetPacket[22]}")
+          // String Character Set: ANSI X3.4 / UTF-8 (since 2010) (0)
+          bacnetPacket[23] = 00
+          for(int i =0 ; i < iObjectNameLen; i++)
+          {
+              bacnetPacket[24 + i] = localBacnetDevice.localObjectListName[iPropertyIdx].get(i)
+          }
+          dataLength = 24 + iObjectNameLen
+          // }[4]
+          bacnetPacket[dataLength] = 0x4F
+          dataLength++
+          
+          // Property Identifier: object-type (79)
+          bacnetPacket[dataLength] = 0x29
+          dataLength++
+          bacnetPacket[dataLength] = 0x4f
+          dataLength++
+          // {[4]
+          bacnetPacket[dataLength] = 0x4E
+          dataLength++
+          // object-type:  analog-input
+          bacnetPacket[dataLength] = 0x91
+          dataLength++
+          bacnetPacket[dataLength] = localBacnetDevice.localObjectListPropertyID[iPropertyIdx] / 0x400000
+          dataLength++
+          // }[4]
+          bacnetPacket[dataLength] = 0x4F
+          dataLength++
+/*          
+          // Property Identifier: present-value (85)
+          bacnetPacket[dataLength] = 0x29
+          dataLength++
+          bacnetPacket[dataLength] = 0x55
+          dataLength++
+          // {[4]
+          bacnetPacket[dataLength] = 0x4E
+          dataLength++
+          // present-value: 0.000000 (Real)
+          bacnetPacket[dataLength] = 0x44
+          dataLength++
+          bacnetPacket[dataLength] = localBacnetDevice.localObjectListPropertyID[iPropertyIdx] / 0x400000
+          dataLength++
+          // }[4]
+          bacnetPacket[dataLength] = 0x4F
+          dataLength++
+ */    
+          // The end of Property list
+          // }[1]
+          bacnetPacket[dataLength] = 0x1F
+          dataLength++
+      }
+      log.message("22222 bacnetPacket[$dataLength]")
+      for(int i =0 ; i < dataLength; i++)
+      {
+          buf[i] = (float)bacnetPacket[i]
+      }
       return dataLength
   }
   
@@ -2081,24 +2220,19 @@ class bacDevice
    
     log.message("Search bacLocalPresentValue with $iObjectType and $iInstanceNumber")
     bool bFound = false
-    if(Sys.app.lookup(this.parent) != null)
+    if(localBacnetDevice != null)
     {
-        Component objBus = Sys.app.lookup(this.parent)
-        for (Component f = Sys.app.lookup(objBus.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-            if(f.type.is(bacLocalDevice.type)) {
-                for (Component d = Sys.app.lookup(f.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-                    if (d.type.is(bacLocalPresentValue.type))  {
-                        int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType(
-                                    ((bacLocalPresentValue)d).objectType)
-                        log.message("Found bacLocalPresentValue with ${((bacLocalPresentValue)d).objectType}->$iBacNetObjectType")
-                        if((iBacNetObjectType == iObjectType) && 
-                          (((bacLocalPresentValue)d).instanceNumber == iInstanceNumber))
-                        {
-                            myFloatPresentValue = ((bacLocalPresentValue)d).present_value
-                            bFound = true
-                            break
-                        }
-                    }
+        for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(bacLocalPresentValue.type))  {
+                int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType(
+                            ((bacLocalPresentValue)d).objectType)
+                log.message("Found bacLocalPresentValue with ${((bacLocalPresentValue)d).objectType}->$iBacNetObjectType")
+                if((iBacNetObjectType == iObjectType) && 
+                  (((bacLocalPresentValue)d).instanceNumber == iInstanceNumber))
+                {
+                    myFloatPresentValue = ((bacLocalPresentValue)d).present_value
+                    bFound = true
+                    break
                 }
             }
         }
@@ -2855,10 +2989,10 @@ class bacDevice
 
    inline int[10]    ipRouterArrayList
    inline int[10]    networkNumberList
-   
-   inline int[256]   localObjectListProperty
-
+      
    int               bacnetCurrentDeviceRet = 0
 
+   bacLocalDevice localBacnetDevice = null
+   
    private int iRecvInvokeID = 0
 }
