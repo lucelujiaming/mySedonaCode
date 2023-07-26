@@ -1945,6 +1945,94 @@ class bacDevice
     }
     return 0
   }
+
+  int fillObjectListPresentValue(int iObjectIdentifierAndType, int iPos)
+  {
+    float myFloatPresentValue = 0.0
+    
+    // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+    int iObjectType = iObjectIdentifierAndType/0x400000
+    // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+    int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+    
+    log.message("fillObjectListPresentValue search start")
+    bool bFound = false
+    if(localBacnetDevice != null)
+    {
+        int iDeviceInstance = localBacnetDevice.deviceInstance.toStr().parseInt()
+        log.message("fillObjectListPresentValue:: find the bacLocalDevice with $iDeviceInstance") 
+        for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(bacLocalPresentValue.type))  {
+                int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType(
+                            ((bacLocalPresentValue)d).objectType)
+                log.message("Found bacLocalPresentValue with ${((bacLocalPresentValue)d).objectType}->$iBacNetObjectType")
+                if((iBacNetObjectType == iObjectType) && 
+                  (((bacLocalPresentValue)d).instanceNumber == iInstanceNumber))
+                {
+                    myFloatPresentValue = ((bacLocalPresentValue)d).present_value
+                    log.message("Found bacLocalPresentValue = $myFloatPresentValue")
+                    bFound = true
+                    break
+                }
+            }
+        }
+    }
+    if(bFound == false)
+    {
+        log.message("No bacLocalPresentValue to use in the makeBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
+        return iPos
+    }
+    
+    if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) ||
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT) || 
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+    {
+        // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
+        bacnetPacket[iPos] = 0x44
+        iPos = iPos + 1
+        // present-value: XX.000000 (Real)
+        bufFloat[0] = myFloatPresentValue
+        log.message("myFloatPresentValue = $myFloatPresentValue")
+        int iFloatLen = bus.encodeFloat(bufFloat, bufData)
+        for(int i = 0; i < iFloatLen; i++)
+        {
+           bacnetPacket[iPos + i] = bufData[i]
+        }
+        iPos = iPos + iFloatLen
+        log.message("iPos = $iPos")
+    }
+    else if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) ||
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT) || 
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+    {
+        if(myFloatPresentValue == 0.0)
+        {
+           bacnetPacket[iPos] = 0x10
+        }
+        else 
+        {
+           bacnetPacket[iPos] = 0x11
+        }
+        iPos = iPos + 1
+    }
+    else if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) ||
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT) || 
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+    {
+        dataLength = 12
+        bufInteger[0] = (int)myFloatPresentValue
+        int iLen = bus.encodeUnsigned(bufInteger, bufData)
+        
+        // Application Tag: Unsigned Integer, Length/Value/Type: 1
+        bacnetPacket[iPos++] = 0x20 + iLen
+        for(int i = 0; i < iLen; i++)
+        {
+           bacnetPacket[iPos + iLen - i - 1] = bufData[i]
+        }
+        iPos += iLen
+    }
+    return iPos
+  }
   
   int makeBACnetObjectListCountACKPDU(int iObjectIdentifierAndType)
   {
@@ -1967,9 +2055,6 @@ class bacDevice
                 log.message("I Found bacLocalPresentValue.alias with ${((bacLocalPresentValue)d).alias.toStr()}")
                 localBacnetDevice.localObjectListName[localBacnetDevice.localObjectListCount]
                                  = ((bacLocalPresentValue)d).alias.toStr()
-                log.message("I Found bacLocalPresentValue.present_value with ${((bacLocalPresentValue)d).present_value}")
-                localBacnetDevice.localObjectListPresentValue[localBacnetDevice.localObjectListCount]
-                                 = ((bacLocalPresentValue)d).present_value
                 localBacnetDevice.localObjectListCount = localBacnetDevice.localObjectListCount + 1
                 log.message("We move to ${localBacnetDevice.localObjectListCount}")
                 bFound = true
@@ -2155,7 +2240,7 @@ class bacDevice
           bacnetPacket[12] = 0x75
           // Length/Value/Type: 12
           int iObjectNameLen = localBacnetDevice.deviceName.toStr().length()
-          log.message("Length/Value/Type = $iObjectNameLen")
+          log.message("makeBACnetPropertyDeviceOptionalComplexACKPDU::Length/Value/Type = $iObjectNameLen")
           // Included String Character Set
           bacnetPacket[13] = iObjectNameLen + 1
           log.message("bacnetPacket[22] = ${bacnetPacket[22]}")
@@ -2233,7 +2318,7 @@ class bacDevice
           bacnetPacket[21] = 0x75
           // Length/Value/Type: 12
           int iObjectNameLen = localBacnetDevice.localObjectListName[iPropertyIdx].length()
-          log.message("Length/Value/Type = $iObjectNameLen")
+          log.message("makeBACnetPropertyRequiredComplexACKPDU::Length/Value/Type = $iObjectNameLen")
           // Included String Character Set
           bacnetPacket[22] = iObjectNameLen + 1
           log.message("bacnetPacket[22] = ${bacnetPacket[22]}")
@@ -2274,16 +2359,9 @@ class bacDevice
           bacnetPacket[dataLength] = 0x4E
           dataLength++
           // present-value: 0.000000 (Real)
-          bacnetPacket[dataLength] = 0x44
-          dataLength++
-          bacnetPacket[dataLength] = 0x00
-          dataLength++
-          bacnetPacket[dataLength] = 0x00
-          dataLength++
-          bacnetPacket[dataLength] = 0x00
-          dataLength++
-          bacnetPacket[dataLength] = 0x00
-          dataLength++
+          log.message("11111 fillObjectListPresentValue[$dataLength]")
+          dataLength = fillObjectListPresentValue(iObjectIdentifierAndType, dataLength)
+          log.message("22222 fillObjectListPresentValue[$dataLength]")
           // }[4]
           bacnetPacket[dataLength] = 0x4F
           dataLength++
@@ -2296,7 +2374,7 @@ class bacDevice
           // {[4]
           bacnetPacket[dataLength] = 0x4E
           dataLength++
-          // present-value: 0.000000 (Real)
+          // event-state:  normal
           bacnetPacket[dataLength] = 0x91
           dataLength++
           bacnetPacket[dataLength] = 0x00
@@ -2348,7 +2426,7 @@ class bacDevice
           bacnetPacket[dataLength] = 0x1F
           dataLength++
       }
-      log.message("22222 bacnetPacket[$dataLength]")
+      log.message("33333 bacnetPacket[$dataLength]")
       for(int i =0 ; i < dataLength; i++)
       {
           buf[i] = (float)bacnetPacket[i]

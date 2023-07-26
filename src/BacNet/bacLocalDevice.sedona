@@ -107,7 +107,6 @@ class bacLocalDevice
   
    public inline int[256]     localObjectListPropertyID
    public inline Str[256]     localObjectListName
-   public inline float[256]   localObjectListPresentValue
    public int                 localObjectListCount = 0
    
 }
