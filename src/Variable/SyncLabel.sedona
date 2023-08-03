@@ -1,0 +1,95 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class SyncLabel
+  extends Component
+{
+  define Str IO_MODE_RANGE = "Input, Output"
+  define int IO_MODE_INPUT                      = 0x00
+  define int IO_MODE_OUTPUT                     = 0x01
+  
+  define Str DATA_TYPE_RANGE = "FloatData, IntData"
+  define int DATA_TYPE_FLOAT                       = 0x00
+  define int DATA_TYPE_INTEGAR                     = 0x01
+  
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @config
+  @range = IO_MODE_RANGE
+  @fieldWidth = 200
+  property int ioMode = IO_MODE_INPUT
+
+  @config
+  @range = DATA_TYPE_RANGE
+  @fieldWidth = 200
+  property int dataType = DATA_TYPE_FLOAT
+  
+
+  @readonly
+  property float outFloatValue = 0.0f
+
+  property float inFloatValue = 0.0f
+  
+  @readonly
+  property int outIntValue = 0
+
+  property int inIntValue = 0
+
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+  
+  override void start()
+  {
+  }
+
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    ** log.message("changed")
+  }
+
+  virtual override void execute()
+  {
+      Str aliasStr = alias.toStr()
+      ** log.message("111111111 SyncLabel name=$name")
+      // find bus and dev
+      Component p = Sys.app.lookup(this.parent)
+      Component root = null
+      while (p != null) {
+        root = p
+        p = Sys.app.lookup(p.parent)
+      }
+      if (root != null) {
+        // log.message("root:: aliasStr=$aliasStr")
+        ** log.message("222222222 SyncLabel name=$name and aliasStr]=$aliasStr")
+        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+          if (f.type.is(Folder.type) && f.name.equals("play")) {
+             for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                ** log.message("3333 SyncLabel name=$name and aliasStr]=$aliasStr")
+                if (n.type.is(SyncLabel.type) 
+                     && ((SyncLabel)n).alias.toStr().equals(aliasStr)
+                     && ((SyncLabel)n).dataType == dataType) {
+                     
+                     ** log.message("444 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name and aliasStr]=$aliasStr")
+                     if ((((SyncLabel)n).ioMode == IO_MODE_INPUT) && 
+                             (ioMode == IO_MODE_OUTPUT)) {
+                         log.message("555 SyncLabel n.inFloatValue=${((SyncLabel)n).inFloatValue} and n.inIntValue=${((SyncLabel)n).inIntValue} with n.name=${((SyncLabel)n).name}")
+                         log.message("555 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name")
+                         if(dataType == DATA_TYPE_FLOAT)
+                         {
+                            outFloatValue := ((SyncLabel)n).inFloatValue
+                         } 
+                         else if(dataType == DATA_TYPE_INTEGAR)
+                         {
+                            outIntValue := ((SyncLabel)n).inIntValue
+                         }                 
+                     }
+                     ** log.message("666 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name and aliasStr]=$aliasStr")
+                }
+             }
+          }
+        }
+     }
+   }
+}
