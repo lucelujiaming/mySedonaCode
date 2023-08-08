@@ -120,7 +120,7 @@ class bacReadProperty
     bacnetPacket[dataLength++] = 0x29
     bacnetPacket[dataLength++] = arrayProperty
 
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeReadPropertyPacket::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -212,7 +212,7 @@ class bacReadProperty
     // .... .111 = Named Tag: Closing Tag (7)
     bacnetPacket[dataLength++] = 0x1F
  */
-    ** log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeReadPropertyMultiplePacket::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -225,6 +225,7 @@ class bacReadProperty
     dataLength = 0
     if(bacnetReadMultipleCount <= BACNET_READMULTIPLE_DONOTHING)
     {
+       log.message("makeMultipleReadPropertyMultiplePacket return BACNET_READMULTIPLE_DONOTHING")
        return
     }
     // 0000 .... = APDU Type: Confirmed-REQ (0)
@@ -273,7 +274,7 @@ class bacReadProperty
         // .... .111 = Named Tag: Closing Tag (7)
         bacnetPacket[dataLength++] = 0x1F
     }
-    ** log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeMultipleReadPropertyMultiplePacket::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -350,10 +351,11 @@ class bacReadProperty
          }
          else if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORTED)
          {
-            ** log.message("333333 bacnetReadMultipleCount=$bacnetReadMultipleCount")
+            log.message("333333 bacnetReadMultipleCount = $bacnetReadMultipleCount when ") 
+            log.message("       instanceNumber = $instanceNumber and ObjectType = $objectType")
             if(bacnetReadMultipleCount == BACNET_READMULTIPLE_NOTUSED){
               makeReadPropertyMultiplePacket()
-              ** log.message("111111 makeReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+              log.message("111111 makeReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
               if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                 ** log.message("device.readReg")
               } else {
@@ -366,7 +368,7 @@ class bacReadProperty
             }
             else if(bacnetReadMultipleCount > BACNET_READMULTIPLE_DONOTHING){
               makeMultipleReadPropertyMultiplePacket()
-              ** log.message("111111 makeMultipleReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+              log.message("111111 makeMultipleReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
               if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                 ** log.message("device.readReg")
               } else {
@@ -395,11 +397,11 @@ class bacReadProperty
         case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
             // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
             // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
-            int instanceNumber = 0x00
-            instanceNumber = data[1] % 0x40
-            instanceNumber = instanceNumber * 0x100 + data[2]
-            instanceNumber = instanceNumber * 0x100 + data[3]
-            present_value := (float)instanceNumber
+            int objectID = 0x00
+            objectID = data[1] % 0x40
+            objectID = objectID * 0x100 + data[2]
+            objectID = objectID * 0x100 + data[3]
+            present_value := (float)objectID
             log.message("objectNodeType = $objectNodeType and instanceNumber=$present_value")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:

@@ -17,7 +17,15 @@ class bacDevice
   define int COMMUNICATIONBYSUBNET   = 2
   define int COMMUNICATIONEND = 3
   // Lujiaming add these end at 23/05/22
-  
+
+  /*
+      @config
+      @defaultOnClone
+      @unit = Units.millisecond
+      @min = 100
+      property int refreshTime = 5000
+   */
+   
   // InstanceNumber
   @asStr
   @config
@@ -112,7 +120,21 @@ class bacDevice
                getBacnetCurrentDevice()
                openPort(true)
             }
-         
+            else 
+            {
+                if(communicationMethod == COMMUNICATIONNONE)
+                {
+                    long nowNanoSecond  = Sys.ticks()
+                    long nowMilliSecond = nowNanoSecond / (long)1000000
+                    if(sendInterval < nowMilliSecond) {
+                       bacnet_close(0)
+                       getBacnetCurrentDevice()
+                       openPort(true)
+                       
+                       sendInterval = nowMilliSecond + (long)5000
+                    }
+                }
+            }
         }
         else 
         {
@@ -446,9 +468,8 @@ class bacDevice
     output_hex(bacnetPacket, iLen)
     // Copy head
     packetSend.copyFromBytes(bacnetPacket, 0, iLen)
-    ** log.message("Copy body ${iLen}")
     dataSendGram.len = iLen
-    ** log.message("send dataSendGram.len =${dataSendGram.len}")
+    log.message("Copy body ${iLen} andsend dataSendGram.len =${dataSendGram.len}")
     dataSendGram.buf = packetSend.bytes
     if(dataSendGram.len > 0)
     {
@@ -2042,7 +2063,7 @@ class bacDevice
     {
         localBacnetDevice.localObjectListCount = 0
         int iDeviceInstance = localBacnetDevice.deviceInstance.toStr().parseInt()
-        log.message("makeBACnetIAmPDU:: find the bacLocalDevice with $iDeviceInstance") 
+        log.message("makeBACnetObjectListCountACKPDU:: find the bacLocalDevice with $iDeviceInstance") 
         for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
             if (d.type.is(bacLocalPresentValue.type))  {
                 int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType(
@@ -2101,7 +2122,7 @@ class bacDevice
         dataLength = 16
     }
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeBACnetObjectListCountACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2141,7 +2162,7 @@ class bacDevice
     bacnetPacket[18] = 0x3F
     dataLength = 19
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeBACnetObjectListDeviceACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2185,7 +2206,7 @@ class bacDevice
         dataLength = 19
     }
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeBACnetObjectListPropertyACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2260,7 +2281,7 @@ class bacDevice
           bacnetPacket[dataLength] = 0x1F
           dataLength++
       }
-      log.message("22222 bacnetPacket[$dataLength]")
+      log.message("22222 makeBACnetPropertyDeviceOptionalComplexACKPDU::bacnetPacket[$dataLength]")
       for(int i =0 ; i < dataLength; i++)
       {
           buf[i] = (float)bacnetPacket[i]
@@ -2426,7 +2447,7 @@ class bacDevice
           bacnetPacket[dataLength] = 0x1F
           dataLength++
       }
-      log.message("33333 bacnetPacket[$dataLength]")
+      log.message("22222 makeBACnetPropertyRequiredComplexACKPDU::bacnetPacket[$dataLength]")
       for(int i =0 ; i < dataLength; i++)
       {
           buf[i] = (float)bacnetPacket[i]
@@ -2463,7 +2484,7 @@ class bacDevice
         dataLength = 14
     }
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeBACnetEventStateACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2582,7 +2603,7 @@ class bacDevice
     bacnetPacket[dataLength] = 0x1F
     dataLength++
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeBACnetPresentValueComplexACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2631,7 +2652,7 @@ class bacDevice
     bacnetPacket[17] = 0x1F
     dataLength = 17 + 1
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeBACnetAccessErrorComplexACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2696,7 +2717,7 @@ class bacDevice
     bacnetPacket[dataLength++] = 0x18 + 1
     bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
 
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeDevice4194303MaxAPDULengthAccepted::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2762,7 +2783,7 @@ class bacDevice
     bacnetPacket[dataLength++] = 0x18 + 1
     bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
 
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeDevice4194303ProtocolServicesSupported::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2827,7 +2848,7 @@ class bacDevice
     bacnetPacket[dataLength++] = 0x18 + 1
     bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
 
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeDevice4194303PropertyIdentifier::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -2958,7 +2979,7 @@ class bacDevice
     
     addrRecvLocal.addr.parse(((BIP)bus).ipLocalAddress.toStr())
     addrRecvLocal.port = ((BIP)bus).port
-    dataRecvGram.setSocketAddr(addrRecvLocal)
+    // dataRecvGram.setSocketAddr(addrRecvLocal)
 
     if(bacnetCurrentDeviceRet == 2)
     {
@@ -2991,20 +3012,26 @@ class bacDevice
      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(bacReadProperty.type))  {
            // Update objectNodeType
-           ((bacReadProperty)d).objectNodeType = 
-                ((bacReadProperty)d).convertObjectTypeToBacNetObjectType(
-                        ((bacReadProperty)d).objectType)
+           ((BacNetFieldBusIO)d).objectNodeType = 
+                ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
+                        ((BacNetFieldBusIO)d).objectType)
            int iObjectType = ((bacReadProperty)d).objectNodeType
            int iInstanceNumber = ((bacReadProperty)d).instanceNumber
            bacnetMultipleReadArray[bacnetMultipleReadCount] = iObjectType * 0x400000 + iInstanceNumber
-           log.message("AAAA createRPMAndWPM with iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
-           log.message("AAAA createRPMAndWPM with bacnetMultipleReadArray[$bacnetMultipleReadCount]=${bacnetMultipleReadArray[bacnetMultipleReadCount]}")
+           log.message("AAAA createRPM with iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
+           log.message("AAAA createRPM with bacnetMultipleReadArray[$bacnetMultipleReadCount]=${bacnetMultipleReadArray[bacnetMultipleReadCount]}")
            bacnetMultipleReadCount++
         } else if (d.type.is(bacWriteProperty.type))  {
+           // Update objectNodeType
+           ((BacNetFieldBusIO)d).objectNodeType = 
+                ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
+                        ((BacNetFieldBusIO)d).objectType)
            int iObjectType = ((bacWriteProperty)d).objectNodeType
            int iInstanceNumber = ((bacWriteProperty)d).instanceNumber
            
            bacnetMultipleWriteArray[bacnetMultipleWriteCount] = iObjectType * 0x400000 + iInstanceNumber
+               log.message("AAAA createWPM with iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
+               log.message("AAAA createWPM with bacnetMultipleWriteArray[$bacnetMultipleReadCount]=${bacnetMultipleWriteArray[bacnetMultipleReadCount]}")
            bacnetMultipleWriteCount++
         }
      }
@@ -3096,71 +3123,93 @@ class bacDevice
   
   int operateOneBlock(int iOperateType, int[] iData, int iLen)
   {
-     log.message("111 operateOneBlock Enter") 
-     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-         if (d.type.is(bacReadProperty.type)
-            && iOperateType == BACNET_PROPERTY_READ)  {
-            // Assume We donot use ReadMultiple
-            ((bacReadProperty)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_NOTUSED
-           log.message("44444 operateOneBlock when instanceNumber=${((bacReadProperty)d).instanceNumber}") 
-           for (int i = 0 ; i < iLen; i++)
-           {
-              int iCmpOne = iData[i] % 0x400000
-              if(iCmpOne == ((bacReadProperty)d).instanceNumber)
-              {
-                 if(i != 0)
-                 {
-                    // We use ReadMultiple and do nothing
-                    log.message("666 bacReadProperty Disable $i when iOperateType=$iOperateType") 
-                    ((bacReadProperty)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
-                 }
-                 else
-                 {
-                    // We use ReadMultiple and use instance number list
-                    ** log.message("7777 bacReadProperty Enable $i when iOperateType=$iOperateType") 
-                    ((bacReadProperty)d).bacnetReadMultipleCount = iLen
-                    // int j = 0
-                    for (int k = 0; k < iLen; k++)
+       log.message("111 operateOneBlock Enter with $iLen ") 
+       for (int i = 0 ; i < iLen; i++)
+       {
+          int iCmpInstanceNumber = iData[i] % 0x400000
+          int iCmpObjectType = iData[i] / 0x400000
+          
+          if(i != 0)
+          {
+              for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                 if (d.type.is(bacReadProperty.type)
+                    && iOperateType == BACNET_PROPERTY_READ)  {
+                    if((iCmpInstanceNumber == ((BacNetFieldBusIO)d).instanceNumber)
+                        && (iCmpObjectType == ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
+                                                                     ((BacNetFieldBusIO)d).objectType)))
                     {
-                        
-                        log.message("We will send ${iData[k]} in the bacReadProperty which instanceNumber=${((bacReadProperty)d).instanceNumber}") 
-                        ((bacReadProperty)d).bacnetReadMultipleList[k] = iData[k]
+                        log.message("44444 operateOneBlock when instanceNumber=${((bacReadProperty)d).instanceNumber}")
+                        ((bacReadProperty)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
+                    }
+                 }
+                 else if (d.type.is(bacWriteProperty.type)
+                        && iOperateType == BACNET_PROPERTY_WRITE)  {
+                    int iConvertObjectType = ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
+                                                                     ((BacNetFieldBusIO)d).objectType)
+                    log.message("454545 iCmpInstanceNumber=$iCmpInstanceNumber and iCmpObjectType=$iCmpObjectType")
+                    log.message("       d.instanceNumber=${((BacNetFieldBusIO)d).instanceNumber}")
+                    log.message("       d.objectType=${((BacNetFieldBusIO)d).objectType}")
+                    log.message("       iConvertObjectType=$iConvertObjectType")
+                    if((iCmpInstanceNumber == ((BacNetFieldBusIO)d).instanceNumber)
+                        && (iCmpObjectType == iConvertObjectType))
+                    {
+                        // We use WriteMultiple and do nothing
+                        log.message("555 bacWriteProperty Disable $i when iOperateType=$iOperateType") 
+                        ((bacWriteProperty)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_DONOTHING
                     }
                  }
               }
-           }
-        }
-        else if (d.type.is(bacWriteProperty.type)
-            && iOperateType == BACNET_PROPERTY_WRITE)  {
-            // Assume We donot use WriteMultiple
-            ((bacWriteProperty)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_NOTUSED
-           for (int i = 0; i < iLen; i++)
-           {
-              int iCmpOne = iData[i] % 0x400000
-              if(iCmpOne == ((BacNetFieldBusIO)d).instanceNumber)
-              {
-                 if(i != 0)
-                 {
-                    // We use WriteMultiple and do nothing
-                    log.message("666 bacWriteProperty Disable $i when iOperateType=$iOperateType") 
-                    ((bacWriteProperty)d).bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_DONOTHING
-                 }
-                 else
-                 {
-                    // We use WriteMultiple and use instance number list
-                     log.message("7777 bacWriteProperty Enable $i when iOperateType=$iOperateType") 
-                    ((bacWriteProperty)d).bacnetWriteMultipleCount = iLen
-                    // int j = 0
-                    for (int k = 0 ; k < iLen; k++)
+          }
+          else
+          {
+              for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                 if (d.type.is(bacReadProperty.type)
+                    && iOperateType == BACNET_PROPERTY_READ)  {
+                    if((iCmpInstanceNumber == ((BacNetFieldBusIO)d).instanceNumber)
+                        && (iCmpObjectType == ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
+                                                                     ((BacNetFieldBusIO)d).objectType)))
                     {
-                        log.message("We will send ${iData[k]} in the bacWriteProperty which instanceNumber=${((bacWriteProperty)d).instanceNumber}") 
-                        ((bacWriteProperty)d).bacnetWriteMultipleList[k] = iData[k]
+                        // We use ReadMultiple and use instance number list
+                        log.message("6666 bacReadProperty Enable $i with $iLen when iOperateType=$iOperateType") 
+                        log.message("     ((bacReadProperty)d).instanceNumber = $iCmpInstanceNumber") 
+                        log.message("     ((bacReadProperty)d).iObjectType    = $iCmpObjectType")
+                        ((bacReadProperty)d).bacnetReadMultipleCount = iLen
+                        // int j = 0
+                        for (int k = 0; k < iLen; k++)
+                        {
+                            
+                            log.message("We will send ${iData[k]} in the bacReadProperty which instanceNumber=${((bacReadProperty)d).instanceNumber}") 
+                            ((bacReadProperty)d).bacnetReadMultipleList[k] = iData[k]
+                        }
+                    }
+                 }
+                 else if (d.type.is(bacWriteProperty.type)
+                        && iOperateType == BACNET_PROPERTY_WRITE)  {
+
+                    int iConvertObjectType = ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
+                                                                     ((BacNetFieldBusIO)d).objectType)
+                    log.message("676767 iCmpInstanceNumber=$iCmpInstanceNumber and iCmpObjectType=$iCmpObjectType")
+                    log.message("       d.instanceNumber=${((BacNetFieldBusIO)d).instanceNumber}")
+                    log.message("       d.objectType=${((BacNetFieldBusIO)d).objectType}")
+                    log.message("       iConvertObjectType=$iConvertObjectType")
+                    
+                    if((iCmpInstanceNumber == ((BacNetFieldBusIO)d).instanceNumber)
+                        && (iCmpObjectType == iConvertObjectType))
+                    {
+                        // We use WriteMultiple and use instance number list
+                         log.message("7777 bacWriteProperty Enable $i when iOperateType=$iOperateType") 
+                        ((bacWriteProperty)d).bacnetWriteMultipleCount = iLen
+                        // int j = 0
+                        for (int k = 0 ; k < iLen; k++)
+                        {
+                            log.message("We will send ${iData[k]} in the bacWriteProperty which instanceNumber=${((bacWriteProperty)d).instanceNumber}") 
+                            ((bacWriteProperty)d).bacnetWriteMultipleList[k] = iData[k]
+                        }
                     }
                  }
               }
-           }
-        }
-     }
+          }
+       }
      return -1;
   }
   
@@ -3182,6 +3231,9 @@ class bacDevice
   define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
   define int BACNET_WRITEMULTIPLE_DONOTHING  = 0
     
+  // Send interval counter
+  long sendInterval = (long)0
+  
   FieldBusNet bus = null
   
   inline UdpSocket socket           // socket used for send/receive

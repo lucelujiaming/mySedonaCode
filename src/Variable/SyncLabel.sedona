@@ -46,7 +46,7 @@ class SyncLabel
   override void changed(Slot slot)
   {
     super.changed(slot)
-    ** log.message("changed")
+    ** log.message("changed It cannot delete")
   }
 
   virtual override void execute()
@@ -74,8 +74,8 @@ class SyncLabel
                      ** log.message("444 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name and aliasStr]=$aliasStr")
                      if ((((SyncLabel)n).ioMode == IO_MODE_INPUT) && 
                              (ioMode == IO_MODE_OUTPUT)) {
-                         log.message("555 SyncLabel n.inFloatValue=${((SyncLabel)n).inFloatValue} and n.inIntValue=${((SyncLabel)n).inIntValue} with n.name=${((SyncLabel)n).name}")
-                         log.message("555 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name")
+                         ** log.message("555 SyncLabel n.inFloatValue=${((SyncLabel)n).inFloatValue} and n.inIntValue=${((SyncLabel)n).inIntValue} with n.name=${((SyncLabel)n).name}")
+                         ** log.message("555 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name")
                          if(dataType == DATA_TYPE_FLOAT)
                          {
                             outFloatValue := ((SyncLabel)n).inFloatValue

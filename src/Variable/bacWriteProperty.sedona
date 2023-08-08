@@ -147,7 +147,7 @@ class bacWriteProperty
     // Context Tag: 4, Length/Value/Type: 1
     bacnetPacket[dataLength++] = 0x1F
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeWritePropertyMultiplePacket::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
         buf[i] = (float)bacnetPacket[i]
   }
@@ -157,14 +157,16 @@ class bacWriteProperty
       for (Component d = Sys.app.lookup(device.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         ** log.message("5555  updateCache d.name=$d.name and type.name=$d.type.name");
         if (d.type.is(bacWriteProperty.type)) {
-           int iObjectType = ((bacWriteProperty)d).objectNodeType
+           int iObjectType = ((BacNetFieldBusIO)d).objectType
+           iObjectType     = ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(iObjectType)
+            
            int iInstanceNumber = ((bacWriteProperty)d).instanceNumber
-           ** log.message("5555  updateCache bacWriteProperty iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber");
+           log.message("5555  checkWritePropertyMultiple::iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
            if((iObjectType == iMultipleObjectType) && (iInstanceNumber == iMultipleInstanceNumber)) 
            {
               float iLastValue = ((bacWriteProperty)d).lastInValue
               currentInFloatValue = ((bacWriteProperty)d).present_value
-              ** log.message("5555  updateCache bacWriteProperty iLastValue=$iLastValue and currentInFloatValue=$currentInFloatValue");
+              log.message("5555  checkWritePropertyMultiple::iLastValue=$iLastValue and currentInFloatValue=$currentInFloatValue")
               if(iLastValue != currentInFloatValue)
               {
                  ((bacWriteProperty)d).lastInValue = ((bacWriteProperty)d).present_value
@@ -287,7 +289,7 @@ class bacWriteProperty
 
     if(iChangedValue > 0)
     {
-        log.message("22222 bacnetPacket[$dataLength]")
+        log.message("22222 makeMultipleWritePropertyMultiplePacket::bacnetPacket[$dataLength]")
         for(int i =0 ; i < dataLength; i++)
         {
             buf[i] = (float)bacnetPacket[i]
@@ -389,7 +391,7 @@ class bacWriteProperty
     // Priority: (Unsigned) 16
     bacnetPacket[dataLength++] = 0x10
     
-    log.message("22222 bacnetPacket[$dataLength]")
+    log.message("22222 makeWritePropertyPacket::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
         buf[i] = (float)bacnetPacket[i]
   }
@@ -471,11 +473,11 @@ class bacWriteProperty
               }
            }
            else if(bacnetWriteMultipleCount == BACNET_WRITEMULTIPLE_DONOTHING){
-              ** log.message("WriteMultiple Disable")
+              log.message("WriteMultiple Disable")
            }
            else if(bacnetWriteMultipleCount > BACNET_WRITEMULTIPLE_DONOTHING){
               int iChangedValue = makeMultipleWritePropertyMultiplePacket()
-              ** log.message("makeMultipleWritePropertyMultiplePacket return $iChangedValue")
+              log.message("makeMultipleWritePropertyMultiplePacket return $iChangedValue")
               if(iChangedValue > 0)
               {
                   log.message("bacWriteProperty makeMultipleWritePropertyMultiplePacket($dataLength)")
