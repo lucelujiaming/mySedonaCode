@@ -96,4 +96,6 @@ abstract class FieldBusNet
   // 22    mstp
   int busId = 0
   
+  // Move from FieldBusDevice
+  int invokeID = 1
 }

@@ -47,7 +47,7 @@ abstract class FieldBusDevice
   Str dataRecvGramAddr
   // int objectIdentifier
   int sourceNetworkAddress
-  int invokeID = 1
+  // int invokeID = 1
   
   // SADR: 5
   int sadr = 0

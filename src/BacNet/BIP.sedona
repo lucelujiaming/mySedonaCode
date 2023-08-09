@@ -391,7 +391,6 @@ class BIP
   private int ctx = -1
 
 
-
   native int dO(int port, int device_instance, int retry_delay)
 
   native int dC(int ctx)

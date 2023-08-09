@@ -56,6 +56,9 @@ class bacWriteProperty
 
   void makeWritePropertyMultiplePacket()
   {
+    if (bus == null) {
+        return
+    }
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
@@ -63,10 +66,10 @@ class bacWriteProperty
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = device.invokeID
-    device.invokeID = device.invokeID + 1
-    if(device.invokeID == 0xFF)
-       device.invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
     dataLength = 3
     // Service Choice: writePropertyMultiple (16)
     bacnetPacket[dataLength++] = 0x10
@@ -184,6 +187,9 @@ class bacWriteProperty
 
   int makeMultipleWritePropertyMultiplePacket()
   {
+    if (bus == null) {
+        return 0
+    }
     int iChangedValue = 0
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
@@ -191,10 +197,10 @@ class bacWriteProperty
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = device.invokeID
-    device.invokeID = device.invokeID + 1
-    if(device.invokeID == 0xFF)
-       device.invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 0
     dataLength = 3
     // Service Choice: writePropertyMultiple (16)
     bacnetPacket[dataLength++] = 0x10
@@ -301,6 +307,9 @@ class bacWriteProperty
 
   void makeWritePropertyPacket()
   {
+    if (bus == null) {
+        return 
+    }
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
@@ -308,10 +317,10 @@ class bacWriteProperty
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = device.invokeID
-    device.invokeID = device.invokeID + 1
-    if(device.invokeID == 0xFF)
-       device.invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
     dataLength = 3
      // Service Choice: writeProperty (15)
     bacnetPacket[dataLength++] = 0x0F

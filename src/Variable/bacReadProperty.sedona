@@ -41,16 +41,19 @@ class bacReadProperty
   
   void makeReadPropertyPacket()
   {
+    if (bus == null) {
+        return 
+    }
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = device.invokeID
-    device.invokeID = device.invokeID + 1
-    if(device.invokeID == 0xFF)
-       device.invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
     dataLength = 3
     // if(segmentedMsg == SEGMENTEDMSGENABLE)
     // {
@@ -129,6 +132,9 @@ class bacReadProperty
 
   void makeReadPropertyMultiplePacket()
   {
+    if (bus == null) {
+        return 
+    }
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
@@ -136,10 +142,10 @@ class bacReadProperty
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = device.invokeID
-    device.invokeID = device.invokeID + 1
-    if(device.invokeID == 0xFF)
-       device.invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 0
     dataLength = 3
     // if(segmentedMsg == SEGMENTEDMSGENABLE)
     // {
@@ -222,6 +228,9 @@ class bacReadProperty
   
   void makeMultipleReadPropertyMultiplePacket()
   {
+    if (bus == null) {
+        return 
+    }
     dataLength = 0
     if(bacnetReadMultipleCount <= BACNET_READMULTIPLE_DONOTHING)
     {
@@ -234,10 +243,10 @@ class bacReadProperty
     bacnetPacket[1] = device.maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = device.invokeID
-    device.invokeID = device.invokeID + 1
-    if(device.invokeID == 0xFF)
-       device.invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
     dataLength = 3
     // Service Choice: readPropertyMultiple (14)
     bacnetPacket[dataLength++] = 0x0E

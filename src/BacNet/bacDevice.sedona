@@ -481,7 +481,14 @@ class bacDevice
   // For debug
   int forwardToVTS(byte[] bacnetRecvPacket, int iPacketLen)
   {
-    return 0
+      addrSendVTS.addr.parse("192.168.168.180")
+      // Fake port for debug
+      addrSendVTS.port = 57808
+      dataVTSForwardSendGram.setSocketAddr(addrSendVTS)
+      dataVTSForwardSendGram.len = iPacketLen
+      ** log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
+      dataVTSForwardSendGram.buf = bacnetRecvPacket
+      return socket.send(dataVTSForwardSendGram)?iPacketLen:0
   }
   
 
@@ -2662,16 +2669,19 @@ class bacDevice
 
   int makeDevice4194303MaxAPDULengthAccepted()
   {
+    if (bus == null) {
+        return 0
+    }
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
     bacnetPacket[1] = maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = invokeID
-    invokeID = invokeID + 1
-    if(invokeID == 0xFF)
-       invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
     dataLength = 3
     // if(segmentedMsg == SEGMENTEDMSGENABLE)
     // {
@@ -2728,16 +2738,19 @@ class bacDevice
 
   int makeDevice4194303ProtocolServicesSupported()
   {
+    if (bus == null) {
+        return 0
+    }
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
     bacnetPacket[1] = maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = invokeID
-    invokeID = invokeID + 1
-    if(invokeID == 0xFF)
-       invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
     dataLength = 3
     // if(segmentedMsg == SEGMENTEDMSGENABLE)
     // {
@@ -2793,16 +2806,19 @@ class bacDevice
   
   int makeDevice4194303PropertyIdentifier()
   {
+    if (bus == null) {
+        return 0
+    }
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
     bacnetPacket[1] = maxAPDULength
     
     // invokeID: Invoke ID: 9
-    bacnetPacket[2] = invokeID
-    invokeID = invokeID + 1
-    if(invokeID == 0xFF)
-       invokeID = 0
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
     dataLength = 3
     // if(segmentedMsg == SEGMENTEDMSGENABLE)
     // {
