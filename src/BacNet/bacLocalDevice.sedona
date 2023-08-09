@@ -97,10 +97,11 @@ class bacLocalDevice
     }
   }
   
-  void writeProperty(FieldBusDevice device, 
+  int writeProperty(FieldBusDevice device, 
                   int propertyVar, int iObjectType, int iInstanceNumber,
                   int tagNumber, byte[] data, int iLen)
   {
+		int isFound = 0
         log.message("AAAA writeProperty with propertyVar=$propertyVar, iObjectType=$iObjectType ")
         log.message("AAAA writeProperty with iInstanceNumber=$iInstanceNumber, tagNumber=$tagNumber")
         log.message("AAAA writeProperty with iLen=$iLen")
@@ -113,6 +114,7 @@ class bacLocalDevice
                 if((iBacNetObjectType == iObjectType) && 
                   (((bacLocalPresentValue)d).instanceNumber == iInstanceNumber))
                 {
+				    isFound = 1
                     switch (tagNumber)
                     {
                         case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
@@ -193,6 +195,7 @@ class bacLocalDevice
                 }
             }
         }
+        return isFound 
   }
 
   

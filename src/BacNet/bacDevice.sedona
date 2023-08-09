@@ -1661,12 +1661,19 @@ class bacDevice
                                                         iPropIdentifier, iObjectType, iInstanceNumber, tagNumber, iValueLen)
                     if(serviceChoicePos == -1)
                     {
-                       log.message("34343434 Error serviceChoicePos ")
-                       return -1
+                       log.message("34343434 Error return serviceChoicePos in the decode_local_tag ")
+                       break
                     }
                     tagNumber = bacnetRecvPacket[serviceChoicePos]
                 }
-                iLen = makeBACnetWritePorpertySimpleACKPDU(iObjectIdentifierAndType)
+				if(serviceChoicePos == -1)
+				{
+					iLen = makeBACnetWritePropertyErrorACKPDU(iObjectIdentifierAndType)
+				}
+				else
+				{
+					iLen = makeBACnetWritePorpertySimpleACKPDU(iObjectIdentifierAndType)
+				}
             }
             
             if(iLen > 0)
@@ -1737,18 +1744,19 @@ class bacDevice
                               int propertyProperty, int iObjectType, int iInstanceNumber, 
                               int tagNumber, int iOutLen)
   {
+    int iWritePropRet = 0
     int serviceChoicePos = iChoicePos;
     int iLen = iOutLen;
     // link_type = Component.LINK_TYPE_READ + tagNumber
 	if(localBacnetDevice == null)
 	{
-		return 0
+		return -1
 	}
     switch (tagNumber)
     {
         case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
             bufData[0] = iLen
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 1)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 1)
             break
         case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
         case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
@@ -1757,7 +1765,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
@@ -1765,7 +1773,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
@@ -1773,7 +1781,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
@@ -1784,7 +1792,7 @@ class bacDevice
             {
                bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
             }
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
@@ -1803,7 +1811,7 @@ class bacDevice
             strInfo.set(iLen, '\0')
             ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
             
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
@@ -1823,7 +1831,7 @@ class bacDevice
             strInfo.set(iLen, '\0')
             ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
             
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
             serviceChoicePos += iLen
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
@@ -1839,7 +1847,7 @@ class bacDevice
             log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
             bufData[3] = bacnetRecvPacket[serviceChoicePos]
             serviceChoicePos++
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
             break
         case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
             log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
@@ -1854,7 +1862,7 @@ class bacDevice
             log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
             bufData[3] = bacnetRecvPacket[serviceChoicePos]
             serviceChoicePos++
-            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
+            iWritePropRet = localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
             break
         // case BANET_PROPVAR_RESERVEDAPPTAG13:
         // case BANET_PROPVAR_RESERVEDAPPTAG14:
@@ -1863,6 +1871,10 @@ class bacDevice
             log.message("Not support $tagNumber ")
             return -1
     }  
+	if(iWritePropRet == 0)
+	{
+		return -1
+	}
     return serviceChoicePos
   }
 
@@ -2996,6 +3008,30 @@ class bacDevice
   
   int makeBACnetAccessErrorACKPDU(int iObjectIdentifierAndType)
   {
+    return dataLength
+  }
+  
+  int makeBACnetWritePropertyErrorACKPDU(int iObjectIdentifierAndType)
+  {
+    dataLength = 0
+    // 0101 .... = APDU Type: Error (5)
+    bacnetPacket[0] = 0x50
+    bacnetPacket[1] = iRecvInvokeID
+    // Service Choice: writeProperty (15)
+    bacnetPacket[2] = 0x0F
+    // Error Class: object (1)
+    bacnetPacket[3] = 0x91
+    bacnetPacket[4] = 0x01
+	// Error Code: unknown-object (31)
+    bacnetPacket[5] = 0x91
+    bacnetPacket[6] = 0x1F
+    dataLength = 6 + 1
+    
+    log.message("22222 makeBACnetWritePropertyErrorACKPDU::bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
     return dataLength
   }
   
