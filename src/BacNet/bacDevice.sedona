@@ -669,7 +669,7 @@ class bacDevice
             // Property Identifier: present-value (85)
             if(iPropIdentifier == 0x55)
             {
-               iLen = makeBACnetPresentValueComplexACKPDU(iObjectIdentifierAndType)
+               iLen = makeBACnetPresentValueACKPDU(iObjectIdentifierAndType)
             }
             // Property Identifier: event-state (36)
             else if(iPropIdentifier == 0x24)
@@ -1348,7 +1348,7 @@ class bacDevice
         return -1
     }
     // Service Choice: readPropertyMultiple (14)
-    // Service Choice: readPropertyMultiple ACK (12)
+    // Service Choice: readPropertyMultiple ACK (14)
     else if(bacnetRecvPacket[serviceChoicePos] == 0x0E)
     {
         // BACnet-Confirmed-Request-PDU
@@ -1606,6 +1606,121 @@ class bacDevice
             return serviceChoicePos
         }
     }
+    // Service Choice: writeProperty (15)
+    // Service Choice: writeProperty ACK (15)
+    else if(bacnetRecvPacket[serviceChoicePos] == 0x0F)
+    {
+        // BACnet-Confirmed-Request-PDU
+        if(apduType == 0)
+        {
+            serviceChoicePos++
+            int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+            log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
+            serviceChoicePos++
+            
+            int iObjectIdentifierAndType = 0
+            for(int i = 0 ; i < iObjectIdentifierLen; i++)
+            {
+               iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
+                                   + bacnetRecvPacket[serviceChoicePos + i]
+            }
+            ** log.message("000111 iObjectIdentifierAndType = 0x").printHex(
+            **                          iObjectIdentifierAndType).print(". ").nl()
+            // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+            int iObjectType = iObjectIdentifierAndType/0x400000
+            // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+            int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+            
+            serviceChoicePos = serviceChoicePos + iObjectIdentifierLen
+            
+            // Property Identifier: present-value (85)
+            int iPropIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+            serviceChoicePos++
+            int iPropIdentifier = 0
+            for(int i = 0 ; i < iPropIdentifierLen; i++)
+            {
+               iPropIdentifier = iPropIdentifier * 0x100
+                                    + bacnetRecvPacket[serviceChoicePos + i]
+            }
+            log.message("00022 writeProperty::iPropIdentifier = 0x").printHex(iPropIdentifier).print(". ").nl()
+            serviceChoicePos += iPropIdentifierLen
+            // Property Identifier: present-value (85)
+            int iLen = 0
+            if(iPropIdentifier == 0x55)
+            {
+                // {[3]
+                serviceChoicePos++
+                int tagNumber = bacnetRecvPacket[serviceChoicePos]
+                while (tagNumber != 0x3F)
+                {
+                    tagNumber = tagNumber/0x10
+                    int iValueLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+                    log.message("iValueLen = $iValueLen and tagNumber=$tagNumber")
+                    serviceChoicePos++
+                    serviceChoicePos = decode_local_tag(bacnetRecvPacket, serviceChoicePos, 
+                                                        iPropIdentifier, iObjectType, iInstanceNumber, tagNumber, iValueLen)
+                    if(serviceChoicePos == -1)
+                    {
+                       log.message("34343434 Error serviceChoicePos ")
+                       return -1
+                    }
+                    tagNumber = bacnetRecvPacket[serviceChoicePos]
+                }
+                iLen = makeBACnetWritePorpertySimpleACKPDU(iObjectIdentifierAndType)
+            }
+            
+            if(iLen > 0)
+            {
+                int headLength = 0
+                log.message("writeBusReg headLength=$headLength") 
+                // headLength = fillHead()
+                bacnetPacket[0] = 0x81
+                // Function: Original-Unicast-NPDU (0x0a)
+                bacnetPacket[1] = 0x0a
+                // Set length later
+                bacnetPacket[4] = 0x01
+                if(dnetSupport == 0x20)
+                {
+                    bacnetPacket[5] = dnetSupport
+                    bacnetPacket[6] = destNetworkAddressHigh
+                    bacnetPacket[7] = destNetworkAddressLow
+                    bacnetPacket[8] = destMACLayerAddress
+                    bacnetPacket[9] = hopCount
+                    // end of headLength = fillHead()
+                    headLength = 10
+                }
+                else if(dnetSupport == 0x00)
+                {
+                    bacnetPacket[5] = dnetSupport
+                    // end of headLength = fillHead()
+                    headLength = 6
+                }
+                log.message("writeBusReg headLength=$headLength") 
+                bacnetPacket[2] = (headLength + iLen)/256
+                bacnetPacket[3] = (headLength + iLen)%256
+                
+                for(int i =0; i < headLength; i++)
+                {
+                   bufToBIP[i] = (float)bacnetPacket[i]
+                }
+                
+                for(int j =0; j < iLen; j++)
+                {
+                   bufToBIP[j + headLength] = buf[j]
+                }
+                int iRet = writeBusReg(0, 0, iLen + headLength, bufToBIP)
+                return iLen + headLength
+            }
+            serviceChoicePos = serviceChoicePos + iPropIdentifierLen
+            // if(bacnetRecvPacket[serviceChoicePos] == 0x1F)
+            return iPacketLen
+        }
+        // BACnet-SimpleACK-PDU
+        else if(apduType == 3)
+        {
+        
+        }
+    }
     else
     {
         log.message("Service Choice: bacnetRecvPacket =${bacnetRecvPacket[serviceChoicePos]} ")
@@ -1616,6 +1731,139 @@ class bacDevice
        return -1
     }
     return iPacketLen
+  }
+
+  int decode_local_tag(byte[] bacnetRecvPacket, int iChoicePos, 
+                              int propertyProperty, int iObjectType, int iInstanceNumber, 
+                              int tagNumber, int iOutLen)
+  {
+    int serviceChoicePos = iChoicePos;
+    int iLen = iOutLen;
+    // link_type = Component.LINK_TYPE_READ + tagNumber
+	if(localBacnetDevice == null)
+	{
+		return 0
+	}
+    switch (tagNumber)
+    {
+        case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+            bufData[0] = iLen
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 1)
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+        case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+        case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+            for (int i = 0; i < iLen; i++)
+            {
+               bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+            }
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            serviceChoicePos += iLen
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+            for (int i = 0; i < iLen; i++)
+            {
+               bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+            }
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            serviceChoicePos += iLen
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+            for (int i = 0; i < iLen; i++)
+            {
+               bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+            }
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            serviceChoicePos += iLen
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+            iLen = bacnetRecvPacket[serviceChoicePos]
+            log.message("iLen fix to ${iLen} ")
+            serviceChoicePos++
+            for (int i = 0; i < iLen; i++)
+            {
+               bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+            }
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            serviceChoicePos += iLen
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+            serviceChoicePos += iLen
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+            iLen = bacnetRecvPacket[serviceChoicePos] 
+            log.message("OCTETSTRINGAPPTAG.iLen = $iLen ")
+            serviceChoicePos++
+
+            for (int i = 0; i < iLen; i++)
+            {
+               strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
+               bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+            }
+            strInfo.set(iLen, '\0')
+            ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
+            
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            serviceChoicePos += iLen
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+            iLen = bacnetRecvPacket[serviceChoicePos] 
+            ** log.message("CHARACTERSTRINGAPPTAG.iLen = $iLen ")
+            serviceChoicePos++
+            // Jump over : ASCII/UTF-8 Character Encoding = 0
+            serviceChoicePos++
+            iLen = iLen - 1
+            
+            for (int i = 0; i < iLen; i++)
+            {
+               ** log.message("bacnetPacketLen = $bacnetPacketLen and we get ${serviceChoicePos} ")
+               strInfo.set(i, bacnetRecvPacket[serviceChoicePos + i])
+               bufData[i] = bacnetRecvPacket[serviceChoicePos + i]
+            }
+            strInfo.set(iLen, '\0')
+            ** log.message("bacDevice::decode_one_tag Character string = $strInfo ")
+            
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, iLen)
+            serviceChoicePos += iLen
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+            log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+            bufData[0] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+            bufData[1] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            log.message("year = ${bacnetRecvPacket[serviceChoicePos]}  ")
+            bufData[2] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            log.message("month = ${bacnetRecvPacket[serviceChoicePos]} ")
+            bufData[3] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
+            break
+        case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+            log.message("hour = ${bacnetRecvPacket[serviceChoicePos]}  ")
+            bufData[0] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            log.message("minute = ${bacnetRecvPacket[serviceChoicePos]} ")
+            bufData[1] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            log.message("second = ${bacnetRecvPacket[serviceChoicePos]}  ")
+            bufData[2] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            log.message("hundredths = ${bacnetRecvPacket[serviceChoicePos]} ")
+            bufData[3] = bacnetRecvPacket[serviceChoicePos]
+            serviceChoicePos++
+            localBacnetDevice.writeProperty(this, propertyProperty, iObjectType, iInstanceNumber, tagNumber, bufData, 4)
+            break
+        // case BANET_PROPVAR_RESERVEDAPPTAG13:
+        // case BANET_PROPVAR_RESERVEDAPPTAG14:
+        // case BANET_PROPVAR_RESERVEDAPPTAG15:
+        default:
+            log.message("Not support $tagNumber ")
+            return -1
+    }  
+    return serviceChoicePos
   }
 
   int decode_one_tag(byte[] bacnetRecvPacket, int iChoicePos, 
@@ -2492,6 +2740,134 @@ class bacDevice
     }
     
     log.message("22222 makeBACnetEventStateACKPDU::bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+    return dataLength
+  }
+
+  int makeBACnetWritePorpertySimpleACKPDU(int iObjectIdentifierAndType)
+  {
+    // 0010 .... = APDU Type: Simple-ACK (2)
+    bacnetPacket[0] = 0x20
+    bacnetPacket[1] = iRecvInvokeID
+    // Service Choice: readProperty (12)
+    bacnetPacket[2] = 0x0F
+    log.message("22222 makeBACnetWritePorpertySimpleACKPDU::bacnetPacket[$dataLength]")
+    for(int i =0 ; i < 3; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+    return 3
+  }
+  
+  int makeBACnetPresentValueACKPDU(int iObjectIdentifierAndType)
+  {
+    dataLength = 0
+    float myFloatPresentValue = 0.0
+    
+    // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+    int iObjectType = iObjectIdentifierAndType/0x400000
+    // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+    int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+   
+    log.message("Search bacLocalPresentValue with $iObjectType and $iInstanceNumber")
+    bool bFound = false
+    if(localBacnetDevice != null)
+    {
+        for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(bacLocalPresentValue.type))  {
+                int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType(
+                            ((bacLocalPresentValue)d).objectType)
+                log.message("Found bacLocalPresentValue with ${((bacLocalPresentValue)d).objectType}->$iBacNetObjectType")
+                if((iBacNetObjectType == iObjectType) && 
+                  (((bacLocalPresentValue)d).instanceNumber == iInstanceNumber))
+                {
+                    myFloatPresentValue = ((bacLocalPresentValue)d).present_value
+                    bFound = true
+                    break
+                }
+            }
+        }
+    }
+    if(bFound == false)
+    {
+        log.message("No bacLocalPresentValue to use in the makeBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
+        int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
+        return iLen
+    }
+    // 0011 .... = APDU Type: Complex-ACK (3)
+    // .... 0000 = PDU Flags: 0x0
+    bacnetPacket[0] = 0x30
+    bacnetPacket[1] = iRecvInvokeID
+    // Service Choice: readProperty (12)
+    bacnetPacket[2] = 0x0C
+    // ObjectIdentifier: analog-value, 1
+    bacnetPacket[3] = 0x0C
+    bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
+    bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
+    bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
+    bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
+    // Property Identifier: present-value (85)
+    bacnetPacket[8] = 0x19
+    bacnetPacket[10] = 0x55
+    // {[4]
+    bacnetPacket[11] = 0x3E
+  
+    if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) ||
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT) || 
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+    {
+        // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
+        bacnetPacket[12] = 0x44
+        dataLength = 12 + 1
+        // present-value: XX.000000 (Real)
+        bufFloat[0] = myFloatPresentValue
+        log.message("myFloatPresentValue = $myFloatPresentValue")
+        int iFloatLen = bus.encodeFloat(bufFloat, bufData)
+        for(int i = 0; i < iFloatLen; i++)
+        {
+           bacnetPacket[dataLength + i] = bufData[i]
+        }
+        dataLength = dataLength + iFloatLen
+    }
+    else if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) ||
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT) || 
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+    {
+        dataLength = 12
+        if(myFloatPresentValue == 0.0)
+        {
+           bacnetPacket[dataLength] = 0x10
+        }
+        else 
+        {
+           bacnetPacket[dataLength] = 0x11
+        }
+        dataLength = dataLength + 1
+    }
+    else if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) ||
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT) || 
+       (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+    {
+        dataLength = 12
+        bufInteger[0] = (int)myFloatPresentValue
+        int iLen = bus.encodeUnsigned(bufInteger, bufData)
+        
+        // Application Tag: Unsigned Integer, Length/Value/Type: 1
+        bacnetPacket[dataLength++] = 0x20 + iLen
+        for(int i = 0; i < iLen; i++)
+        {
+           bacnetPacket[dataLength + iLen - i - 1] = bufData[i]
+        }
+        dataLength += iLen
+    }
+    // }[4]
+    bacnetPacket[dataLength] = 0x3F
+    dataLength++
+    
+    log.message("22222 makeBACnetPresentValueACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]

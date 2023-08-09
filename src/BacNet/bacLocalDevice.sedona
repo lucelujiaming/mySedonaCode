@@ -96,6 +96,104 @@ class bacLocalDevice
        log.message("bus is null. I am $name and type is ${type.name}")
     }
   }
+  
+  void writeProperty(FieldBusDevice device, 
+                  int propertyVar, int iObjectType, int iInstanceNumber,
+                  int tagNumber, byte[] data, int iLen)
+  {
+        log.message("AAAA writeProperty with propertyVar=$propertyVar, iObjectType=$iObjectType ")
+        log.message("AAAA writeProperty with iInstanceNumber=$iInstanceNumber, tagNumber=$tagNumber")
+        log.message("AAAA writeProperty with iLen=$iLen")
+
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(bacLocalPresentValue.type))  {
+                int iBacNetObjectType = ((bacLocalPresentValue)d).convertObjectTypeToBacNetObjectType( 
+                                            ((bacLocalPresentValue)d).objectType) 
+                log.message("writeProperty::Found bacLocalPresentValue with ${((bacLocalPresentValue)d).objectType}->$iBacNetObjectType")
+                if((iBacNetObjectType == iObjectType) && 
+                  (((bacLocalPresentValue)d).instanceNumber == iInstanceNumber))
+                {
+                    switch (tagNumber)
+                    {
+                        case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+                            if(data[0] != 0x00)
+                                ((bacLocalPresentValue)d).present_value := 1.0
+                            else
+                                ((bacLocalPresentValue)d).present_value := 0.0
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+                            // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+                            // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+                            int objectID = 0x00
+                            objectID = data[1] % 0x40
+                            objectID = objectID * 0x100 + data[2]
+                            objectID = objectID * 0x100 + data[3]
+                            ((bacLocalPresentValue)d).present_value := (float)objectID
+                            log.message("present_value=${((bacLocalPresentValue)d).present_value}")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+                        case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+                            bus.decodeUnsigned(data, iLen, bufInteger)
+                            ((bacLocalPresentValue)d).present_value := (float)bufInteger[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("-------------------------ReadPropertyMultipleUnsignedInteger = ${((bacLocalPresentValue)d).present_value}------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+                            bus.decodeUnsigned(data, iLen, bufInteger)
+                            ((bacLocalPresentValue)d).present_value := (float)bufInteger[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("------------------------ReadPropertyMultipleSignedInteger = ${((bacLocalPresentValue)d).present_value}------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+                            bus.decodeFloat(data, bufFloat)
+                            ((bacLocalPresentValue)d).present_value := (float)bufFloat[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("--------------------------ReadPropertyMultipleFloat = ${((bacLocalPresentValue)d).present_value}--------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+                            bus.decodeDouble(data, bufDouble)
+                            ((bacLocalPresentValue)d).present_value := (float)bufDouble[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("-------------------------ReadPropertyMultipleDouble = ${((bacLocalPresentValue)d).present_value}--------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        // case BANET_PROPVAR_NULLAPPTAG:
+                        case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+                        case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+                            for (int i = 0; i < iLen; i++)
+                            {
+                               strInfo.set(i, data[i])
+                            }
+                            strInfo.set(iLen, '\0')
+                            ** log.message("bacreadProperty Character string = $strInfo ")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+                            for (int i = 0; i < iLen; i++)
+                            {
+                               strInfo.set(i, data[i])
+                            }
+                            strInfo.set(iLen, '\0')
+                            ** log.message("bacreadProperty Character string = $strInfo ")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+                            break
+                        // case BANET_PROPVAR_RESERVEDAPPTAG13:
+                        // case BANET_PROPVAR_RESERVEDAPPTAG14:
+                        // case BANET_PROPVAR_RESERVEDAPPTAG15:
+                        default:
+                            log.message("Not support $tagNumber ")
+                            break
+                    }
+                    break
+                }
+            }
+        }
+  }
 
   
   // define Log log
@@ -108,5 +206,10 @@ class bacLocalDevice
    public inline int[256]     localObjectListPropertyID
    public inline Str[256]     localObjectListName
    public int                 localObjectListCount = 0
-   
+  
+   private inline int[2]    bufInteger
+   private inline float[2]  bufFloat
+   private inline double[2] bufDouble
+
+   private inline Str(128)   strInfo
 }
