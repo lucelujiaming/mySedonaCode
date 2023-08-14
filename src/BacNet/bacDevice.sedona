@@ -1728,6 +1728,164 @@ class bacDevice
         
         }
     }
+    // Service Choice: writePropertyMultiple (16)
+    // Service Choice: writePropertyMultiple ACK (16)
+    else if(bacnetRecvPacket[serviceChoicePos] == 0x10)
+    {
+    	log.message("writePropertyMultiple::apduType = ${apduType}  ")
+        // BACnet-Confirmed-Request-PDU
+        if(apduType == 0)
+        {
+            // ObjectIdentifier: analog-value, 0
+            serviceChoicePos++
+            while (serviceChoicePos < iPacketLen)
+            {
+                log.message("00000 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+                log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
+                serviceChoicePos++
+                
+                int iObjectIdentifierAndType = 0
+                for(int i = 0 ; i < iObjectIdentifierLen; i++)
+                {
+                   iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
+                                       + bacnetRecvPacket[serviceChoicePos + i]
+                }
+                log.message("000114 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
+                // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+                int iObjectType = iObjectIdentifierAndType/0x400000
+                // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+                int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+                log.message("iObjectType = ${iObjectType} and iInstanceNumber = ${iInstanceNumber} ")
+                serviceChoicePos += iObjectIdentifierLen
+                log.message("11111 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+				// {[1]
+                if(bacnetRecvPacket[serviceChoicePos] != 0x1E)
+                {
+                   log.message("bacnetRecvPacket Error Opening Tag")
+                   return -1
+                }
+                serviceChoicePos++
+                // Property Identifier : Length Value Type: 1
+                int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
+                log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+                
+                int  propertyProperty = 0
+                serviceChoicePos++
+                for(int i = 0 ; i < PropertyLengthValue; i++)
+                {
+                   propertyProperty = propertyProperty * 0x100
+                                       + bacnetRecvPacket[serviceChoicePos + i]
+                   ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
+                   **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
+                }
+                log.message("----------------- We Get propertyProperty = ${propertyProperty} ")
+                serviceChoicePos += PropertyLengthValue
+                ** log.message("22222 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+				// {[2]
+                if(bacnetRecvPacket[serviceChoicePos] != 0x2E)
+                {
+                   log.message("Error tag ")
+                   return -1
+                }
+                serviceChoicePos++
+                int tagNumber = bacnetRecvPacket[serviceChoicePos]
+                while (tagNumber != 0x3F)
+                {
+                    tagNumber = tagNumber/0x10
+                    int iLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+                    log.message("33333 iLen = $iLen and tagNumber=$tagNumber")
+                    serviceChoicePos++
+                    serviceChoicePos = decode_local_tag(bacnetRecvPacket, serviceChoicePos, 
+                                            propertyProperty, iObjectType, iInstanceNumber, tagNumber, iLen)
+                    if(serviceChoicePos == -1)
+                    {
+                       log.message("34343434 Error serviceChoicePos ")
+                       return -1
+                    }
+                    log.message("444444 bacnetRecvPacket at $serviceChoicePos")
+                    log.message("444444 bacnetRecvPacket[$serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                    if(bacnetRecvPacket[serviceChoicePos] != 0x2F)
+                    {
+                       log.message("Error Closing Tag")
+                       return -1
+                    }
+                    serviceChoicePos++
+                    log.message("45454545 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                    if (bacnetRecvPacket[serviceChoicePos] == 0x1F)
+                    {
+                       log.message("We meet the end of this packet ")
+                       serviceChoicePos++
+                       break;
+                    }
+                    tagNumber = bacnetRecvPacket[serviceChoicePos]
+
+                    // Property Identifier
+                    log.message("We meet a Property Identifier with 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                    PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
+                    log.message("PropertyLengthValue = ${PropertyLengthValue} ")
+                    
+                    propertyProperty = 0
+                    serviceChoicePos++
+                    for(int i = 0 ; i < PropertyLengthValue; i++)
+                    {
+                       propertyProperty = propertyProperty * 0x100
+                                           + bacnetRecvPacket[serviceChoicePos + i]
+                       ** log.message("propertyProperty[").printInt(i).print("] = 0x").printHex(
+                       **                  bacnetRecvPacket[serviceChoicePos + i]).print(". ").nl()
+                    }
+                    log.message("-----------------  Get next propertyProperty = ${propertyProperty} ")
+                    serviceChoicePos += PropertyLengthValue
+                    log.message("5555555 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+
+                    // Error Property Identifier
+                    if(bacnetRecvPacket[serviceChoicePos] == 0x5E)
+                    {
+                        serviceChoicePos++
+                        // error Class:  property
+                        int iErrorClassPropertyLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+                        serviceChoicePos++
+                        serviceChoicePos += iErrorClassPropertyLen
+                        // error Code:  unknown-property
+                        int iErrorCodePropertyLen = bacnetRecvPacket[serviceChoicePos] % 0x10
+                        serviceChoicePos++
+                        serviceChoicePos += iErrorCodePropertyLen
+                    }
+                    // Property Identifier
+                    else if(bacnetRecvPacket[serviceChoicePos] == 0x4E)
+                    {
+                       serviceChoicePos++
+                       log.message("6666 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+                       tagNumber = bacnetRecvPacket[serviceChoicePos]
+                       // We goto the start of this cycle to get the next property
+                       continue
+                    }
+                    
+                    // When we arrive here we are at the end of Property Identifier List
+                    if(bacnetRecvPacket[serviceChoicePos] == 0x5F)
+                    {
+                       serviceChoicePos++
+                       log.message("End of Property Identifier List")
+                       serviceChoicePos++
+                       // We have to quit the cycle of Property Identifier List
+                       break
+                    }
+                    else 
+                    {
+                       log.message("bacnetRecvPacket[serviceChoicePos] Error Opening Tag")
+                       return -1
+                    }
+                }
+            }
+            log.message("77777 End of checkReadData. ")
+            return serviceChoicePos
+        }
+        // BACnet-SimpleACK-PDU
+        else if(apduType == 3)
+        {
+        
+        }
+    }
     else
     {
         log.message("Service Choice: bacnetRecvPacket =${bacnetRecvPacket[serviceChoicePos]} ")
@@ -2823,17 +2981,17 @@ class bacDevice
     bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
     // Property Identifier: present-value (85)
     bacnetPacket[8] = 0x19
-    bacnetPacket[10] = 0x55
+    bacnetPacket[9] = 0x55
     // {[4]
-    bacnetPacket[11] = 0x3E
+    bacnetPacket[10] = 0x3E
   
     if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) ||
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT) || 
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
     {
         // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
-        bacnetPacket[12] = 0x44
-        dataLength = 12 + 1
+        bacnetPacket[11] = 0x44
+        dataLength = 11 + 1
         // present-value: XX.000000 (Real)
         bufFloat[0] = myFloatPresentValue
         log.message("myFloatPresentValue = $myFloatPresentValue")
@@ -2848,7 +3006,7 @@ class bacDevice
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT) || 
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
     {
-        dataLength = 12
+        dataLength = 11
         if(myFloatPresentValue == 0.0)
         {
            bacnetPacket[dataLength] = 0x10
@@ -2863,7 +3021,7 @@ class bacDevice
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT) || 
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
     {
-        dataLength = 12
+        dataLength = 11
         bufInteger[0] = (int)myFloatPresentValue
         int iLen = bus.encodeUnsigned(bufInteger, bufData)
         
