@@ -1355,108 +1355,120 @@ class bacDevice
         if(apduType == 0)
         {
             serviceChoicePos++
-            int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
-            log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
-            serviceChoicePos++
-            
-            int iObjectIdentifierAndType = 0
-            for(int i = 0 ; i < iObjectIdentifierLen; i++)
+            makeReadPropertyMultiplePrefixPacket()
+            int iLen = 0
+            while (serviceChoicePos < iPacketLen)
             {
-               iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
-                                   + bacnetRecvPacket[serviceChoicePos + i]
-            }
-            log.message("000113 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
-            // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
-            int iObjectType = iObjectIdentifierAndType/0x400000
-            // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
-            int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+	            int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+	            log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
+	            serviceChoicePos++
+	            
+	            int iObjectIdentifierAndType = 0
+	            for(int i = 0 ; i < iObjectIdentifierLen; i++)
+	            {
+	               iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
+	                                   + bacnetRecvPacket[serviceChoicePos + i]
+	            }
+	            log.message("000113 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
+	            // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+	            int iObjectType = iObjectIdentifierAndType/0x400000
+	            // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+	            int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+                log.message("iObjectType = ${iObjectType} and iInstanceNumber = ${iInstanceNumber} ")
             
-            serviceChoicePos = serviceChoicePos + iObjectIdentifierLen
-            if(bacnetRecvPacket[serviceChoicePos] == 0x1E)
+            	serviceChoicePos = serviceChoicePos + iObjectIdentifierLen
+                log.message("000114 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
+	            if(bacnetRecvPacket[serviceChoicePos] != 0x1E)
+	            {
+                   log.message("bacnetRecvPacket Error Opening Tag")
+                   return -1
+	            }
+                serviceChoicePos++
+                // Property Identifier: present-value (85)
+                int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x07
+                serviceChoicePos++
+                int propertyProperty = 0
+                for(int i = 0 ; i < PropertyLengthValue; i++)
+                {
+                   propertyProperty = propertyProperty * 0x100
+                                        + bacnetRecvPacket[serviceChoicePos + i]
+                }
+                log.message("00022 readPropertyMultiple::iPropIdentifier = 0x").printHex(propertyProperty).print(". ").nl()
+				serviceChoicePos += PropertyLengthValue
+                // Property Identifier: present-value (85)
+                if(propertyProperty == 0x55)
+                {
+                   iLen = complementBACnetPresentValueComplexACKPDU(iObjectIdentifierAndType)
+                }
+                // Property Identifier: object-list (76)
+                else if(propertyProperty == 0x4C)
+                {
+                   log.message("readPropertyMultiple::Property Identifier: object-list (76)")
+                }
+                // Property Identifier: optional (80)
+                else if(propertyProperty == 0x50)
+                {
+                   iLen = complementBACnetPropertyDeviceOptionalComplexACKPDU(iObjectIdentifierAndType)
+                }
+                // Property Identifier: required (105)
+                else if(propertyProperty == 0x69)
+                {
+                   iLen = complementBACnetPropertyRequiredComplexACKPDU(iObjectIdentifierAndType)
+                }
+                else
+                {
+                   iLen = complementBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
+                }
+                if(bacnetRecvPacket[serviceChoicePos] != 0x1F)
+	            {
+                   log.message("bacnetRecvPacket Error Closing Tag")
+                   return -1
+	            }
+                serviceChoicePos++
+        	}
+        	// Send response.
+            if(iLen > 0)
             {
-               serviceChoicePos++
-               // Property Identifier: present-value (85)
-               int iPropIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
-               serviceChoicePos++
-               int iPropIdentifier = 0
-               for(int i = 0 ; i < iPropIdentifierLen; i++)
-               {
-                  iPropIdentifier = iPropIdentifier * 0x100
-                                       + bacnetRecvPacket[serviceChoicePos + i]
-               }
-               log.message("00022 readPropertyMultiple::iPropIdentifier = 0x").printHex(iPropIdentifier).print(". ").nl()
-               int iLen = 0
-               // Property Identifier: present-value (85)
-               if(iPropIdentifier == 0x55)
-               {
-                  iLen = makeBACnetPresentValueComplexACKPDU(iObjectIdentifierAndType)
-               }
-               // Property Identifier: object-list (76)
-               else if(iPropIdentifier == 0x4C)
-               {
-                  log.message("readPropertyMultiple::Property Identifier: object-list (76)")
-               }
-               // Property Identifier: optional (80)
-               else if(iPropIdentifier == 0x50)
-               {
-                  iLen = makeBACnetPropertyDeviceOptionalComplexACKPDU(iObjectIdentifierAndType)
-               }
-               // Property Identifier: required (105)
-               else if(iPropIdentifier == 0x69)
-               {
-                  iLen = makeBACnetPropertyRequiredComplexACKPDU(iObjectIdentifierAndType)
-               }
-               else
-               {
-                  iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
-               }
-               
-               if(iLen > 0)
-               {
-                    log.message("writeBusReg makeBACnetACKPDU($iLen)")
-                    int headLength = 0
-                    log.message("writeBusReg headLength=$headLength") 
-                    // headLength = fillHead()
-                    bacnetPacket[0] = 0x81
-                    // Function: Original-Unicast-NPDU (0x0a)
-                    bacnetPacket[1] = 0x0a
-                    // Set length later
-                    bacnetPacket[4] = 0x01
-                    if(dnetSupport == 0x20)
-                    {
-                        bacnetPacket[5] = dnetSupport
-                        bacnetPacket[6] = destNetworkAddressHigh
-                        bacnetPacket[7] = destNetworkAddressLow
-                        bacnetPacket[8] = destMACLayerAddress
-                        bacnetPacket[9] = hopCount
-                        // end of headLength = fillHead()
-                        headLength = 10
-                    }
-                    else if(dnetSupport == 0x00)
-                    {
-                        bacnetPacket[5] = dnetSupport
-                        // end of headLength = fillHead()
-                        headLength = 6
-                    }
-                    log.message("writeBusReg headLength=$headLength") 
-                    bacnetPacket[2] = (headLength + iLen)/256
-                    bacnetPacket[3] = (headLength + iLen)%256
-                    
-                    for(int i =0; i < headLength; i++)
-                    {
-                       bufToBIP[i] = (float)bacnetPacket[i]
-                    }
-                    
-                    for(int j =0; j < iLen; j++)
-                    {
-                       bufToBIP[j + headLength] = buf[j]
-                    }
-                    int iRet = writeBusReg(0, 0, iLen + headLength, bufToBIP)
-                    return iLen + headLength
-               }
-                  
-               serviceChoicePos = serviceChoicePos + iPropIdentifierLen
-               // if(bacnetRecvPacket[serviceChoicePos] == 0x1F)
+                 log.message("writeBusReg makeBACnetACKPDU($iLen)")
+                 int headLength = 0
+                 log.message("writeBusReg headLength=$headLength") 
+                 // headLength = fillHead()
+                 bacnetPacket[0] = 0x81
+                 // Function: Original-Unicast-NPDU (0x0a)
+                 bacnetPacket[1] = 0x0a
+                 // Set length later
+                 bacnetPacket[4] = 0x01
+                 if(dnetSupport == 0x20)
+                 {
+                     bacnetPacket[5] = dnetSupport
+                     bacnetPacket[6] = destNetworkAddressHigh
+                     bacnetPacket[7] = destNetworkAddressLow
+                     bacnetPacket[8] = destMACLayerAddress
+                     bacnetPacket[9] = hopCount
+                     // end of headLength = fillHead()
+                     headLength = 10
+                 }
+                 else if(dnetSupport == 0x00)
+                 {
+                     bacnetPacket[5] = dnetSupport
+                     // end of headLength = fillHead()
+                     headLength = 6
+                 }
+                 log.message("writeBusReg headLength=$headLength") 
+                 bacnetPacket[2] = (headLength + iLen)/256
+                 bacnetPacket[3] = (headLength + iLen)%256
+                 
+                 for(int i =0; i < headLength; i++)
+                 {
+                    bufToBIP[i] = (float)bacnetPacket[i]
+                 }
+                 
+                 for(int j =0; j < iLen; j++)
+                 {
+                    bufToBIP[j + headLength] = buf[j]
+                 }
+                 int iRet = writeBusReg(0, 0, iLen + headLength, bufToBIP)
+                 return iLen + headLength
             }
             return iPacketLen
         }
@@ -2425,7 +2437,7 @@ class bacDevice
     }
     if(bFound == false)
     {
-        log.message("No bacLocalPresentValue to use in the makeBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
+        log.message("No bacLocalPresentValue to use in the fillObjectListPresentValue with $iObjectType and $iInstanceNumber")
         return iPos
     }
     
@@ -2658,45 +2670,52 @@ class bacDevice
     return -1;
   }
   
-  int makeBACnetPropertyDeviceOptionalComplexACKPDU(int iObjectIdentifierAndType)
+  int complementBACnetPropertyDeviceOptionalComplexACKPDU(int iObjectIdentifierAndType)
   {
       if(localBacnetDevice != null)
       {
-          // 0011 .... = APDU Type: Complex-ACK (3)
-          // .... 0000 = PDU Flags: 0x0
-          bacnetPacket[0] = 0x30
-          bacnetPacket[1] = iRecvInvokeID
-          // Service Choice: readPropertyMultiple (14)
-          bacnetPacket[2] = 0x0E
-          // ObjectIdentifier: device, 1004
-          bacnetPacket[3] = 0x0C
-          bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
-          bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
-          bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
-          bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
+          // ObjectIdentifier: analog-value, 1
+          bacnetPacket[dataLength] = 0x0C
+          dataLength++
+          bacnetPacket[dataLength] = iObjectIdentifierAndType/(0x01000000)
+          dataLength++
+          bacnetPacket[dataLength] = (iObjectIdentifierAndType /(0x010000))%0x0100
+          dataLength++
+          bacnetPacket[dataLength] = (iObjectIdentifierAndType /   0x0100)%0x0100
+          dataLength++
+          bacnetPacket[dataLength] = (iObjectIdentifierAndType)%0x0100
+          dataLength++
+          // listOfResults
           // {[1]
-          bacnetPacket[8] = 0x1E
+          bacnetPacket[dataLength] = 0x1E
+		  dataLength++
           // Property Identifier: description (28)
-          bacnetPacket[9] = 0x29
-          bacnetPacket[10] = 0x1C
+          bacnetPacket[dataLength] = 0x29
+		  dataLength++
+          bacnetPacket[dataLength] = 0x1C
+		  dataLength++
           // {[4]
-          bacnetPacket[11] = 0x4E
+          bacnetPacket[dataLength] = 0x4E
+		  dataLength++
           // description: UTF-8 'vav Controller'
           // Application Tag: Character String, 
-          bacnetPacket[12] = 0x75
+          bacnetPacket[dataLength] = 0x75
+		  dataLength++
           // Length/Value/Type: 12
           int iObjectNameLen = localBacnetDevice.deviceName.toStr().length()
-          log.message("makeBACnetPropertyDeviceOptionalComplexACKPDU::Length/Value/Type = $iObjectNameLen")
+          log.message("complementBACnetPropertyDeviceOptionalComplexACKPDU::Length/Value/Type = $iObjectNameLen")
           // Included String Character Set
-          bacnetPacket[13] = iObjectNameLen + 1
+          bacnetPacket[dataLength] = iObjectNameLen + 1
+		  dataLength++
           log.message("bacnetPacket[22] = ${bacnetPacket[22]}")
           // String Character Set: ANSI X3.4 / UTF-8 (since 2010) (0)
-          bacnetPacket[14] = 00
+          bacnetPacket[dataLength] = 00
+		  dataLength++
           for(int i =0 ; i < iObjectNameLen; i++)
           {
-              bacnetPacket[15 + i] = localBacnetDevice.deviceName.get(i)
+              bacnetPacket[dataLength + i] = localBacnetDevice.deviceName.get(i)
           }
-          dataLength = 15 + iObjectNameLen
+          dataLength = dataLength + iObjectNameLen
           // }[4]
           bacnetPacket[dataLength] = 0x4F
           dataLength++
@@ -2706,7 +2725,7 @@ class bacDevice
           bacnetPacket[dataLength] = 0x1F
           dataLength++
       }
-      log.message("22222 makeBACnetPropertyDeviceOptionalComplexACKPDU::bacnetPacket[$dataLength]")
+      log.message("22222 complementBACnetPropertyDeviceOptionalComplexACKPDU::bacnetPacket[$dataLength]")
       for(int i =0 ; i < dataLength; i++)
       {
           buf[i] = (float)bacnetPacket[i]
@@ -2714,24 +2733,25 @@ class bacDevice
       return dataLength
   }
   
-  int makeBACnetPropertyRequiredComplexACKPDU(int iObjectIdentifierAndType)
+  int complementBACnetPropertyRequiredComplexACKPDU(int iObjectIdentifierAndType)
   {
       if(localBacnetDevice != null)
-      {
-          // 0011 .... = APDU Type: Complex-ACK (3)
-          // .... 0000 = PDU Flags: 0x0
-          bacnetPacket[0] = 0x30
-          bacnetPacket[1] = iRecvInvokeID
-          // Service Choice: readPropertyMultiple (14)
-          bacnetPacket[2] = 0x0E
-          // ObjectIdentifier: device, 1004
-          bacnetPacket[3] = 0x0C
-          bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
-          bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
-          bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
-          bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
+      {	
+          // ObjectIdentifier: analog-value, 1
+          bacnetPacket[dataLength] = 0x0C
+          dataLength++
+          bacnetPacket[dataLength] = iObjectIdentifierAndType/(0x01000000)
+          dataLength++
+          bacnetPacket[dataLength] = (iObjectIdentifierAndType /(0x010000))%0x0100
+          dataLength++
+          bacnetPacket[dataLength] = (iObjectIdentifierAndType /   0x0100)%0x0100
+          dataLength++
+          bacnetPacket[dataLength] = (iObjectIdentifierAndType)%0x0100
+          dataLength++
+          // listOfResults
           // {[1]
-          bacnetPacket[8] = 0x1E
+          bacnetPacket[dataLength] = 0x1E
+		  dataLength++
           // The Property list consist by <Property Identifier> {[4] <VALUE> }[4]
           // I have to seperate them by empty line because I will add them later.
           // Just see below:
@@ -2741,40 +2761,55 @@ class bacDevice
              return -1;
           }
           // Property Identifier: object-identifier (75)
-          bacnetPacket[9] = 0x29
-          bacnetPacket[10] = 0x4b
+          bacnetPacket[dataLength] = 0x29
+		  dataLength++
+          bacnetPacket[dataLength] = 0x4b
+		  dataLength++
           // {[4]
-          bacnetPacket[11] = 0x4E
+          bacnetPacket[dataLength] = 0x4E
+		  dataLength++
           // ObjectIdentifier: analog-input, 0
-          bacnetPacket[12] = 0xC4
-          bacnetPacket[13] = localBacnetDevice.localObjectListPropertyID[iPropertyIdx]/(0x01000000)
-          bacnetPacket[14] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /(0x010000))%0x0100
-          bacnetPacket[15] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /   0x0100)%0x0100
-          bacnetPacket[16] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx])%0x0100
+          bacnetPacket[dataLength] = 0xC4
+		  dataLength++
+          bacnetPacket[dataLength] = localBacnetDevice.localObjectListPropertyID[iPropertyIdx]/(0x01000000)
+		  dataLength++
+          bacnetPacket[dataLength] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /(0x010000))%0x0100
+		  dataLength++
+          bacnetPacket[dataLength] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /   0x0100)%0x0100
+		  dataLength++
+          bacnetPacket[dataLength] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx])%0x0100
+		  dataLength++
           // }[4]
-          bacnetPacket[17] = 0x4F
+          bacnetPacket[dataLength] = 0x4F
+		  dataLength++
           
           // Property Identifier: object-name (77)
-          bacnetPacket[18] = 0x29
-          bacnetPacket[19] = 0x4d
+          bacnetPacket[dataLength] = 0x29
+		  dataLength++
+          bacnetPacket[dataLength] = 0x4d
+		  dataLength++
           // {[4]
-          bacnetPacket[20] = 0x4E
+          bacnetPacket[dataLength] = 0x4E
+		  dataLength++
           // object-name: UTF-8 'vav_duct_dp'
           // Application Tag: Character String, 
-          bacnetPacket[21] = 0x75
+          bacnetPacket[dataLength] = 0x75
+		  dataLength++
           // Length/Value/Type: 12
           int iObjectNameLen = localBacnetDevice.localObjectListName[iPropertyIdx].length()
-          log.message("makeBACnetPropertyRequiredComplexACKPDU::Length/Value/Type = $iObjectNameLen")
+          log.message("complementBACnetPropertyRequiredComplexACKPDU::Length/Value/Type = $iObjectNameLen")
           // Included String Character Set
-          bacnetPacket[22] = iObjectNameLen + 1
+          bacnetPacket[dataLength] = iObjectNameLen + 1
+		  dataLength++
           log.message("bacnetPacket[22] = ${bacnetPacket[22]}")
           // String Character Set: ANSI X3.4 / UTF-8 (since 2010) (0)
-          bacnetPacket[23] = 00
+          bacnetPacket[dataLength] = 0x00
+		  dataLength++
           for(int i =0 ; i < iObjectNameLen; i++)
           {
-              bacnetPacket[24 + i] = localBacnetDevice.localObjectListName[iPropertyIdx].get(i)
+              bacnetPacket[dataLength + i] = localBacnetDevice.localObjectListName[iPropertyIdx].get(i)
           }
-          dataLength = 24 + iObjectNameLen
+          dataLength = dataLength + iObjectNameLen
           // }[4]
           bacnetPacket[dataLength] = 0x4F
           dataLength++
@@ -2872,7 +2907,7 @@ class bacDevice
           bacnetPacket[dataLength] = 0x1F
           dataLength++
       }
-      log.message("22222 makeBACnetPropertyRequiredComplexACKPDU::bacnetPacket[$dataLength]")
+      log.message("22222 complementBACnetPropertyRequiredComplexACKPDU::bacnetPacket[$dataLength]")
       for(int i =0 ; i < dataLength; i++)
       {
           buf[i] = (float)bacnetPacket[i]
@@ -2963,7 +2998,7 @@ class bacDevice
     }
     if(bFound == false)
     {
-        log.message("No bacLocalPresentValue to use in the makeBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
+        log.message("No bacLocalPresentValue to use in the makeBACnetPresentValueACKPDU with $iObjectType and $iInstanceNumber")
         int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
         return iLen
     }
@@ -3045,9 +3080,20 @@ class bacDevice
     return dataLength
   }
   
-  int makeBACnetPresentValueComplexACKPDU(int iObjectIdentifierAndType)
+  int makeReadPropertyMultiplePrefixPacket()
   {
-    dataLength = 0
+    // 0011 .... = APDU Type: Complex-ACK (3)
+    // .... 0000 = PDU Flags: 0x0
+    bacnetPacket[0] = 0x30
+    bacnetPacket[1] = iRecvInvokeID
+    // Service Choice: readPropertyMultiple (14)
+    bacnetPacket[2] = 0x0E
+    dataLength = 3
+	return dataLength
+  }
+  
+  int complementBACnetPresentValueComplexACKPDU(int iObjectIdentifierAndType)
+  {
     float myFloatPresentValue = 0.0
     
     // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
@@ -3076,38 +3122,42 @@ class bacDevice
     }
     if(bFound == false)
     {
-        log.message("No bacLocalPresentValue to use in the makeBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
-        int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
+        log.message("No bacLocalPresentValue to use in the complementBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
+        int iLen = complementBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
         return iLen
     }
-    // 0011 .... = APDU Type: Complex-ACK (3)
-    // .... 0000 = PDU Flags: 0x0
-    bacnetPacket[0] = 0x30
-    bacnetPacket[1] = iRecvInvokeID
-    // Service Choice: readPropertyMultiple (14)
-    bacnetPacket[2] = 0x0E
+	
     // ObjectIdentifier: analog-value, 1
-    bacnetPacket[3] = 0x0C
-    bacnetPacket[4] = iObjectIdentifierAndType/(0x01000000)
-    bacnetPacket[5] = (iObjectIdentifierAndType /(0x010000))%0x0100
-    bacnetPacket[6] = (iObjectIdentifierAndType /   0x0100)%0x0100
-    bacnetPacket[7] = (iObjectIdentifierAndType)%0x0100
+    bacnetPacket[dataLength] = 0x0C
+    dataLength++
+    bacnetPacket[dataLength] = iObjectIdentifierAndType/(0x01000000)
+    dataLength++
+    bacnetPacket[dataLength] = (iObjectIdentifierAndType /(0x010000))%0x0100
+    dataLength++
+    bacnetPacket[dataLength] = (iObjectIdentifierAndType /   0x0100)%0x0100
+    dataLength++
+    bacnetPacket[dataLength] = (iObjectIdentifierAndType)%0x0100
+    dataLength++
     // listOfResults
     // {[1]
-    bacnetPacket[8] = 0x1E
+    bacnetPacket[dataLength] = 0x1E
+    dataLength++
     // Property Identifier: present-value (85)
-    bacnetPacket[9] = 0x29
-    bacnetPacket[10] = 0x55
+    bacnetPacket[dataLength] = 0x29
+    dataLength++
+    bacnetPacket[dataLength] = 0x55
+    dataLength++
     // {[4]
-    bacnetPacket[11] = 0x4E
+    bacnetPacket[dataLength] = 0x4E
+    dataLength++
   
     if((iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) ||
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT) || 
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
     {
         // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
-        bacnetPacket[12] = 0x44
-        dataLength = 12 + 1
+        bacnetPacket[dataLength] = 0x44
+		dataLength++
         // present-value: XX.000000 (Real)
         bufFloat[0] = myFloatPresentValue
         log.message("myFloatPresentValue = $myFloatPresentValue")
@@ -3122,7 +3172,6 @@ class bacDevice
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT) || 
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
     {
-        dataLength = 12
         if(myFloatPresentValue == 0.0)
         {
            bacnetPacket[dataLength] = 0x10
@@ -3137,7 +3186,6 @@ class bacDevice
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT) || 
        (iObjectType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
     {
-        dataLength = 12
         bufInteger[0] = (int)myFloatPresentValue
         int iLen = bus.encodeUnsigned(bufInteger, bufData)
         
@@ -3156,7 +3204,7 @@ class bacDevice
     bacnetPacket[dataLength] = 0x1F
     dataLength++
     
-    log.message("22222 makeBACnetPresentValueComplexACKPDU::bacnetPacket[$dataLength]")
+    log.message("22222 complementBACnetPresentValueComplexACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
@@ -3186,6 +3234,57 @@ class bacDevice
     dataLength = 6 + 1
     
     log.message("22222 makeBACnetWritePropertyErrorACKPDU::bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+    return dataLength
+  }
+  
+  int complementBACnetAccessErrorComplexACKPDU(int iObjectIdentifierAndType)
+  {
+    // ObjectIdentifier: analog-value, 1
+    bacnetPacket[dataLength] = 0x0C
+    dataLength++
+    bacnetPacket[dataLength] = iObjectIdentifierAndType/(0x01000000)
+    dataLength++
+    bacnetPacket[dataLength] = (iObjectIdentifierAndType /(0x010000))%0x0100
+    dataLength++
+    bacnetPacket[dataLength] = (iObjectIdentifierAndType /   0x0100)%0x0100
+    dataLength++
+    bacnetPacket[dataLength] = (iObjectIdentifierAndType)%0x0100
+    dataLength++
+    // listOfResults
+    // {[1]
+    bacnetPacket[dataLength] = 0x1E
+	dataLength++
+    // Property Identifier: present-value (85)
+    bacnetPacket[dataLength] = 0x29
+	dataLength++
+    bacnetPacket[dataLength] = 0x55
+	dataLength++
+    // propertyAccessError
+    // {[5]
+    bacnetPacket[dataLength] = 0x5E
+	dataLength++
+    // error Class:  object
+    bacnetPacket[dataLength] = 0x91
+	dataLength++
+    bacnetPacket[dataLength] = 0x01
+	dataLength++
+    // error Code:  unsupported-object-type
+    bacnetPacket[dataLength] = 0x91
+	dataLength++
+    bacnetPacket[dataLength] = 0x24
+	dataLength++
+    // }[5]
+    bacnetPacket[dataLength] = 0x5F
+	dataLength++
+    // }[1]
+    bacnetPacket[dataLength] = 0x1F
+	dataLength++
+    
+    log.message("22222 complementBACnetAccessErrorComplexACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
