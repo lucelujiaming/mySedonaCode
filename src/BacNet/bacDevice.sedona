@@ -1614,7 +1614,7 @@ class bacDevice
                     }
                 }
             }
-            log.message("77777 End of checkReadData. ")
+            log.message("77777 End of checkReadData with BACnet-SimpleACK-PDU. ")
             return serviceChoicePos
         }
     }
@@ -1889,7 +1889,54 @@ class bacDevice
                     }
                 }
             }
-            log.message("77777 End of checkReadData. ")
+            // writePropertyMultiple ACK 
+            int iLen = makeBACnetWritePropertyMultipleACKPDU();
+            log.message("Send writePropertyMultiple ACK return $iLen")
+       		// Send response.
+            if(iLen > 0)
+            {
+                 log.message("writeBusReg makeBACnetACKPDU($iLen)")
+                 int headLength = 0
+                 log.message("writeBusReg headLength=$headLength") 
+                 // headLength = fillHead()
+                 bacnetPacket[0] = 0x81
+                 // Function: Original-Unicast-NPDU (0x0a)
+                 bacnetPacket[1] = 0x0a
+                 // Set length later
+                 bacnetPacket[4] = 0x01
+                 if(dnetSupport == 0x20)
+                 {
+                     bacnetPacket[5] = dnetSupport
+                     bacnetPacket[6] = destNetworkAddressHigh
+                     bacnetPacket[7] = destNetworkAddressLow
+                     bacnetPacket[8] = destMACLayerAddress
+                     bacnetPacket[9] = hopCount
+                     // end of headLength = fillHead()
+                     headLength = 10
+                 }
+                 else if(dnetSupport == 0x00)
+                 {
+                     bacnetPacket[5] = dnetSupport
+                     // end of headLength = fillHead()
+                     headLength = 6
+                 }
+                 log.message("writeBusReg headLength=$headLength") 
+                 bacnetPacket[2] = (headLength + iLen)/256
+                 bacnetPacket[3] = (headLength + iLen)%256
+                 
+                 for(int i =0; i < headLength; i++)
+                 {
+                    bufToBIP[i] = (float)bacnetPacket[i]
+                 }
+                 
+                 for(int j =0; j < iLen; j++)
+                 {
+                    bufToBIP[j + headLength] = buf[j]
+                 }
+                 int iRet = writeBusReg(0, 0, iLen + headLength, bufToBIP)
+                 return iLen + headLength
+            }			
+            log.message("77777 End of checkReadData and Send writePropertyMultiple ACK. ")
             return serviceChoicePos
         }
         // BACnet-SimpleACK-PDU
@@ -2952,6 +2999,21 @@ class bacDevice
     return dataLength
   }
 
+  int makeBACnetWritePropertyMultipleACKPDU()
+  {
+    // 0010 .... = APDU Type: Simple-ACK (2)
+    bacnetPacket[0] = 0x20
+    bacnetPacket[1] = iRecvInvokeID
+    // Service Choice: writePropertyMultiple (16)
+    bacnetPacket[2] = 0x10
+    log.message("22222 makeBACnetWritePorpertySimpleACKPDU::bacnetPacket[$dataLength]")
+    for(int i =0 ; i < 3; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+    return 3
+  }
+  
   int makeBACnetWritePorpertySimpleACKPDU(int iObjectIdentifierAndType)
   {
     // 0010 .... = APDU Type: Simple-ACK (2)
