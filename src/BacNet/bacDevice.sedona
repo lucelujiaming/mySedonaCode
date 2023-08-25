@@ -130,8 +130,8 @@ class bacDevice
                        bacnet_close(0)
                        getBacnetCurrentDevice()
                        openPort(true)
-                       
-                       sendInterval = nowMilliSecond + (long)5000
+                       // Offline timespan is 30 seconds at 08/22/23
+                       sendInterval = nowMilliSecond + (long)30000
                     }
                 }
             }
@@ -399,12 +399,12 @@ class bacDevice
     packetSend.copyFromBytes(bacnetPacket, 0, iLen)
     ** log.message("Copy body ${iLen}")
     dataBroadcastGram.len = iLen
-    ** log.message("send dataBroadcastGram.len =${dataBroadcastGram.len}")
     dataBroadcastGram.buf = packetSend.bytes
     if(dataBroadcastGram.len > 0)
     {
        forwardToVTS(dataBroadcastGram.buf, dataBroadcastGram.len)
     }
+    log.message("send dataBroadcastGram.len =${dataBroadcastGram.len}")
     return socket.send(dataBroadcastGram)?iLen:0
   }
   
@@ -431,6 +431,7 @@ class bacDevice
             {
                forwardToVTS(dataRecvGram.buf, dataRecvGram.len)
             }
+			log.message("send dataRecvGram.len =${dataRecvGram.len}")
             return socket.send(dataRecvGram)?iLen:0
         }
         else
@@ -475,6 +476,7 @@ class bacDevice
     {
        forwardToVTS(dataSendGram.buf, dataSendGram.len)
     }
+	log.message("send dataSendGram.len =${dataSendGram.len}")
     return socket.send(dataSendGram)?iLen:0
   }
 
@@ -488,6 +490,7 @@ class bacDevice
       dataVTSForwardSendGram.len = iPacketLen
       ** log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
       dataVTSForwardSendGram.buf = bacnetRecvPacket
+	  log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
       return socket.send(dataVTSForwardSendGram)?iPacketLen:0
   }
   
@@ -554,6 +557,7 @@ class bacDevice
        log.message("ERROR: bacnetPacketLen = ${bacnetPacketLen} and iPacketLen =${iPacketLen}")
        return -1
     }
+    log.message("checkReadData bacnetPacketLen = ${bacnetPacketLen} and iPacketLen =${iPacketLen} ")
     forwardToVTS(bacnetRecvPacket, iPacketLen)
     // BACnet Virtual Link Control
     int serviceChoicePos = 4
