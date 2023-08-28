@@ -143,17 +143,25 @@ class bacDevice
 
         if(maxAPDULength == -1)
         {
-            log.message("Sending makeDevice4194303MaxAPDULengthAccepted")
-            // Get max-apdu-length-accepted by <B'0000' Up to MinimumMessageSize (50 octets)>
-            maxAPDULength = 0
-            int iLen = makeDevice4194303MaxAPDULengthAccepted()
-            maxAPDULength = -1
-            if(iLen > 0)
-            {
-               log.message("writeReg makeDevice4194303MaxAPDULengthAccepted($iLen)")
-               writeReg(0, 0, iLen, buf)
-            }
-            return 
+			bool isIncludeSubNetMac = isInstanceNumberIncludeSubNetMac()
+			if(isIncludeSubNetMac && iInstanceNumberFromSubNetMac == -1)
+			{
+				log.message("Waiting iInstanceNumberFromSubNetMac with ${InstanceNumber.toStr()}")
+			}
+			else
+			{
+				log.message("Sending makeDevice4194303MaxAPDULengthAccepted with ${InstanceNumber.toStr()}")
+				// Get max-apdu-length-accepted by <B'0000' Up to MinimumMessageSize (50 octets)>
+				maxAPDULength = 0
+				int iLen = makeDevice4194303MaxAPDULengthAccepted()
+				maxAPDULength = -1
+				if(iLen > 0)
+				{
+				   log.message("writeReg makeDevice4194303MaxAPDULengthAccepted($iLen)")
+				   writeReg(0, 0, iLen, buf)
+				}
+				return
+			}
         }
         if(readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
         {
@@ -470,7 +478,7 @@ class bacDevice
     // Copy head
     packetSend.copyFromBytes(bacnetPacket, 0, iLen)
     dataSendGram.len = iLen
-    log.message("Copy body ${iLen} andsend dataSendGram.len =${dataSendGram.len}")
+    log.message("Copy body ${iLen} and send dataSendGram.len =${dataSendGram.len}")
     dataSendGram.buf = packetSend.bytes
     if(dataSendGram.len > 0)
     {
@@ -800,7 +808,9 @@ class bacDevice
             log.message("iInstanceNumber = ${iInstanceNumber} ")
             serviceChoicePos += 3
             // Object information
-            if((iObjectType == 8) && (iInstanceNumber == 4194303))
+            // if((iObjectType == 8) && (iInstanceNumber == 4194303))
+			// if((iObjectType == 8) && ((iInstanceNumber == 4194303) || (iInstanceNumberFromSubNetMac != -1)))
+			if(iObjectType == 8)
             {
                 // Property Identifier : Length Value Type: 1
                 int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
@@ -820,7 +830,7 @@ class bacDevice
                 serviceChoicePos += PropertyLengthValue
 
                 // Property Identifier: max-apdu-length-accepted (62)
-                log.message("Property Identifier: max-apdu-length-accepted (62) ")
+                log.message("Property Identifier:  ($propertyProperty) ")
                 if(propertyProperty == 62)
                 {
                     if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
@@ -835,6 +845,26 @@ class bacDevice
                     iAPDULen = iAPDULen * 0x100 + bacnetRecvPacket[serviceChoicePos]
                     maxAPDULength = convertmaxADPU(iAPDULen)
                     log.message("max-apdu-length-accepted set maxAPDULength = $maxAPDULength")
+                }
+                // Property Identifier: object-identifier (75)
+                else if(propertyProperty == 75)
+                {
+                    if(bacnetRecvPacket[serviceChoicePos] != 0x3E)
+                    {
+                       log.message("ERROR: Can not find start Tag ")
+                    }
+                    serviceChoicePos += 1
+                    // Application Tag: BACnetObjectIdentifier, Length/Value/Type: 4
+                    serviceChoicePos += 1
+                    // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+                    serviceChoicePos += 1
+                    // .... .... ..00 0000 0000 0011 1110 1110 = Instance Number: 1006
+                    iInstanceNumberFromSubNetMac = bacnetRecvPacket[serviceChoicePos] % 0x40
+                    serviceChoicePos += 1
+                    iInstanceNumberFromSubNetMac = iInstanceNumberFromSubNetMac * 0x100 + bacnetRecvPacket[serviceChoicePos]
+                    serviceChoicePos += 1
+                    iInstanceNumberFromSubNetMac = iInstanceNumberFromSubNetMac * 0x100 + bacnetRecvPacket[serviceChoicePos]
+                    log.message("Property Identifier: object-identifier set iInstanceNumberFromSubNetMac = $iInstanceNumberFromSubNetMac")
                 }
                 // Property Identifier: protocol-services-supported (97)
                 else if(propertyProperty == 97)
@@ -3443,18 +3473,38 @@ class bacDevice
     }
     bacnetPacket[dataLength] = (objectNodeType % 4) * 0x40
     // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
-    int instanceNumber = 4194303
-    bacnetPacket[dataLength] += 0x3F
-    dataLength++
-    if(instanceNumber > 0x00)
-    {
-        bacnetPacket[dataLength++] = instanceNumber / 0x100
-    }
-    else 
-    {
-        bacnetPacket[dataLength++] = 0x00
-    }
-    bacnetPacket[dataLength++] = instanceNumber % 0x100
+	int instanceNumber = 4194303
+    bool isIncludeSubNetMac = isInstanceNumberIncludeSubNetMac()
+	if(isIncludeSubNetMac && (iInstanceNumberFromSubNetMac != -1))
+	{
+		instanceNumber = iInstanceNumberFromSubNetMac
+		bacnetPacket[dataLength] = 0x00
+		dataLength++
+		if(instanceNumber > 0x100)
+		{
+			bacnetPacket[dataLength++] = instanceNumber / 0x100
+		}
+		else 
+		{
+			bacnetPacket[dataLength++] = 0x00
+		}
+		bacnetPacket[dataLength++] = instanceNumber % 0x100
+	}
+    // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
+	else
+	{
+		bacnetPacket[dataLength] += 0x3F
+		dataLength++
+		if(instanceNumber > 0x100)
+		{
+			bacnetPacket[dataLength++] = instanceNumber / 0x100
+		}
+		else 
+		{
+			bacnetPacket[dataLength++] = 0x00
+		}
+		bacnetPacket[dataLength++] = instanceNumber % 0x100
+	}
     log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
     // Property Identifier: max-apdu-length-accepted (62)
     int propertyIdentifier = 62
@@ -3607,6 +3657,18 @@ class bacDevice
     return dataLength
   }
   
+  bool isInstanceNumberIncludeSubNetMac()
+  {
+       bool isSubNetMac = false
+       for (int i=0; i<InstanceNumber.toStr().length(); i++) {
+          int c = InstanceNumber.toStr().get(i)
+          if (c == "/".get(0)) {
+             return true
+          }
+       }  
+	   return false
+  }
+  
   int getBacnetCurrentDevice()
   {
        bool isSubNetMac = false
@@ -3649,7 +3711,7 @@ class bacDevice
             }
             else
             {
-                log.message("-------getBacnetRouterDevice Failed--------------")
+                log.message("-------getBacnetRouterDevice Failed with $sNetBuf of ${InstanceNumber.toStr()}--------------")
             }
             lastInstanceNumber.copyFromBuf(InstanceNumber)
             return 2
@@ -3687,7 +3749,7 @@ class bacDevice
             }
             else
             {
-                log.message("-------getBacnetDevice Failed--------------")
+                log.message("-------getBacnetDevice Failed with ${InstanceNumber.toStr()}--------------")
             }
             
             lastInstanceNumber.copyFromBuf(InstanceNumber)
@@ -3731,11 +3793,13 @@ class bacDevice
     addrRecvLocal.addr.parse(((BIP)bus).ipLocalAddress.toStr())
     addrRecvLocal.port = ((BIP)bus).port
     // dataRecvGram.setSocketAddr(addrRecvLocal)
-
+    // 
     if(bacnetCurrentDeviceRet == 2)
     {
         log.message("Sending makeDevice4194303PropertyIdentifier")
+        maxAPDULength = 0
         int iLen = makeDevice4194303PropertyIdentifier()
+        maxAPDULength = -1
         if(iLen > 0)
         {
            log.message("writeReg makeDevice4194303PropertyIdentifier($iLen)")
@@ -4026,6 +4090,8 @@ class bacDevice
   private       int dataLength
   
   inline Buf(64) lastInstanceNumber = ""
+  
+  private int iInstanceNumberFromSubNetMac = -1
 
   // RPM
   int                     bacnetMultipleReadCount = 0
@@ -4065,4 +4131,6 @@ class bacDevice
    bacLocalDevice localBacnetDevice = null
    
    private int iRecvInvokeID = 0
+
+   
 }
