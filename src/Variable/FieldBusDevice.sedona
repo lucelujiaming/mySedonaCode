@@ -51,7 +51,16 @@ abstract class FieldBusDevice
   
   // SADR: 5
   int sadr = 0
-  int maxAPDULength = 0
+  int maxRecvAPDULength = 255
+  // Max Resp: 
+  //      B'0000'   Up to MinimumMessageSize (50 octets)
+  //      B'0001'   Up to 128 octets
+  //      B'0010'   Up to 206 octets (fits in a LonTalk frame)
+  //      B'0011'   Up to 480 octets (fits in an ARCNET frame)
+  //      B'0100'   Up to 1024 octets
+  //      B'0101'   Up to 1476 octets (fits in an ISO 8802-3 frame)
+  //      B'0101' is 0x05
+  int maxSendAPDULength = 0x05
   
   int readPropertyMultipleSupport = READ_PROPERTY_MULTIPLE_SUPPORT_NONE
 }

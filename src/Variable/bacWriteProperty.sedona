@@ -62,8 +62,12 @@ class bacWriteProperty
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    log.message("makeWritePropertyMultiplePacket::maxAPDULength = ${device.maxAPDULength}")
-    bacnetPacket[1] = device.maxAPDULength
+    log.message("makeWritePropertyMultiplePacket::maxSendAPDULength = ${device.maxSendAPDULength}")
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = device.maxSendAPDULength % 0x10
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
@@ -194,7 +198,11 @@ class bacWriteProperty
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    bacnetPacket[1] = device.maxAPDULength
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = device.maxSendAPDULength % 0x10
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
@@ -313,8 +321,12 @@ class bacWriteProperty
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    log.message("makeWritePropertyPacket::maxAPDULength = ${device.maxAPDULength}")
-    bacnetPacket[1] = device.maxAPDULength
+    log.message("makeWritePropertyPacket::maxSendAPDULength = ${device.maxSendAPDULength}")
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = device.maxSendAPDULength % 0x10
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID

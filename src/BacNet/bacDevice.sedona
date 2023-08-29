@@ -89,7 +89,10 @@ class bacDevice
     ** log.message("bacDevice execute 11111 status=$status") 
     if (bus != null) {
         if (bus.needFlush == false) {
-            dataLength = readReg(0, 0, 1024, buf)
+            // dataLength = readReg(0, 0, 1024, buf)
+            // Max Resp: Up to 1476 octets (fits in an ISO 8802-3 frame)
+	    // 2,952 = 1476 * 2
+            dataLength = readReg(0, 0, 2952, buf)
             if(dataLength > 0)
             {
                 ** log.message("We readReg and return $dataLength from ${dataRecvGramAddr}")
@@ -141,27 +144,25 @@ class bacDevice
             log.message("We needFlush ")
         }
 
-        if(maxAPDULength == -1)
+        if(maxRecvAPDULength == 255)
         {
-			bool isIncludeSubNetMac = isInstanceNumberIncludeSubNetMac()
-			if(isIncludeSubNetMac && iInstanceNumberFromSubNetMac == -1)
-			{
-				log.message("Waiting iInstanceNumberFromSubNetMac with ${InstanceNumber.toStr()}")
-			}
-			else
-			{
-				log.message("Sending makeDevice4194303MaxAPDULengthAccepted with ${InstanceNumber.toStr()}")
-				// Get max-apdu-length-accepted by <B'0000' Up to MinimumMessageSize (50 octets)>
-				maxAPDULength = 0
-				int iLen = makeDevice4194303MaxAPDULengthAccepted()
-				maxAPDULength = -1
-				if(iLen > 0)
-				{
-				   log.message("writeReg makeDevice4194303MaxAPDULengthAccepted($iLen)")
-				   writeReg(0, 0, iLen, buf)
-				}
-				return
-			}
+            bool isIncludeSubNetMac = isInstanceNumberIncludeSubNetMac()
+            if(isIncludeSubNetMac && iInstanceNumberFromSubNetMac == -1)
+            {
+                log.message("Waiting iInstanceNumberFromSubNetMac with ${InstanceNumber.toStr()}")
+            }
+            else
+            {
+                log.message("Sending makeDevice4194303MaxAPDULengthAccepted with ${InstanceNumber.toStr()}")
+                // Get max-apdu-length-accepted by <B'0000' Up to MinimumMessageSize (50 octets)>
+                int iLen = makeDevice4194303MaxAPDULengthAccepted()
+                if(iLen > 0)
+                {
+                   log.message("writeReg makeDevice4194303MaxAPDULengthAccepted($iLen)")
+                   writeReg(0, 0, iLen, buf)
+                }
+                return
+            }
         }
         if(readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
         {
@@ -205,7 +206,7 @@ class bacDevice
                 ** log.message("WRITE::execute_mode = $execute_mode and execute_counter= $execute_counter ")
                 if (d.type.is(bacWriteProperty.type))  {
                    ((bacWriteProperty)d).execute()
-                } 
+                }
             }
             execute_counter = execute_counter + 1
             if(execute_counter == BACNET_PROPERTY_WRITE_EXECUTE_TIMES)
@@ -439,7 +440,7 @@ class bacDevice
             {
                forwardToVTS(dataRecvGram.buf, dataRecvGram.len)
             }
-			log.message("send dataRecvGram.len =${dataRecvGram.len}")
+            log.message("send dataRecvGram.len =${dataRecvGram.len}")
             return socket.send(dataRecvGram)?iLen:0
         }
         else
@@ -484,7 +485,7 @@ class bacDevice
     {
        forwardToVTS(dataSendGram.buf, dataSendGram.len)
     }
-	log.message("send dataSendGram.len =${dataSendGram.len}")
+    log.message("send dataSendGram.len =${dataSendGram.len}")
     return socket.send(dataSendGram)?iLen:0
   }
 
@@ -498,7 +499,7 @@ class bacDevice
       dataVTSForwardSendGram.len = iPacketLen
       ** log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
       dataVTSForwardSendGram.buf = bacnetRecvPacket
-	  log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
+      log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
       return socket.send(dataVTSForwardSendGram)?iPacketLen:0
   }
   
@@ -809,8 +810,8 @@ class bacDevice
             serviceChoicePos += 3
             // Object information
             // if((iObjectType == 8) && (iInstanceNumber == 4194303))
-			// if((iObjectType == 8) && ((iInstanceNumber == 4194303) || (iInstanceNumberFromSubNetMac != -1)))
-			if(iObjectType == 8)
+            // if((iObjectType == 8) && ((iInstanceNumber == 4194303) || (iInstanceNumberFromSubNetMac != -1)))
+            if(iObjectType == 8)
             {
                 // Property Identifier : Length Value Type: 1
                 int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x03
@@ -843,8 +844,8 @@ class bacDevice
                     int iAPDULen = bacnetRecvPacket[serviceChoicePos]
                     serviceChoicePos += 1
                     iAPDULen = iAPDULen * 0x100 + bacnetRecvPacket[serviceChoicePos]
-                    maxAPDULength = convertmaxADPU(iAPDULen)
-                    log.message("max-apdu-length-accepted set maxAPDULength = $maxAPDULength")
+                    maxRecvAPDULength = convertmaxADPU(iAPDULen)
+                    log.message("max-apdu-length-accepted set maxRecvAPDULength = $maxRecvAPDULength")
                 }
                 // Property Identifier: object-identifier (75)
                 else if(propertyProperty == 75)
@@ -1393,30 +1394,30 @@ class bacDevice
             int iLen = 0
             while (serviceChoicePos < iPacketLen)
             {
-	            int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
-	            log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
-	            serviceChoicePos++
-	            
-	            int iObjectIdentifierAndType = 0
-	            for(int i = 0 ; i < iObjectIdentifierLen; i++)
-	            {
-	               iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
-	                                   + bacnetRecvPacket[serviceChoicePos + i]
-	            }
-	            log.message("000113 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
-	            // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
-	            int iObjectType = iObjectIdentifierAndType/0x400000
-	            // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
-	            int iInstanceNumber = iObjectIdentifierAndType % 0x400000
+                int iObjectIdentifierLen = bacnetRecvPacket[serviceChoicePos] & 0x07
+                log.message("iObjectIdentifierLen = ${iObjectIdentifierLen}  ")
+                serviceChoicePos++
+                
+                int iObjectIdentifierAndType = 0
+                for(int i = 0 ; i < iObjectIdentifierLen; i++)
+                {
+                   iObjectIdentifierAndType = iObjectIdentifierAndType * 0x100
+                                       + bacnetRecvPacket[serviceChoicePos + i]
+                }
+                log.message("000113 iObjectIdentifierAndType = 0x").printHex(iObjectIdentifierAndType).print(". ").nl()
+                // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+                int iObjectType = iObjectIdentifierAndType/0x400000
+                // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
+                int iInstanceNumber = iObjectIdentifierAndType % 0x400000
                 log.message("iObjectType = ${iObjectType} and iInstanceNumber = ${iInstanceNumber} ")
             
-            	serviceChoicePos = serviceChoicePos + iObjectIdentifierLen
+                serviceChoicePos = serviceChoicePos + iObjectIdentifierLen
                 log.message("000114 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
-	            if(bacnetRecvPacket[serviceChoicePos] != 0x1E)
-	            {
+                if(bacnetRecvPacket[serviceChoicePos] != 0x1E)
+                {
                    log.message("bacnetRecvPacket Error Opening Tag")
                    return -1
-	            }
+                }
                 serviceChoicePos++
                 // Property Identifier: present-value (85)
                 int PropertyLengthValue = bacnetRecvPacket[serviceChoicePos] & 0x07
@@ -1428,7 +1429,7 @@ class bacDevice
                                         + bacnetRecvPacket[serviceChoicePos + i]
                 }
                 log.message("00022 readPropertyMultiple::iPropIdentifier = 0x").printHex(propertyProperty).print(". ").nl()
-				serviceChoicePos += PropertyLengthValue
+                serviceChoicePos += PropertyLengthValue
                 // Property Identifier: present-value (85)
                 if(propertyProperty == 0x55)
                 {
@@ -1454,13 +1455,13 @@ class bacDevice
                    iLen = complementBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
                 }
                 if(bacnetRecvPacket[serviceChoicePos] != 0x1F)
-	            {
+                {
                    log.message("bacnetRecvPacket Error Closing Tag")
                    return -1
-	            }
+                }
                 serviceChoicePos++
-        	}
-        	// Send response.
+            }
+            // Send response.
             if(iLen > 0)
             {
                  log.message("writeBusReg makeBACnetACKPDU($iLen)")
@@ -1712,14 +1713,14 @@ class bacDevice
                     }
                     tagNumber = bacnetRecvPacket[serviceChoicePos]
                 }
-				if(serviceChoicePos == -1)
-				{
-					iLen = makeBACnetWritePropertyErrorACKPDU(iObjectIdentifierAndType)
-				}
-				else
-				{
-					iLen = makeBACnetWritePorpertySimpleACKPDU(iObjectIdentifierAndType)
-				}
+                if(serviceChoicePos == -1)
+                {
+                    iLen = makeBACnetWritePropertyErrorACKPDU(iObjectIdentifierAndType)
+                }
+                else
+                {
+                    iLen = makeBACnetWritePorpertySimpleACKPDU(iObjectIdentifierAndType)
+                }
             }
             
             if(iLen > 0)
@@ -1778,7 +1779,7 @@ class bacDevice
     // Service Choice: writePropertyMultiple ACK (16)
     else if(bacnetRecvPacket[serviceChoicePos] == 0x10)
     {
-    	log.message("writePropertyMultiple::apduType = ${apduType}  ")
+        log.message("writePropertyMultiple::apduType = ${apduType}  ")
         // BACnet-Confirmed-Request-PDU
         if(apduType == 0)
         {
@@ -1805,7 +1806,7 @@ class bacDevice
                 log.message("iObjectType = ${iObjectType} and iInstanceNumber = ${iInstanceNumber} ")
                 serviceChoicePos += iObjectIdentifierLen
                 log.message("11111 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
-				// {[1]
+                // {[1]
                 if(bacnetRecvPacket[serviceChoicePos] != 0x1E)
                 {
                    log.message("bacnetRecvPacket Error Opening Tag")
@@ -1828,7 +1829,7 @@ class bacDevice
                 log.message("----------------- We Get propertyProperty = ${propertyProperty} ")
                 serviceChoicePos += PropertyLengthValue
                 ** log.message("22222 bacnetRecvPacket[serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
-				// {[2]
+                // {[2]
                 if(bacnetRecvPacket[serviceChoicePos] != 0x2E)
                 {
                    log.message("Error tag ")
@@ -1926,7 +1927,7 @@ class bacDevice
             // writePropertyMultiple ACK 
             int iLen = makeBACnetWritePropertyMultipleACKPDU();
             log.message("Send writePropertyMultiple ACK return $iLen")
-       		// Send response.
+               // Send response.
             if(iLen > 0)
             {
                  log.message("writeBusReg makeBACnetACKPDU($iLen)")
@@ -1969,7 +1970,7 @@ class bacDevice
                  }
                  int iRet = writeBusReg(0, 0, iLen + headLength, bufToBIP)
                  return iLen + headLength
-            }			
+            }
             log.message("77777 End of checkReadData and Send writePropertyMultiple ACK. ")
             return serviceChoicePos
         }
@@ -1999,10 +2000,10 @@ class bacDevice
     int serviceChoicePos = iChoicePos;
     int iLen = iOutLen;
     // link_type = Component.LINK_TYPE_READ + tagNumber
-	if(localBacnetDevice == null)
-	{
-		return -1
-	}
+    if(localBacnetDevice == null)
+    {
+        return -1
+    }
     switch (tagNumber)
     {
         case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
@@ -2122,10 +2123,10 @@ class bacDevice
             log.message("Not support $tagNumber ")
             return -1
     }  
-	if(iWritePropRet == 0)
-	{
-		return -1
-	}
+    if(iWritePropRet == 0)
+    {
+        return -1
+    }
     return serviceChoicePos
   }
 
@@ -2344,8 +2345,8 @@ class bacDevice
             setClientAddress(addrClient.toStr())
             if((sourceNetworkAddress != 0) && (sadr != 0))
             {
-               maxAPDULength = convertmaxADPU(((BIP)bus).maxADPUList[i])
-               log.message("maxAPDULength = $maxAPDULength and ClientAddress= ${addrClient.toStr()}")
+               maxRecvAPDULength = convertmaxADPU(((BIP)bus).maxADPUList[i])
+               log.message("maxRecvAPDULength = $maxRecvAPDULength and ClientAddress= ${addrClient.toStr()}")
                log.message("We are Setting communicationMethod into COMMUNICATIONBYSUBNET")
                return 2 // COMMUNICATIONBYSUBNET
             }
@@ -2382,8 +2383,8 @@ class bacDevice
             sadr                 = ((BIP)bus).NPDUList[i] / 0x10000
             if((sourceNetworkAddress != 0) && (sadr != 0))
             {
-               maxAPDULength = convertmaxADPU(((BIP)bus).maxADPUList[i])
-               log.message("maxAPDULength = $maxAPDULength and ClientAddress= ${addrClient.toStr()}")
+               maxRecvAPDULength = convertmaxADPU(((BIP)bus).maxADPUList[i])
+               log.message("maxRecvAPDULength = $maxRecvAPDULength and ClientAddress= ${addrClient.toStr()}")
                log.message("Setting communicationMethod to COMMUNICATIONBYSUBNET")
                return 2 // COMMUNICATIONBYSUBNET
             }
@@ -2769,29 +2770,29 @@ class bacDevice
           // listOfResults
           // {[1]
           bacnetPacket[dataLength] = 0x1E
-		  dataLength++
+          dataLength++
           // Property Identifier: description (28)
           bacnetPacket[dataLength] = 0x29
-		  dataLength++
+          dataLength++
           bacnetPacket[dataLength] = 0x1C
-		  dataLength++
+          dataLength++
           // {[4]
           bacnetPacket[dataLength] = 0x4E
-		  dataLength++
+          dataLength++
           // description: UTF-8 'vav Controller'
           // Application Tag: Character String, 
           bacnetPacket[dataLength] = 0x75
-		  dataLength++
+          dataLength++
           // Length/Value/Type: 12
           int iObjectNameLen = localBacnetDevice.deviceName.toStr().length()
           log.message("complementBACnetPropertyDeviceOptionalComplexACKPDU::Length/Value/Type = $iObjectNameLen")
           // Included String Character Set
           bacnetPacket[dataLength] = iObjectNameLen + 1
-		  dataLength++
+          dataLength++
           log.message("bacnetPacket[22] = ${bacnetPacket[22]}")
           // String Character Set: ANSI X3.4 / UTF-8 (since 2010) (0)
           bacnetPacket[dataLength] = 00
-		  dataLength++
+          dataLength++
           for(int i =0 ; i < iObjectNameLen; i++)
           {
               bacnetPacket[dataLength + i] = localBacnetDevice.deviceName.get(i)
@@ -2817,7 +2818,7 @@ class bacDevice
   int complementBACnetPropertyRequiredComplexACKPDU(int iObjectIdentifierAndType)
   {
       if(localBacnetDevice != null)
-      {	
+      {    
           // ObjectIdentifier: analog-value, 1
           bacnetPacket[dataLength] = 0x0C
           dataLength++
@@ -2832,7 +2833,7 @@ class bacDevice
           // listOfResults
           // {[1]
           bacnetPacket[dataLength] = 0x1E
-		  dataLength++
+          dataLength++
           // The Property list consist by <Property Identifier> {[4] <VALUE> }[4]
           // I have to seperate them by empty line because I will add them later.
           // Just see below:
@@ -2843,49 +2844,49 @@ class bacDevice
           }
           // Property Identifier: object-identifier (75)
           bacnetPacket[dataLength] = 0x29
-		  dataLength++
+          dataLength++
           bacnetPacket[dataLength] = 0x4b
-		  dataLength++
+          dataLength++
           // {[4]
           bacnetPacket[dataLength] = 0x4E
-		  dataLength++
+          dataLength++
           // ObjectIdentifier: analog-input, 0
           bacnetPacket[dataLength] = 0xC4
-		  dataLength++
+          dataLength++
           bacnetPacket[dataLength] = localBacnetDevice.localObjectListPropertyID[iPropertyIdx]/(0x01000000)
-		  dataLength++
+          dataLength++
           bacnetPacket[dataLength] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /(0x010000))%0x0100
-		  dataLength++
+          dataLength++
           bacnetPacket[dataLength] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx] /   0x0100)%0x0100
-		  dataLength++
+          dataLength++
           bacnetPacket[dataLength] = (localBacnetDevice.localObjectListPropertyID[iPropertyIdx])%0x0100
-		  dataLength++
+          dataLength++
           // }[4]
           bacnetPacket[dataLength] = 0x4F
-		  dataLength++
+          dataLength++
           
           // Property Identifier: object-name (77)
           bacnetPacket[dataLength] = 0x29
-		  dataLength++
+          dataLength++
           bacnetPacket[dataLength] = 0x4d
-		  dataLength++
+          dataLength++
           // {[4]
           bacnetPacket[dataLength] = 0x4E
-		  dataLength++
+          dataLength++
           // object-name: UTF-8 'vav_duct_dp'
           // Application Tag: Character String, 
           bacnetPacket[dataLength] = 0x75
-		  dataLength++
+          dataLength++
           // Length/Value/Type: 12
           int iObjectNameLen = localBacnetDevice.localObjectListName[iPropertyIdx].length()
           log.message("complementBACnetPropertyRequiredComplexACKPDU::Length/Value/Type = $iObjectNameLen")
           // Included String Character Set
           bacnetPacket[dataLength] = iObjectNameLen + 1
-		  dataLength++
+          dataLength++
           log.message("bacnetPacket[22] = ${bacnetPacket[22]}")
           // String Character Set: ANSI X3.4 / UTF-8 (since 2010) (0)
           bacnetPacket[dataLength] = 0x00
-		  dataLength++
+          dataLength++
           for(int i =0 ; i < iObjectNameLen; i++)
           {
               bacnetPacket[dataLength + i] = localBacnetDevice.localObjectListName[iPropertyIdx].get(i)
@@ -3185,7 +3186,7 @@ class bacDevice
     // Service Choice: readPropertyMultiple (14)
     bacnetPacket[2] = 0x0E
     dataLength = 3
-	return dataLength
+    return dataLength
   }
   
   int complementBACnetPresentValueComplexACKPDU(int iObjectIdentifierAndType)
@@ -3222,7 +3223,7 @@ class bacDevice
         int iLen = complementBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
         return iLen
     }
-	
+    
     // ObjectIdentifier: analog-value, 1
     bacnetPacket[dataLength] = 0x0C
     dataLength++
@@ -3253,7 +3254,7 @@ class bacDevice
     {
         // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
         bacnetPacket[dataLength] = 0x44
-		dataLength++
+        dataLength++
         // present-value: XX.000000 (Real)
         bufFloat[0] = myFloatPresentValue
         log.message("myFloatPresentValue = $myFloatPresentValue")
@@ -3324,7 +3325,7 @@ class bacDevice
     // Error Class: object (1)
     bacnetPacket[3] = 0x91
     bacnetPacket[4] = 0x01
-	// Error Code: unknown-object (31)
+    // Error Code: unknown-object (31)
     bacnetPacket[5] = 0x91
     bacnetPacket[6] = 0x1F
     dataLength = 6 + 1
@@ -3353,32 +3354,32 @@ class bacDevice
     // listOfResults
     // {[1]
     bacnetPacket[dataLength] = 0x1E
-	dataLength++
+    dataLength++
     // Property Identifier: present-value (85)
     bacnetPacket[dataLength] = 0x29
-	dataLength++
+    dataLength++
     bacnetPacket[dataLength] = 0x55
-	dataLength++
+    dataLength++
     // propertyAccessError
     // {[5]
     bacnetPacket[dataLength] = 0x5E
-	dataLength++
+    dataLength++
     // error Class:  object
     bacnetPacket[dataLength] = 0x91
-	dataLength++
+    dataLength++
     bacnetPacket[dataLength] = 0x01
-	dataLength++
+    dataLength++
     // error Code:  unsupported-object-type
     bacnetPacket[dataLength] = 0x91
-	dataLength++
+    dataLength++
     bacnetPacket[dataLength] = 0x24
-	dataLength++
+    dataLength++
     // }[5]
     bacnetPacket[dataLength] = 0x5F
-	dataLength++
+    dataLength++
     // }[1]
     bacnetPacket[dataLength] = 0x1F
-	dataLength++
+    dataLength++
     
     log.message("22222 complementBACnetAccessErrorComplexACKPDU::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
@@ -3440,7 +3441,15 @@ class bacDevice
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    bacnetPacket[1] = maxAPDULength
+    // We use the iMaxAPDULength rather than maxAPDULength
+    // bacnetPacket[1] = maxAPDULength
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = maxSendAPDULength % 0x10
+    
+    log.message("BacReadPropertyVar::bacnetPacket[1] = ${bacnetPacket[1]}")
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
@@ -3473,38 +3482,38 @@ class bacDevice
     }
     bacnetPacket[dataLength] = (objectNodeType % 4) * 0x40
     // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
-	int instanceNumber = 4194303
+    int instanceNumber = 4194303
     bool isIncludeSubNetMac = isInstanceNumberIncludeSubNetMac()
-	if(isIncludeSubNetMac && (iInstanceNumberFromSubNetMac != -1))
-	{
-		instanceNumber = iInstanceNumberFromSubNetMac
-		bacnetPacket[dataLength] = 0x00
-		dataLength++
-		if(instanceNumber > 0x100)
-		{
-			bacnetPacket[dataLength++] = instanceNumber / 0x100
-		}
-		else 
-		{
-			bacnetPacket[dataLength++] = 0x00
-		}
-		bacnetPacket[dataLength++] = instanceNumber % 0x100
-	}
+    if(isIncludeSubNetMac && (iInstanceNumberFromSubNetMac != -1))
+    {
+        instanceNumber = iInstanceNumberFromSubNetMac
+        bacnetPacket[dataLength] = 0x00
+        dataLength++
+        if(instanceNumber > 0x100)
+        {
+            bacnetPacket[dataLength++] = instanceNumber / 0x100
+        }
+        else 
+        {
+            bacnetPacket[dataLength++] = 0x00
+        }
+        bacnetPacket[dataLength++] = instanceNumber % 0x100
+    }
     // .... .... ..11 1111 1111 1111 1111 1111 = Instance Number: 4194303
-	else
-	{
-		bacnetPacket[dataLength] += 0x3F
-		dataLength++
-		if(instanceNumber > 0x100)
-		{
-			bacnetPacket[dataLength++] = instanceNumber / 0x100
-		}
-		else 
-		{
-			bacnetPacket[dataLength++] = 0x00
-		}
-		bacnetPacket[dataLength++] = instanceNumber % 0x100
-	}
+    else
+    {
+        bacnetPacket[dataLength] += 0x3F
+        dataLength++
+        if(instanceNumber > 0x100)
+        {
+            bacnetPacket[dataLength++] = instanceNumber / 0x100
+        }
+        else 
+        {
+            bacnetPacket[dataLength++] = 0x00
+        }
+        bacnetPacket[dataLength++] = instanceNumber % 0x100
+    }
     log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
     // Property Identifier: max-apdu-length-accepted (62)
     int propertyIdentifier = 62
@@ -3529,7 +3538,11 @@ class bacDevice
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    bacnetPacket[1] = maxAPDULength
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = maxSendAPDULength % 0x10
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
@@ -3597,7 +3610,10 @@ class bacDevice
     dataLength = 0
     // 0000 .... = APDU Type: Confirmed-REQ (0)
     bacnetPacket[0] = 0x00
-    bacnetPacket[1] = maxAPDULength
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = maxSendAPDULength % 0x10
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
@@ -3666,7 +3682,7 @@ class bacDevice
              return true
           }
        }  
-	   return false
+       return false
   }
   
   int getBacnetCurrentDevice()
@@ -3699,9 +3715,9 @@ class bacDevice
                 setClientAddress(addrClient.toStr())
                 log.message("addrClient.toStr() = ${addrClient.toStr()}")
 
-                // Set maxAPDULength to -1 and call makeDevice4194303MaxAPDULengthAccepted later
-                maxAPDULength = -1
-                ** log.message("SubNetMac::maxAPDULength = $maxAPDULength")
+                // Set maxRecvAPDULength to 255 and call makeDevice4194303MaxAPDULengthAccepted later
+                maxRecvAPDULength = 255
+                ** log.message("SubNetMac::maxRecvAPDULength = $maxRecvAPDULength")
                 sourceNetworkAddress = sNetBuf.parseInt()
                 log.message("SubNetMac::sourceNetworkAddress = $sourceNetworkAddress")
                 sadr                 = macBuf.parseInt()
@@ -3731,8 +3747,8 @@ class bacDevice
                 addrClient.loadBuf(addrClientBuf)
                 setClientAddress(addrClient.toStr())
 
-                maxAPDULength = convertmaxADPU(maxADPUList[0])
-                ** log.message("SubNetMac::maxAPDULength = $maxAPDULength")
+                maxRecvAPDULength = convertmaxADPU(maxADPUList[0])
+                ** log.message("SubNetMac::maxRecvAPDULength = $maxRecvAPDULength")
                 sourceNetworkAddress = NPDUList[0] % 0x10000
                 log.message("InstanceNumber::sourceNetworkAddress = $sourceNetworkAddress")
                 sadr                 = NPDUList[0] / 0x10000
@@ -3797,9 +3813,7 @@ class bacDevice
     if(bacnetCurrentDeviceRet == 2)
     {
         log.message("Sending makeDevice4194303PropertyIdentifier")
-        maxAPDULength = 0
         int iLen = makeDevice4194303PropertyIdentifier()
-        maxAPDULength = -1
         if(iLen > 0)
         {
            log.message("writeReg makeDevice4194303PropertyIdentifier($iLen)")
@@ -4084,13 +4098,14 @@ class bacDevice
   static inline byte[8]    bufData
   
   private inline float[512] bufToBIP
-  
-  private inline float[1024] buf
+  // Max Resp: Up to 1476 octets (fits in an ISO 8802-3 frame)
+  // 2,952 = 1476 * 2
+  private inline float[2952] buf
   static inline byte[1024] bacnetRecvPacket
   private       int dataLength
   
   inline Buf(64) lastInstanceNumber = ""
-  
+  // Only used by SubNetMac mode
   private int iInstanceNumberFromSubNetMac = -1
 
   // RPM
@@ -4131,6 +4146,4 @@ class bacDevice
    bacLocalDevice localBacnetDevice = null
    
    private int iRecvInvokeID = 0
-
-   
 }
