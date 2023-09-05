@@ -91,7 +91,7 @@ class bacDevice
         if (bus.needFlush == false) {
             // dataLength = readReg(0, 0, 1024, buf)
             // Max Resp: Up to 1476 octets (fits in an ISO 8802-3 frame)
-	    // 2,952 = 1476 * 2
+	    	// 2,952 = 1476 * 2
             dataLength = readReg(0, 0, 2952, buf)
             if(dataLength > 0)
             {
@@ -625,6 +625,15 @@ class bacDevice
        // Size of Maximum ADPU accepted: Up to 480 octets (fits in an ARCNET frame) (3)
        serviceChoicePos += 1
        // Invoke ID: 184
+       iRecvInvokeID = bacnetRecvPacket[serviceChoicePos]
+       log.message("Invoke ID is ${bacnetRecvPacket[serviceChoicePos]} ")
+       serviceChoicePos += 1
+    }
+    // 0010 .... = APDU Type: Simple-ACK (2)
+    else if(apduType == 2)
+    {
+       // Invoke ID: 184
+       serviceChoicePos += 1
        iRecvInvokeID = bacnetRecvPacket[serviceChoicePos]
        log.message("Invoke ID is ${bacnetRecvPacket[serviceChoicePos]} ")
        serviceChoicePos += 1
@@ -1575,6 +1584,10 @@ class bacDevice
                        log.message("34343434 Error serviceChoicePos ")
                        return -1
                     }
+                    // Add Device status at 09/05/23
+                    iDeviceReadPropertyCount = iDeviceReadPropertyCount - 1
+                    log.message("3434343434 iDeviceReadPropertyCount=$iDeviceReadPropertyCount")
+                    // Add Device status end at 09/05/23
                     log.message("444444 bacnetRecvPacket at $serviceChoicePos")
                     log.message("444444 bacnetRecvPacket[$serviceChoicePos] = 0x").printHex(bacnetRecvPacket[serviceChoicePos]).print(". ").nl()
                     if(bacnetRecvPacket[serviceChoicePos] != 0x4F)
@@ -1770,9 +1783,14 @@ class bacDevice
             return iPacketLen
         }
         // BACnet-SimpleACK-PDU
+        else if(apduType == 2)
+        {
+        	iDeviceWritePropertyCount = 0
+            log.message("3434343434 iDeviceWritePropertyCount=$iDeviceWritePropertyCount")
+        }
+        // BACnet-ComplexACK-PDU
         else if(apduType == 3)
         {
-        
         }
     }
     // Service Choice: writePropertyMultiple (16)
@@ -1975,9 +1993,14 @@ class bacDevice
             return serviceChoicePos
         }
         // BACnet-SimpleACK-PDU
+        else if(apduType == 2)
+        {
+        	iDeviceWritePropertyCount = 0
+            log.message("3434343434 iDeviceWritePropertyCount=$iDeviceWritePropertyCount")
+        }
+        // BACnet-ComplexACK-PDU
         else if(apduType == 3)
         {
-        
         }
     }
     else
@@ -4146,4 +4169,5 @@ class bacDevice
    bacLocalDevice localBacnetDevice = null
    
    private int iRecvInvokeID = 0
+
 }

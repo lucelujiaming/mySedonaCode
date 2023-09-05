@@ -63,4 +63,9 @@ abstract class FieldBusDevice
   int maxSendAPDULength = 0x05
   
   int readPropertyMultipleSupport = READ_PROPERTY_MULTIPLE_SUPPORT_NONE
+  
+   // Device status
+   public int iDeviceWritePropertyCount = 0
+   public int iDeviceReadPropertyCount = 0
+   
 }

@@ -365,6 +365,11 @@ class bacReadProperty
             ** log.message("111111 makeReadPropertyPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
             if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
               ** log.message("device.readReg")
+			  if(device.iDeviceReadPropertyCount <= 255)
+			  {
+				 device.iDeviceReadPropertyCount = device.iDeviceReadPropertyCount + 1
+                    log.message("3434343434 iDeviceReadPropertyCount=${device.iDeviceReadPropertyCount}")
+			  }
             } else {
               log.message("Send ReadPropertyPacket Error")
               status := STATUSOFFLINE
@@ -379,6 +384,11 @@ class bacReadProperty
               log.message("111111 makeReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
               if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                 ** log.message("device.readReg")
+			    if(device.iDeviceReadPropertyCount <= 255)
+			    {
+				   device.iDeviceReadPropertyCount = device.iDeviceReadPropertyCount + 1
+                    log.message("3434343434 iDeviceReadPropertyCount=${device.iDeviceReadPropertyCount}")
+			    }
               } else {
                 log.message("Send ReadPropertyMultiplePacket Error")
                 status := STATUSOFFLINE
@@ -392,6 +402,11 @@ class bacReadProperty
               log.message("111111 makeMultipleReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
               if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                 ** log.message("device.readReg")
+			    if(device.iDeviceReadPropertyCount <= 255)
+			    {
+				   device.iDeviceReadPropertyCount = device.iDeviceReadPropertyCount + bacnetReadMultipleCount
+                    log.message("3434343434 iDeviceReadPropertyCount=${device.iDeviceReadPropertyCount}")
+			    }
               } else {
                 log.message("Send MultipleReadPropertyMultiplePacket Error")
                 status := STATUSOFFLINE

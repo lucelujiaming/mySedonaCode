@@ -471,6 +471,11 @@ class bacWriteProperty
               log.message("BacWriteProperty after makeWritePropertyPacket($dataLength)")
               if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                 ** log.message("device.readReg")
+			    if(device.iDeviceWritePropertyCount <= 255)
+			    {
+				   device.iDeviceWritePropertyCount = device.iDeviceWritePropertyCount + 1
+                    log.message("3434343434 iDeviceWritePropertyCount=${device.iDeviceWritePropertyCount}")
+			    }
               } else {
                 log.message("BacWriteProperty Error")
                 status := STATUSOFFLINE
@@ -486,6 +491,11 @@ class bacWriteProperty
                   log.message("bacWriteProperty makeWritePropertyMultiplePacket($dataLength)")
                   if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                     ** log.message("device.readReg")
+			        if(device.iDeviceWritePropertyCount <= 255)
+			        {
+				       device.iDeviceWritePropertyCount = device.iDeviceWritePropertyCount + 1
+                    	log.message("3434343434 iDeviceWritePropertyCount=${device.iDeviceWritePropertyCount}")
+			        }
                   } else {
                     log.message("bacWriteProperty Error")
                     status := STATUSOFFLINE
@@ -504,6 +514,11 @@ class bacWriteProperty
                   log.message("bacWriteProperty makeMultipleWritePropertyMultiplePacket($dataLength)")
                   if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                      ** log.message("device.readReg")
+			         if(device.iDeviceWritePropertyCount <= 255)
+			         {
+				        device.iDeviceWritePropertyCount = device.iDeviceWritePropertyCount + bacnetWriteMultipleCount
+                    	log.message("3434343434 iDeviceWritePropertyCount=${device.iDeviceWritePropertyCount}")
+			         }
                   } else {
                      log.message("bacWriteProperty Error")
                      status := STATUSOFFLINE
