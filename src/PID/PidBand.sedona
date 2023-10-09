@@ -1,0 +1,100 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class PidBand
+  extends Component
+{
+  @readonly
+  property
+  float out
+
+  property
+  float
+  enable = 1.0f
+
+  property
+  float cv
+
+  property
+  float sp
+
+  property
+  float Direct
+
+  property
+  float reset
+
+  @config
+  property
+  float kp
+
+  @config
+  property
+  float db
+
+  @config
+  property
+  float eepKi
+
+  @config
+  property
+  float eepKd
+
+  @config
+  property
+  float eepBias
+
+  @config
+  property
+  float eepLimit = 100.0f
+
+  @config
+  property
+  float eepDirect
+
+  virtual override void start()
+  {
+      ctx = a()
+  }
+
+  virtual override void stop()
+  {
+      int ret = d(ctx)
+      if (ret == 0) {
+          ctx = 0
+      }
+  }
+
+  virtual override void execute()
+  {
+      if (enable == 0.0) return
+
+      if (!isSlotLinkToDIRECT()) {
+        Direct := eepDirect
+      }
+
+      float _out = 0.0f
+      if (ctx != 0) {
+          _out = f(ctx, cv, sp, kp, db, eepKi, eepKd, eepBias, eepLimit, Direct, reset)
+      }
+      out := _out
+  }
+
+  private bool isSlotLinkToDIRECT()
+  {
+    for (Link link = linksTo; link != null; link = link.nextTo) {
+      Slot slot = type.slot(link.toSlot)
+      if (slot == PidBand.Direct) {
+        return true
+      }
+    }
+    return false
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  private int ctx = 0
+
+  native int a()
+  native float f(int ctx, float cv, float sp, float kp, float db, float integ_const, float diff_const, float bias, float integ_limit, float Direct, float reset)
+  native int d(int ctx)
+}

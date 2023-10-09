@@ -1,0 +1,434 @@
+@niagaraIcon="module://icons/x16/control/logic/or.png"
+class Or
+  extends Component
+{
+    ** Enable count
+    @config
+    property int enableCount = 2
+    
+    ** out is the And of all inputs
+    @readonly property float out
+
+    ** 1th value for BitLogic
+    property float in1
+
+    ** 2th value for BitLogic
+    property float in2
+
+    ** 3th value for BitLogic
+    property float in3
+
+    ** 4th value for BitLogic
+    property float in4
+
+    ** 5th value for BitLogic
+    property float in5
+
+    ** 6th value for BitLogic
+    property float in6
+
+    ** 7th value for BitLogic
+    property float in7
+
+    ** 8th value for BitLogic
+    property float in8
+
+    ** 9th value for BitLogic
+    property float in9
+
+    ** 10th value for BitLogic
+    property float in10
+
+    ** 11th value for BitLogic
+    property float in11
+
+    ** 12th value for BitLogic
+    property float in12
+
+    ** 13th value for BitLogic
+    property float in13
+
+    ** 14th value for BitLogic
+    property float in14
+
+    ** 15th value for BitLogic
+    property float in15
+
+    ** 16th value for BitLogic
+    property float in16
+
+    ** 17th value for BitLogic
+    property float in17
+
+    ** 18th value for BitLogic
+    property float in18
+
+    ** 19th value for BitLogic
+    property float in19
+
+    ** 20th value for BitLogic
+    property float in20
+
+    ** 21th value for BitLogic
+    property float in21
+
+    ** 22th value for BitLogic
+    property float in22
+
+    ** 23th value for BitLogic
+    property float in23
+
+    ** 24th value for BitLogic
+    property float in24
+
+    ** 25th value for BitLogic
+    property float in25
+
+    ** 26th value for BitLogic
+    property float in26
+
+    ** 27th value for BitLogic
+    property float in27
+
+    ** 28th value for BitLogic
+    property float in28
+
+    ** 29th value for BitLogic
+    property float in29
+
+    ** 30th value for BitLogic
+    property float in30
+
+    ** 31th value for BitLogic
+    property float in31
+
+    ** 32th value for BitLogic
+    property float in32
+
+    ** 33th value for BitLogic
+    property float in33
+
+    ** 34th value for BitLogic
+    property float in34
+
+    ** 35th value for BitLogic
+    property float in35
+
+    ** 36th value for BitLogic
+    property float in36
+
+    ** 37th value for BitLogic
+    property float in37
+
+    ** 38th value for BitLogic
+    property float in38
+
+    ** 39th value for BitLogic
+    property float in39
+
+    ** 40th value for BitLogic
+    property float in40
+
+    ** 41th value for BitLogic
+    property float in41
+
+    ** 42th value for BitLogic
+    property float in42
+
+    ** 43th value for BitLogic
+    property float in43
+
+    ** 44th value for BitLogic
+    property float in44
+
+    ** 45th value for BitLogic
+    property float in45
+
+    ** 46th value for BitLogic
+    property float in46
+
+    ** 47th value for BitLogic
+    property float in47
+
+    ** 48th value for BitLogic
+    property float in48
+
+    ** 49th value for BitLogic
+    property float in49
+
+    ** 50th value for BitLogic
+    property float in50
+
+    ** 51th value for BitLogic
+    property float in51
+
+    ** 52th value for BitLogic
+    property float in52
+
+    ** 53th value for BitLogic
+    property float in53
+
+    ** 54th value for BitLogic
+    property float in54
+
+    ** 55th value for BitLogic
+    property float in55
+
+    ** 56th value for BitLogic
+    property float in56
+
+    ** 57th value for BitLogic
+    property float in57
+
+    ** 58th value for BitLogic
+    property float in58
+
+    ** 59th value for BitLogic
+    property float in59
+
+    ** 60th value for BitLogic
+    property float in60
+
+    ** 61th value for BitLogic
+    property float in61
+
+    ** 62th value for BitLogic
+    property float in62
+
+    ** 63th value for BitLogic
+    property float in63
+
+    ** 64th value for BitLogic
+    property float in64
+
+    ** 65th value for BitLogic
+    property float in65
+
+    ** 66th value for BitLogic
+    property float in66
+
+    ** 67th value for BitLogic
+    property float in67
+
+    ** 68th value for BitLogic
+    property float in68
+
+    ** 69th value for BitLogic
+    property float in69
+
+    ** 70th value for BitLogic
+    property float in70
+
+    ** 71th value for BitLogic
+    property float in71
+
+    ** 72th value for BitLogic
+    property float in72
+
+    ** 73th value for BitLogic
+    property float in73
+
+    ** 74th value for BitLogic
+    property float in74
+
+    ** 75th value for BitLogic
+    property float in75
+
+    ** 76th value for BitLogic
+    property float in76
+
+    ** 77th value for BitLogic
+    property float in77
+
+    ** 78th value for BitLogic
+    property float in78
+
+    ** 79th value for BitLogic
+    property float in79
+
+    ** 80th value for BitLogic
+    property float in80
+
+    ** 81th value for BitLogic
+    property float in81
+
+    ** 82th value for BitLogic
+    property float in82
+
+    ** 83th value for BitLogic
+    property float in83
+
+    ** 84th value for BitLogic
+    property float in84
+
+    ** 85th value for BitLogic
+    property float in85
+
+    ** 86th value for BitLogic
+    property float in86
+
+    ** 87th value for BitLogic
+    property float in87
+
+    ** 88th value for BitLogic
+    property float in88
+
+    ** 89th value for BitLogic
+    property float in89
+
+    ** 90th value for BitLogic
+    property float in90
+
+    ** 91th value for BitLogic
+    property float in91
+
+    ** 92th value for BitLogic
+    property float in92
+
+    ** 93th value for BitLogic
+    property float in93
+
+    ** 94th value for BitLogic
+    property float in94
+
+    ** 95th value for BitLogic
+    property float in95
+
+    ** 96th value for BitLogic
+    property float in96
+
+    ** 97th value for BitLogic
+    property float in97
+
+    ** 98th value for BitLogic
+    property float in98
+
+    ** 99th value for BitLogic
+    property float in99
+
+    ** 100th value for BitLogic
+    property float in100
+
+  virtual override void execute()
+  {
+    if(enableCount >= 100)
+       return 
+    setAllValues()
+    ** log.message("outSum=$outSum ") 
+    for(int i = 0; i < enableCount; i++)
+    {
+        if(sampleValue[i] == 1.0)
+        {
+           out := 1.0
+           return
+        }
+    }
+    out := 0.0
+  }
+
+  void setAllValues()
+  {
+    sampleValue[0] = in1
+    sampleValue[1] = in2
+    sampleValue[2] = in3
+    sampleValue[3] = in4
+    sampleValue[4] = in5
+    sampleValue[5] = in6
+    sampleValue[6] = in7
+    sampleValue[7] = in8
+    sampleValue[8] = in9
+    sampleValue[9] = in10
+    sampleValue[10] = in11
+    sampleValue[11] = in12
+    sampleValue[12] = in13
+    sampleValue[13] = in14
+    sampleValue[14] = in15
+    sampleValue[15] = in16
+    sampleValue[16] = in17
+    sampleValue[17] = in18
+    sampleValue[18] = in19
+    sampleValue[19] = in20
+    sampleValue[20] = in21
+    sampleValue[21] = in22
+    sampleValue[22] = in23
+    sampleValue[23] = in24
+    sampleValue[24] = in25
+    sampleValue[25] = in26
+    sampleValue[26] = in27
+    sampleValue[27] = in28
+    sampleValue[28] = in29
+    sampleValue[29] = in30
+    sampleValue[30] = in31
+    sampleValue[31] = in32
+    sampleValue[32] = in33
+    sampleValue[33] = in34
+    sampleValue[34] = in35
+    sampleValue[35] = in36
+    sampleValue[36] = in37
+    sampleValue[37] = in38
+    sampleValue[38] = in39
+    sampleValue[39] = in40
+    sampleValue[40] = in41
+    sampleValue[41] = in42
+    sampleValue[42] = in43
+    sampleValue[43] = in44
+    sampleValue[44] = in45
+    sampleValue[45] = in46
+    sampleValue[46] = in47
+    sampleValue[47] = in48
+    sampleValue[48] = in49
+    sampleValue[49] = in50
+    sampleValue[50] = in51
+    sampleValue[51] = in52
+    sampleValue[52] = in53
+    sampleValue[53] = in54
+    sampleValue[54] = in55
+    sampleValue[55] = in56
+    sampleValue[56] = in57
+    sampleValue[57] = in58
+    sampleValue[58] = in59
+    sampleValue[59] = in60
+    sampleValue[60] = in61
+    sampleValue[61] = in62
+    sampleValue[62] = in63
+    sampleValue[63] = in64
+    sampleValue[64] = in65
+    sampleValue[65] = in66
+    sampleValue[66] = in67
+    sampleValue[67] = in68
+    sampleValue[68] = in69
+    sampleValue[69] = in70
+    sampleValue[70] = in71
+    sampleValue[71] = in72
+    sampleValue[72] = in73
+    sampleValue[73] = in74
+    sampleValue[74] = in75
+    sampleValue[75] = in76
+    sampleValue[76] = in77
+    sampleValue[77] = in78
+    sampleValue[78] = in79
+    sampleValue[79] = in80
+    sampleValue[80] = in81
+    sampleValue[81] = in82
+    sampleValue[82] = in83
+    sampleValue[83] = in84
+    sampleValue[84] = in85
+    sampleValue[85] = in86
+    sampleValue[86] = in87
+    sampleValue[87] = in88
+    sampleValue[88] = in89
+    sampleValue[89] = in90
+    sampleValue[90] = in91
+    sampleValue[91] = in92
+    sampleValue[92] = in93
+    sampleValue[93] = in94
+    sampleValue[94] = in95
+    sampleValue[95] = in96
+    sampleValue[96] = in97
+    sampleValue[97] = in98
+    sampleValue[98] = in99
+    sampleValue[99] = in100
+  }
+  // define Log log
+  private inline float[100] sampleValue
+}

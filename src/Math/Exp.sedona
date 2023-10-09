@@ -1,0 +1,22 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Exp
+  extends Component
+{
+  @readonly property float out
+
+  property float in1
+
+  property float in2
+
+  virtual override void execute()
+  {
+    buf[0] = in1
+    buf[1] = in2
+    if (Runtime.mathExp(buf) == 0)
+    {
+      out := buf[2]
+    }
+  }
+
+  private inline float[3] buf
+}

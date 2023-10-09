@@ -1,0 +1,61 @@
+//
+// Copyright (c) 2007-2011 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//   10 Jan 2007  Andy Saunders  Creation
+//   27 Apr 2007  Brian Frank    Port from Java to Sedona
+//   22 Apr 2009  Elizabeth McKenney   Updated
+//   04 Aug 2011  Clif Turman    Add comments
+//
+
+**
+** B2P Boolean to pulse object
+**
+** out = in for one scan cycle, on rising edge of in
+**
+@niagaraIcon="module://icons/x16/control/control.png"
+class B2P
+  extends Component
+{
+
+  ** out = in for one scan cycle, on rising edge of in  
+  @readonly property float out
+  
+  ** rising edge of in causes out to go true for one cycle
+  property float in
+
+  **
+  ** Callback when component is first started in an app.
+  **
+  virtual override void start()
+  {
+    if (in == null) {
+      lastIn = false
+    } else {
+      lastIn = in != 0.0 ? true : false    // Initialize lastIn before first call to execute()
+    }
+  }
+
+
+  **
+  ** Execute is called once every scan.
+  **
+  virtual override void execute()
+  {
+    // Output is true immediately on rising edge of input;
+    // set false again on next scan cycle
+    if (in == null) {
+      out := null
+      return
+    }
+    if (in != 0.0 && !lastIn) {
+      out := 1.0
+    } else {
+      out := 0.0
+    }
+    lastIn = in != 0.0 ? true : false
+  }
+
+  private bool lastIn
+}

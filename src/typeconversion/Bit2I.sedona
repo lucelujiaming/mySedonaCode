@@ -1,0 +1,32 @@
+@niagaraIcon="module://icons/x16/control/util/switch.png"
+class Bit2I
+  extends Component
+{
+  property int in0
+  property int in1
+  property int in2
+  property int in3
+  property int in4
+  property int in5
+  property int in6
+  property int in7
+  
+  @readonly property int out
+
+  virtual override void execute()
+  {
+    int val = 0
+
+    val += (in0 != 0) ? 1 << 0 : 0
+    val += (in1 != 0) ? 1 << 1 : 0
+    val += (in2 != 0) ? 1 << 2 : 0
+    val += (in3 != 0) ? 1 << 3 : 0
+    val += (in4 != 0) ? 1 << 4 : 0
+    val += (in5 != 0) ? 1 << 5 : 0
+    val += (in6 != 0) ? 1 << 6 : 0
+    val += (in7 != 0) ? 1 << 7 : 0
+
+    out := val
+  }
+}
+

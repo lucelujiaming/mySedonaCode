@@ -1,0 +1,30 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Scale
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  @config @defaultOnClone
+  property float min
+
+  @config @defaultOnClone
+  property float max
+
+  virtual override void execute()
+  {
+    float delta = max - min
+    if (delta != 0.0) {
+      if (in < 0.0) {
+        in := 0.0
+      }
+      if (in > 1.0) {
+        in := 1.0
+      }
+      out := (in * delta) + min
+    } else {
+      out := 0.0
+    }
+  }
+}

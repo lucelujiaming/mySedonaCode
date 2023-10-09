@@ -1,0 +1,46 @@
+@niagaraIcon="module://icons/x16/control/util/switch.png"
+class I2Bit16
+  extends Component
+{
+  property int in
+  
+  @readonly property int out00
+  @readonly property int out01
+  @readonly property int out02
+  @readonly property int out03
+  @readonly property int out04
+  @readonly property int out05
+  @readonly property int out06
+  @readonly property int out07
+
+  @readonly property int out08
+  @readonly property int out09
+  @readonly property int out10
+  @readonly property int out11
+  @readonly property int out12
+  @readonly property int out13
+  @readonly property int out14
+  @readonly property int out15
+
+  virtual override void execute()
+  {
+    out00 := (in & 0x0001) != 0 ? 1 : 0
+    out01 := (in & 0x0002) != 0 ? 1 : 0
+    out02 := (in & 0x0004) != 0 ? 1 : 0
+    out03 := (in & 0x0008) != 0 ? 1 : 0
+    out04 := (in & 0x0010) != 0 ? 1 : 0
+    out05 := (in & 0x0020) != 0 ? 1 : 0
+    out06 := (in & 0x0040) != 0 ? 1 : 0
+    out07 := (in & 0x0080) != 0 ? 1 : 0
+
+    out08 := (in & 0x0100) != 0 ? 1 : 0
+    out09 := (in & 0x0200) != 0 ? 1 : 0
+    out10 := (in & 0x0400) != 0 ? 1 : 0
+    out11 := (in & 0x0800) != 0 ? 1 : 0
+    out12 := (in & 0x1000) != 0 ? 1 : 0
+    out13 := (in & 0x2000) != 0 ? 1 : 0
+    out14 := (in & 0x4000) != 0 ? 1 : 0
+    out15 := (in & 0x8000) != 0 ? 1 : 0
+  }
+}
+

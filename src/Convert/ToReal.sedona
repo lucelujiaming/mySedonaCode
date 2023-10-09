@@ -1,0 +1,13 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class ToReal
+  extends Component
+{
+  @readonly property float out
+
+  property int in
+
+  virtual override void execute()
+  {
+      out := (float)(in & 0xFFFF)
+  }
+}

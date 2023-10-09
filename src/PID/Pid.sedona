@@ -1,0 +1,99 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Pid
+  extends Component
+{
+  @readonly
+  property
+  float out
+
+  property
+  float
+  enable = 1.0f
+
+  property
+  float v
+
+  property
+  float sp
+
+  property
+  float Direct
+
+  property
+  float reset
+
+  @precision=2
+  @config
+  @summary
+  property
+  float kp
+
+  @precision=2
+  @config
+  @summary
+  property
+  float ki
+
+  @precision=2
+  @config
+  @summary
+  property
+  float kd
+
+  @config
+  property
+  float db
+
+  @config
+  property
+  float eepDirect
+
+  virtual override void start()
+  {
+      ctx = a()
+  }
+
+  virtual override void stop()
+  {
+      int ret = d(ctx)
+      if (ret == 0) {
+          ctx = 0
+      }
+  }
+
+  virtual override void execute()
+  {
+      if (enable == 0.0) return
+
+      if (!isSlotLinkToDIRECT()) {
+        Direct := eepDirect
+      }
+
+      float _out = 0.0f
+      if (ctx != 0) {
+          _out = f(ctx, v, sp, kp, ki, kd, db, Direct, reset)
+      }
+
+      out := _out
+  }
+
+  private bool isSlotLinkToDIRECT()
+  {
+    for (Link link = linksTo; link != null; link = link.nextTo) {
+      Slot slot = type.slot(link.toSlot)
+      if (slot == Pid.Direct) {
+        return true
+      }
+    }
+    return false
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  private int ctx = 0
+
+  native int a()
+  native float f(int ctx, float v, float sp, float kp, float ki, float kd, float dead_band, float opp_ctrl, float reset)
+  native int d(int ctx)
+}

@@ -1,0 +1,342 @@
+//
+// Copyright (c) 2007-2011 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//   27 Apr 2007  Brian Frank    Creation
+//   04 Aug 2011  Clif Turman    Add comments
+//
+         
+@niagaraIcon="module://icons/x16/control/math/add.png"
+class TableConvert
+  extends Component
+{
+	define Str NTC_TYPE_RANGE = "None, TenKB3950, TwentyKHNWL, TenKII, TenKIII, END"
+	
+	define int NTC_TYPE_NONE= 0;
+	define int NTC_TYPE_10K_B3950= 1;
+	define int NTC_TYPE_20K_HNWL= 2;
+	// define int NTC_TYPE_10K_B3935= 3;
+	// define int NTC_TYPE_10K_B3630= 4;
+	// //ACI
+	// define int NTC_TYPE_10K_CP= 3;
+	// define int NTC_TYPE_10K_AN= 4;
+    // 
+	// //BAIPI	
+	define int NTC_TYPE_10K_II= 3;
+	define int NTC_TYPE_10K_III= 4;
+
+	define int NTC_TYPE_MAX= 5
+	
+  
+	// dataExpectingReplyNPCI
+	@range=NTC_TYPE_RANGE
+	property int ntc_type = NTC_TYPE_NONE   
+
+	** out is the sum of all inputs
+	@readonly property float out
+
+	** input 1
+	property float in1 = 0.0
+
+
+  
+	**
+	** Execute is called once every scan.
+	**
+	virtual override void execute()
+	{
+		out := GetThermTemp(in1, ntc_type, -30.0, 100.0)
+	}
+
+	float GetTemperature_NTC_Table(float kohm,  float[] res_tbl)
+	{
+		float max
+        float min
+        float resolution
+		int i;
+        int points;
+		float ret_value= 0.0;
+		
+		min= res_tbl[0];
+		max= res_tbl[1];
+		resolution= res_tbl[2];
+		
+		points= (int)((max - min)/resolution)
+		
+		if(kohm >= res_tbl[3])
+		{
+			ret_value= min;
+		}
+		else
+		{
+			if(kohm <= res_tbl[points + 3])
+			{
+				ret_value= max;
+			}
+			else
+			{
+				for(i= 0; i< points; i++)
+				{
+					if(kohm <= res_tbl[i + 3] && kohm > res_tbl[i + 4])
+					{
+						ret_value  = (-1.0f)*(kohm - res_tbl[i + 4])/(res_tbl[i + 3] - res_tbl[i + 4]);
+						ret_value  *= resolution;
+						ret_value  += min + (float)(i + 1)*resolution;
+						break;
+					}
+				}
+			}
+		}
+		
+		return ret_value;
+	}
+
+	float GetThermTemp(float kohm, int type, float max, float min)
+	{
+		float ret_value= 0.0f;
+		
+		if(type > NTC_TYPE_MAX 
+			|| type <= NTC_TYPE_NONE)
+			return 0.0f;
+		
+		switch(type)
+		{
+			case NTC_TYPE_10K_B3950:
+				ret_value= GetTemperature_NTC_Table(kohm, Therm_MF58_103F3950_Array);  
+				break;
+			case NTC_TYPE_20K_HNWL:
+				ret_value= GetTemperature_NTC_Table(kohm, Therm_20K_HW_Array);
+				break;
+			case NTC_TYPE_10K_II:
+				ret_value= GetTemperature_NTC_Table(kohm, Therm_10K_II_Array);
+				break;
+			case NTC_TYPE_10K_III:
+				ret_value= GetTemperature_NTC_Table(kohm, Therm_10K_III_F_Array);
+				break;
+			default:
+				break;
+		}
+		
+		if(ret_value > max && max !=0.0f)
+		{
+			ret_value= max;
+		}
+		else
+		{
+			if(ret_value < min && min != 0.0f)
+			{
+				ret_value= min;
+			}
+		}
+		
+		return ret_value;
+	}
+
+	float Temp_F2C(float temp)
+	{
+		return (temp*9.0f/5.0f + 32.0f);
+	}
+
+	float Temp_C2F(float temp)
+	{
+		return ((temp - 32.0f)*5.0f/9.0f);
+	}
+	
+	override void start()
+	{
+		float max
+        float min
+        float resolution
+		int i;
+        int points;
+		
+		// Set Therm_10K_II
+		min= Therm_10K_II[0];
+		max= Therm_10K_II[1];
+		resolution= Therm_10K_II[2];
+		points= (int)((max - min)/resolution)
+		
+		for(i= 0; i< points + 3; i++)
+		{
+			
+			Therm_10K_II_Array[i] = Therm_10K_II[i]
+		}
+		
+		// Set Therm_10K_III_F
+		min= Therm_10K_III_F[0];
+		max= Therm_10K_III_F[1];
+		resolution= Therm_10K_III_F[2];
+		points= (int)((max - min)/resolution)
+		
+		for(i= 0; i< points + 3; i++)
+		{
+			
+			Therm_10K_III_F_Array[i] = Therm_10K_III_F[i]
+		}
+		
+		// Set Therm_20K_HW
+		min= Therm_20K_HW[0];
+		max= Therm_20K_HW[1];
+		resolution= Therm_20K_HW[2];
+		points= (int)((max - min)/resolution)
+		
+		for(i= 0; i< points + 3; i++)
+		{
+			
+			Therm_20K_HW_Array[i] = Therm_20K_HW[i]
+		}
+		
+		// Set Therm_MF58_103F3950
+		min= Therm_MF58_103F3950[0];
+		max= Therm_MF58_103F3950[1];
+		resolution= Therm_MF58_103F3950[2];
+		points= (int)((max - min)/resolution)
+		
+		for(i= 0; i< points + 3; i++)
+		{
+			
+			Therm_MF58_103F3950_Array[i] = Therm_MF58_103F3950[i]
+		}
+	}
+	// define Log log
+  
+	// NTC-10K-II, ACI-10K-CP, B3935
+	define float[] Therm_10K_II = 
+		{
+			-30.000f,	100.000f,	1.000f,
+			176.970f,	166.352f,	156.437f,	147.173f,   138.514f,
+			130.418f,	122.844f,   115.755f,   109.119f,   102.903f,
+			97.078f,	91.619f, 	86.499f,	81.696f,	77.188f,//-40~-20
+			72.955f,	68.980f,	65.245f,	61.735f,	58.433f,
+			55.328f,	52.407f,	49.657f,	47.066f,	44.626f,
+			42.326f,	40.159f,	38.115f,	36.187f,	34.368f,
+			32.651f,	31.029f,	29.498f,	28.051f,	26.684f,
+			25.391f,	24.168f,	23.011f,	21.916f,	20.880f,//-15~5
+			19.898f,	18.969f,	18.088f,	17.253f,	16.461f,
+			15.714f,	14.998f,	14.322f,	13.680f,	13.70f,	
+			12.492f,	11.942f,	11.419f,	10.922f,	10.449f,
+			10.000f,	9.572f,		9.165f,		8.778f,		8.409f,
+			8.056f,		7.722f,		7.403f,		7.098f,		6.808f,	//10~30
+			6.530f,		6.268f,		6.016f,		5.776f,		5.546f,
+			5.327f,		5.118f,		4.918f,		4.727f,		4.544f,
+			4.367f,		4.202f,		4.042f,		3.889f,		3.743f,
+			3.603f,		3.469f,		3.340f,		3.217f,		3.099,
+			2.987f,		2.878f,		2.775f,		2.675f,		2.580f,	//35~55
+			2.488f,		2.400f,		2.316f,		2.235f,		2.157f,		
+			2.082f,		2.011f,		1.943f,		1.876f,		1.813f,	
+			1.752f,		1.693f,		1.636f,		1.582f,		1.530f,	
+			1.480f,		1.431f,		1.384f,		1.340f,		1.297f,
+			1.255f,		1.215f,		1.177f,		1.140f,		1.104f,//60~80
+			1.070f,		1.037f,		1.005f,		0.938f,		0.944f,
+			0.915f,		0.888f,		0.861f,		0.835f,		0.810f,
+			0.786f,		0.763f,		0.741f,		0.719f,		0.699f,
+			0.679f					//85~100
+		};
+
+	// NTC-10K-III, ACI-10K-AN, B3630
+	define float[] Therm_10K_III_F=
+		{
+			-30.000f,	100.000f,	1.000f,
+			134.250f,	127.058f,	120.290f,	113.919f,	107.920f,
+			102.270f,	96.946f,	91.929f,	87.199f,	82.738f,
+			78.530f,	74.559f,	70.811f,	67.271f,	63.928f,//-40~-20
+			60.770f,	55.427f,	51.350f,	48.204f,	45.743f,
+			43.781f,	42.172f,	40.800f,	39.576f,	38.391f,
+			37.201f,	35.938f,	34.557f,	33.022f,	31.312f,
+			29.419f,	28.088f,	26.825f,	25.627f,	24.490f,
+			23.410f,	22.384f,	21.409f,	20.482f,	19.600f,//-15~5
+			18.760f,	17.960f,	17.199f,	16.472f,	15.780f,	
+			15.120f,	14.492f,	13.893f,	13.323f,	12.779f,
+			12.260f,	11.765f,	11.293f,	10.842f,	10.411f,
+			10.000f,	9.607f,		9.231f,		8.872f,		8.529f,
+			8.200f,		7.886f,		7.586f,		7.298f,		7.023f,//10~30
+			6.760f,		6.508f,		6.266f,		6.035f,		5.813f,
+			5.600f,		5.396f,		5.200f,		5.013f,		4.833f,
+			4.660f,		4.495f,		4.337f,		4.185f,		4.040f,
+			3.900f,		3.766f,		3.637f,		3.513f,		3.394f,		
+			3.280f,		3.170f,		3.065f,		2.963f,		2.865f,	//35~55
+			2.772f,		2.676f,		2.586f,		2.500f,		2.419f,
+			2.339f,		2.265f,		2.192f,		2.123f,		2.056f,
+			1.990f,		1.928f,		1.868f,		1.811f,		1.754f,
+			1.700f,		1.648f,		1.598f,		1.551f,		1.504f,
+			1.460f,		1.417f,		1.376f,		1.336f,		1.297f,	//60~80
+			1.260f,		1.224f,		1.189f,		1.155f,		1.122f,
+			1.090f,		1.057f,		1.027f,		0.997f,		0.968f,
+			0.940f,		0.913f,		0.888f,		0.864f,		0.841f,
+			0.817f					//85~100
+		};
+
+	// Honeywell NTC-20K 
+	define float[] Therm_20K_HW =
+		{
+			-30.0f,		100.0f,		1.0f,
+			415.0f,	389.0f,	364.0f,	342.0f,	321.0f,		//-30~-26
+			301.0f,	283.0f,	266.0f,	250.0f,	235.0f,		//-25~-21
+			221.0f,	208.0f,	196.0f,	184.0f,	174.0f,		//-20~-16
+			164.0f,	154.0f,	146.0f,	137.0f,	130.0f,		//-15~-11
+			122.0f,	116.0f,	109.0f,	103.0f,	97.6f,		//-10~-6
+			92.3f,	87.3f,	82.6f,	78.2f,	74.1f,		//-5~-1
+			70.2f,	66.5f,	63.0f,	59.8f,	56.7f,		//0~4
+			53.8f,	51.1f,	48.5f,	46.0f,	43.7f,		//5~9
+			41.6f,	39.5f,	37.6f,	35.7f,	34.0f,		//10~14
+			32.3f,	30.8f,	29.3f,	27.9f,	26.6f,		//15~19
+			25.3f,	24.2f,	23.0f,	22.0f,	21.0f,		//20~24
+			20.0f,	19.1f,	18.2f,	17.4f,	16.6f,		//25~29
+			15.9f,	15.2f,	14.5f,	13.9f,	13.3f,		//30~34
+			12.7f,	12.1f,	11.6f,	11.1f,	10.7f,		//35~39
+			10.2f,	9.78f,	9.37f,	8.98f,	8.61f,		//40~44
+			8.26f,	7.92f,	7.60f,	7.29f,	7.00f,		//45~49
+			6.72f,	6.45f,	6.19f,	5.95f,	5.72f,		//50~54
+			5.49f,	5.28f,	5.08f,	4.88f,	4.69f,		//55~59
+			4.52f,	4.35f,	4.18f,	4.03f,	3.88f,		//60~64
+			3.73f,	3.59f,	3.46f,	3.34f,	3.21f,		//65~69
+			3.10f,	2.99f,	2.88f,	2.78f,	2.68f,		//70~74
+			2.58f,	2.49f,	2.41f,	2.32f,	2.24f,		//75~79
+			2.17f,	2.09f,	2.02f,	1.95f,	1.89f,		//80~84
+			1.82f,	1.76f,	1.70f,	1.65f,	1.59f,		//85~89
+			1.54f,	1.49f,	1.44f,	1.40f,	1.35f,		//90~94
+			1.31f,	1.27f,	1.23f,	1.19f,	1.15f,		//95~99
+			1.11f										//100
+		};
+
+	define float[] Therm_MF58_103F3950 =
+		{
+			-30.000f,	100.000f,	1.000f,		//Min, Max, Resolution
+			168.044f,	159.021f,	150.485f,	142.402f,	134.745f,	//-30~-26
+			127.490f,	120.614f,	114.099f,	107.928f,	102.085f,	//-25~-21
+			96.554f,	91.322f,	86.375f,	81.699f,	77.282f,	//-20~-16
+			73.110f,	69.173f,	65.457f,	61.952f,	58.647f,	//-15~-11
+			55.530f,	52.591f,	49.821f,	47.210f,	44.748f,	//-10~-6
+			42.428f,	40.241f,	38.179f,	36.235f,	34.401f,	//-5~-1
+			33.010f,	31.039f,	29.498f,	28.044f,	26.671f,	//0~4
+			25.374f,	24.148f,	22.989f,	21.894f,	20.857f,	//5~9
+			20.008f,	18.947f,	18.068f,	17.235f,	16.445f,	//10~14
+			15.696f,	14.985f,	14.311f,	13.671f,	13.064f,	//15~19
+			12.486f,	11.938f,	11.416f,	10.920f,	10.449f,	//20~24
+			10.000f,	9.572f,		9.165f,		8.777f,		8.408f,		//25~29
+			8.056f,		7.720f,		7.400f,		7.095f,		6.804f,		//30~34
+			6.526f,		6.260f,		6.007f,		5.765f,		5.534f,		//35~39
+			5.313f,		5.102f,		4.900f,		4.707f,		4.523f,		//40~44
+			4.347f,		4.178f,		4.017f,		3.863f,		3.715f,		//45~49
+			3.574f,		3.438f,		3.309f,		3.185f,		3.066f,		//50~54
+			2.952f,		2.843f,		2.738f,		2.638f,		2.542f,		//55~59
+			2.450f,		2.362f,		2.277f,		2.196f,		2.119f,		//60~64
+			2.044f,		1.972f,		1.904f,		1.838f,		1.774f,		//65~69
+			1.714f,		1.655f,		1.599f,		1.545f,		1.494f,		//70~74
+			1.444f,		1.396f,		1.350f,		1.306f,		1.264f,		//75~79
+			1.223f,		1.184f,		1.146f,		1.110f,		1.075f,		//80~84
+			1.061f,		1.009f,		0.978f,		0.948f,		0.919f,		//85~89
+			0.891f,		0.864f,		0.838f,		0.813f,		0.789f,		//90~94
+			0.766f,		0.744f,		0.722f,		0.701f,		0.681f,		//95~99
+			0.673f														//100
+		};
+	
+	private inline float[100] sampleValue
+	
+	private inline float[256] Therm_10K_II_Array
+	private inline float[256] Therm_10K_III_F_Array
+	private inline float[256] Therm_20K_HW_Array
+	private inline float[256] Therm_MF58_103F3950_Array
+  
+}

@@ -1,0 +1,442 @@
+//
+// Mul Two Input Multiplication object
+//
+// out = in1 * in2
+//
+@niagaraIcon="module://icons/x16/control/math/multiply.png"
+class Mul
+  extends Component
+{
+    ** Enable count
+    @config
+    property int enableCount = 2
+    
+  // out = in1 * in2
+  @readonly property float out
+
+    ** input 1
+    property float in1 = 1.0
+
+    ** input 2
+    property float in2 = 1.0
+
+    ** input 3
+    property float in3 = 1.0
+
+    ** input 4
+    property float in4 = 1.0
+
+    ** input 5
+    property float in5 = 1.0
+
+    ** input 6
+    property float in6 = 1.0
+
+    ** input 7
+    property float in7 = 1.0
+
+    ** input 8
+    property float in8 = 1.0
+
+    ** input 9
+    property float in9 = 1.0
+
+    ** input 10
+    property float in10 = 1.0
+
+    ** input 11
+    property float in11 = 1.0
+
+    ** input 12
+    property float in12 = 1.0
+
+    ** input 13
+    property float in13 = 1.0
+
+    ** input 14
+    property float in14 = 1.0
+
+    ** input 15
+    property float in15 = 1.0
+
+    ** input 16
+    property float in16 = 1.0
+
+    ** input 17
+    property float in17 = 1.0
+
+    ** input 18
+    property float in18 = 1.0
+
+    ** input 19
+    property float in19 = 1.0
+
+    ** input 20
+    property float in20 = 1.0
+
+    ** input 21
+    property float in21 = 1.0
+
+    ** input 22
+    property float in22 = 1.0
+
+    ** input 23
+    property float in23 = 1.0
+
+    ** input 24
+    property float in24 = 1.0
+
+    ** input 25
+    property float in25 = 1.0
+
+    ** input 26
+    property float in26 = 1.0
+
+    ** input 27
+    property float in27 = 1.0
+
+    ** input 28
+    property float in28 = 1.0
+
+    ** input 29
+    property float in29 = 1.0
+
+    ** input 30
+    property float in30 = 1.0
+
+    ** input 31
+    property float in31 = 1.0
+
+    ** input 32
+    property float in32 = 1.0
+
+    ** input 33
+    property float in33 = 1.0
+
+    ** input 34
+    property float in34 = 1.0
+
+    ** input 35
+    property float in35 = 1.0
+
+    ** input 36
+    property float in36 = 1.0
+
+    ** input 37
+    property float in37 = 1.0
+
+    ** input 38
+    property float in38 = 1.0
+
+    ** input 39
+    property float in39 = 1.0
+
+    ** input 40
+    property float in40 = 1.0
+
+    ** input 41
+    property float in41 = 1.0
+
+    ** input 42
+    property float in42 = 1.0
+
+    ** input 43
+    property float in43 = 1.0
+
+    ** input 44
+    property float in44 = 1.0
+
+    ** input 45
+    property float in45 = 1.0
+
+    ** input 46
+    property float in46 = 1.0
+
+    ** input 47
+    property float in47 = 1.0
+
+    ** input 48
+    property float in48 = 1.0
+
+    ** input 49
+    property float in49 = 1.0
+
+    ** input 50
+    property float in50 = 1.0
+
+    ** input 51
+    property float in51 = 1.0
+
+    ** input 52
+    property float in52 = 1.0
+
+    ** input 53
+    property float in53 = 1.0
+
+    ** input 54
+    property float in54 = 1.0
+
+    ** input 55
+    property float in55 = 1.0
+
+    ** input 56
+    property float in56 = 1.0
+
+    ** input 57
+    property float in57 = 1.0
+
+    ** input 58
+    property float in58 = 1.0
+
+    ** input 59
+    property float in59 = 1.0
+
+    ** input 60
+    property float in60 = 1.0
+
+    ** input 61
+    property float in61 = 1.0
+
+    ** input 62
+    property float in62 = 1.0
+
+    ** input 63
+    property float in63 = 1.0
+
+    ** input 64
+    property float in64 = 1.0
+
+    ** input 65
+    property float in65 = 1.0
+
+    ** input 66
+    property float in66 = 1.0
+
+    ** input 67
+    property float in67 = 1.0
+
+    ** input 68
+    property float in68 = 1.0
+
+    ** input 69
+    property float in69 = 1.0
+
+    ** input 70
+    property float in70 = 1.0
+
+    ** input 71
+    property float in71 = 1.0
+
+    ** input 72
+    property float in72 = 1.0
+
+    ** input 73
+    property float in73 = 1.0
+
+    ** input 74
+    property float in74 = 1.0
+
+    ** input 75
+    property float in75 = 1.0
+
+    ** input 76
+    property float in76 = 1.0
+
+    ** input 77
+    property float in77 = 1.0
+
+    ** input 78
+    property float in78 = 1.0
+
+    ** input 79
+    property float in79 = 1.0
+
+    ** input 80
+    property float in80 = 1.0
+
+    ** input 81
+    property float in81 = 1.0
+
+    ** input 82
+    property float in82 = 1.0
+
+    ** input 83
+    property float in83 = 1.0
+
+    ** input 84
+    property float in84 = 1.0
+
+    ** input 85
+    property float in85 = 1.0
+
+    ** input 86
+    property float in86 = 1.0
+
+    ** input 87
+    property float in87 = 1.0
+
+    ** input 88
+    property float in88 = 1.0
+
+    ** input 89
+    property float in89 = 1.0
+
+    ** input 90
+    property float in90 = 1.0
+
+    ** input 91
+    property float in91 = 1.0
+
+    ** input 92
+    property float in92 = 1.0
+
+    ** input 93
+    property float in93 = 1.0
+
+    ** input 94
+    property float in94 = 1.0
+
+    ** input 95
+    property float in95 = 1.0
+
+    ** input 96
+    property float in96 = 1.0
+
+    ** input 97
+    property float in97 = 1.0
+
+    ** input 98
+    property float in98 = 1.0
+
+    ** input 99
+    property float in99 = 1.0
+
+    ** input 100
+    property float in100 = 1.0
+
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    if(enableCount >= 100)
+       return 
+    setAllValues()
+    float outSum = sampleValue[0];
+    ** log.message("outSum=$outSum ") 
+    for(int i = 1; i < enableCount; i++)
+    {
+        ** log.message("outSum=$outSum and sampleValue[$i] = ${sampleValue[i]}") 
+        outSum = outSum * sampleValue[i]
+    }
+    ** log.message("outSum=$outSum ") 
+    out := outSum
+  }
+  
+  void setAllValues()
+  {
+    sampleValue[0] = in1
+    sampleValue[1] = in2
+    sampleValue[2] = in3
+    sampleValue[3] = in4
+    sampleValue[4] = in5
+    sampleValue[5] = in6
+    sampleValue[6] = in7
+    sampleValue[7] = in8
+    sampleValue[8] = in9
+    sampleValue[9] = in10
+    sampleValue[10] = in11
+    sampleValue[11] = in12
+    sampleValue[12] = in13
+    sampleValue[13] = in14
+    sampleValue[14] = in15
+    sampleValue[15] = in16
+    sampleValue[16] = in17
+    sampleValue[17] = in18
+    sampleValue[18] = in19
+    sampleValue[19] = in20
+    sampleValue[20] = in21
+    sampleValue[21] = in22
+    sampleValue[22] = in23
+    sampleValue[23] = in24
+    sampleValue[24] = in25
+    sampleValue[25] = in26
+    sampleValue[26] = in27
+    sampleValue[27] = in28
+    sampleValue[28] = in29
+    sampleValue[29] = in30
+    sampleValue[30] = in31
+    sampleValue[31] = in32
+    sampleValue[32] = in33
+    sampleValue[33] = in34
+    sampleValue[34] = in35
+    sampleValue[35] = in36
+    sampleValue[36] = in37
+    sampleValue[37] = in38
+    sampleValue[38] = in39
+    sampleValue[39] = in40
+    sampleValue[40] = in41
+    sampleValue[41] = in42
+    sampleValue[42] = in43
+    sampleValue[43] = in44
+    sampleValue[44] = in45
+    sampleValue[45] = in46
+    sampleValue[46] = in47
+    sampleValue[47] = in48
+    sampleValue[48] = in49
+    sampleValue[49] = in50
+    sampleValue[50] = in51
+    sampleValue[51] = in52
+    sampleValue[52] = in53
+    sampleValue[53] = in54
+    sampleValue[54] = in55
+    sampleValue[55] = in56
+    sampleValue[56] = in57
+    sampleValue[57] = in58
+    sampleValue[58] = in59
+    sampleValue[59] = in60
+    sampleValue[60] = in61
+    sampleValue[61] = in62
+    sampleValue[62] = in63
+    sampleValue[63] = in64
+    sampleValue[64] = in65
+    sampleValue[65] = in66
+    sampleValue[66] = in67
+    sampleValue[67] = in68
+    sampleValue[68] = in69
+    sampleValue[69] = in70
+    sampleValue[70] = in71
+    sampleValue[71] = in72
+    sampleValue[72] = in73
+    sampleValue[73] = in74
+    sampleValue[74] = in75
+    sampleValue[75] = in76
+    sampleValue[76] = in77
+    sampleValue[77] = in78
+    sampleValue[78] = in79
+    sampleValue[79] = in80
+    sampleValue[80] = in81
+    sampleValue[81] = in82
+    sampleValue[82] = in83
+    sampleValue[83] = in84
+    sampleValue[84] = in85
+    sampleValue[85] = in86
+    sampleValue[86] = in87
+    sampleValue[87] = in88
+    sampleValue[88] = in89
+    sampleValue[89] = in90
+    sampleValue[90] = in91
+    sampleValue[91] = in92
+    sampleValue[92] = in93
+    sampleValue[93] = in94
+    sampleValue[94] = in95
+    sampleValue[95] = in96
+    sampleValue[96] = in97
+    sampleValue[97] = in98
+    sampleValue[98] = in99
+    sampleValue[99] = in100
+  }
+  // define Log log
+  private inline float[100] sampleValue
+}

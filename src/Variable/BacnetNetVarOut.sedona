@@ -1,0 +1,574 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class BacnetNetVarOut
+  extends BacNetFieldBusIO
+{
+  define Str WRITEPROPERTY_RANGE = "writeProperty, writePropertyMultiple, END"
+  define int WRITE_PROPERTY          = 0
+  define int WRITE_PROPERTY_MULTIPLE = 1
+  define int WRITEPROPERTY_END       = 2
+
+  // Lujiaming add these at 23/02/24
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @config
+  @range = WRITEPROPERTY_RANGE
+  @fieldWidth = 200
+  property int isWriteMultiple = WRITE_PROPERTY
+  
+  @config
+  @defaultOnClone
+  @unit = Units.millisecond
+  @min = 100
+  property int refreshTime = 2000
+
+  @readonly
+  @unit = Units.millisecond
+  property int elapsedTime = -1
+
+  ////////////////////////////////////////////////////////////////
+  // config Properties
+  ////////////////////////////////////////////////////////////////
+
+  // 
+  // @readonly
+  property float present_value = 0.0f
+
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+
+  override void start()
+  {
+    super.start()
+    ** link_type = Component.LINK_TYPE_WRITE
+  }
+  
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == BacNetFieldBusIO.objectType || slot == BacNetFieldBusIO.instanceNumber) {
+      log.message("changed slot.name=$slot.name")
+      update()
+    }
+  }
+
+  void makeWritePropertyMultiplePacket()
+  {
+    if (bus == null) {
+        return
+    }
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    log.message("makeWritePropertyMultiplePacket::maxSendAPDULength = ${device.maxSendAPDULength}")
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = device.maxSendAPDULength % 0x10
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
+    dataLength = 3
+    // Service Choice: writePropertyMultiple (16)
+    bacnetPacket[dataLength++] = 0x10
+    // ObjectIdentifier: analog-value, 14
+    bacnetPacket[dataLength++] = 0x0C
+    // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+    if(objectNodeType > 4)
+    {
+        bacnetPacket[dataLength++] = objectNodeType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
+    // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    // .... .110 = Named Tag: Opening Tag (6)
+    bacnetPacket[dataLength++] = 0x1E
+    // Property Identifier: present-value (85)
+    bacnetPacket[dataLength++] = 0x09
+    bacnetPacket[dataLength++] = propertyIdentifier
+    
+    // .... .110 = Named Tag: Opening Tag (6)
+    bacnetPacket[dataLength++] = 0x2E
+    // Analog
+    if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+    {
+        // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
+        bacnetPacket[dataLength++] = 0x44
+        bufFloat[0] = (float)present_value
+        int iLen = bus.encodeFloat(bufFloat, bufData)
+        for(int i = 0; i < iLen; i++)
+        {
+           bacnetPacket[dataLength++] = bufData[i]
+        }
+    }
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+    {
+        // Application Tag: Enumerated, Length/Value/Type: 1
+        bacnetPacket[dataLength++] = 0x91
+        if(present_value == 0.0)
+           bacnetPacket[dataLength++] = 0
+        else
+           bacnetPacket[dataLength++] = 1
+    }
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+    {
+        bufInteger[0] = (int)present_value
+        log.message("MULTISTATE present_value=$present_value");
+        int iLen = bus.encodeUnsigned(bufInteger, bufData)
+        
+        // Application Tag: Unsigned Integer, Length/Value/Type: 1
+        bacnetPacket[dataLength++] = 0x20 + iLen
+        for(int i = 0; i < iLen; i++)
+        {
+           bacnetPacket[dataLength + iLen - i - 1] = bufData[i]
+        }
+        dataLength += iLen
+    }
+    // .... .111 = Named Tag: Closing Tag (7)
+    bacnetPacket[dataLength++] = 0x2F
+    // Priority: (Unsigned) 16
+    // Context Tag: 4, Length/Value/Type: 1
+    bacnetPacket[dataLength++] = 0x1F
+    
+    log.message("22222 makeWritePropertyMultiplePacket::bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+        buf[i] = (float)bacnetPacket[i]
+  }
+
+  int checkWritePropertyMultiple(int iMultipleObjectType, int iMultipleInstanceNumber)
+  {
+      for (Component d = Sys.app.lookup(device.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        ** log.message("5555  updateCache d.name=$d.name and type.name=$d.type.name");
+        if (d.type.is(BacnetNetVarOut.type)) {
+           int iObjectType = ((BacNetFieldBusIO)d).objectType
+           iObjectType     = ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(iObjectType)
+            
+           int iInstanceNumber = ((BacnetNetVarOut)d).instanceNumber
+           log.message("5555  checkWritePropertyMultiple::iObjectType=$iObjectType and iInstanceNumber=$iInstanceNumber")
+           if((iObjectType == iMultipleObjectType) && (iInstanceNumber == iMultipleInstanceNumber)) 
+           {
+              float iLastValue = ((BacnetNetVarOut)d).lastInValue
+              currentInFloatValue = ((BacnetNetVarOut)d).present_value
+              log.message("5555  checkWritePropertyMultiple::iLastValue=$iLastValue and currentInFloatValue=$currentInFloatValue")
+              if(iLastValue != currentInFloatValue)
+              {
+                 ((BacnetNetVarOut)d).lastInValue = ((BacnetNetVarOut)d).present_value
+                 return 1
+              }
+              else 
+              {
+                 return 0
+              }
+           }
+        }
+      }
+      return 0
+  }
+
+  int makeMultipleWritePropertyMultiplePacket()
+  {
+    if (bus == null) {
+        return 0
+    }
+    int iChangedValue = 0
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = device.maxSendAPDULength % 0x10
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 0
+    dataLength = 3
+    // Service Choice: writePropertyMultiple (16)
+    bacnetPacket[dataLength++] = 0x10
+    
+    for(int i = 0; i < bacnetWriteMultipleCount; i++)
+    {
+        // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+        int iMultipleObjectType = bacnetWriteMultipleList[i] / 0x400000
+        // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+        int iMultipleInstanceNumber = bacnetWriteMultipleList[i] % 0x400000
+        int isChanged = checkWritePropertyMultiple(
+                            iMultipleObjectType, iMultipleInstanceNumber)
+        if(isChanged == 1)
+        {
+            iChangedValue = iChangedValue + 1
+            log.message("5555  makeMultipleWritePropertyMultiplePacket iChangedValue=$iChangedValue and bacnetWriteMultipleCount=$bacnetWriteMultipleCount");
+            // ObjectIdentifier: analog-value, 0
+            bacnetPacket[dataLength++] = 0x0C
+            if(iMultipleObjectType > 4)
+            {
+                bacnetPacket[dataLength++] = iMultipleObjectType / 4
+            }
+            else 
+            {
+                bacnetPacket[dataLength++] = 0x00
+            }
+            bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
+            if(iMultipleInstanceNumber > 0x100)
+            {
+                bacnetPacket[dataLength++] = iMultipleInstanceNumber / 0x100
+            }
+            else 
+            {
+                bacnetPacket[dataLength++] = 0x00
+            }
+            bacnetPacket[dataLength++] = iMultipleInstanceNumber % 0x100
+            // .... .110 = Named Tag: Opening Tag (6)
+            bacnetPacket[dataLength++] = 0x1E
+            // Property Identifier: present-value (85)
+            bacnetPacket[dataLength++] = 0x09
+            bacnetPacket[dataLength++] = propertyIdentifier
+            
+            // .... .110 = Named Tag: Opening Tag (6)
+            bacnetPacket[dataLength++] = 0x2E
+           // Analog
+           if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
+           || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
+           || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+           {
+                // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
+                bacnetPacket[dataLength++] = 0x44
+                // bufFloat[0] = (float)in
+                bufFloat[0] = (float)currentInFloatValue;
+                int iLen = bus.encodeFloat(bufFloat, bufData)
+                for(int j = 0; j < iLen; j++)
+                {
+                   bacnetPacket[dataLength++] = bufData[j]
+                }
+            }
+            else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
+                 || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
+                 || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+            {
+                // Application Tag: Enumerated, Length/Value/Type: 1
+                bacnetPacket[dataLength++] = 0x91
+                if(currentInFloatValue == 0.0)
+                   bacnetPacket[dataLength++] = 0
+                else
+                   bacnetPacket[dataLength++] = 1
+            }
+            else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
+             || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
+             || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+            {
+                bufInteger[0] = (int)present_value
+                int iLen = bus.encodeUnsigned(bufInteger, bufData)
+                // Application Tag: Unsigned Integer, Length/Value/Type: 1
+                bacnetPacket[dataLength++] = 0x20 + iLen
+                for(int j = 0; j < iLen; j++)
+                {
+                   bacnetPacket[dataLength + iLen - j - 1] = bufData[j]
+                }
+                dataLength += iLen
+            }
+            // .... .111 = Named Tag: Closing Tag (7)
+            bacnetPacket[dataLength++] = 0x2F
+            // Priority: (Unsigned) 16
+            // Context Tag: 4, Length/Value/Type: 1
+            bacnetPacket[dataLength++] = 0x1F
+        }
+    }
+
+    if(iChangedValue > 0)
+    {
+        log.message("22222 makeMultipleWritePropertyMultiplePacket::bacnetPacket[$dataLength]")
+        for(int i =0 ; i < dataLength; i++)
+        {
+            buf[i] = (float)bacnetPacket[i]
+        }
+    }
+    return iChangedValue
+  }
+
+
+  void makeWritePropertyPacket()
+  {
+    if (bus == null) {
+        return 
+    }
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    log.message("makeWritePropertyPacket::maxSendAPDULength = ${device.maxSendAPDULength}")
+    
+    // .000 .... = Max Response Segments accepted: Unspecified (0)
+    // .... 0000 = Size of Maximum ADPU accepted: Up to MinimumMessageSize (50 octets) (0)
+    // Max Response Segments is zero
+    bacnetPacket[1] = device.maxSendAPDULength % 0x10
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = bus.invokeID
+    bus.invokeID = bus.invokeID + 1
+    if(bus.invokeID == 0xFF)
+       bus.invokeID = 1
+    dataLength = 3
+     // Service Choice: writeProperty (15)
+    bacnetPacket[dataLength++] = 0x0F
+    // ObjectIdentifier: analog-value, 14
+    bacnetPacket[dataLength++] = 0x0C
+    // 0000 0000 10.. .... .... .... .... .... = Object Type: analog-value (2)
+    if(objectNodeType > 4)
+    {
+        bacnetPacket[dataLength++] = objectNodeType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
+    // .... .... ..00 0000 0000 0000 0000 0001 = Instance Number: 1
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber
+    // Property Identifier: present-value (85)
+    bacnetPacket[dataLength++] = 0x19
+    bacnetPacket[dataLength++] = propertyIdentifier
+    
+    log.message("----------------- objectNodeType = $objectNodeType ----------------------")
+    // .... .110 = Named Tag: Opening Tag (6)
+    bacnetPacket[dataLength++] = 0x3E
+    // Analog
+    if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_INPUT) 
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_OUTPUT)
+    || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_ANALOG_VALUE))
+    {
+        // Application Tag: Real (ANSI/IEE-754 floating point), Length/Value/Type: 4
+        bacnetPacket[dataLength++] = 0x44
+        bufFloat[0] = (float)present_value
+        int iLen = bus.encodeFloat(bufFloat, bufData)
+        for(int i = 0; i < iLen; i++)
+        {
+           bacnetPacket[dataLength++] = bufData[i]
+        }
+    }
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_BINARY_VALUE))
+    {
+        // Application Tag: Enumerated, Length/Value/Type: 1
+        bacnetPacket[dataLength++] = 0x91
+        if(present_value == 0.0)
+           bacnetPacket[dataLength++] = 0
+        else
+           bacnetPacket[dataLength++] = 1
+    }
+    else if((objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_INPUT) 
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT)
+         || (objectNodeType == BacNetFieldBusIO.BACNET_OBJERCTTYPE_MULTISTATE_VALUE))
+    {
+        bufInteger[0] = (int)present_value
+        int iLen = bus.encodeUnsigned(bufInteger, bufData)
+        // Application Tag: Unsigned Integer, Length/Value/Type: 1
+        bacnetPacket[dataLength++] = 0x20 + iLen
+        for(int i = 0; i < iLen; i++)
+        {
+           bacnetPacket[dataLength + iLen - i - 1] = bufData[i]
+        }
+        dataLength += iLen
+    }
+    // .... .111 = Named Tag: Closing Tag (7)
+    bacnetPacket[dataLength++] = 0x3F
+    // Priority: (Unsigned) 16
+    // Context Tag: 4, Length/Value/Type: 1
+    bacnetPacket[dataLength++] = 0x49
+    // Priority: (Unsigned) 16
+    bacnetPacket[dataLength++] = 0x10
+    
+    log.message("22222 makeWritePropertyPacket::bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+        buf[i] = (float)bacnetPacket[i]
+  }
+
+  void getParentDevice()
+  {
+    if(Sys.app.lookup(this.parent) != null)
+    {
+        log.message("bacreadProperty:: get this.parent as Device") 
+        Component objDevice = Sys.app.lookup(this.parent)
+        if(objDevice.type.is(FieldBusDevice.type)) {
+            log.message("bacreadProperty:: set this.parent as Device") 
+            device = (FieldBusDevice)objDevice
+        }
+    }
+  }
+  
+  void getParentBus()
+  {
+    if(device != null)
+    {
+        if(Sys.app.lookup(device.parent) != null)
+        {
+            log.message("bacreadProperty:: get device.parent as Bus") 
+            Component objBus = Sys.app.lookup(device.parent)
+            if(objBus.type.is(FieldBusNet.type)) {
+                log.message("bacreadProperty:: set device.parent as Bus") 
+                bus = (FieldBusNet)objBus
+                update()
+            }
+        }
+    }
+  }
+  
+  virtual override void execute()
+  {
+    ** log.message("BacnetNetVarOut::execute 11111 status=$status") 
+    int iDelayCount = 0
+    if (bus == null) {
+        log.message("BacnetNetVarOut:: bus == null and status=$status")  // status=4 -> STATUSNODEV
+        getParentBus()
+        return
+    }
+    if(device == null){
+        log.message("BacnetNetVarOut:: device == null and status=$status")  // status=4 -> STATUSNODEV
+        getParentDevice()
+        return
+    }
+	if(isOutofService == true)
+	{
+		present_value := outofservice_value
+        log.message("BacnetNetVarOut:: isOutofService == true")  // status=4 -> STATUSNODEV
+        return
+	}
+    ** log.message("BacnetNetVarOut::execute 222222 bacnetWriteMultipleCount=$bacnetWriteMultipleCount") 
+    if (cache != 0 && bus != null && status <= STATUSREADY) {
+       if(isWriteMultiple == WRITE_PROPERTY)
+       {
+          ** log.message("23232323 sendInterval=$sendInterval") 
+          if(lastInValue != present_value) {
+              makeWritePropertyPacket()
+              log.message("BacWriteProperty after makeWritePropertyPacket($dataLength)")
+              if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+                ** log.message("device.readReg")
+			    if(device.iDeviceWritePropertyCount <= 255)
+			    {
+				   device.iDeviceWritePropertyCount = device.iDeviceWritePropertyCount + 1
+                    log.message("3434343434 iDeviceWritePropertyCount=${device.iDeviceWritePropertyCount}")
+			    }
+              } else {
+                log.message("BacWriteProperty Error")
+                status := STATUSOFFLINE
+              }
+              lastInValue = present_value
+          }       
+       }
+       else if(isWriteMultiple == WRITE_PROPERTY_MULTIPLE)
+       {
+           if(bacnetWriteMultipleCount == BACNET_WRITEMULTIPLE_NOTUSED){
+              if(lastInValue != present_value) {
+                  makeWritePropertyMultiplePacket()
+                  log.message("BacnetNetVarOut makeWritePropertyMultiplePacket($dataLength)")
+                  if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+                    ** log.message("device.readReg")
+			        if(device.iDeviceWritePropertyCount <= 255)
+			        {
+				       device.iDeviceWritePropertyCount = device.iDeviceWritePropertyCount + 1
+                    	log.message("3434343434 iDeviceWritePropertyCount=${device.iDeviceWritePropertyCount}")
+			        }
+                  } else {
+                    log.message("BacnetNetVarOut Error")
+                    status := STATUSOFFLINE
+                  }
+                  lastInValue = present_value
+              }
+           }
+           else if(bacnetWriteMultipleCount == BACNET_WRITEMULTIPLE_DONOTHING){
+              log.message("WriteMultiple Disable")
+           }
+           else if(bacnetWriteMultipleCount > BACNET_WRITEMULTIPLE_DONOTHING){
+              int iChangedValue = makeMultipleWritePropertyMultiplePacket()
+              log.message("makeMultipleWritePropertyMultiplePacket return $iChangedValue")
+              if(iChangedValue > 0)
+              {
+                  log.message("BacnetNetVarOut makeMultipleWritePropertyMultiplePacket($dataLength)")
+                  if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+                     ** log.message("device.readReg")
+			         if(device.iDeviceWritePropertyCount <= 255)
+			         {
+				        device.iDeviceWritePropertyCount = device.iDeviceWritePropertyCount + bacnetWriteMultipleCount
+                    	log.message("3434343434 iDeviceWritePropertyCount=${device.iDeviceWritePropertyCount}")
+			         }
+                  } else {
+                     log.message("BacnetNetVarOut Error")
+                     status := STATUSOFFLINE
+                  }
+              }
+           }
+       }
+       else
+       {
+           log.message("BacnetNetVarOut WriteMultiple Flag Error")
+       }
+    }
+    ** log.message("33333 status=$status") 
+  }
+
+  int checkWritePropertyData()
+  {
+    return 0
+  }
+  
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
+  define int BACNET_WRITEMULTIPLE_DONOTHING  = 0
+  
+  define int SEND_INTERVAL = 10
+  private inline float[1024] buf
+  static inline byte[1024] bacnetPacket
+  int dataLength
+  // Send interval counter
+  public float lastInValue = 0.0
+
+  private inline int[2]    bufInteger
+  private inline float[2]  bufFloat
+  private inline double[2] bufDouble
+  static inline byte[8]    bufData
+  
+  // -1                - We donot use WriteMultiple
+  // 0                 - We use WriteMultiple and do nothing
+  // Positive number   - We use WriteMultiple and use instance number list
+  int                     bacnetWriteMultipleCount = BACNET_WRITEMULTIPLE_NOTUSED
+  inline int[128]  bacnetWriteMultipleList
+  
+  float                    currentInFloatValue
+}
+

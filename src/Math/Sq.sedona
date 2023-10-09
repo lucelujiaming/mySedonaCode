@@ -1,0 +1,19 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Sq
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  virtual override void execute()
+  {
+    buf[0] = in
+    if (Runtime.mathSq(buf) == 0)
+    {
+      out := buf[1]
+    }
+  }
+
+  private inline float[2] buf
+}

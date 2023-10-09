@@ -1,0 +1,101 @@
+abstract class FieldBusNet
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, Busy, Ready, NoDev, NoReg, END"
+  define int STATUSOK = 0
+  define int STATUSBUSY = 1
+  define int STATUSREADY = 2
+  define int STATUSNODEV = 3
+  define int STATUSNOREG = 4
+  define int STATUSEND = 5
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSOK
+
+  void notifyFlush()
+  {
+    needFlush = true
+  }
+
+  virtual void update()
+  {
+  }
+
+  virtual int readReg(int a, int b, int c, float[] buf)
+  {
+    return 0
+  }
+
+  virtual int writeReg(int a, int b, int c, float[] buf)
+  {
+    return 0
+  }
+
+  override bool allowChildExecute()
+  {
+    return false
+  }
+
+  
+  virtual int decodeDouble(byte[] data, double[] value)
+  {
+      return -1;
+  }
+
+  virtual int decodeFloat(byte[] data, float[] value)
+  {
+      return -1;
+  }
+
+  virtual int decodeUnsigned(byte[] data, int iLen, int[] value)
+  {
+      return -1;
+  }
+
+  virtual int decodeInteger(byte[] data, int iLen, int[] value)
+  {
+      return -1;
+  }
+  
+  virtual int encodeDouble(double[] data, byte[] value)
+  {
+      return -1;
+  }
+
+  virtual int encodeFloat(float[] data, byte[] value)
+  {
+      return -1;
+  }
+
+  virtual int encodeUnsigned(int[] data, byte[] value)
+  {
+      return -1;
+  }
+  virtual void setBacReadPropertyVarByProperty(FieldBusDevice device, 
+                int propertyVar, int iObjectType, int iInstanceNumber,
+                  int tagNumber, byte[] data, int iLen)
+  {
+  }
+  // inline float[8] buffer
+  // bacNet buffer is larger.
+  inline float[1024] buffer
+  bool needFlush = false
+  //  1    mbrtu1
+  //  2    mbrtu2
+  // 11    mbtcps
+  // 12    mbtcpc
+  // 21    bip
+  // 22    mstp
+  int busId = 0
+  
+  // Move from FieldBusDevice
+  int invokeID = 1
+}

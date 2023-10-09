@@ -1,0 +1,17 @@
+
+@niagaraIcon="module://icons/x16/control/control.png"
+class Rand
+  extends Component
+{
+  // out is the sum of all inputs
+  @readonly property float out
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+   
+    out := ((float)Sys.rand() / (float)Sys.maxInt)
+  }
+}

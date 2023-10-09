@@ -1,0 +1,30 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Norm
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  @config @defaultOnClone
+  property float min
+
+  @config @defaultOnClone
+  property float max
+
+  virtual override void execute()
+  {
+    float delta = max - min
+    if (delta != 0.0) {
+      if ((delta > 0.0 && in > max) || (delta < 0.0 && in > min)) {
+        out := 1.0
+      } else if ((delta > 0.0 && in < min) || (delta < 0.0 && in > min)) {
+        out := 0.0
+      } else {
+        out := (in - min) / delta
+      }
+    } else {
+      out := in
+    }
+  }
+}

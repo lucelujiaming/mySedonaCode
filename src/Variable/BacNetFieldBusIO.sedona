@@ -1,0 +1,278 @@
+abstract class BacNetFieldBusIO
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, OffLine, Ready, NoNet, NoDev, AddrErr, UrlErr, END"
+  define int STATUSOK = 0
+  define int STATUSOFFLINE = 1
+  define int STATUSREADY = 2
+  define int STATUSNONET = 3
+  define int STATUSNODEV = 4
+  define int STATUSEADDR = 5 // set by net
+  define int STATUSEURL = 6
+  define int STATUSEND = 7
+
+  define Str BANET_PROPVAR_RANGE = "NULL, Boolean, UnsignedInteger, Integer, Float, Double, END"
+  // define int BANET_PROPVAR_UNUSEDAPPTAG                = 0xFF
+  define int BANET_PROPVAR_NULLAPPTAG                = 0x00
+  define int BANET_PROPVAR_BOOLEANAPPTAG                = 0x01
+  define int BANET_PROPVAR_UNSIGNEDINTAPPTAG            = 0x02
+  define int BANET_PROPVAR_INTEGERAPPTAG                = 0x03
+  define int BANET_PROPVAR_REALAPPTAG                = 0x04
+  define int BANET_PROPVAR_DOUBLEAPPTAG                = 0x05
+  
+  define int BANET_PROPVAR_OCTETSTRINGAPPTAG            = 0x06
+  define int BANET_PROPVAR_CHARACTERSTRINGAPPTAG        = 0x07
+  define int BANET_PROPVAR_BITSTRINGAPPTAG                = 0x08
+  define int BANET_PROPVAR_ENUMERATEDAPPTAG                = 0x09
+  define int BANET_PROPVAR_DATEAPPTAG                = 0x0A
+  define int BANET_PROPVAR_TIMEAPPTAG                = 0x0B
+  define int BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG    = 0x0C
+  define int BANET_PROPVAR_END                            = 0x0D
+  // define int BANET_PROPVAR_RESERVEDAPPTAG13            = 0x0D
+  // define int BANET_PROPVAR_RESERVEDAPPTAG14            = 0x0E
+  // define int BANET_PROPVAR_RESERVEDAPPTAG15            = 0x0F
+
+  define Str OBJECT_TYPE_RANGE = 
+        "AnalogInput, AnalogOutput, AnalogValue, BinaryInput, BinaryOutput, BinaryValue, MultiStateInput, MultiStateOutput, MultiStateValue"
+  define int OBJECT_TYPE_ANALOG_INPUT              = 0x00
+  define int OBJECT_TYPE_ANALOG_OUTPUT             = 0x01
+  define int OBJECT_TYPE_ANALOG_VALUE              = 0x02
+  define int OBJECT_TYPE_BINARY_INPUT              = 0x03
+  define int OBJECT_TYPE_BINARY_OUTPUT             = 0x04
+  define int OBJECT_TYPE_BINARY_VALUE              = 0x05
+  define int OBJECT_TYPE_MULTISTATE_INPUT           = 0x06
+  define int OBJECT_TYPE_MULTISTATE_OUTPUT          = 0x07
+  define int OBJECT_TYPE_MULTISTATE_VALUE           = 0x08
+  
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @summary=false
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSNODEV
+
+  @config
+  @range = OBJECT_TYPE_RANGE
+  @fieldWidth = 200
+  property int objectType = OBJECT_TYPE_ANALOG_VALUE
+  
+  @config
+  property int instanceNumber = 0
+  
+  @config
+  property bool isOutofService = false
+  
+  @config
+  property float outofservice_value = 0.0f
+  
+  // Example1:
+  // Property Identifier: (374) Reserved for Use by ASHRAE (374)
+  //     Context Tag: 1, Length/Value/Type: 2
+  //         .... 1... = Tag Class: Context Specific Tag
+  //         0001 .... = Context Tag Number: 1
+  //         Length Value Type: 2
+  //     Property Identifier: Unknown (374) = 0x176
+  // property int propertyIdentifier = 0x176 // 0x1A0176
+  // @config
+  // property int propertyIdentifier = 0x4D // 0x1A0176
+  // Example2:
+  // Property Identifier: object-name (77)
+  // Now we set it as Property Identifier: present-value (85) forever
+  
+  override void loaded()
+  {
+    update()
+  }
+  override void stop()
+  {
+    if (bus != null) {
+      bus.notifyFlush()
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  void update()
+  {
+    busId = 0
+    if (bus != null) {
+      bus.notifyFlush()
+    }
+    status := STATUSNODEV
+    Str tmpBuf = ""
+    FieldBusNet tmpBus = lookupNetByDeviceName(tmpBuf)
+    if (tmpBus != null) {
+        busId = tmpBus.busId
+        ** log.message("444444 busId=$busId")
+        // trigger notify flush.
+        if (busId != 0) {
+          log.message("55555 busId=$busId")
+          bus = lookupNetById(busId)
+          if (bus != null) {
+              log.message("66666 bus.notifyFlush()")
+            bus.notifyFlush()
+          }
+        } else {
+          log.message("77777 tmpBus.notifyFlush()")
+          tmpBus.notifyFlush()
+        }
+    }
+          
+    if(bus != null)
+    {
+       log.message("987654321 ")
+    } else {
+       log.message("123456789 ") 
+    }
+  }
+
+  private FieldBusNet lookupNetById(int id)
+  {
+    Component root
+    Component f
+    Component n
+    Component p = this
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && f.name.equals("service")) {
+        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+          if (n.type.is(FieldBusNet.type) && ((FieldBusNet)n).busId == id) {
+            return (FieldBusNet)n
+          }
+        }
+      }
+    }
+
+    return null
+  }
+  
+  private FieldBusNet lookupNetByDeviceName(Str devName)
+  {
+    Component root
+    Component f
+    Component n
+    Component p = this
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && f.name.equals("service")) {
+        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+          if (n.type.is(FieldBusNet.type)) {
+            for (p = Sys.app.lookup(n.children); p != null; p = Sys.app.lookup(p.nextSibling)) {
+              if (p.type.is(FieldBusDevice.type) && devName.equals(((FieldBusDevice)p).deviceName.toStr())) {
+                return (FieldBusNet)n
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return null
+  }
+  
+  /*
+  private FieldBusDevice lookupDeviceByDeviceName(Str devName)
+  {
+    Component root
+    Component f
+    Component n
+    Component p = this
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && f.name.equals("service")) {
+        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+          if (n.type.is(FieldBusNet.type)) {
+            for (p = Sys.app.lookup(n.children); p != null; p = Sys.app.lookup(p.nextSibling)) {
+              if (p.type.is(FieldBusDevice.type) && devName.equals(((FieldBusDevice)p).deviceName.toStr())) {
+                return (FieldBusDevice)p
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return null
+  }
+  */
+
+  int convertObjectTypeToBacNetObjectType(int iObjectType)
+  {
+     log.message("-----------  iObjectType=$iObjectType --------------------") 
+     if((iObjectType >= OBJECT_TYPE_ANALOG_INPUT) 
+     && (iObjectType <= OBJECT_TYPE_BINARY_VALUE))
+     {
+        return iObjectType
+     }
+     else
+     {
+        if(iObjectType == OBJECT_TYPE_MULTISTATE_INPUT)
+           return BACNET_OBJERCTTYPE_MULTISTATE_INPUT
+        else if(iObjectType == OBJECT_TYPE_MULTISTATE_OUTPUT)
+           return BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT
+        else if(iObjectType == OBJECT_TYPE_MULTISTATE_VALUE)
+           return BACNET_OBJERCTTYPE_MULTISTATE_VALUE
+     }
+     log.message("----------- ERROR ObjectType --------------------") 
+     return -1
+  }
+  
+  // define Log log
+  
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  // P414 - BACnetObjectType
+  static int BACNET_OBJERCTTYPE_ANALOG_INPUT  =  0
+  static int BACNET_OBJERCTTYPE_ANALOG_OUTPUT =  1
+  static int BACNET_OBJERCTTYPE_ANALOG_VALUE  =  2
+  static int BACNET_OBJERCTTYPE_BINARY_INPUT  =  3
+  static int BACNET_OBJERCTTYPE_BINARY_OUTPUT =  4
+  static int BACNET_OBJERCTTYPE_BINARY_VALUE  =  5
+  
+  static int BACNET_OBJERCTTYPE_MULTISTATE_INPUT  =  13
+  static int BACNET_OBJERCTTYPE_MULTISTATE_OUTPUT =  14
+  static int BACNET_OBJERCTTYPE_MULTISTATE_VALUE  =  19
+  
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  FieldBusNet bus = null
+  FieldBusDevice device = null
+  int cache = 0
+
+  int busId = 0
+  int regId = 0
+  // int typeId = 0
+  // int dataLen = 0
+
+  // Property Identifier: present-value (85)
+  int propertyIdentifier = 85
+
+  bool isEnableRPM = false;
+  bool isEnableWPM = false;  
+
+  int objectNodeType = BACNET_OBJERCTTYPE_ANALOG_VALUE
+  
+}

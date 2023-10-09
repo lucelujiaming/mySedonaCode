@@ -1,0 +1,21 @@
+@niagaraIcon="module://icons/x16/control/util/limit.png"
+class InRange
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  property float min
+
+  property float max
+
+  virtual override void execute()
+  {
+    if (min <= in && in <= max) {
+      out := 1.0
+    } else {
+      out := 0.0
+    }
+  }
+}

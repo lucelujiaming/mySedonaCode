@@ -1,0 +1,454 @@
+//
+// Copyright (c) 2011 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//   02 Feb 2011  Clif Turman    Creation
+//
+
+**
+** Max selects the highest of inputs to send to the output
+**
+@niagaraIcon="module://icons/x16/control/control.png"
+class MinMax
+  extends Component
+{
+    ** Enable count
+    @config
+    property int enableCount = 2
+    
+    ** the computed min of all in's'
+    @readonly property float minOut
+
+    ** the computed max of all in's'
+    @readonly property float maxOut
+
+    ** first value for comparison
+    property float in1 = 0.0
+
+    ** second value for comparison
+    property float in2 = 0.0
+  
+    ** third value for comparison
+    property float in3 = 0.0
+
+    ** 4th value for comparison
+    property float in4 = 0.0
+
+    ** 5th value for comparison
+    property float in5 = 0.0
+
+    ** 6th value for comparison
+    property float in6 = 0.0
+
+    ** 7th value for comparison
+    property float in7 = 0.0
+
+    ** 8th value for comparison
+    property float in8 = 0.0
+
+    ** 9th value for comparison
+    property float in9 = 0.0
+
+    ** 10th value for comparison
+    property float in10 = 0.0
+
+    ** 11th value for comparison
+    property float in11 = 0.0
+
+    ** 12th value for comparison
+    property float in12 = 0.0
+
+    ** 13th value for comparison
+    property float in13 = 0.0
+
+    ** 14th value for comparison
+    property float in14 = 0.0
+
+    ** 15th value for comparison
+    property float in15 = 0.0
+
+    ** 16th value for comparison
+    property float in16 = 0.0
+
+    ** 17th value for comparison
+    property float in17 = 0.0
+
+    ** 18th value for comparison
+    property float in18 = 0.0
+
+    ** 19th value for comparison
+    property float in19 = 0.0
+
+    ** 20th value for comparison
+    property float in20 = 0.0
+
+    ** 21th value for comparison
+    property float in21 = 0.0
+
+    ** 22th value for comparison
+    property float in22 = 0.0
+
+    ** 23th value for comparison
+    property float in23 = 0.0
+
+    ** 24th value for comparison
+    property float in24 = 0.0
+
+    ** 25th value for comparison
+    property float in25 = 0.0
+
+    ** 26th value for comparison
+    property float in26 = 0.0
+
+    ** 27th value for comparison
+    property float in27 = 0.0
+
+    ** 28th value for comparison
+    property float in28 = 0.0
+
+    ** 29th value for comparison
+    property float in29 = 0.0
+
+    ** 30th value for comparison
+    property float in30 = 0.0
+
+    ** 31th value for comparison
+    property float in31 = 0.0
+
+    ** 32th value for comparison
+    property float in32 = 0.0
+
+    ** 33th value for comparison
+    property float in33 = 0.0
+
+    ** 34th value for comparison
+    property float in34 = 0.0
+
+    ** 35th value for comparison
+    property float in35 = 0.0
+
+    ** 36th value for comparison
+    property float in36 = 0.0
+
+    ** 37th value for comparison
+    property float in37 = 0.0
+
+    ** 38th value for comparison
+    property float in38 = 0.0
+
+    ** 39th value for comparison
+    property float in39 = 0.0
+
+    ** 40th value for comparison
+    property float in40 = 0.0
+
+    ** 41th value for comparison
+    property float in41 = 0.0
+
+    ** 42th value for comparison
+    property float in42 = 0.0
+
+    ** 43th value for comparison
+    property float in43 = 0.0
+
+    ** 44th value for comparison
+    property float in44 = 0.0
+
+    ** 45th value for comparison
+    property float in45 = 0.0
+
+    ** 46th value for comparison
+    property float in46 = 0.0
+
+    ** 47th value for comparison
+    property float in47 = 0.0
+
+    ** 48th value for comparison
+    property float in48 = 0.0
+
+    ** 49th value for comparison
+    property float in49 = 0.0
+
+    ** 50th value for comparison
+    property float in50 = 0.0
+
+    ** 51th value for comparison
+    property float in51 = 0.0
+
+    ** 52th value for comparison
+    property float in52 = 0.0
+
+    ** 53th value for comparison
+    property float in53 = 0.0
+
+    ** 54th value for comparison
+    property float in54 = 0.0
+
+    ** 55th value for comparison
+    property float in55 = 0.0
+
+    ** 56th value for comparison
+    property float in56 = 0.0
+
+    ** 57th value for comparison
+    property float in57 = 0.0
+
+    ** 58th value for comparison
+    property float in58 = 0.0
+
+    ** 59th value for comparison
+    property float in59 = 0.0
+
+    ** 60th value for comparison
+    property float in60 = 0.0
+
+    ** 61th value for comparison
+    property float in61 = 0.0
+
+    ** 62th value for comparison
+    property float in62 = 0.0
+
+    ** 63th value for comparison
+    property float in63 = 0.0
+
+    ** 64th value for comparison
+    property float in64 = 0.0
+
+    ** 65th value for comparison
+    property float in65 = 0.0
+
+    ** 66th value for comparison
+    property float in66 = 0.0
+
+    ** 67th value for comparison
+    property float in67 = 0.0
+
+    ** 68th value for comparison
+    property float in68 = 0.0
+
+    ** 69th value for comparison
+    property float in69 = 0.0
+
+    ** 70th value for comparison
+    property float in70 = 0.0
+
+    ** 71th value for comparison
+    property float in71 = 0.0
+
+    ** 72th value for comparison
+    property float in72 = 0.0
+
+    ** 73th value for comparison
+    property float in73 = 0.0
+
+    ** 74th value for comparison
+    property float in74 = 0.0
+
+    ** 75th value for comparison
+    property float in75 = 0.0
+
+    ** 76th value for comparison
+    property float in76 = 0.0
+
+    ** 77th value for comparison
+    property float in77 = 0.0
+
+    ** 78th value for comparison
+    property float in78 = 0.0
+
+    ** 79th value for comparison
+    property float in79 = 0.0
+
+    ** 80th value for comparison
+    property float in80 = 0.0
+
+    ** 81th value for comparison
+    property float in81 = 0.0
+
+    ** 82th value for comparison
+    property float in82 = 0.0
+
+    ** 83th value for comparison
+    property float in83 = 0.0
+
+    ** 84th value for comparison
+    property float in84 = 0.0
+
+    ** 85th value for comparison
+    property float in85 = 0.0
+
+    ** 86th value for comparison
+    property float in86 = 0.0
+
+    ** 87th value for comparison
+    property float in87 = 0.0
+
+    ** 88th value for comparison
+    property float in88 = 0.0
+
+    ** 89th value for comparison
+    property float in89 = 0.0
+
+    ** 90th value for comparison
+    property float in90 = 0.0
+
+    ** 91th value for comparison
+    property float in91 = 0.0
+
+    ** 92th value for comparison
+    property float in92 = 0.0
+
+    ** 93th value for comparison
+    property float in93 = 0.0
+
+    ** 94th value for comparison
+    property float in94 = 0.0
+
+    ** 95th value for comparison
+    property float in95 = 0.0
+
+    ** 96th value for comparison
+    property float in96 = 0.0
+
+    ** 97th value for comparison
+    property float in97 = 0.0
+
+    ** 98th value for comparison
+    property float in98 = 0.0
+
+    ** 99th value for comparison
+    property float in99 = 0.0
+
+    ** 100th value for comparison
+    property float in100 = 0.0
+
+  **
+  ** Execute the comparison
+  **
+  virtual override void execute()
+  {
+    if(enableCount >= 100)
+       return 
+    setAllCompareValues()
+    float outMaxCompare = sampleValue[0];
+    float outMinCompare = sampleValue[0];
+    for(int i = 1; i < enableCount; i++)
+    {
+      if(outMaxCompare < sampleValue[i])
+        outMaxCompare = sampleValue[i]
+      if(outMinCompare > sampleValue[i])
+        outMinCompare = sampleValue[i]
+    }
+    minOut := outMinCompare
+    maxOut := outMaxCompare
+  }
+
+  void setAllCompareValues()
+  {
+    sampleValue[0] = in1
+    sampleValue[1] = in2
+    sampleValue[2] = in3
+    sampleValue[3] = in4
+    sampleValue[4] = in5
+    sampleValue[5] = in6
+    sampleValue[6] = in7
+    sampleValue[7] = in8
+    sampleValue[8] = in9
+    sampleValue[9] = in10
+    sampleValue[10] = in11
+    sampleValue[11] = in12
+    sampleValue[12] = in13
+    sampleValue[13] = in14
+    sampleValue[14] = in15
+    sampleValue[15] = in16
+    sampleValue[16] = in17
+    sampleValue[17] = in18
+    sampleValue[18] = in19
+    sampleValue[19] = in20
+    sampleValue[20] = in21
+    sampleValue[21] = in22
+    sampleValue[22] = in23
+    sampleValue[23] = in24
+    sampleValue[24] = in25
+    sampleValue[25] = in26
+    sampleValue[26] = in27
+    sampleValue[27] = in28
+    sampleValue[28] = in29
+    sampleValue[29] = in30
+    sampleValue[30] = in31
+    sampleValue[31] = in32
+    sampleValue[32] = in33
+    sampleValue[33] = in34
+    sampleValue[34] = in35
+    sampleValue[35] = in36
+    sampleValue[36] = in37
+    sampleValue[37] = in38
+    sampleValue[38] = in39
+    sampleValue[39] = in40
+    sampleValue[40] = in41
+    sampleValue[41] = in42
+    sampleValue[42] = in43
+    sampleValue[43] = in44
+    sampleValue[44] = in45
+    sampleValue[45] = in46
+    sampleValue[46] = in47
+    sampleValue[47] = in48
+    sampleValue[48] = in49
+    sampleValue[49] = in50
+    sampleValue[50] = in51
+    sampleValue[51] = in52
+    sampleValue[52] = in53
+    sampleValue[53] = in54
+    sampleValue[54] = in55
+    sampleValue[55] = in56
+    sampleValue[56] = in57
+    sampleValue[57] = in58
+    sampleValue[58] = in59
+    sampleValue[59] = in60
+    sampleValue[60] = in61
+    sampleValue[61] = in62
+    sampleValue[62] = in63
+    sampleValue[63] = in64
+    sampleValue[64] = in65
+    sampleValue[65] = in66
+    sampleValue[66] = in67
+    sampleValue[67] = in68
+    sampleValue[68] = in69
+    sampleValue[69] = in70
+    sampleValue[70] = in71
+    sampleValue[71] = in72
+    sampleValue[72] = in73
+    sampleValue[73] = in74
+    sampleValue[74] = in75
+    sampleValue[75] = in76
+    sampleValue[76] = in77
+    sampleValue[77] = in78
+    sampleValue[78] = in79
+    sampleValue[79] = in80
+    sampleValue[80] = in81
+    sampleValue[81] = in82
+    sampleValue[82] = in83
+    sampleValue[83] = in84
+    sampleValue[84] = in85
+    sampleValue[85] = in86
+    sampleValue[86] = in87
+    sampleValue[87] = in88
+    sampleValue[88] = in89
+    sampleValue[89] = in90
+    sampleValue[90] = in91
+    sampleValue[91] = in92
+    sampleValue[92] = in93
+    sampleValue[93] = in94
+    sampleValue[94] = in95
+    sampleValue[95] = in96
+    sampleValue[96] = in97
+    sampleValue[97] = in98
+    sampleValue[98] = in99
+    sampleValue[99] = in100
+  }
+  
+  private inline float[100] sampleValue
+}
+
+

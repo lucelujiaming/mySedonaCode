@@ -1,0 +1,20 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class COV
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  virtual override void execute()
+  {
+      if (in != lastIn) {
+        lastIn = in
+        out := 1.0
+      } else {
+        out := 0.0
+      }
+  }
+
+  private float lastIn = 0.0
+}

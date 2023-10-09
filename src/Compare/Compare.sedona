@@ -1,0 +1,77 @@
+@niagaraIcon="module://icons/x16/control/logic/lessThan.png"
+class Compare
+  extends Component
+{
+    define Str COMPAREMETHOD        = "Greater, GreaterEqual, Less, LessEqual, Equal, NotEqual"
+    define int COMPARE_GREATER        = 0
+    define int COMPARE_GREATEREQUAL   = 1
+    define int COMPARE_LESS           = 2
+    define int COMPARE_LESSEQUAL      = 3
+    define int COMPARE_EQUAL          = 4
+    define int COMPARE_NOTEQUAL       = 5
+  // Lujiaming add these end at 23/05/22
+
+  // dataExpectingReplyNPCI
+  @config
+  @range = COMPAREMETHOD
+  @fieldWidth = 200
+  property int compareOperation = COMPARE_GREATER
+  
+  @readonly property float out
+
+  property float x
+
+  property float y
+
+  virtual override void execute()
+  {
+    if(compareOperation == COMPARE_GREATER)
+    {
+        if (x > y) {
+          out := 1.0f
+        } else {
+          out := 0.0f
+        }    
+    }
+    else if(compareOperation == COMPARE_GREATEREQUAL)
+    {
+        if (x >= y) {
+          out := 1.0f
+        } else {
+          out := 0.0f
+        }    
+    }
+    else if(compareOperation == COMPARE_LESS)
+    {
+        if (x < y) {
+          out := 1.0f
+        } else {
+          out := 0.0f
+        }    
+    }
+    else if(compareOperation == COMPARE_LESSEQUAL)
+    {
+        if (x <= y) {
+          out := 1.0f
+        } else {
+          out := 0.0f
+        }    
+    }
+    else if(compareOperation == COMPARE_EQUAL)
+    {
+        if (x == y) {
+          out := 1.0f
+        } else {
+          out := 0.0f
+        }
+    }
+    else if(compareOperation == COMPARE_NOTEQUAL)
+    {
+        if (x != y) {
+          out := 1.0f
+        } else {
+          out := 0.0f
+        }    
+    }
+  }
+}

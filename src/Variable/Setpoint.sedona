@@ -1,0 +1,95 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class Setpoint
+  extends Component
+{
+  @config @asStr
+  property Buf(32) url = ""
+
+  @asStr
+  @readonly
+  property Buf(32) pointName = ""
+
+  @readonly
+  property float out = 0.0f
+
+  property float in = 0.0f
+
+  override void start()
+  {
+    Runtime.load()
+    if (url.toStr().length() > 0) {
+      pointName.clear()
+      pointName.copyFromStr(url.toStr())
+      ctx = Runtime.dataOpen(pointName.toStr())
+      if (ctx != -1) {
+        Runtime.dataRead(ctx, buf)
+        out := buf[0]
+      }
+    }
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == Setpoint.url) {
+      if (ctx != -1) {
+        Runtime.dataClose(ctx)
+        ctx = -1
+      }
+      if (url.toStr().length() > 0) {
+        pointName.clear()
+        pointName.copyFromStr(url.toStr())
+        ctx = Runtime.dataOpen(pointName.toStr())
+        if (ctx != -1) {
+          Runtime.dataRead(ctx, buf)
+          out := buf[0]
+        }
+      }
+    }
+  }
+  override void stop()
+  {
+    if (ctx != -1) {
+      Runtime.dataClose(ctx)
+      ctx = -1
+    }
+  }
+  override void execute()
+  {
+    if (ctx != -1 && isSlotLinkToIN()) {
+      if (initCnt < 0) {
+        initCnt++
+        lastIn = in
+      } else if (lastIn != in) {
+        lastIn = in
+        buf[0] = in
+        Runtime.dataWrite(ctx, buf)
+      }
+    } else {
+      initCnt = -20
+    }
+    if (ctx != -1) {
+      Runtime.dataRead(ctx, buf)
+      out := buf[0]
+    }
+    if (url.toStr().length() != pointName.toStr().length()) {
+      pointName.clear()
+      pointName.copyFromStr(url.toStr())
+    }
+  }
+
+  private bool isSlotLinkToIN()
+  {
+    for (Link link = linksTo; link != null; link = link.nextTo) {
+      Slot slot = type.slot(link.toSlot)
+      if (slot == Setpoint.in) {
+        return true
+      }
+    }
+    return false
+  }
+
+  private int ctx = -1
+  private int initCnt = -20
+  private float lastIn
+  private inline float[1] buf
+}

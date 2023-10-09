@@ -1,0 +1,13 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class Const
+  extends Component
+{
+  @readonly property float out
+
+  @config property float value = 0.0
+
+  virtual override void execute()
+  {
+    out := value
+  }
+}

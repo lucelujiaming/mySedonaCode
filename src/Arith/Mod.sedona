@@ -1,0 +1,31 @@
+//
+//
+//
+// out = in1 % in2
+//
+@niagaraIcon="module://icons/x16/control/control.png"
+class Mod
+  extends Component
+{
+  // out is the sum of all inputs
+  @readonly property float out
+
+  // input 1
+  property float in1
+
+  // input 2
+  property float in2
+
+  //
+  // Execute is called once every scan.
+  //
+  virtual override void execute()
+  {
+    int num = (int)in2
+    if (num != 0) {
+      out := (float)((int)in1 % num)
+    } else {
+      out := 0.0
+    }
+  }
+}

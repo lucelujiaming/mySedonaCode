@@ -1,0 +1,17 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Abs
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  virtual override void execute()
+  {
+    if (in >= 0.0) {
+      out := in
+    } else {
+      out := (in * -1.0)
+    }
+  }
+}

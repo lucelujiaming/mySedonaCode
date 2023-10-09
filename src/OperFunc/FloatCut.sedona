@@ -1,0 +1,15 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class FloatCut
+  extends Component
+{
+  property float in
+  @readonly property float out1
+  @readonly property float out2
+
+  virtual override void execute()
+  {
+      out1 := (float)((int)in / 1);
+      out2 := in - out1;
+  }
+
+}

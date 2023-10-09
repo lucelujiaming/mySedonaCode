@@ -17,8 +17,7 @@
   <depend on="Arith 0.1"   />
   <depend on="Schedule 0.1"   />
   <depend on="Variable 0.1"   />
-  <depend on="ModBus 0.1"   />
-  <depend on="BacNet 0.1"   />
+  <depend on="FieldBus 0.1"   />
   <depend on="PID 0.1"   />
   <depend on="Timer 0.1"   />
   <depend on="Math 0.1"   />

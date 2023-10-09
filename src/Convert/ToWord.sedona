@@ -1,0 +1,13 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class ToWord
+  extends Component
+{
+  @readonly property int out
+
+  property float in
+
+  virtual override void execute()
+  {
+      out := ((int)in) & 0xFFFF
+  }
+}

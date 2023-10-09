@@ -1,0 +1,11 @@
+abstract class FieldBusSchedule
+  extends Component
+{
+  @asStr
+  @config
+  property Buf(16) url = ""
+
+
+  @readonly
+  property float presentValue = 0.0f
+}

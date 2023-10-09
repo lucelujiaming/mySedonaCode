@@ -1,0 +1,75 @@
+abstract class FieldBusDevice
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, OffLine, Ready, NoNet, NoReg, InnerErr, AddrErr, NameErr, END"
+  define int STATUSOK = 0
+  define int STATUSOFFLINE = 1
+  define int STATUSREADY = 2
+  define int STATUSNONET = 3
+  define int STATUSNOREG = 4
+  define int STATUSEINNER = 5 // set by net
+  define int STATUSEADDR = 6 // config err
+  define int STATUSENAME = 7
+  define int STATUSEND = 8
+
+  virtual int writeReg(int a, int b, int c, float[] buf)
+  {
+     log.message("---------------FieldBusDevice---------------");
+     return 0
+  }
+  virtual bool openPort(bool logError)
+  {
+     return true
+  }
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSNOREG
+
+  @asStr
+  @config
+  property Buf(64) deviceName = ""
+
+  @asStr
+  @config
+  property Buf(64) deviceLocation = ""
+
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  define int READ_PROPERTY_MULTIPLE_SUPPORT_NONE    = 0
+  define int READ_PROPERTY_MULTIPLE_CHECKING        = 1
+  define int READ_PROPERTY_MULTIPLE_NOT_SUPPORT     = 2
+  define int READ_PROPERTY_MULTIPLE_SUPPORTED       = 3
+  
+  Str dataRecvGramAddr
+  // int objectIdentifier
+  int sourceNetworkAddress
+  // int invokeID = 1
+  
+  // SADR: 5
+  int sadr = 0
+  int maxRecvAPDULength = 255
+  // Max Resp: 
+  //      B'0000'   Up to MinimumMessageSize (50 octets)
+  //      B'0001'   Up to 128 octets
+  //      B'0010'   Up to 206 octets (fits in a LonTalk frame)
+  //      B'0011'   Up to 480 octets (fits in an ARCNET frame)
+  //      B'0100'   Up to 1024 octets
+  //      B'0101'   Up to 1476 octets (fits in an ISO 8802-3 frame)
+  //      B'0101' is 0x05
+  int maxSendAPDULength = 0x05
+  
+  int readPropertyMultipleSupport = READ_PROPERTY_MULTIPLE_SUPPORT_NONE
+  
+   // Device status
+   public int iDeviceWritePropertyCount = 0
+   public int iDeviceReadPropertyCount = 0
+   
+}

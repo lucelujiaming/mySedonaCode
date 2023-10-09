@@ -1,0 +1,21 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class Sqrt
+  extends Component
+{
+  @readonly property float out
+
+  property float in
+
+  virtual override void execute()
+  {
+    buf[0] = in
+    if (buf[0] >= 0.0 && Runtime.mathSqrt(buf) == 0)
+    {
+      out := buf[1]
+    } else {
+      out := 0.0
+    }
+  }
+
+  private inline float[2] buf
+}

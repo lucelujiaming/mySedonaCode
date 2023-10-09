@@ -1,0 +1,48 @@
+@niagaraIcon="module://icons/x16/control/util/xy.png"
+class Ramp
+  extends Component
+{
+  @readonly property float out
+
+  property float enable = 1.0f
+
+  property float in
+
+  property float delta = 1.0
+
+  property float reset = 0.0
+
+  override void start()
+  {
+    lastValue = in
+    out := lastValue
+  }
+
+  virtual override void execute()
+  {
+    if (enable == 0.0) return
+
+    if (reset != 0.0) {
+      lastValue = in
+    } else if (in == out) {
+      lastValue = in
+    } else {
+      if (in > out) {
+        if (in - out > delta) {
+          lastValue = out + delta
+        } else {
+          lastValue = in
+        }
+      } else {
+        if (out - in > delta) {
+          lastValue = out - delta
+        } else {
+          lastValue = in
+        }
+      }
+    }
+    out := lastValue
+  }
+
+  private float lastValue
+}

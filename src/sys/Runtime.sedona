@@ -1,0 +1,27 @@
+class Runtime
+{
+  native static void load()
+  native static void save()
+  native static int timeOpen(Str name)
+  native static int timeClose(int ctx)
+  native static int timeRead(int ctx, float[] buf)
+  native static int timeWrite(int ctx, float[] buf)
+  native static int dataOpen(Str name)
+  native static int dataClose(int ctx)
+  native static int dataRead(int ctx, float[] buf)
+  native static int dataWrite(int ctx, float[] buf)
+
+  native static int tableA()
+  native static int tableD(int ctx)
+  native static int tableC(int ctx, float[] x, float[] y)
+  native static float tableE(int ctx, float x)
+
+  native static int mathSq(float[] buf)
+  native static int mathSqrt(float[] buf)
+  native static int mathLn(float[] buf)
+  native static int mathExp(float[] buf)
+  native static int mathExpt(float[] buf)
+
+  native static long now()
+  native static void setTime(long time)
+}

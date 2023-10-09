@@ -1,0 +1,20 @@
+**
+** Word Or logic object
+**
+** out = in1 | in2
+**
+@niagaraIcon="module://icons/x16/control/logic/or.png"
+class WOr
+  extends Component
+{
+  @readonly property int out
+
+  property int in1
+  
+  property int in2
+
+  virtual override void execute()
+  {
+    out := ((in1 & 0xFFFF) | (in2 & 0xFFFF)) & 0xFFFF
+  }
+}

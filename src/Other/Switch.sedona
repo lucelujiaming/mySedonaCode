@@ -1,0 +1,294 @@
+@niagaraIcon="module://icons/x16/control/util/xy.png"
+class Switch
+  extends Component
+{
+    ** Enable count
+    @config
+    property int enableCount = 2
+    
+	@readonly property float out
+	// Switch condition
+	property float in
+
+    ** input channel  0
+    property float in0 = 0.0
+	
+    ** input channel  1
+    property float in1 = 0.0
+
+    ** input channel  2
+    property float in2 = 0.0
+
+    ** input channel  3
+    property float in3 = 0.0
+
+    ** input channel  4
+    property float in4 = 0.0
+
+    ** input channel  5
+    property float in5 = 0.0
+
+    ** input channel  6
+    property float in6 = 0.0
+
+    ** input channel  7
+    property float in7 = 0.0
+
+    ** input channel  8
+    property float in8 = 0.0
+
+    ** input channel  9
+    property float in9 = 0.0
+
+    ** input channel  10
+    property float in10 = 0.0
+
+    ** input channel  11
+    property float in11 = 0.0
+
+    ** input channel  12
+    property float in12 = 0.0
+
+    ** input channel  13
+    property float in13 = 0.0
+
+    ** input channel  14
+    property float in14 = 0.0
+
+    ** input channel  15
+    property float in15 = 0.0
+
+    ** input channel  16
+    property float in16 = 0.0
+
+    ** input channel  17
+    property float in17 = 0.0
+
+    ** input channel  18
+    property float in18 = 0.0
+
+    ** input channel  19
+    property float in19 = 0.0
+
+    ** input channel  20
+    property float in20 = 0.0
+
+    ** input channel  21
+    property float in21 = 0.0
+
+    ** input channel  22
+    property float in22 = 0.0
+
+    ** input channel  23
+    property float in23 = 0.0
+
+    ** input channel  24
+    property float in24 = 0.0
+
+    ** input channel  25
+    property float in25 = 0.0
+
+    ** input channel  26
+    property float in26 = 0.0
+
+    ** input channel  27
+    property float in27 = 0.0
+
+    ** input channel  28
+    property float in28 = 0.0
+
+    ** input channel  29
+    property float in29 = 0.0
+
+    ** input channel  30
+    property float in30 = 0.0
+
+    ** input channel  31
+    property float in31 = 0.0
+
+    ** input channel  32
+    property float in32 = 0.0
+
+    ** input channel  33
+    property float in33 = 0.0
+
+    ** input channel  34
+    property float in34 = 0.0
+
+    ** input channel  35
+    property float in35 = 0.0
+
+    ** input channel  36
+    property float in36 = 0.0
+
+    ** input channel  37
+    property float in37 = 0.0
+
+    ** input channel  38
+    property float in38 = 0.0
+
+    ** input channel  39
+    property float in39 = 0.0
+
+    ** input channel  40
+    property float in40 = 0.0
+
+    ** input channel  41
+    property float in41 = 0.0
+
+    ** input channel  42
+    property float in42 = 0.0
+
+    ** input channel  43
+    property float in43 = 0.0
+
+    ** input channel  44
+    property float in44 = 0.0
+
+    ** input channel  45
+    property float in45 = 0.0
+
+    ** input channel  46
+    property float in46 = 0.0
+
+    ** input channel  47
+    property float in47 = 0.0
+
+    ** input channel  48
+    property float in48 = 0.0
+
+    ** input channel  49
+    property float in49 = 0.0
+
+    ** input channel  50
+    property float in50 = 0.0
+
+    ** input channel  51
+    property float in51 = 0.0
+
+    ** input channel  52
+    property float in52 = 0.0
+
+    ** input channel  53
+    property float in53 = 0.0
+
+    ** input channel  54
+    property float in54 = 0.0
+
+    ** input channel  55
+    property float in55 = 0.0
+
+    ** input channel  56
+    property float in56 = 0.0
+
+    ** input channel  57
+    property float in57 = 0.0
+
+    ** input channel  58
+    property float in58 = 0.0
+
+    ** input channel  59
+    property float in59 = 0.0
+
+    ** input channel  60
+    property float in60 = 0.0
+
+    ** input channel  61
+    property float in61 = 0.0
+
+    ** input channel  62
+    property float in62 = 0.0
+
+    ** input channel  63
+    property float in63 = 0.0
+
+    ** input channel Default
+    property float inDefault = 0.0
+	
+  override void start()
+  {
+  }
+
+  virtual override void execute()
+  {
+    setAllValues()
+    if(in >= 0.0 && in <= max)
+	{
+		out := sampleValue[(int)(in)]
+	}
+	else
+	{
+		out := inDefault
+	}
+	
+  }
+  void setAllValues()
+  {
+    sampleValue[0]  = in0
+    sampleValue[1]  = in1
+    sampleValue[2]  = in2
+    sampleValue[3]  = in3
+    sampleValue[4]  = in4
+    sampleValue[5]  = in5
+    sampleValue[6]  = in6
+    sampleValue[7]  = in7
+    sampleValue[8]  = in8
+    sampleValue[9]  = in9
+    sampleValue[10] = in10
+    sampleValue[11] = in11
+    sampleValue[12] = in12
+    sampleValue[13] = in13
+    sampleValue[14] = in14
+    sampleValue[15] = in15
+    sampleValue[16] = in16
+    sampleValue[17] = in17
+    sampleValue[18] = in18
+    sampleValue[19] = in19
+    sampleValue[20] = in20
+    sampleValue[21] = in21
+    sampleValue[22] = in22
+    sampleValue[23] = in23
+    sampleValue[24] = in24
+    sampleValue[25] = in25
+    sampleValue[26] = in26
+    sampleValue[27] = in27
+    sampleValue[28] = in28
+    sampleValue[29] = in29
+    sampleValue[30] = in30
+    sampleValue[31] = in31
+    sampleValue[32] = in32
+    sampleValue[33] = in33
+    sampleValue[34] = in34
+    sampleValue[35] = in35
+    sampleValue[36] = in36
+    sampleValue[37] = in37
+    sampleValue[38] = in38
+    sampleValue[39] = in39
+    sampleValue[40] = in40
+    sampleValue[41] = in41
+    sampleValue[42] = in42
+    sampleValue[43] = in43
+    sampleValue[44] = in44
+    sampleValue[45] = in45
+    sampleValue[46] = in46
+    sampleValue[47] = in47
+    sampleValue[48] = in48
+    sampleValue[49] = in49
+    sampleValue[50] = in50
+    sampleValue[51] = in51
+    sampleValue[52] = in52
+    sampleValue[53] = in53
+    sampleValue[54] = in54
+    sampleValue[55] = in55
+    sampleValue[56] = in56
+    sampleValue[57] = in57
+    sampleValue[58] = in58
+    sampleValue[59] = in59
+    sampleValue[60] = in60
+    sampleValue[61] = in61
+    sampleValue[62] = in62
+    sampleValue[63] = in63
+  }
+  // define Log log
+  private inline float[64] sampleValue
+}

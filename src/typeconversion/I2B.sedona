@@ -1,0 +1,18 @@
+@niagaraIcon="module://icons/x16/control/util/switch.png"
+class I2B
+  extends Component
+{
+  property int in
+  
+  @readonly property bool out
+
+  virtual override void execute()
+  {
+    if(in != 0){
+      out := true
+    }else{
+      out := false
+    }
+  }
+}
+

@@ -1,0 +1,43 @@
+@niagaraIcon="module://icons/x16/control/control.png"
+class DelayOn
+  extends DelaySwitch
+{
+  virtual override void start()
+  {
+      ctx = a(in)
+  }
+
+  virtual override void stop()
+  {
+      int ret = d(ctx)
+      if (ret == 0) {
+          ctx = 0
+      }
+  }
+
+  virtual override void changed(Slot slot)
+  {
+      super.changed(slot)
+      if (slot.name.equals("delay")) {
+          d(ctx)
+          ctx = a(in)
+      }
+      if (slot.name.equals("in")) {
+          if (ctx != 0) {
+              c(ctx, in, delay)
+          }
+      }
+  }
+
+  virtual override void execute()
+  {
+      float a = e(ctx)
+      if (in == 0.0f) {
+          out := 0.0f
+      } else {
+          out := a
+      }
+  }
+
+  private int ctx = 0
+}

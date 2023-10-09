@@ -1,0 +1,43 @@
+
+	float all_dev_count = 0.0
+    ** log.message("111111111 Variable name=$name")
+    // find bus and dev
+    Component p = Sys.app.lookup(this.parent)
+    Component root = null
+    while (p != null) {
+      root = p
+      p = Sys.app.lookup(p.parent)
+    }
+	
+    if (root != null) {
+		for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+		  ** log.message("888 Variable f.name=${f.name}")
+		  if (f.type.is(Folder.type) && f.name.equals("service")) {
+			   ** log.message("999 Variable f.name=${f.name}")
+			   for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+					** log.message("AAAA FieldBusNet r.name=${r.name}")
+					if (r.type.is(FieldBusNet.type))
+					{
+					   for (Component s = Sys.app.lookup(r.children); s != null; s = Sys.app.lookup(r.nextSibling)) {
+							** log.message("BBBBB FieldBusDevice s.name=${s.name}")
+							if (s.type.is(FieldBusDevice.type))
+							{
+								float iReadCount  =  (float)(((FieldBusDevice)s).iDeviceReadPropertyCount)
+								float iWriteCount =  (float)(((FieldBusDevice)s).iDeviceWritePropertyCount)
+								all_dev_count = all_dev_count + iReadCount + iWriteCount
+								log.message("CCCCC FieldBusDevice present_value=$present_value with (iDeviceReadPropertyCount = $iReadCount, iDeviceWritePropertyCount = $iWriteCount)")
+							}
+					   }
+					}
+			   }
+		  }
+		}
+	}
+	if(all_dev_count >= 20.0)  // NG 
+	{
+	    status := 0.0
+	}
+	else 
+	{
+	    status := 1.0
+	}

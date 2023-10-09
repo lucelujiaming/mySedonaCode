@@ -1,0 +1,218 @@
+@niagaraIcon="module://icons/x16/device.png"
+class BacnetLocDev
+  extends FieldBusDevice
+{
+  // Lujiaming add these at 23/05/22
+  define Str MAX_ADPU_LENGTH_RANGE = "Min50Size, UpTo128, UpTo206, UpTo480, UpTo1024, UpTo1476, END"
+  define int MAX_ADPU_LENGTH_50   = 0
+  define int MAX_ADPU_LENGTH_128  = 1
+  define int MAX_ADPU_LENGTH_206  = 2
+  define int MAX_ADPU_LENGTH_480  = 3
+  define int MAX_ADPU_LENGTH_1024 = 4
+  define int MAX_ADPU_LENGTH_1476 = 5
+  define int MAX_ADPU_LENGTH_END  = 6
+
+  // Lujiaming add these end at 23/05/22
+
+/*  
+  // dataExpectingReplyNPCI
+  @range=MAX_ADPU_LENGTH_RANGE
+  property int maxADPULength = MAX_ADPU_LENGTH_1024
+ */
+ 
+  // InstanceNumber
+  @asStr
+  @config
+  property Buf(64) deviceInstance = ""
+
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void loaded()
+  {
+    update()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == BacnetRemDev.deviceName) {
+      update()
+    }
+  }
+  override void stop()
+  {
+    status := STATUSEND
+    Component n = Sys.app.lookup(parent)
+    if (n.type.is(FieldBusNet.type)) {
+      ((FieldBusNet)n).update()
+      ((FieldBusNet)n).notifyFlush()
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  void update()
+  {
+    if (bus != null) {
+        if(bus.type.is(BacnetIP.type))
+        {
+            ((BacnetIP)bus).updateCache()
+        }
+    }
+    log.message("BacnetRemDev update 1111 status=$status") 
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+         if(((BacNetFieldBusIO)d).device == null)
+         {
+            ((BacNetFieldBusIO)d).device = this
+         }
+         ** log.message("BacnetRemDev update 22222 status=$status") 
+    } 
+    status := STATUSREADY
+    log.message("BacnetRemDev update 3333 status=$status") 
+  }
+
+  override void execute()
+  {
+    ** log.message("BacnetRemDev execute 11111 status=$status") 
+    if (bus != null) {
+        if (bus.needFlush == false) {
+            
+        }
+        else 
+        {
+            log.message("We needFlush ")
+        }
+        ** log.message("111111111 execute name=$name")
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(BacnetLocalVar.type))  {
+               ** log.message("111111111 BacnetLocalVar.execute name=$name")
+               ((BacnetLocalVar)d).execute()
+            }
+        }
+    }
+    else
+    {
+       log.message("bus is null. I am $name and type is ${type.name}")
+    }
+  }
+  
+  int writeProperty(FieldBusDevice device, 
+                  int propertyVar, int iObjectType, int iInstanceNumber,
+                  int tagNumber, byte[] data, int iLen)
+  {
+		int isFound = 0
+        log.message("AAAA writeProperty with propertyVar=$propertyVar, iObjectType=$iObjectType ")
+        log.message("AAAA writeProperty with iInstanceNumber=$iInstanceNumber, tagNumber=$tagNumber")
+        log.message("AAAA writeProperty with iLen=$iLen")
+
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(BacnetLocalVar.type))  {
+                int iBacNetObjectType = ((BacnetLocalVar)d).convertObjectTypeToBacNetObjectType( 
+                                            ((BacnetLocalVar)d).objectType) 
+                log.message("writeProperty::Found BacnetLocalVar with ${((BacnetLocalVar)d).objectType}->$iBacNetObjectType")
+                if((iBacNetObjectType == iObjectType) && 
+                  (((BacnetLocalVar)d).instanceNumber == iInstanceNumber))
+                {
+				    isFound = 1
+                    switch (tagNumber)
+                    {
+                        case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
+                            if(data[0] != 0x00)
+                                ((BacnetLocalVar)d).present_value := 1.0
+                            else
+                                ((BacnetLocalVar)d).present_value := 0.0
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
+                            // 0000 0010 00.. .... .... .... .... .... = Object Type: device (8)
+                            // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+                            int objectID = 0x00
+                            objectID = data[1] % 0x40
+                            objectID = objectID * 0x100 + data[2]
+                            objectID = objectID * 0x100 + data[3]
+                            ((BacnetLocalVar)d).present_value := (float)objectID
+                            log.message("present_value=${((BacnetLocalVar)d).present_value}")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
+                        case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
+                            bus.decodeUnsigned(data, iLen, bufInteger)
+                            ((BacnetLocalVar)d).present_value := (float)bufInteger[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("-------------------------ReadPropertyMultipleUnsignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
+                            bus.decodeUnsigned(data, iLen, bufInteger)
+                            ((BacnetLocalVar)d).present_value := (float)bufInteger[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("------------------------ReadPropertyMultipleSignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
+                            bus.decodeFloat(data, bufFloat)
+                            ((BacnetLocalVar)d).present_value := (float)bufFloat[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("--------------------------ReadPropertyMultipleFloat = ${((BacnetLocalVar)d).present_value}--------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
+                            bus.decodeDouble(data, bufDouble)
+                            ((BacnetLocalVar)d).present_value := (float)bufDouble[0]
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("-------------------------ReadPropertyMultipleDouble = ${((BacnetLocalVar)d).present_value}--------------------")
+                            log.message("-------------------------------------------------------------------------------")
+                            break
+                        // case BANET_PROPVAR_NULLAPPTAG:
+                        case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:
+                        case BacNetFieldBusIO.BANET_PROPVAR_OCTETSTRINGAPPTAG:
+                            for (int i = 0; i < iLen; i++)
+                            {
+                               strInfo.set(i, data[i])
+                            }
+                            strInfo.set(iLen, '\0')
+                            ** log.message("bacreadProperty Character string = $strInfo ")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_CHARACTERSTRINGAPPTAG:
+                            for (int i = 0; i < iLen; i++)
+                            {
+                               strInfo.set(i, data[i])
+                            }
+                            strInfo.set(iLen, '\0')
+                            ** log.message("bacreadProperty Character string = $strInfo ")
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_DATEAPPTAG:
+                            break
+                        case BacNetFieldBusIO.BANET_PROPVAR_TIMEAPPTAG:
+                            break
+                        // case BANET_PROPVAR_RESERVEDAPPTAG13:
+                        // case BANET_PROPVAR_RESERVEDAPPTAG14:
+                        // case BANET_PROPVAR_RESERVEDAPPTAG15:
+                        default:
+                            log.message("Not support $tagNumber ")
+                            break
+                    }
+                    break
+                }
+            }
+        }
+        return isFound 
+  }
+
+  
+  // define Log log
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  FieldBusNet bus = null
+  int maxADPULength = MAX_ADPU_LENGTH_480
+  
+   public inline int[256]     localObjectListPropertyID
+   public inline Str[256]     localObjectListName
+   public int                 localObjectListCount = 0
+  
+   private inline int[2]    bufInteger
+   private inline float[2]  bufFloat
+   private inline double[2] bufDouble
+
+   private inline Str(128)   strInfo
+}
