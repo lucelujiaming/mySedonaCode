@@ -46,7 +46,7 @@ class TableConvert
 	**
 	virtual override void execute()
 	{
-		out := GetThermTemp(in1, ntc_type, -30.0, 100.0)
+		out := GetThermTemp(in1, ntc_type, 100.0, -30.0)
 	}
 
 	float GetTemperature_NTC_Table(float kohm,  float[] res_tbl)
@@ -63,16 +63,19 @@ class TableConvert
 		resolution= res_tbl[2];
 		
 		points= (int)((max - min)/resolution)
+		// log.message("points = $points")
 		
 		if(kohm >= res_tbl[3])
 		{
 			ret_value= min;
+			// log.message("min = $min")
 		}
 		else
 		{
 			if(kohm <= res_tbl[points + 3])
 			{
 				ret_value= max;
+			    // log.message("max = $max")
 			}
 			else
 			{
@@ -81,8 +84,11 @@ class TableConvert
 					if(kohm <= res_tbl[i + 3] && kohm > res_tbl[i + 4])
 					{
 						ret_value  = (-1.0f)*(kohm - res_tbl[i + 4])/(res_tbl[i + 3] - res_tbl[i + 4]);
+		                // log.message("STEP1: ret_value = $ret_value")
 						ret_value  *= resolution;
+		                // log.message("STEP2: ret_value = $ret_value")
 						ret_value  += min + (float)(i + 1)*resolution;
+		                // log.message("calc ret_value = $ret_value")
 						break;
 					}
 				}
@@ -98,8 +104,10 @@ class TableConvert
 		
 		if(type > NTC_TYPE_MAX 
 			|| type <= NTC_TYPE_NONE)
+		{
 			return 0.0f;
-		
+		}
+		// log.message("kohm = $kohm")
 		switch(type)
 		{
 			case NTC_TYPE_10K_B3950:
@@ -117,6 +125,7 @@ class TableConvert
 			default:
 				break;
 		}
+		// log.message("kohm = $kohm and Get ret_value = $ret_value and max=$max, min=$min")
 		
 		if(ret_value > max && max !=0.0f)
 		{
@@ -129,6 +138,7 @@ class TableConvert
 				ret_value= min;
 			}
 		}
+		// log.message("return ret_value = $ret_value")
 		
 		return ret_value;
 	}

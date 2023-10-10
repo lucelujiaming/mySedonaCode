@@ -284,6 +284,7 @@ class App
           timeConsume = 0L
         // DATE BEGIN
         dateTime = Runtime.now()
+        // log.message("Runtime.now()=$dateTime")
         // DATE END
       }
       // FPS END

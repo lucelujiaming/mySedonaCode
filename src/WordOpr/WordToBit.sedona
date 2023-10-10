@@ -2,40 +2,189 @@
 class WordToBit
   extends Component
 {
-  @readonly property float out0
+    ** Enable Bit count
+    @config
+    property int enableBitCount = 16
+    
+	@readonly property float out0
 
-  @readonly property float out1
+	@readonly property float out1
 
-  @readonly property float out2
+	@readonly property float out2
 
-  @readonly property float out3
+	@readonly property float out3
 
-  @readonly property float outn
+	@readonly property float out4
 
-  property float in
+	@readonly property float out5
 
-  property int k
+	@readonly property float out6
+
+	@readonly property float out7
+
+	@readonly property float out8
+
+	@readonly property float out9
+
+	@readonly property float out10
+
+	@readonly property float out11
+
+	@readonly property float out12
+
+	@readonly property float out13
+
+	@readonly property float out14
+
+	@readonly property float out15
+
+	property float in
 
   virtual override void execute()
   {
-    int c = k
-    switch (c)
+    int c = (int)in
+    if(((c & 0x01) != 0) && (enableBitCount >= 1))
     {
-      case 0:
-        out0 := in
-        break
-      case 1:
-        out1 := in
-        break
-      case 2:
-        out2 := in
-        break
-      case 3:
-        out3 := in
-        break
-      default:
-        outn := in
-        break;
+       out0 := 1.0
+    }
+    else 
+    {
+       out0 := 0.0
+    }
+    
+    if(((c & 0x02) != 0) && (enableBitCount >= 2))
+    {
+       out1 := 1.0
+    }
+    else 
+    {
+       out1 := 0.0
+    }
+    
+    if(((c & 0x04) != 0) && (enableBitCount >= 3))
+    {
+       out2 := 1.0
+    }
+    else 
+    {
+       out2 := 0.0
+    }
+    
+    if(((c & 0x08) != 0) && (enableBitCount >= 4))
+    {
+       out3 := 1.0
+    }
+    else 
+    {
+       out3 := 0.0
+    }
+    
+    if(((c & 0x10) != 0) && (enableBitCount >= 5))
+    {
+       out4 := 1.0
+    }
+    else 
+    {
+       out4 := 0.0
+    }
+    
+    if(((c & 0x20) != 0) && (enableBitCount >= 6))
+    {
+       out5 := 1.0
+    }
+    else 
+    {
+       out5 := 0.0
+    }
+    
+    if(((c & 0x40) != 0) && (enableBitCount >= 7))
+    {
+       out6 := 1.0
+    }
+    else 
+    {
+       out6 := 0.0
+    }
+    
+    if(((c & 0x80) != 0) && (enableBitCount >= 8))
+    {
+       out7 := 1.0
+    }
+    else 
+    {
+       out7 := 0.0
+    }
+    
+    if(((c & 0x100) != 0) && (enableBitCount >= 9))
+    {
+       out8 := 1.0
+    }
+    else 
+    {
+       out8 := 0.0
+    }
+    
+    if(((c & 0x200) != 0) && (enableBitCount >= 10))
+    {
+       out9 := 1.0
+    }
+    else 
+    {
+       out9 := 0.0
+    }
+    
+    if(((c & 0x400) != 0) && (enableBitCount >= 11))
+    {
+       out10 := 1.0
+    }
+    else 
+    {
+       out10 := 0.0
+    }
+    
+    if(((c & 0x800) != 0) && (enableBitCount >= 12))
+    {
+       out11 := 1.0
+    }
+    else 
+    {
+       out11 := 0.0
+    }
+    
+    if(((c & 0x1000) != 0) && (enableBitCount >= 13))
+    {
+       out12 := 1.0
+    }
+    else 
+    {
+       out12 := 0.0
+    }
+    
+    if(((c & 0x2000) != 0) && (enableBitCount >= 14))
+    {
+       out13 := 1.0
+    }
+    else 
+    {
+       out13 := 0.0
+    }
+    
+    if(((c & 0x4000) != 0) && (enableBitCount >= 15))
+    {
+       out14 := 1.0
+    }
+    else 
+    {
+       out14 := 0.0
+    }
+    
+    if(((c & 0x8000) != 0) && (enableBitCount >= 16))
+    {
+       out15 := 1.0
+    }
+    else 
+    {
+       out15 := 0.0
     }
   }
 }

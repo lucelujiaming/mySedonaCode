@@ -2,40 +2,125 @@
 class BitToWord
   extends Component
 {
-  @readonly property float out
+    ** Enable Bit count
+    @config
+    property int enableBitCount = 16
+    
+	@readonly property float out
+
+	property float in0
+
+	property float in1
+
+	property float in2
+
+	property float in3
+
+	property float in4
+
+	property float in5
+
+	property float in6
+
+	property float in7
+
+	property float in8
+
+	property float in9
+
+	property float in10
+
+	property float in11
+
+	property float in12
+
+	property float in13
+
+	property float in14
+
+	property float in15
   
-  property int k
-
-  property float in0
-
-  property float in1
-
-  property float in2
-
-  property float in3
-
-  property float inn
-
   virtual override void execute()
   {
-    int c = k
-    switch (c)
+    out := 0.0
+    if((in0 != 0.0) && (enableBitCount >= 1))
     {
-      case 0:
-        out := in0
-        break
-      case 1:
-        out := in1
-        break
-      case 2:
-        out := in2
-        break
-      case 3:
-        out := in3
-        break
-      default:
-        out := inn
-        break
+       out := out + (float)(0x01)
     }
+    
+    if((in1 != 0.0) && (enableBitCount >= 2))
+    {
+       out := out + (float)(0x02)
+    }
+    
+    if((in2 != 0.0) && (enableBitCount >= 3))
+    {
+       out := out + (float)(0x04)
+    }
+    
+    if((in3 != 0.0) && (enableBitCount >= 4))
+    {
+       out := out + (float)(0x08)
+    }
+    
+    if((in4 != 0.0) && (enableBitCount >= 5))
+    {
+       out := out + (float)(0x10)
+    }
+    
+    if((in5 != 0.0) && (enableBitCount >= 6))
+    {
+       out := out + (float)(0x20)
+    }
+    
+    if((in6 != 0.0) && (enableBitCount >= 7))
+    {
+       out := out + (float)(0x40)
+    } 
+    
+    if((in7 != 0.0) && (enableBitCount >= 8))
+    {
+       out := out + (float)(0x80)
+    } 
+    
+    if((in8 != 0.0) && (enableBitCount >= 9))
+    {
+       out := out + (float)(0x100)
+    } 
+    
+    if((in9 != 0.0) && (enableBitCount >= 10))
+    {
+       out := out + (float)(0x200)
+    } 
+    
+    if((in10 != 0.0) && (enableBitCount >= 11))
+    {
+       out := out + (float)(0x400)
+    } 
+    
+    if((in11 != 0.0) && (enableBitCount >= 12))
+    {
+       out := out + (float)(0x800)
+    } 
+    
+    if((in12 != 0.0) && (enableBitCount >= 13))
+    {
+       out := out + (float)(0x1000)
+    } 
+    
+    if((in13 != 0.0) && (enableBitCount >= 14))
+    {
+       out := out + (float)(0x2000)
+    } 
+    
+    if((in14 != 0.0) && (enableBitCount >= 15))
+    {
+       out := out + (float)(0x4000)
+    } 
+    
+    if((in15 != 0.0) && (enableBitCount >= 16))
+    {
+       out := out + (float)(0x8000)
+    } 
   }
 }

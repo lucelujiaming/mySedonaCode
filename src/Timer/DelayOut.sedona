@@ -65,7 +65,7 @@ class DelayOut
 	{
 	    // Descending edge appears
 		if (in == 0.0f && lastIn != 0.0f) {
-		  delayEnd = now + (long)(delay * (-1.0) * 1000.0f )
+		  delayEnd = now + (long)(delay * 1000.0f )
 		}
 		// Descending edge does not appear
 		if (in != 0.0f) {

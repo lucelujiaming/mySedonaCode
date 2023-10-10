@@ -212,7 +212,7 @@ class Switch
   virtual override void execute()
   {
     setAllValues()
-    if(in >= 0.0 && in <= max)
+    if(in >= 0.0 && (int)(in) <= enableCount)
 	{
 		out := sampleValue[(int)(in)]
 	}

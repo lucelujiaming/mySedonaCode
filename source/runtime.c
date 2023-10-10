@@ -757,9 +757,10 @@ static void set_rtc(unsigned int date, unsigned int time)
 int64_t sys_Runtime_now(SedonaVM* vm, Cell* params)
 {
   int64_t time = 0;
-
+  // printf("[%s:%s:%d] time = %lld\r\n", __FILE__, __FUNCTION__, __LINE__, (long long)time);
   if (rtc_fd == -1) {
       rtc_fd = open(RTC_DRV_NAME, O_RDONLY);
+      // printf("[%s:%s:%d] time = %lld\r\n", __FILE__, __FUNCTION__, __LINE__, (long long)time);
   }
   if (rtc_fd != -1) {
       struct rtc_time rtc_tm;
@@ -767,6 +768,7 @@ int64_t sys_Runtime_now(SedonaVM* vm, Cell* params)
           if (currecttime(&rtc_tm) == 1) {
           }
           time = ((rtc_tm.tm_year + 1900) << 8) + (rtc_tm.tm_mon + 1);
+          // printf("[%s:%s:%d] time = %lld\r\n", __FILE__, __FUNCTION__, __LINE__, (long long)time);
           time = time << 32;
           time = time + (rtc_tm.tm_mday << 24) +
                   (rtc_tm.tm_hour << 16) + (rtc_tm.tm_min << 8) + (rtc_tm.tm_sec);
@@ -801,6 +803,7 @@ int64_t sys_Runtime_now(SedonaVM* vm, Cell* params)
       }
   }
 
+  // printf("[%s:%s:%d] time = %lld\r\n", __FILE__, __FUNCTION__, __LINE__, (long long)time);
   return time;
 }
 
