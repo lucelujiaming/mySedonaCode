@@ -135,12 +135,11 @@ class SoxService
       return false
     }
 
-    // log.message("started port=$port")
-
+    log.message("SoxService::openPort started port=$port")
     if (socket.join())
-      log.message("DASP Discovery enabled")
+      log.message("SoxService::openPort DASP Discovery enabled with port=$port")
     else
-      log.message("DASP Discovery not enabled")
+      log.message("SoxService::openPort DASP Discovery not enabled with port=$port")
 
     Sys.app.platform.notify("sox", Sys.intStr(port))
     return isPortOpen = true
