@@ -1,0 +1,44 @@
+<sedonaKit
+  name="ModBus"
+  vendor="XunGaoAuto"
+  description="ModBus Management"
+  includeSource="false"
+  doc="false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+  <depend on="Variable 0.1+" />
+
+  <!-- Source Directories  -->
+  <source dir="ModbusRTUSlave.sedona" />
+  <source dir="ModbusRTUMaster.sedona" />
+  <source dir="ModbusTCPClient.sedona" />
+  <source dir="ModbusTCPServer.sedona" />
+  <source dir="ModbusRemDev.sedona" />
+
+  <!-- Natives -->
+  <native qname="ModBus::ModbusRTUMaster.dO" id="3::0"/>
+  <native qname="ModBus::ModbusRTUMaster.dC" id="3::1"/>
+  <native qname="ModBus::ModbusRTUMaster.dA" id="3::2"/>
+  <native qname="ModBus::ModbusRTUMaster.dR" id="3::3"/>
+  <native qname="ModBus::ModbusRTUMaster.dW" id="3::4"/>
+
+  <native qname="ModBus::ModbusRTUSlave.dO" id="3::5"/>
+  <native qname="ModBus::ModbusRTUSlave.dC" id="3::6"/>
+  <native qname="ModBus::ModbusRTUSlave.dA" id="3::7"/>
+  <native qname="ModBus::ModbusRTUSlave.dR" id="3::8"/>
+  <native qname="ModBus::ModbusRTUSlave.dW" id="3::9"/>
+
+  <native qname="ModBus::ModbusTCPClient.dO" id="3::10"/>
+  <native qname="ModBus::ModbusTCPClient.dC" id="3::11"/>
+  <native qname="ModBus::ModbusTCPClient.dA" id="3::12"/>
+  <native qname="ModBus::ModbusTCPClient.dR" id="3::13"/>
+  <native qname="ModBus::ModbusTCPClient.dW" id="3::14"/>
+
+  <native qname="ModBus::ModbusTCPServer.dO" id="3::15"/>
+  <native qname="ModBus::ModbusTCPServer.dC" id="3::16"/>
+  <native qname="ModBus::ModbusTCPServer.dA" id="3::17"/>
+  <native qname="ModBus::ModbusTCPServer.dR" id="3::18"/>
+  <native qname="ModBus::ModbusTCPServer.dW" id="3::19"/>
+</sedonaKit>

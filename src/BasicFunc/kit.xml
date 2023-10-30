@@ -1,0 +1,26 @@
+<sedonaKit
+ name = "BasicFunc"
+ vendor="XunGaoAuto"
+ description = "Basic function block library"
+ includeSource = "false"
+ doc = "false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+
+  <!-- Source Directories -->
+  <source dir="." />
+  <source dir="test" testonly="true"/>
+
+  <!-- Natives -->
+  <native qname="BasicFunc::Pid.a" id="11::0"/>
+  <native qname="BasicFunc::Pid.f" id="11::1"/>
+  <native qname="BasicFunc::Pid.d" id="11::2"/>
+  <native qname="BasicFunc::DelaySwitch.a" id="11::3"/>
+  <native qname="BasicFunc::DelaySwitch.c" id="11::4"/>
+  <native qname="BasicFunc::DelaySwitch.e" id="11::5"/>
+  <native qname="BasicFunc::DelaySwitch.d" id="11::6"/>
+
+</sedonaKit>
+

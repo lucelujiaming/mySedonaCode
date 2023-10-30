@@ -1,0 +1,42 @@
+<sedonaKit
+  name="BacNet"
+  vendor="XunGaoAuto"
+  description="BacNet Management"
+  includeSource="false"
+  doc="false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+  <depend on="Variable 0.1+" />
+  <depend on="inet 0.1+"/>
+
+  <!-- Source Directories  -->
+  <source dir="BacnetIP.sedona" />
+  <source dir="BacnetMSTP.sedona" />
+  <source dir="BacnetRemDev.sedona" />
+  <source dir="BacnetLocDev.sedona" />
+  <source dir="BacnetSchedule.sedona" />
+
+  <!-- Natives -->
+  <native qname="BacNet::BacnetIP.dO" id="4::0"/>
+  <native qname="BacNet::BacnetIP.dC" id="4::1"/>
+  <native qname="BacNet::BacnetIP.dA" id="4::2"/>
+  <native qname="BacNet::BacnetIP.dR" id="4::3"/>
+  <native qname="BacNet::BacnetIP.dW" id="4::4"/>
+  <native qname="BacNet::BacnetMSTP.dO" id="4::5"/>
+  <native qname="BacNet::BacnetMSTP.dC" id="4::6"/>
+  <native qname="BacNet::BacnetMSTP.dA" id="4::7"/>
+  <native qname="BacNet::BacnetMSTP.dR" id="4::8"/>
+  <native qname="BacNet::BacnetMSTP.dW" id="4::9"/>
+  <native qname="BacNet::BacnetIP.dS" id="4::10"/>
+  <native qname="BacNet::BacnetIP.dT" id="4::11"/>
+  <native qname="BacNet::BacnetMSTP.dS" id="4::12"/>
+  <native qname="BacNet::BacnetMSTP.dT" id="4::13"/>
+  <native qname="BacNet::BacnetIP.dD" id="4::14"/>
+  <native qname="BacNet::BacnetIP.dF" id="4::15"/>
+  <native qname="BacNet::BacnetIP.eD" id="4::16"/>
+  <native qname="BacNet::BacnetIP.eF" id="4::17"/>
+  <native qname="BacNet::BacnetIP.eUI" id="4::18"/>
+
+</sedonaKit>

@@ -1,0 +1,26 @@
+<sedonaKit
+ name = "PID"
+ vendor="XunGaoAuto"
+ description = "PID function block library"
+ includeSource = "false"
+ doc = "false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+
+  <!-- Source Directories -->
+  <source dir="Pid.sedona" />
+
+  <!-- Natives -->
+  <!--
+  <native qname="PID::PidBand.a" id="10::0"/>
+  <native qname="PID::PidBand.f" id="10::1"/>
+  <native qname="PID::PidBand.d" id="10::2"/>
+  -->
+  <native qname="PID::Pid.a" id="10::3"/>
+  <native qname="PID::Pid.f" id="10::4"/>
+  <native qname="PID::Pid.d" id="10::5"/>
+
+</sedonaKit>
+

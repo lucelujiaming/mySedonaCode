@@ -1,0 +1,16 @@
+<sedonaKit
+ name = "Convert"
+ vendor="XunGaoAuto"
+ description = "Convert function block library"
+ includeSource = "false"
+ doc = "false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+
+  <!-- Source Directories -->
+  <source dir="." />
+
+</sedonaKit>
+

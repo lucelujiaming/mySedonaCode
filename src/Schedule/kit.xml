@@ -1,0 +1,13 @@
+<sedonaKit
+  name="Schedule"
+  vendor="XunGaoAuto"
+  description="Date Schedule Management"
+  includeSource="false"
+  doc="false"
+>
+
+  <depend on="sys 0.1+" />
+
+  <source dir="." />
+
+</sedonaKit>
