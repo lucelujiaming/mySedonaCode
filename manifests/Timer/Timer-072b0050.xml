@@ -1,0 +1,91 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Timer"
+   checksum="72b0050"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Timer function block library"
+   buildHost="ubuntu"
+   buildTime="2023-09-14T16:41:27.449+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Timer::DelayOn -->
+<type id="0" name="DelayOn" sizeof="64" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="in" type="float"/>
+  <slot id="1" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="tm" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="delay" type="float" flags="c" default="1.0">
+    <facets>
+      <str name="unit" val="second"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Timer::RunHour -->
+<type id="1" name="RunHour" sizeof="144" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="url" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="32"/>
+    </facets>
+  </slot>
+  <slot id="1" name="hourName" type="sys::Buf" flags="s" default="">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="readonly" val="true"/>
+      <int name="max" val="32"/>
+    </facets>
+  </slot>
+  <slot id="2" name="value" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="in" type="float" default="0.0"/>
+  <slot id="4" name="preset" type="float" default="0.0"/>
+</type>
+
+<!-- Timer::Tick -->
+<type id="2" name="Tick" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/sine.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="hz" type="float" flags="c" default="1.0">
+    <facets>
+      <str name="unit" val="per_second"/>
+      <int name="max" val="10"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+</kitManifest>

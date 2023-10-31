@@ -1,0 +1,478 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="OperFunc"
+   checksum="481957b8"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Math and Logic function block library"
+   buildHost="ubuntu"
+   buildTime="2023-07-07T15:32:21.260+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- OperFunc::ADemux2 -->
+<type id="0" name="ADemux2" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/split.png"/>
+  </facets>
+  <slot id="0" name="out1" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="out2" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="in" type="float"/>
+  <slot id="3" name="s1" type="float"/>
+</type>
+
+<!-- OperFunc::Add2 -->
+<type id="1" name="Add2" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/add.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+<!-- OperFunc::Add4 -->
+<type id="2" name="Add4" sizeof="56" base="OperFunc::Add2">
+  <slot id="0" name="in3" type="float"/>
+  <slot id="1" name="in4" type="float"/>
+</type>
+
+<!-- OperFunc::And2 -->
+<type id="3" name="And2" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/and.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+<!-- OperFunc::And4 -->
+<type id="4" name="And4" sizeof="56" base="OperFunc::And2">
+  <slot id="0" name="in3" type="float"/>
+  <slot id="1" name="in4" type="float"/>
+</type>
+
+<!-- OperFunc::Avg10 -->
+<type id="5" name="Avg10" sizeof="120" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/average.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="maxTime" type="float" flags="c" default="0.0">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- OperFunc::AvgN -->
+<type id="6" name="AvgN" sizeof="64" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/average.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="numSamplesToAvg" type="float" flags="c" default="5.0">
+    <facets>
+      <int name="min" val="1"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="reset" type="float" default="0.0">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- OperFunc::B2P -->
+<type id="7" name="B2P" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+</type>
+
+<!-- OperFunc::Compare -->
+<type id="8" name="Compare" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
+  </facets>
+  <slot id="0" name="xgy" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="xey" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="xly" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="x" type="float"/>
+  <slot id="4" name="y" type="float"/>
+</type>
+
+<!-- OperFunc::DemuxI2B4 -->
+<type id="9" name="DemuxI2B4" sizeof="60" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/switch.png"/>
+  </facets>
+  <slot id="0" name="in" type="float"/>
+  <slot id="1" name="out1" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="out2" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="out3" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="out4" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="startsAt" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- OperFunc::Div2 -->
+<type id="10" name="Div2" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/divide.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+  <slot id="3" name="div0" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- OperFunc::FloatCut -->
+<type id="11" name="FloatCut" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="in" type="float"/>
+  <slot id="1" name="out1" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="out2" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- OperFunc::FloatOffset -->
+<type id="12" name="FloatOffset" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/add.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="offset" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- OperFunc::Max -->
+<type id="13" name="Max" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+<!-- OperFunc::Min -->
+<type id="14" name="Min" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+<!-- OperFunc::MinMax -->
+<type id="15" name="MinMax" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="minOut" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="maxOut" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="in" type="float"/>
+  <slot id="3" name="r" type="float"/>
+  <slot id="4" name="reset" type="void" flags="a"/>
+</type>
+
+<!-- OperFunc::Mul2 -->
+<type id="16" name="Mul2" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/multiply.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+<!-- OperFunc::Mul4 -->
+<type id="17" name="Mul4" sizeof="56" base="OperFunc::Mul2">
+  <slot id="0" name="in3" type="float"/>
+  <slot id="1" name="in4" type="float"/>
+</type>
+
+<!-- OperFunc::Neg -->
+<type id="18" name="Neg" sizeof="44" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/subtract.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+</type>
+
+<!-- OperFunc::Not -->
+<type id="19" name="Not" sizeof="44" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/not.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+</type>
+
+<!-- OperFunc::Or2 -->
+<type id="20" name="Or2" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/or.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+<!-- OperFunc::Or4 -->
+<type id="21" name="Or4" sizeof="56" base="OperFunc::Or2">
+  <slot id="0" name="in3" type="float"/>
+  <slot id="1" name="in4" type="float"/>
+</type>
+
+<!-- OperFunc::Round -->
+<type id="22" name="Round" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+      <int name="precision" val="1"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float">
+    <facets>
+      <int name="precision" val="3"/>
+    </facets>
+  </slot>
+  <slot id="2" name="decimalPlaces" type="float" flags="c" default="0.0">
+    <facets>
+      <int name="min" val="-1"/>
+      <int name="max" val="3"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- OperFunc::SW -->
+<type id="23" name="SW" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/switch.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+  <slot id="3" name="s1" type="float"/>
+</type>
+
+<!-- OperFunc::SW4 -->
+<type id="24" name="SW4" sizeof="64" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/select.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+  <slot id="3" name="in3" type="float"/>
+  <slot id="4" name="in4" type="float"/>
+  <slot id="5" name="startsAt" type="float" flags="c" default="0.0">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="sel" type="float"/>
+</type>
+
+<!-- OperFunc::Sub2 -->
+<type id="25" name="Sub2" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/subtract.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+<!-- OperFunc::Sub4 -->
+<type id="26" name="Sub4" sizeof="56" base="OperFunc::Sub2">
+  <slot id="0" name="in3" type="float"/>
+  <slot id="1" name="in4" type="float"/>
+</type>
+
+<!-- OperFunc::TimeAvg -->
+<type id="27" name="TimeAvg" sizeof="68" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/average.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="time" type="float" flags="c" default="10000.0">
+    <facets>
+      <bool name="summary" val="true"/>
+      <str name="unit" val="millisecond"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="reset" type="void" flags="a"/>
+</type>
+
+<!-- OperFunc::Xor -->
+<type id="28" name="Xor" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/xor.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float"/>
+  <slot id="2" name="in2" type="float"/>
+</type>
+
+</kitManifest>

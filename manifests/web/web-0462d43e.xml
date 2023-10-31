@@ -1,0 +1,42 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="web"
+   checksum="462d43e"
+   hasNatives="false"
+   doc="true"
+   isPlay="false"
+   version="0.1.0"
+   vendor="Tridium"
+   description="Web service and servlet engine"
+   buildHost="ubuntu"
+   buildTime="2023-07-07T15:29:46.257+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+  <depend on="inet 0.1+"/>
+  <depend on="sox 0.1+"/>
+</depends>
+
+<!-- web::Weblet -->
+<type id="0" name="Weblet" sizeof="40" flags="a" base="sys::Component">
+</type>
+
+<!-- web::SpyWeblet -->
+<type id="1" name="SpyWeblet" sizeof="40" base="web::Weblet">
+</type>
+
+<!-- web::WebService -->
+<type id="2" name="WebService" sizeof="12084" base="sys::Service">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/web.png"/>
+  </facets>
+  <slot id="0" name="port" type="short" flags="c" default="80">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+</kitManifest>

@@ -1,0 +1,128 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Compare"
+   checksum="88d920d9"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Compare function block library"
+   buildHost="ubuntu"
+   buildTime="2023-06-26T17:38:17.723+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Compare::AlternativeCompare -->
+<type id="0" name="AlternativeCompare" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
+  </facets>
+  <slot id="0" name="compareOperation" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="200"/>
+      <str name="range" val="None, Greater, GreaterEqual, Less, LessEqual, Equal, NotEqual, END"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="x" type="float"/>
+  <slot id="3" name="y" type="float"/>
+</type>
+
+<!-- Compare::CompHystH -->
+<type id="1" name="CompHystH" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="set" type="float"/>
+  <slot id="3" name="hyst" type="float"/>
+</type>
+
+<!-- Compare::CompHystL -->
+<type id="2" name="CompHystL" sizeof="56" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="set" type="float"/>
+  <slot id="3" name="hyst" type="float"/>
+</type>
+
+<!-- Compare::CompareE -->
+<type id="3" name="CompareE" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="x" type="float"/>
+  <slot id="2" name="y" type="float"/>
+</type>
+
+<!-- Compare::CompareG -->
+<type id="4" name="CompareG" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="x" type="float"/>
+  <slot id="2" name="y" type="float"/>
+</type>
+
+<!-- Compare::CompareL -->
+<type id="5" name="CompareL" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="x" type="float"/>
+  <slot id="2" name="y" type="float"/>
+</type>
+
+<!-- Compare::InRange -->
+<type id="6" name="InRange" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/limit.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="min" type="float"/>
+  <slot id="3" name="max" type="float"/>
+</type>
+
+</kitManifest>

@@ -1,0 +1,212 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="ModBus"
+   checksum="f620b2e0"
+   hasNatives="true"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="ModBus Management"
+   buildHost="ubuntu"
+   buildTime="2023-10-19T09:40:13.354+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+  <depend on="Variable 0.1+"/>
+</depends>
+
+<!-- ModBus::ModbusRTUMaster -->
+<type id="0" name="ModbusRTUMaster" sizeof="4180" base="Variable::FieldBusNet">
+  <slot id="0" name="port" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <str name="range" val="Port1, Port2"/>
+      <int name="min" val="0"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="1"/>
+    </facets>
+  </slot>
+  <slot id="1" name="band" type="int" flags="c" default="19200">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <int name="min" val="1200"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="115200"/>
+    </facets>
+  </slot>
+  <slot id="2" name="parity" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <str name="range" val="None, Even, Odd"/>
+      <int name="min" val="0"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="2"/>
+    </facets>
+  </slot>
+  <slot id="3" name="dataBits" type="int" flags="c" default="8">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <int name="min" val="7"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="8"/>
+    </facets>
+  </slot>
+  <slot id="4" name="stopBits" type="int" flags="c" default="1">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <int name="min" val="1"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="2"/>
+    </facets>
+  </slot>
+  <slot id="5" name="retryDelay" type="int" flags="c" default="60">
+    <facets>
+      <str name="unit" val="second"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="responseTimeout" type="int" flags="c" default="500">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- ModBus::ModbusRTUSlave -->
+<type id="1" name="ModbusRTUSlave" sizeof="4172" base="Variable::FieldBusNet">
+  <slot id="0" name="port" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <str name="range" val="Port1, Port2"/>
+      <int name="min" val="0"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="1"/>
+    </facets>
+  </slot>
+  <slot id="1" name="band" type="int" flags="c" default="19200">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <int name="min" val="1200"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="115200"/>
+    </facets>
+  </slot>
+  <slot id="2" name="parity" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <str name="range" val="None, Even, Odd"/>
+      <int name="min" val="0"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="2"/>
+    </facets>
+  </slot>
+  <slot id="3" name="dataBits" type="int" flags="c" default="8">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <int name="min" val="7"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="8"/>
+    </facets>
+  </slot>
+  <slot id="4" name="stopBits" type="int" flags="c" default="1">
+    <facets>
+      <int name="fieldWidth" val="10"/>
+      <int name="min" val="1"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="2"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- ModBus::ModbusRemDev -->
+<type id="2" name="ModbusRemDev" sizeof="236" base="Variable::FieldBusDevice">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/device.png"/>
+  </facets>
+  <slot id="0" name="address" type="int" flags="c" default="1">
+    <facets>
+      <int name="min" val="1"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="250"/>
+    </facets>
+  </slot>
+  <slot id="1" name="refreshTime" type="int" flags="c" default="500">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <int name="min" val="100"/>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="pointDelay" type="int" flags="c" default="5">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="endian" type="int" flags="c" default="0">
+    <facets>
+      <str name="range" val="LittleEndian, BigEndian"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="elapsedTime" type="int" default="-1">
+    <facets>
+      <str name="unit" val="millisecond"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="packetsTotal" type="int" default="-1">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="packetsError" type="int" default="-1">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- ModBus::ModbusTCPClient -->
+<type id="3" name="ModbusTCPClient" sizeof="4180" base="Variable::FieldBusNet">
+  <slot id="0" name="ipaddr" type="sys::Buf" flags="cs" default="127.0.0.1">
+    <facets>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="20"/>
+    </facets>
+  </slot>
+  <slot id="1" name="port" type="int" flags="c" default="502">
+    <facets>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="65535"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- ModBus::ModbusTCPServer -->
+<type id="4" name="ModbusTCPServer" sizeof="4156" base="Variable::FieldBusNet">
+  <slot id="0" name="port" type="int" flags="c" default="502">
+    <facets>
+      <bool name="config" val="true"/>
+      <bool name="defaultOnClone" val="true"/>
+      <int name="max" val="65535"/>
+    </facets>
+  </slot>
+</type>
+
+</kitManifest>

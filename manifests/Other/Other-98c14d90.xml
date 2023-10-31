@@ -1,0 +1,180 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Other"
+   checksum="98c14d90"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Other function block library"
+   buildHost="ubuntu"
+   buildTime="2023-09-21T18:24:51.133+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Other::COV -->
+<type id="0" name="COV" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+</type>
+
+<!-- Other::Count -->
+<type id="1" name="Count" sizeof="64" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/step.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="preset" type="float" flags="c" default="0.0">
+    <facets>
+      <int name="min" val="0"/>
+      <bool name="defaultOnClone" val="true"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="dir" type="float" flags="c" default="1.0">
+    <facets>
+      <str name="falseText" val="down"/>
+      <bool name="defaultOnClone" val="true"/>
+      <bool name="config" val="true"/>
+      <str name="trueText" val="up"/>
+    </facets>
+  </slot>
+  <slot id="4" name="en" type="float" default="1.0"/>
+  <slot id="5" name="reset" type="float"/>
+</type>
+
+<!-- Other::Ramp -->
+<type id="2" name="Ramp" sizeof="60" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/xy.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="enable" type="float" default="1.0"/>
+  <slot id="2" name="in" type="float"/>
+  <slot id="3" name="delta" type="float" default="1.0"/>
+  <slot id="4" name="reset" type="float" default="0.0"/>
+</type>
+
+<!-- Other::Switch -->
+<type id="3" name="Switch" sizeof="564" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/xy.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="max" type="float" default="1.0">
+    <facets>
+      <int name="range" val="63"/>
+    </facets>
+  </slot>
+  <slot id="3" name="in0" type="float" default="0.0"/>
+  <slot id="4" name="in1" type="float" default="0.0"/>
+  <slot id="5" name="in2" type="float" default="0.0"/>
+  <slot id="6" name="in3" type="float" default="0.0"/>
+  <slot id="7" name="in4" type="float" default="0.0"/>
+  <slot id="8" name="in5" type="float" default="0.0"/>
+  <slot id="9" name="in6" type="float" default="0.0"/>
+  <slot id="10" name="in7" type="float" default="0.0"/>
+  <slot id="11" name="in8" type="float" default="0.0"/>
+  <slot id="12" name="in9" type="float" default="0.0"/>
+  <slot id="13" name="in10" type="float" default="0.0"/>
+  <slot id="14" name="in11" type="float" default="0.0"/>
+  <slot id="15" name="in12" type="float" default="0.0"/>
+  <slot id="16" name="in13" type="float" default="0.0"/>
+  <slot id="17" name="in14" type="float" default="0.0"/>
+  <slot id="18" name="in15" type="float" default="0.0"/>
+  <slot id="19" name="in16" type="float" default="0.0"/>
+  <slot id="20" name="in17" type="float" default="0.0"/>
+  <slot id="21" name="in18" type="float" default="0.0"/>
+  <slot id="22" name="in19" type="float" default="0.0"/>
+  <slot id="23" name="in20" type="float" default="0.0"/>
+  <slot id="24" name="in21" type="float" default="0.0"/>
+  <slot id="25" name="in22" type="float" default="0.0"/>
+  <slot id="26" name="in23" type="float" default="0.0"/>
+  <slot id="27" name="in24" type="float" default="0.0"/>
+  <slot id="28" name="in25" type="float" default="0.0"/>
+  <slot id="29" name="in26" type="float" default="0.0"/>
+  <slot id="30" name="in27" type="float" default="0.0"/>
+  <slot id="31" name="in28" type="float" default="0.0"/>
+  <slot id="32" name="in29" type="float" default="0.0"/>
+  <slot id="33" name="in30" type="float" default="0.0"/>
+  <slot id="34" name="in31" type="float" default="0.0"/>
+  <slot id="35" name="in32" type="float" default="0.0"/>
+  <slot id="36" name="in33" type="float" default="0.0"/>
+  <slot id="37" name="in34" type="float" default="0.0"/>
+  <slot id="38" name="in35" type="float" default="0.0"/>
+  <slot id="39" name="in36" type="float" default="0.0"/>
+  <slot id="40" name="in37" type="float" default="0.0"/>
+  <slot id="41" name="in38" type="float" default="0.0"/>
+  <slot id="42" name="in39" type="float" default="0.0"/>
+  <slot id="43" name="in40" type="float" default="0.0"/>
+  <slot id="44" name="in41" type="float" default="0.0"/>
+  <slot id="45" name="in42" type="float" default="0.0"/>
+  <slot id="46" name="in43" type="float" default="0.0"/>
+  <slot id="47" name="in44" type="float" default="0.0"/>
+  <slot id="48" name="in45" type="float" default="0.0"/>
+  <slot id="49" name="in46" type="float" default="0.0"/>
+  <slot id="50" name="in47" type="float" default="0.0"/>
+  <slot id="51" name="in48" type="float" default="0.0"/>
+  <slot id="52" name="in49" type="float" default="0.0"/>
+  <slot id="53" name="in50" type="float" default="0.0"/>
+  <slot id="54" name="in51" type="float" default="0.0"/>
+  <slot id="55" name="in52" type="float" default="0.0"/>
+  <slot id="56" name="in53" type="float" default="0.0"/>
+  <slot id="57" name="in54" type="float" default="0.0"/>
+  <slot id="58" name="in55" type="float" default="0.0"/>
+  <slot id="59" name="in56" type="float" default="0.0"/>
+  <slot id="60" name="in57" type="float" default="0.0"/>
+  <slot id="61" name="in58" type="float" default="0.0"/>
+  <slot id="62" name="in59" type="float" default="0.0"/>
+  <slot id="63" name="in60" type="float" default="0.0"/>
+  <slot id="64" name="in61" type="float" default="0.0"/>
+  <slot id="65" name="in62" type="float" default="0.0"/>
+  <slot id="66" name="in63" type="float" default="0.0"/>
+  <slot id="67" name="inDefault" type="float" default="0.0"/>
+</type>
+
+<!-- Other::TableConvert -->
+<type id="4" name="TableConvert" sizeof="4544" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/add.png"/>
+  </facets>
+  <slot id="0" name="ntc_type" type="int" default="0">
+    <facets>
+      <str name="range" val="None, TenKB3950, TwentyKHNWL, TenKII, TenKIII, END"/>
+    </facets>
+  </slot>
+  <slot id="1" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="in1" type="float" default="0.0"/>
+</type>
+
+</kitManifest>

@@ -1,0 +1,634 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Other"
+   checksum="bd391874"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Other function block library"
+   buildHost="ubuntu"
+   buildTime="2023-09-13T14:22:36.244+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Other::COV -->
+<type id="0" name="COV" sizeof="48" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+</type>
+
+<!-- Other::Count -->
+<type id="1" name="Count" sizeof="64" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/step.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="preset" type="float" flags="c" default="0.0">
+    <facets>
+      <int name="min" val="0"/>
+      <bool name="defaultOnClone" val="true"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="dir" type="float" flags="c" default="1.0">
+    <facets>
+      <str name="falseText" val="down"/>
+      <bool name="defaultOnClone" val="true"/>
+      <bool name="config" val="true"/>
+      <str name="trueText" val="up"/>
+    </facets>
+  </slot>
+  <slot id="4" name="en" type="float" default="1.0"/>
+  <slot id="5" name="reset" type="float"/>
+</type>
+
+<!-- Other::Hold -->
+<type id="2" name="Hold" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/control.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="enable" type="int" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="value" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Other::Ramp -->
+<type id="3" name="Ramp" sizeof="60" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/xy.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="enable" type="float" default="1.0"/>
+  <slot id="2" name="in" type="float"/>
+  <slot id="3" name="delta" type="float" default="1.0"/>
+  <slot id="4" name="reset" type="float" default="0.0"/>
+</type>
+
+<!-- Other::Table -->
+<type id="4" name="Table" sizeof="448" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/xy.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="x1" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="3" name="y1" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="4" name="x2" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="5" name="y2" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="6" name="x3" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="7" name="y3" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="8" name="x4" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="9" name="y4" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="10" name="x5" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="11" name="y5" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="12" name="x6" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="13" name="y6" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="14" name="x7" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="15" name="y7" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="16" name="x8" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="17" name="y8" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="18" name="x9" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="19" name="y9" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="20" name="x10" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="21" name="y10" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="22" name="x11" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="23" name="y11" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="24" name="x12" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="25" name="y12" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="26" name="x13" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="27" name="y13" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="28" name="x14" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="29" name="y14" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="30" name="x15" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="31" name="y15" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="32" name="x16" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="33" name="y16" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="34" name="x17" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="35" name="y17" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="36" name="x18" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="37" name="y18" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="38" name="x19" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="39" name="y19" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="40" name="x20" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="41" name="y20" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="42" name="x21" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="43" name="y21" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="44" name="x22" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="45" name="y22" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="46" name="x23" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="47" name="y23" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="48" name="x24" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="49" name="y24" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="50" name="x25" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="51" name="y25" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="52" name="x26" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="53" name="y26" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="54" name="x27" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="55" name="y27" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="56" name="x28" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="57" name="y28" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="58" name="x29" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="59" name="y29" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="60" name="x30" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="61" name="y30" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="62" name="x31" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="63" name="y31" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="64" name="x32" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="65" name="y32" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="66" name="x33" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="67" name="y33" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="68" name="x34" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="69" name="y34" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="70" name="x35" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="71" name="y35" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="72" name="x36" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="73" name="y36" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="74" name="x37" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="75" name="y37" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="76" name="x38" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="77" name="y38" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="78" name="x39" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="79" name="y39" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="80" name="x40" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="81" name="y40" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="82" name="x41" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="83" name="y41" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="84" name="x42" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="85" name="y42" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="86" name="x43" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="87" name="y43" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="88" name="x44" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="89" name="y44" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="90" name="x45" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="91" name="y45" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="92" name="x46" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="93" name="y46" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="94" name="x47" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="95" name="y47" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="96" name="x48" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="97" name="y48" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="98" name="x49" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="99" name="y49" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="100" name="x50" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="101" name="y50" type="float" flags="c">
+    <facets>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Other::TableConvert -->
+<type id="5" name="TableConvert" sizeof="4544" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/add.png"/>
+  </facets>
+  <slot id="0" name="ntc_type" type="int" default="0">
+    <facets>
+      <str name="range" val="None, 10K_B3950, 20K_HNWL, 10K_II, 10K_III, END"/>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="in1" type="float" default="0.0"/>
+</type>
+
+</kitManifest>

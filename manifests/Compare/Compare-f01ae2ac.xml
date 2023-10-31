@@ -1,0 +1,56 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Compare"
+   checksum="f01ae2ac"
+   hasNatives="false"
+   doc="false"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Compare function block library"
+   buildHost="ubuntu"
+   buildTime="2023-10-09T09:45:48.404+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Compare::Compare -->
+<type id="0" name="Compare" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/logic/lessThan.png"/>
+  </facets>
+  <slot id="0" name="compareOperation" type="int" flags="c" default="0">
+    <facets>
+      <int name="fieldWidth" val="200"/>
+      <str name="range" val="Greater, GreaterEqual, Less, LessEqual, Equal, NotEqual"/>
+      <bool name="config" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="2" name="x" type="float"/>
+  <slot id="3" name="y" type="float"/>
+</type>
+
+<!-- Compare::InRange -->
+<type id="1" name="InRange" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/util/limit.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in" type="float"/>
+  <slot id="2" name="min" type="float"/>
+  <slot id="3" name="max" type="float"/>
+</type>
+
+</kitManifest>

@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Sedona core system module"
    buildHost="ubuntu"
-   buildTime="2023-05-17T09:54:59.206+08:00"
+   buildTime="2023-10-11T10:53:58.260+08:00"
 >
 
 <!-- Dependencies -->
