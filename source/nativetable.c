@@ -499,6 +499,38 @@ Cell ModBus_tcpServer_dR(SedonaVM* vm, Cell* params);
 // int tcpServer.dW(int, int, int, int, float[])
 Cell ModBus_tcpServer_dW(SedonaVM* vm, Cell* params);
 
+// Lujiaming add at 231025
+// int rtuRemDev.dO(int, int, int, int, int, int, int)
+Cell ModBus_rtuRemDev_dO(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dC(int)
+Cell ModBus_rtuRemDev_dC(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dA(int, int, int, int, int, int)
+Cell ModBus_rtuRemDev_dA(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dR(int, int, int, int, float[])
+Cell ModBus_rtuRemDev_dR(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dW(int, int, int, int, float[])
+Cell ModBus_rtuRemDev_dW(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dO(int, int, int, int, int)
+Cell ModBus_rtuLocDev_dO(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dC(int)
+Cell ModBus_rtuLocDev_dC(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dA(int, int, int, int)
+Cell ModBus_rtuLocDev_dA(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dR(int, int, int, int, float[])
+Cell ModBus_rtuLocDev_dR(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dW(int, int, int, int, float[])
+Cell ModBus_rtuLocDev_dW(SedonaVM* vm, Cell* params);
+// Lujiaming add at 231025 end 
+
 // native table for kit 3
 NativeMethod kitNatives3[] = 
 {
@@ -522,6 +554,17 @@ NativeMethod kitNatives3[] =
   ModBus_tcpServer_dA,            // 3::17
   ModBus_tcpServer_dR,            // 3::18
   ModBus_tcpServer_dW,            // 3::19
+  // Lujiaming add at 2310125
+  ModBus_rtuRemDev_dO,             // 3::20
+  ModBus_rtuRemDev_dC,             // 3::21
+  ModBus_rtuRemDev_dA,             // 3::22
+  ModBus_rtuRemDev_dR,             // 3::23
+  ModBus_rtuRemDev_dW,             // 3::24
+  ModBus_rtuLocDev_dO,             // 3::25
+  ModBus_rtuLocDev_dC,             // 3::26
+  ModBus_rtuLocDev_dA,             // 3::27
+  ModBus_rtuLocDev_dR,             // 3::28
+  ModBus_rtuLocDev_dW,             // 3::29
 };
 
 ////////////////////////////////////////////////////////////////
@@ -668,7 +711,7 @@ int isNativeIdValid(int kitId, int methodId)
       if (methodId >= 21) return 0;
       else return kitNatives2[methodId] != NULL;
     case 3:
-      if (methodId >= 20) return 0;
+      if (methodId >= 30) return 0;
       else return kitNatives3[methodId] != NULL;
     case 4:
       // jiaming.lu adjust it @03/20/2023

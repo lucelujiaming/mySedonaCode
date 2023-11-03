@@ -136,30 +136,35 @@ class BacnetLocDev
                         case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
                         case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
                             bus.decodeUnsigned(data, iLen, bufInteger)
+                            log.message("-------------------------------------------------------------------------------")
+                            log.message("-------------------------d.name=$d.name and d.type.name=$d.type.name-------------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleUnsignedInteger oldValue= ${((BacnetLocalVar)d).present_value}------------------")
+                            log.message("-------------------------------------------------------------------------------")
                             ((BacnetLocalVar)d).present_value := (float)bufInteger[0]
                             log.message("-------------------------------------------------------------------------------")
-                            log.message("-------------------------ReadPropertyMultipleUnsignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
+                            log.message("-------------------------d.name=$d.name and d.type.name=$d.type.name-------------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleUnsignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
                             bus.decodeUnsigned(data, iLen, bufInteger)
                             ((BacnetLocalVar)d).present_value := (float)bufInteger[0]
                             log.message("-------------------------------------------------------------------------------")
-                            log.message("------------------------ReadPropertyMultipleSignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
+                            log.message("------------------------writeProperty::ReadPropertyMultipleSignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
                             bus.decodeFloat(data, bufFloat)
                             ((BacnetLocalVar)d).present_value := (float)bufFloat[0]
                             log.message("-------------------------------------------------------------------------------")
-                            log.message("--------------------------ReadPropertyMultipleFloat = ${((BacnetLocalVar)d).present_value}--------------------")
+                            log.message("--------------------------writeProperty::ReadPropertyMultipleFloat = ${((BacnetLocalVar)d).present_value}--------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
                             bus.decodeDouble(data, bufDouble)
                             ((BacnetLocalVar)d).present_value := (float)bufDouble[0]
                             log.message("-------------------------------------------------------------------------------")
-                            log.message("-------------------------ReadPropertyMultipleDouble = ${((BacnetLocalVar)d).present_value}--------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleDouble = ${((BacnetLocalVar)d).present_value}--------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         // case BANET_PROPVAR_NULLAPPTAG:

@@ -88,11 +88,13 @@ class ModbusRTUMaster
       for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status <= ModbusRemDev.STATUSREADY) {
           if (readReg(((ModbusRemDev)d).address, 0, 1, buffer) == 3) {
+             log.message("readReg OK")
             ((ModbusRemDev)d).elapsedTime := (int)buffer[0]
             ((ModbusRemDev)d).packetsTotal := (int)buffer[1]
             ((ModbusRemDev)d).packetsError := (int)buffer[2]
             ((ModbusRemDev)d).status := ModbusRemDev.STATUSOK
           } else {
+             log.message("readReg Failed")
             ((ModbusRemDev)d).elapsedTime := -1
             ((ModbusRemDev)d).packetsTotal := -1
             ((ModbusRemDev)d).packetsError := -1
@@ -275,6 +277,7 @@ class ModbusRTUMaster
       if(ctx == -1){
           return -1
       }
+      log.message("ModbusRTUMaster::readReg ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
       return dR(ctx, deviceAddr, addr, len, buf)
   }
 
@@ -286,6 +289,7 @@ class ModbusRTUMaster
       if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
           return -1
       }
+      log.message("ModbusRTUMaster::writeReg ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
       return dW(ctx, deviceAddr, addr, len, buf)
   }
   

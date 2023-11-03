@@ -20,38 +20,80 @@ class ModbusNetVarOut
   
   override void changed(Slot slot)
   {
+    int iRet = -1
     super.changed(slot)
     if (slot == ModbusNetVarOut.in) {
       if (cache != 0 && bus != null && status <= STATUSOK) {
         buf[0] = in
-        bus.writeReg(cache, regId, typeId, buf)
+        iRet = bus.writeReg(cache, regId, typeId, buf)
+        if(iRet <= 0)
+        {
+	        if(device != null)
+	        {
+	           device.modbusRTUMasterWrite(
+           			device.ctx, cache, regId, typeId, buf)
+	        }
+        }
       }
     } 
     if (slot == ModbusNetVarOut.device_name || slot == ModbusNetVarOut.io_type || slot == ModbusNetVarOut.Address) {
+      log.message("changed slot.name=$slot.name")
       update()
       needUpdate = true
     }
   }
   virtual override void execute()
   {
-	if(isOutofService == true)
-	{
-		out := outofservice_value
+    int iRet = -1
+    ** log.message("11111 name=$name")
+    if (bus != null) {
+        ** log.message("11111 bus.busId=$busId ")
+    }
+    if(isOutofService == true)
+    {
+    	out := outofservice_value
         log.message("ModbusNetVarOut:: isOutofService == true")  // status=4 -> STATUSNODEV
         return
-	}
+    }
     if (cache != 0 && bus != null && status <= STATUSREADY) {
+      log.message("22222 ModbusNetVarOut::regId=$regId typeId=$typeId")
       if (bus.readReg(cache, regId, typeId, buf) == dataLen) {
         out := buf[0]
+        log.message("33333 ModbusNetVarOut::out=$out")
         status := STATUSOK
       } else {
-        out := 0.0f
-        status := STATUSOFFLINE
+        if(device != null)
+        {
+           if (device.modbusRTUMasterRead(
+           			device.ctx, cache, regId, typeId, buf) == dataLen) {
+	         out := buf[0]
+	         log.message("4444 ModbusNetVarIn::out=$out")
+	         status := STATUSOK
+	       } else {
+	           log.message("55555 ModbusNetVarIn::regId=$regId typeId=$typeId")
+	           out := 0.0f
+	           status := STATUSOFFLINE
+	       } 
+        }
+        else 
+        {
+           log.message("666666 ModbusNetVarOut::regId=$regId typeId=$typeId")
+           out := 0.0f
+           status := STATUSOFFLINE
+        }
       }
     }
     if (needUpdate && isSlotLinkToIN() && cache != 0 && bus != null && status <= STATUSOK) {
       buf[0] = in
-      bus.writeReg(cache, regId, typeId, buf)
+      iRet = bus.writeReg(cache, regId, typeId, buf)
+      if(iRet <= 0)
+      {
+	      if(device != null)
+	      {
+	         device.modbusRTUMasterWrite(
+         			device.ctx, cache, regId, typeId, buf)
+	      }
+      }
       needUpdate = false
     }
     if (!isSlotLinkToIN() || cache == 0) {

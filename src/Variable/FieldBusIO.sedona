@@ -251,6 +251,7 @@ abstract class FieldBusIO
   // Fields
   ////////////////////////////////////////////////////////////////
   FieldBusNet bus = null
+  FieldBusDevice device = null
   int cache = 0
 
   int busId = 0

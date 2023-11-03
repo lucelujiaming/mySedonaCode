@@ -30,22 +30,38 @@ class ModbusNetVarIn
     if (bus != null) {
         ** log.message("11111 bus.busId=$busId ")
     }
-	if(isOutofService == true)
-	{
-		out := outofservice_value
+    if(isOutofService == true)
+    {
+    	out := outofservice_value
         log.message("ModbusNetVarIn:: isOutofService == true")  // status=4 -> STATUSNODEV
         return
-	}
+    }
     if (cache != 0 && bus != null && status <= STATUSREADY) {
-        ** log.message("22222 name=$name")
+      log.message("22222 ModbusNetVarIn::regId=$regId typeId=$typeId")
       if (bus.readReg(cache, regId, typeId, buf) == dataLen) {
-        ** log.message("33333 out=$out")
         out := buf[0]
+        log.message("33333 ModbusNetVarIn::out=$out")
         status := STATUSOK
       } else {
-        ** log.message("44444 name=$name")
-        out := 0.0f
-        status := STATUSOFFLINE
+        if(device != null)
+        {
+           if (device.modbusRTUMasterRead(
+           			device.ctx, cache, regId, typeId, buf) == dataLen) {
+	         out := buf[0]
+	         log.message("4444 ModbusNetVarIn::out=$out")
+	         status := STATUSOK
+	       } else {
+	           log.message("55555 ModbusNetVarIn::regId=$regId typeId=$typeId")
+	           out := 0.0f
+	           status := STATUSOFFLINE
+	       } 
+        }
+        else 
+        {
+           log.message("666666 ModbusNetVarIn::regId=$regId typeId=$typeId")
+           out := 0.0f
+           status := STATUSOFFLINE
+        }
       }
     }
   }

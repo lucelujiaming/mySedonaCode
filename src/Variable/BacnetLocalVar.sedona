@@ -58,6 +58,10 @@ class BacnetLocalVar
                         if(((Variable)r).alias.toStr().equals(aliasStr))  {
                             ** log.message("6666 r.value=${((Variable)r).value}")
                             present_value := ((Variable)r).value
+                           **  log.message("-------------------------------------------------------------------------------")
+                           **  log.message("-------------------------name=$name and type.name=$type.name-------------------------")
+                           **  log.message("-------------------------execute::present_value = $present_value------------------")
+                           **  log.message("-------------------------------------------------------------------------------")
                         }
                     }
                }

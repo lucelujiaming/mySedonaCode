@@ -20,16 +20,16 @@ class BacnetIP
   @fieldWidth = 20
   property int bacpacketStatus = BACPACKETSTATUSINIT
   
-  @config
-  property int deviceInstance = 0
+  // @config
+  // property int deviceInstance = 0
 
   @config
   @unit = Units.second
   property int retryDelay = 60
 
-  @asStr
-  @config
-  property Buf(64) ipLocalAddress = "192.168.168.2"
+//  @readonly
+//  @asStr
+//  property Buf(128) ipLocalAddress = "192.168.168.2"
   
   // 
   @config
@@ -41,12 +41,14 @@ class BacnetIP
   ////////////////////////////////////////////////////////////////
   override void loaded()
   {
+    
     update()
   }
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == BacnetIP.port || slot == BacnetIP.deviceInstance || slot == BacnetIP.retryDelay) {
+    if (slot == BacnetIP.port  // || slot == BacnetIP.deviceInstance
+     || slot == BacnetIP.retryDelay) {
       update()
     }
   }
@@ -84,7 +86,7 @@ class BacnetIP
       ctx = -1
       busId = 0
     }
-    ctx = bacnet_open(port, deviceInstance, retryDelay)
+    ctx = bacnet_open(port, 0, retryDelay)
     log.message("bacnet_open flush")
     if (ctx != -1) {
       log.message("Call updateCache flush")
@@ -268,6 +270,11 @@ class BacnetIP
       status := STATUSNODEV
     }
     needFlush = true
+    file.name = "current_ip"
+    if (!file.open("r")) return
+    int size = file.size()
+    file.in.readBytes(ipLocalAddress.bytes, ipLocalAddress.size, size)
+    log.message("ipLocalAddress  = ${ipLocalAddress.toStr()}")
   }
   
   override int readReg(int deviceAddr, int addr, int iLen, float[] buf)
@@ -389,7 +396,8 @@ class BacnetIP
   ////////////////////////////////////////////////////////////////
   // define Log log
   private int ctx = -1
-
+  inline File file 
+  inline Buf(128) ipLocalAddress 
 
   native int dO(int port, int device_instance, int retry_delay)
 

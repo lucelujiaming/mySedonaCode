@@ -149,16 +149,16 @@ class BacnetRemDev
             bool isIncludeSubNetMac = isInstanceNumberIncludeSubNetMac()
             if(isIncludeSubNetMac && iInstanceNumberFromSubNetMac == -1)
             {
-                log.message("Waiting iInstanceNumberFromSubNetMac with ${InstanceNumber.toStr()}")
+                ** log.message("Waiting iInstanceNumberFromSubNetMac with ${InstanceNumber.toStr()}")
             }
             else
             {
-                log.message("Sending makeDevice4194303MaxAPDULengthAccepted with ${InstanceNumber.toStr()}")
+                ** log.message("Sending makeDevice4194303MaxAPDULengthAccepted with ${InstanceNumber.toStr()}")
                 // Get max-apdu-length-accepted by <B'0000' Up to MinimumMessageSize (50 octets)>
                 int iLen = makeDevice4194303MaxAPDULengthAccepted()
                 if(iLen > 0)
                 {
-                   log.message("writeReg makeDevice4194303MaxAPDULengthAccepted($iLen)")
+                   ** log.message("writeReg makeDevice4194303MaxAPDULengthAccepted($iLen)")
                    writeReg(0, 0, iLen, buf)
                 }
                 return
@@ -166,12 +166,12 @@ class BacnetRemDev
         }
         if(readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
         {
-            log.message("Sending makeDevice4194303ProtocolServicesSupported")
+            ** log.message("Sending makeDevice4194303ProtocolServicesSupported")
             // Get device information
             int iLen = makeDevice4194303ProtocolServicesSupported()
             if(iLen > 0)
             {
-               log.message("writeReg makeDevice4194303ProtocolServicesSupported($iLen)")
+               ** log.message("writeReg makeDevice4194303ProtocolServicesSupported($iLen)")
                writeReg(0, 0, iLen, buf)
             }
             return 
@@ -296,8 +296,8 @@ class BacnetRemDev
     }
     else 
     {   
-      log.message("Error dataExpectingReplyNPCI with (${sourceNetworkAddress}, ${sadr})") 
-      log.message("I am $name and type is ${type.name}")
+      ** log.message("Error dataExpectingReplyNPCI with (${sourceNetworkAddress}, ${sadr})") 
+      log.message("Error dataExpectingReplyNPCI:: I am $name and type is ${type.name}")
       return -1
     }
   }
@@ -305,7 +305,7 @@ class BacnetRemDev
   override int writeReg(int deviceAddr, int addr, int iLen, float[] buf)
   { 
     int headLength = 0
-    log.message("writeReg headLength=$headLength") 
+    ** log.message("writeReg headLength=$headLength") 
     headLength = fillHead()
     if(headLength == -1)
         return headLength
@@ -3610,14 +3610,14 @@ class BacnetRemDev
         bacnetPacket[dataLength++] = 0x00
     }
     bacnetPacket[dataLength++] = instanceNumber % 0x100
-    log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
+    ** log.message("makeDevice4194303ProtocolServicesSupported::instanceNumber = ${instanceNumber}")
     //Property Identifier: protocol-services-supported (97)
     int propertyIdentifier = 97
-    log.message("BacReadPropertyVar::propertyIdentifier = $propertyIdentifier")
+    ** log.message("makeDevice4194303ProtocolServicesSupported::propertyIdentifier = $propertyIdentifier")
     bacnetPacket[dataLength++] = 0x18 + 1
     bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
 
-    log.message("22222 makeDevice4194303ProtocolServicesSupported::bacnetPacket[$dataLength]")
+    ** log.message("22222 makeDevice4194303ProtocolServicesSupported::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
     {
         buf[i] = (float)bacnetPacket[i]
