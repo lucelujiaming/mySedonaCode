@@ -1,0 +1,217 @@
+@niagaraIcon="module://icons/x16/device.png"
+class ModbusLocDev
+  extends FieldBusDevice
+{
+  @config
+  @min = 1
+  @max = 250
+  property int address = 1
+
+  @config
+  @defaultOnClone
+  @unit = Units.millisecond
+  @min = 100
+  property int refreshTime = 500
+
+  @config
+  @unit = Units.millisecond
+  property int pointDelay = 5
+
+  define Str ENDIANRANGE = "LittleEndian, BigEndian"
+  define int LITTLEENDIAN = 0
+  define int BIGENDIAN = 1
+  @config
+  @range = ENDIANRANGE
+  property int endian = 0
+
+  @readonly
+  @unit = Units.millisecond
+  property int elapsedTime = -1
+
+  @readonly
+  property int packetsTotal = -1
+
+  @readonly
+  property int packetsError = -1
+
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void loaded()
+  {
+    sub_fieldbusdevice_type_id = SUB_FIELDBUSDEVICE_TYPE_MODBUSLOCDEV
+    update()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == ModbusRemDev.deviceName || slot == ModbusRemDev.address || 
+        slot == ModbusRemDev.refreshTime || slot == ModbusRemDev.pointDelay || slot == ModbusRemDev.endian) {
+      update()
+    }
+  }
+  override void stop()
+  {
+    status := STATUSEND
+    Component n = Sys.app.lookup(parent)
+    if (n.type.is(FieldBusNet.type)) {
+      ((FieldBusNet)n).update()
+      ((FieldBusNet)n).notifyFlush()
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  void update()
+  {
+    Component n = Sys.app.lookup(parent)
+    if (n != null && n.type.is(FieldBusNet.type)) {
+      ((FieldBusNet)n).update()
+      ((FieldBusNet)n).notifyFlush()
+      for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d == this) {
+          continue
+        }
+        if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).address == address) {
+          status := STATUSEADDR
+          return
+        }
+      }
+      if (deviceName.toStr().length() > 0) {
+        Component s = Sys.app.lookup(n.parent)
+        if (s != null && s.type.is(Folder.type) && s.name.equals("service")) {
+          for (Component n1 = Sys.app.lookup(s.children); n1 != null; n1 = Sys.app.lookup(n1.nextSibling)) {
+            if (n1.type.is(FieldBusNet.type)) {
+              for (Component d = Sys.app.lookup(n1.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                if (d == this) {
+                  continue
+                }
+                if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).deviceName.toStr().equals(deviceName.toStr())) {
+                  status := STATUSENAME
+                  return
+                }
+              }
+            }
+          }
+        }
+      } else {
+        status := STATUSENAME
+        return
+      }
+      status := STATUSNOREG
+    } else {
+      status := STATUSNONET
+    }
+  }
+
+  override int modbusRTUSlaveOpen(int port, int band, int parity, int dataBits, int stopBits)
+  {
+     log.message("ModbusRTULocDev::modbusRTUSlaveOpen ctx=$ctx");
+     return dRtuO(port, band, parity, dataBits, stopBits)
+  }
+  override int modbusRTUSlaveClose(int ctx)
+  {
+     log.message("ModbusRTULocDev::modbusRTUSlaveClose ctx=$ctx");
+     return dRtuC(ctx)
+  }
+  override int  modbusRTUSlaveAdd(int ctx, int deviceAddr, int addr, int len)
+  {
+      if(ctx == -1){
+          log.message("ModbusRTULocDev::modbusRTUSlaveAdd failed ctx=$ctx");
+          return -1
+      }
+     log.message("ModbusRTURemDev::modbusRTUSlaveAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dRtuA(ctx, deviceAddr, addr, len)
+  }
+  override int modbusRTUSlaveRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRTULocDev::modbusRTUSlaveRead failed ctx=$ctx");
+          return -1
+      }
+     // log.message("ModbusRTULocDev::modbusRTUSlaveRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dRtuR(ctx, deviceAddr, addr, len, buf)
+  }
+  override int modbusRTUSlaveWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRTULocDev::modbusRTUSlaveWrite failed ctx=$ctx");
+          return -1
+      }
+      if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
+          log.message("ModbusRTULocDev::modbusRTUSlaveWrite failed addr=$addr");
+          return -1
+      }
+     // log.message("ModbusRTULocDev::modbusRTUSlaveWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dRtuW(ctx, deviceAddr, addr, len, buf)
+  }
+  // 
+  override int modbusTCPClientOpen(Str ip, int port)
+  {
+     log.message("ModbusRTULocDev::modbusRTUSlaveOpen ctx=$ctx");
+     return dTcpO(ip, port)
+  }
+  override int modbusTCPClientClose(int ctx)
+  {
+     log.message("ModbusRTULocDev::modbusRTUSlaveClose ctx=$ctx");
+     return dTcpC(ctx)
+  }
+  override int  modbusTCPClientAdd(int ctx, int deviceAddr, int addr, int len, int refreshms)
+  {
+      if(ctx == -1){
+          log.message("ModbusRTULocDev::modbusRTUSlaveAdd failed ctx=$ctx");
+          return -1
+      }
+     log.message("ModbusRTURemDev::modbusRTUSlaveAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpA(ctx, deviceAddr, addr, len, refreshms)
+  }
+  override int modbusTCPClientRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRTULocDev::modbusRTUSlaveRead failed ctx=$ctx");
+          return -1
+      }
+     // log.message("ModbusRTULocDev::modbusRTUSlaveRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpR(ctx, deviceAddr, addr, len, buf)
+  }
+  override int modbusTCPClientWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRTULocDev::modbusRTUSlaveWrite failed ctx=$ctx");
+          return -1
+      }
+      if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
+          log.message("ModbusRTULocDev::modbusRTUSlaveWrite failed addr=$addr");
+          return -1
+      }
+     // log.message("ModbusRTULocDev::modbusRTUSlaveWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpW(ctx, deviceAddr, addr, len, buf)
+  }
+  // define Log log
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  FieldBusNet bus = null
+
+  native int dRtuO(int port, int band, int parity, int dataBits, int stopBits)
+
+  native int dRtuC(int ctx)
+
+  native int dRtuA(int ctx, int deviceAddr, int addr, int len)
+
+  native int dRtuR(int ctx, int deviceAddr, int addr, int len, float[] buf)
+
+  native int dRtuW(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  
+  ////////////////////////////////////////////////////////////////
+  native int dTcpO(Str ip, int port)
+
+  native int dTcpC(int ctx)
+
+  native int dTcpA(int ctx, int deviceAddr, int addr, int len, int refreshms)
+
+  native int dTcpR(int ctx, int deviceAddr, int addr, int len, float[] buf)
+
+  native int dTcpW(int ctx, int deviceAddr, int addr, int len, float[] buf)
+}

@@ -1142,10 +1142,20 @@ class SoxCommands
     //   - define fileSize (for get)
 
     int txMode
+    Str errorNoFoundInfo = ""
+    Str errorOpenInfo    = ""
     switch (method.get(0))
     {
       case 'g':
-        if (!file.exists()) { res.error("not found"); return }
+        // Str errorInfo = "File ${file.name} not found"
+        errorNoFoundInfo.copyFromStr("File ", 7)
+        errorNoFoundInfo.appendFromStr(file.name, file.name.length())
+        errorNoFoundInfo.appendFromStr(" not found", 11)
+        if (!file.exists()) 
+        { 
+            res.error(errorNoFoundInfo)
+            return 
+        }
         openMode = "r"
         txMode   = FileTransfer.get
         // Make sure we don't read more than there is
@@ -1168,7 +1178,14 @@ class SoxCommands
     }
 
     // open the file
-    if (!file.open(openMode)) { res.error("cannot open"); return }
+    errorOpenInfo.copyFromStr("File ", 7)
+    errorOpenInfo.appendFromStr(file.name, file.name.length())
+    errorOpenInfo.appendFromStr(" cannot open", 13)
+    if (!file.open(openMode)) 
+    { 
+        res.error(errorOpenInfo)
+        return 
+    }
 
     // setup the transaction
     tx.mode      = txMode
@@ -1502,4 +1519,6 @@ class SoxCommands
   static Str tempStr2
   static Str tempKey
   static Str tempVal
+
+  byte[] errorBuf
 }

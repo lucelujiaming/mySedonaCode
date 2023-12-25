@@ -60,11 +60,16 @@ class SyncLabel
         root = p
         p = Sys.app.lookup(p.parent)
       }
+      // Only use inFloatValue and CellBanch does not use inIntValue.
+      inIntValue := (int)inFloatValue
+      
       if (root != null) {
         // log.message("root:: aliasStr=$aliasStr")
         ** log.message("222222222 SyncLabel name=$name and aliasStr]=$aliasStr")
         for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-          if (f.type.is(Folder.type) && f.name.equals("play")) {
+          // Remove Folder limit
+          // if (f.type.is(Folder.type) && f.name.equals("play")) {
+          if (f.type.is(Folder.type)) {
              for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
                 ** log.message("3333 SyncLabel name=$name and aliasStr]=$aliasStr")
                 if (n.type.is(SyncLabel.type) 

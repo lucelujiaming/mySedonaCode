@@ -39,6 +39,7 @@ class ModbusRemDev
   ////////////////////////////////////////////////////////////////
   override void loaded()
   {
+    sub_fieldbusdevice_type_id = SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV
     update()
   }
   override void changed(Slot slot)
@@ -103,4 +104,117 @@ class ModbusRemDev
       status := STATUSNONET
     }
   }
+  
+  override int modbusRTUMasterOpen(int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
+  {
+     log.message("ModbusRemDev::modbusRTUMasterOpen port=$port");
+     return dRtuO(port, band, parity, dataBits, stopBits, retryDelay, rto)
+  }
+  override int modbusRTUMasterClose(int ctx)
+  {
+     log.message("ModbusRemDev::modbusRTUMasterClose ctx=$ctx");
+     return dRtuC(ctx)
+  }
+  override int  modbusRTUMasterAdd(int ctx, int deviceAddr, int addr, int len, int refreshms, int pointDelay)
+  {
+      if(ctx == -1){
+          log.message("ModbusRemDev::modbusRTUMasterAdd failed ctx=$ctx");
+          return -1
+      }
+     log.message("ModbusRemDev::modbusRTUMasterAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dRtuA(ctx, deviceAddr, addr, len, refreshms, pointDelay)
+  }
+  override int modbusRTUMasterRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRemDev::modbusRTUMasterRead failed ctx=$ctx");
+          return -1
+      }
+     // log.message("ModbusRemDev::modbusRTUMasterRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dRtuR(ctx, deviceAddr, addr, len, buf)
+  }
+  override int modbusRTUMasterWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRemDev::modbusRTUMasterWrite failed ctx=$ctx");
+          return -1
+      }
+      if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
+          log.message("ModbusRemDev::modbusRTUMasterWrite failed addr=$addr");
+          return -1
+      }
+     // log.message("ModbusRemDev::modbusRTUMasterWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dRtuW(ctx, deviceAddr, addr, len, buf)
+  }
+  // TCP
+  override int modbusTCPServerOpen(int port)
+  {
+     log.message("ModbusRemDev::modbusTCPServerOpen port=$port");
+     return dTcpO(port)
+  }
+  override int modbusTCPServerClose(int ctx)
+  {
+     log.message("ModbusRemDev::modbusTCPServerClose ctx=$ctx");
+     // It will block the whole system 
+     return dTcpC(ctx)
+  }
+  override int  modbusTCPServerAdd(int ctx, int deviceAddr, int addr, int len)
+  {
+      if(ctx == -1){
+          log.message("ModbusRemDev::modbusTCPServerAdd failed ctx=$ctx");
+          return -1
+      }
+     // log.message("ModbusRemDev::modbusTCPMasterAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpA(ctx, deviceAddr, addr, len)
+  }
+  override int modbusTCPServerRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRemDev::modbusTCPServerRead failed ctx=$ctx");
+          return -1
+      }
+      ** log.message("ModbusRemDev::modbusTCPMasterRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+      return dTcpR(ctx, deviceAddr, addr, len, buf)
+  }
+  override int modbusTCPServerWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+      if(ctx == -1){
+          log.message("ModbusRemDev::modbusTcpServerWrite failed ctx=$ctx");
+          return -1
+      }
+   //   if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
+   //       log.message("ModbusRemDev::modbusTcpServerWrite failed addr=$addr");
+   //       return -1
+   //   }
+     // log.message("ModbusRemDev::modbusTcpMasterWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpW(ctx, deviceAddr, addr, len, buf)
+  }
+  // define Log log
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  FieldBusNet bus = null
+  
+  native int dRtuO(int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
+  
+  native int dRtuC(int ctx)
+  
+  native int dRtuA(int ctx, int deviceAddr, int addr, int len, int refreshms, int pointDelay)
+  
+  native int dRtuR(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  
+  native int dRtuW(int ctx, int deviceAddr, int addr, int len, float[] buf)
+
+  ////////////////////////////////////////////////////////////////
+
+  native int dTcpO(int port)
+
+  native int dTcpC(int ctx)
+
+  native int dTcpA(int ctx, int deviceAddr, int addr, int len)
+
+  native int dTcpR(int ctx, int deviceAddr, int addr, int len, float[] buf)
+
+  native int dTcpW(int ctx, int deviceAddr, int addr, int len, float[] buf)
+
 }

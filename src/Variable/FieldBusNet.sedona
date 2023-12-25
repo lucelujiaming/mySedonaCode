@@ -98,4 +98,12 @@ abstract class FieldBusNet
   
   // Move from FieldBusDevice
   int invokeID = 1
+  
+  
+  define int SUB_FIELDBUSNET_TYPE_FIELDBUSNET       = 0
+  define int SUB_FIELDBUSNET_TYPE_BACNET_IP          = 1
+  define int SUB_FIELDBUSNET_TYPE_BACNET_MSTP        = 2
+  define int SUB_FIELDBUSNET_TYPE_MODBUS_RTU         = 3
+  define int SUB_FIELDBUSNET_TYPE_MODBUS_TCP         = 4
+  int sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_FIELDBUSNET
 }

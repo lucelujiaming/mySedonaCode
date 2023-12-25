@@ -1,0 +1,411 @@
+class ModbusTCP
+  extends FieldBusNet
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @config
+  @asStr
+  property Buf(20) ipaddr = "127.0.0.1"
+
+  @config
+  @defaultOnClone
+  @max = 65535
+  property int port = 502
+
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void start()
+  {
+    sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_MODBUS_TCP
+    update()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == ModbusTCP.port) {
+      update()
+    }
+  }
+  override void stop()
+  {
+    // if (ctx != -1) {
+    //   cleanCache()
+    //   dC(ctx)
+    //   ctx = -1
+    //   busId = 0
+    // }
+    
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d.type.is(ModbusRemDev.type)) {
+          if (((ModbusRemDev)d).ctx != -1) {
+              cleanCache()
+              ((ModbusRemDev)d).dTcpC(((ModbusRemDev)d).ctx)
+              ((ModbusRemDev)d).ctx = -1
+            busId = 0
+          } 
+        }
+        else if (d.type.is(ModbusLocDev.type)) {
+          if (((ModbusLocDev)d).ctx != -1) {
+              cleanCache()
+              ((ModbusLocDev)d).dTcpC(((ModbusLocDev)d).ctx)
+              ((ModbusLocDev)d).ctx = -1
+            busId = 0
+          } 
+        }
+    }
+  }
+  override void execute()
+  {
+    if (status != STATUSNODEV && needFlush) {
+      flush()
+      needFlush = false
+    }
+    // Read Modbus 
+    if (status == STATUSOK) {
+      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status <= ModbusRemDev.STATUSREADY) {
+          if (((ModbusRemDev)d).modbusTCPServerRead(
+                    ((ModbusRemDev)d).ctx, ((ModbusRemDev)d).address, 0, 1, buffer) == 1) {
+            ((ModbusRemDev)d).elapsedTime := (int)buffer[0]
+            ((ModbusRemDev)d).status := ModbusRemDev.STATUSOK
+          } else {
+            ((ModbusRemDev)d).elapsedTime := -1
+            ((ModbusRemDev)d).status := ModbusRemDev.STATUSOFFLINE
+          }
+        }
+        else if (d.type.is(ModbusLocDev.type) && ((ModbusLocDev)d).status <= ModbusLocDev.STATUSREADY) {
+          if (((ModbusLocDev)d).modbusTCPClientRead(
+                    ((ModbusRemDev)d).ctx, ((ModbusLocDev)d).address, 0, 1, buffer) == 1) {
+            ((ModbusLocDev)d).elapsedTime := (int)buffer[0]
+            ((ModbusLocDev)d).status := ModbusLocDev.STATUSOK
+          } else {
+            ((ModbusLocDev)d).elapsedTime := -1
+            ((ModbusLocDev)d).status := ModbusLocDev.STATUSOFFLINE
+          }
+        }
+      }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  private void flush()
+  {
+    // if (ctx != -1) {
+    //   cleanCache()
+    //   dC(ctx)
+    //   ctx = -1
+    //   busId = 0
+    // }
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d.type.is(ModbusRemDev.type)) {
+          if (((ModbusRemDev)d).ctx != -1) {
+              cleanCache()
+              ((ModbusRemDev)d).dTcpC(((ModbusRemDev)d).ctx)
+              ((ModbusRemDev)d).ctx = -1
+            busId = 0
+            log.message("11111 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
+          } 
+        }
+        else if (d.type.is(ModbusLocDev.type)) {
+          if (((ModbusLocDev)d).ctx != -1) {
+              cleanCache()
+              ((ModbusLocDev)d).dTcpC(((ModbusLocDev)d).ctx)
+              ((ModbusLocDev)d).ctx = -1
+            busId = 0
+            log.message("11111 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
+          } 
+        }
+    }
+    // ctx = dO(port)
+    // add device node.
+    bool bRet = false
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(ModbusRemDev.type)) {
+          ((ModbusRemDev)d).bus = this
+          ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusTCPServerOpen(port)
+            log.message("22222 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
+      }
+      else if (d.type.is(ModbusLocDev.type)) {
+          ((ModbusLocDev)d).bus = this
+          ((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusTCPClientOpen(
+                     ipaddr.toStr(), port)
+            log.message("22222 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
+      }
+    }
+    
+    if (bRet == false) {
+      if (updateCache()) {
+        // 结束添加标记。
+        // dA(ctx, 0, 0, 0)
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            if (d.type.is(ModbusRemDev.type)) {
+                // dA(ctx, 0, 0, 0, 0, 0)
+                ((ModbusRemDev)d).modbusTCPServerAdd(
+                         ((ModbusRemDev)d).ctx, 0, 0, 0)
+                log.message("ModbusRTU modbusRTUMasterAdd flush status=$status");
+                log.message("33333 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
+            }
+            else if (d.type.is(ModbusLocDev.type)) {
+                // dA(ctx, 0, 0, 0, 0, 0)
+                ((ModbusLocDev)d).modbusTCPClientAdd(
+                         ((ModbusLocDev)d).ctx, 0, 0, 0, 0)
+                log.message("ModbusRTU modbusRTUSlaveAdd flush status=$status");
+                log.message("3333 updateCache ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
+            }
+        }
+        status := STATUSOK
+      } else {
+        status := STATUSNOREG
+      }
+    } else {
+      status := STATUSBUSY
+    }
+  }
+  private void cleanCache()
+  {
+    Component root
+    Component p = this
+    int id = 0
+    // if (ctx == 0) {
+    //   id = 11
+    // }
+    // 
+    // if (id == 0) {
+    //   return
+    // }
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+    
+    root = p
+    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+          if (r.type.is(FieldBusIO.type) && ((FieldBusIO)r).busId == id) {
+            ((FieldBusIO)r).bus = null
+            ((FieldBusIO)r).cache = 0
+            ((FieldBusIO)r).busId = 0
+            ((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+          }
+        }
+      }
+    }
+  }
+  private bool updateCache()
+  {
+    Component root
+    Component p = this
+    bool result = false
+    // if (ctx == 0) {
+    //  busId = 11
+    // }
+
+    if (busId == 0) {
+      return result
+    }
+
+    // add device node.
+    bool devRemInited = false
+    bool devLocInited = false
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status < ModbusRemDev.STATUSEADDR) {
+        if(devRemInited == false)
+        {
+          log.message("CCCC updateCache ctx = ${((ModbusRemDev)d).ctx}");
+          int iRet = ((ModbusRemDev)d).modbusTCPServerAdd(((ModbusRemDev)d).ctx, 
+                            ((ModbusRemDev)d).address, 0, 0)
+          if (iRet != 0) {
+            ((ModbusRemDev)d).status := ModbusRemDev.STATUSEINNER
+             devRemInited = true
+          } else {
+            ((ModbusRemDev)d).status := ModbusRemDev.STATUSNOREG
+          }
+        } 
+        else {
+           ((ModbusRemDev)d).status := ModbusRemDev.STATUSEINNER
+        }
+      }
+      else if (d.type.is(ModbusLocDev.type) && ((ModbusLocDev)d).status < ModbusLocDev.STATUSEADDR) {
+        if(devRemInited == false)
+        {
+          log.message("CCCC updateCache ctx = ${((ModbusLocDev)d).ctx}");
+          int iRet = ((ModbusLocDev)d).modbusTCPClientAdd(((ModbusLocDev)d).ctx, 
+                            ((ModbusLocDev)d).address, 0, 0, ((ModbusLocDev)d).refreshTime)
+          if (iRet != 0) {
+            ((ModbusLocDev)d).status := ModbusLocDev.STATUSEINNER
+          } else {
+            ((ModbusLocDev)d).status := ModbusLocDev.STATUSNOREG
+          }
+        } 
+        else {
+           ((ModbusLocDev)d).status := ModbusLocDev.STATUSEINNER
+        }
+      }
+    }
+
+    // add register node in play.
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+          if (r.type.is(FieldBusIO.type) && ((FieldBusIO)r).status < FieldBusIO.STATUSEURL && ((FieldBusIO)r).busId == 0) {
+            FieldBusDevice dev = null
+            for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+              if (d.type.is(ModbusRemDev.type) &&
+                           (r.type.is(ModbusNetVarIn.type) || r.type.is(ModbusNetVarOut.type))&& 
+	                   ((FieldBusIO)r).devStr.equals(((ModbusRemDev)d).deviceName.toStr())) {
+                dev = (ModbusRemDev)d
+                break
+              }
+                else if (d.type.is(ModbusLocDev.type) &&                 			
+                           (r.type.is(ModbusNetVarIn.type) || r.type.is(ModbusNetVarOut.type))&& 
+                           ((FieldBusIO)r).devStr.equals(((ModbusLocDev)d).deviceName.toStr())) {
+                  dev = (ModbusLocDev)d
+                  break
+                }
+            }
+            if (dev != null) {
+                if (dev.type.is(ModbusRemDev.type)) {
+                  if (((FieldBusIO)r).dataLen == 1) {
+                    ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPServerAdd(
+                    		((ModbusRemDev)dev).ctx, 
+                            ((ModbusRemDev)dev).address + (((ModbusRemDev)dev).endian << 8), 
+                            ((FieldBusIO)r).regId, 1)
+                  } else if (((FieldBusIO)r).dataLen == 2) {
+                    ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPServerAdd(
+                    		((ModbusRemDev)dev).ctx, 
+                            ((ModbusRemDev)dev).address + (((ModbusRemDev)dev).endian << 8), 
+                            ((FieldBusIO)r).regId + 1, 1)
+                    if (((FieldBusIO)r).cache != 0) {
+                      ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPServerAdd(
+                      		((ModbusRemDev)dev).ctx, 
+                            ((ModbusRemDev)dev).address + (((ModbusRemDev)dev).endian << 8), 
+                            ((FieldBusIO)r).regId, 1)
+                    }
+                  }
+                  if (((FieldBusIO)r).cache != 0) {
+                    if (((FieldBusIO)r).bus == null) {
+                      ((FieldBusIO)r).bus = this
+                    }
+                    if (((FieldBusIO)r).device == null) {
+                        log.message("updateCache::SetDevice ModbusRemDev r.name=$r.name");
+                        ((FieldBusIO)r).device = dev
+                    }
+                    log.message("7777 updateCache r.name=$r.name");
+                    ((FieldBusIO)r).status := FieldBusIO.STATUSREADY
+                    dev.status := ModbusRemDev.STATUSREADY
+                    result = true
+                  } else {
+                    ((FieldBusIO)r).status := FieldBusIO.STATUSEADDR
+                  }
+                }
+                else if (dev.type.is(ModbusLocDev.type)) {
+                  if (((FieldBusIO)r).dataLen == 1) {
+                    ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPClientAdd(
+                    		((ModbusLocDev)dev).ctx, 
+                            ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
+                            ((FieldBusIO)r).regId, 1, ((ModbusLocDev)dev).refreshTime)
+                  } else if (((FieldBusIO)r).dataLen == 2) {
+                    ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPClientAdd(
+                    		((ModbusLocDev)dev).ctx, 
+                            ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
+                            ((FieldBusIO)r).regId + 1, 1, ((ModbusLocDev)dev).refreshTime)
+                    if (((FieldBusIO)r).cache != 0) {
+                      ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPClientAdd(
+                      		((ModbusLocDev)dev).ctx, 
+                            ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
+                            ((FieldBusIO)r).regId, 1, ((ModbusLocDev)dev).refreshTime)
+                    }
+                  }
+                  if (((FieldBusIO)r).cache != 0) {
+                    if (((FieldBusIO)r).bus == null) {
+                      ((FieldBusIO)r).bus = this
+                    }
+                    if (((FieldBusIO)r).device == null) {
+                        log.message("updateCache::SetDevice ModbusLocDev r.name=$r.name");
+                        ((FieldBusIO)r).device = dev
+                    }
+                      log.message("8888 updateCache r.name=$r.name");
+                    ((FieldBusIO)r).status := FieldBusIO.STATUSREADY
+                    dev.status := ModbusLocDev.STATUSREADY
+                    result = true
+                  } else {
+                    ((FieldBusIO)r).status := FieldBusIO.STATUSEADDR
+                  }
+                }
+            } else {
+              //((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+            }
+          }
+        }
+      }
+    }
+
+    return result
+  }
+
+  override void update()
+  {
+    bool isDevFound = false
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status != ModbusRemDev.STATUSEND) {
+        isDevFound = true
+        break
+      }
+      else if (d.type.is(ModbusLocDev.type) && ((ModbusLocDev)d).status != ModbusLocDev.STATUSEND) {
+        isDevFound = true
+        break
+      }
+    }
+    if (isDevFound) {
+      status := STATUSNOREG
+    } else {
+      status := STATUSNODEV
+    }
+    needFlush = true
+  }
+  // override int readReg(int deviceAddr, int addr, int len, float[] buf)
+  // {
+  //     if(ctx == -1){
+  //         return -1
+  //     }
+  //     return dR(ctx, deviceAddr, addr, len, buf)
+  // }
+  // 
+  // override int writeReg(int deviceAddr, int addr, int len, float[] buf)
+  // {
+  //     if(ctx == -1){
+  //         return -1
+  //     }
+  //     return dW(ctx, deviceAddr, addr, len, buf)
+  // }
+
+  // define Log log
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  // private int ctx = -1
+  // 
+  // native int dO(int port)
+  // 
+  // native int dC(int ctx)
+  // 
+  // native int dA(int ctx, int deviceAddr, int addr, int len)
+  // 
+  // native int dR(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  // 
+  // native int dW(int ctx, int deviceAddr, int addr, int len, float[] buf)
+}

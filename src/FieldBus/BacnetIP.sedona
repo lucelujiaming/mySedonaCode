@@ -41,7 +41,7 @@ class BacnetIP
   ////////////////////////////////////////////////////////////////
   override void loaded()
   {
-    
+    sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_BACNET_IP
     update()
   }
   override void changed(Slot slot)
@@ -238,8 +238,10 @@ class BacnetIP
                             ((BacNetFieldBusIO)d).objectType)
               log.message("6666 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
               ((BacNetFieldBusIO)d).bus = this
+              log.message("777 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
             // ((BacNetFieldBusIO)d).device = (bacDevice)r
               ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
+              log.message("888 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
             }
           }
         }

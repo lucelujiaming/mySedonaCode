@@ -1,0 +1,91 @@
+<sedonaKit
+  name="FieldBus"
+  vendor="XunGaoAuto"
+  description="ModBus Management"
+  includeSource="false"
+  doc="false"
+>
+
+  <!-- Dependencies -->
+  <depend on="sys 0.1+" />
+  <depend on="Variable 0.1+" />
+  <depend on="inet 0.1+"/>
+
+  <!-- Modbus Source Directories  -->
+  <source dir="ModbusRTUSlave.sedona" />
+  <source dir="ModbusRTUMaster.sedona" />
+  <source dir="ModbusTCPClient.sedona" />
+  <source dir="ModbusTCPServer.sedona" />
+  <source dir="ModbusRemDev.sedona" />
+  <!--
+	  <source dir="ModbusRTU.sedona" />
+	  <source dir="ModbusRTURemDev.sedona" />
+	  <source dir="ModbusRTULocDev.sedona" />
+  -->
+  <!-- Bacnet Source Directories  -->
+  <source dir="BacnetIP.sedona" />
+  <source dir="BacnetMSTP.sedona" />
+  <source dir="BacnetRemDev.sedona" />
+  <source dir="BacnetLocDev.sedona" />
+  <source dir="BacnetSchedule.sedona" />
+  
+  <!-- Modbus Natives -->
+  <native qname="FieldBus::ModbusRTUMaster.dO" id="3::0"/>
+  <native qname="FieldBus::ModbusRTUMaster.dC" id="3::1"/>
+  <native qname="FieldBus::ModbusRTUMaster.dA" id="3::2"/>
+  <native qname="FieldBus::ModbusRTUMaster.dR" id="3::3"/>
+  <native qname="FieldBus::ModbusRTUMaster.dW" id="3::4"/>
+
+  <native qname="FieldBus::ModbusRTUSlave.dO" id="3::5"/>
+  <native qname="FieldBus::ModbusRTUSlave.dC" id="3::6"/>
+  <native qname="FieldBus::ModbusRTUSlave.dA" id="3::7"/>
+  <native qname="FieldBus::ModbusRTUSlave.dR" id="3::8"/>
+  <native qname="FieldBus::ModbusRTUSlave.dW" id="3::9"/>
+
+  <native qname="FieldBus::ModbusTCPClient.dO" id="3::10"/>
+  <native qname="FieldBus::ModbusTCPClient.dC" id="3::11"/>
+  <native qname="FieldBus::ModbusTCPClient.dA" id="3::12"/>
+  <native qname="FieldBus::ModbusTCPClient.dR" id="3::13"/>
+  <native qname="FieldBus::ModbusTCPClient.dW" id="3::14"/>
+
+  <native qname="FieldBus::ModbusTCPServer.dO" id="3::15"/>
+  <native qname="FieldBus::ModbusTCPServer.dC" id="3::16"/>
+  <native qname="FieldBus::ModbusTCPServer.dA" id="3::17"/>
+  <native qname="FieldBus::ModbusTCPServer.dR" id="3::18"/>
+  <native qname="FieldBus::ModbusTCPServer.dW" id="3::19"/>
+  <!-- Lujiaming add at 102523 -->
+  <!--
+	  <native qname="FieldBus::ModbusRTURemDev.dO" id="3::20"/>
+	  <native qname="FieldBus::ModbusRTURemDev.dC" id="3::21"/>
+	  <native qname="FieldBus::ModbusRTURemDev.dA" id="3::22"/>
+	  <native qname="FieldBus::ModbusRTURemDev.dR" id="3::23"/>
+	  <native qname="FieldBus::ModbusRTURemDev.dW" id="3::24"/>
+
+	  <native qname="FieldBus::ModbusRTULocDev.dO" id="3::25"/>
+	  <native qname="FieldBus::ModbusRTULocDev.dC" id="3::26"/>
+	  <native qname="FieldBus::ModbusRTULocDev.dA" id="3::27"/>
+	  <native qname="FieldBus::ModbusRTULocDev.dR" id="3::28"/>
+	  <native qname="FieldBus::ModbusRTULocDev.dW" id="3::29"/>
+  -->
+  <!-- BacNet Natives -->
+  <native qname="FieldBus::BacnetIP.dO" id="4::0"/>
+  <native qname="FieldBus::BacnetIP.dC" id="4::1"/>
+  <native qname="FieldBus::BacnetIP.dA" id="4::2"/>
+  <native qname="FieldBus::BacnetIP.dR" id="4::3"/>
+  <native qname="FieldBus::BacnetIP.dW" id="4::4"/>
+  <native qname="FieldBus::BacnetMSTP.dO" id="4::5"/>
+  <native qname="FieldBus::BacnetMSTP.dC" id="4::6"/>
+  <native qname="FieldBus::BacnetMSTP.dA" id="4::7"/>
+  <native qname="FieldBus::BacnetMSTP.dR" id="4::8"/>
+  <native qname="FieldBus::BacnetMSTP.dW" id="4::9"/>
+  <native qname="FieldBus::BacnetIP.dS" id="4::10"/>
+  <native qname="FieldBus::BacnetIP.dT" id="4::11"/>
+  <native qname="FieldBus::BacnetMSTP.dS" id="4::12"/>
+  <native qname="FieldBus::BacnetMSTP.dT" id="4::13"/>
+  <native qname="FieldBus::BacnetIP.dD" id="4::14"/>
+  <native qname="FieldBus::BacnetIP.dF" id="4::15"/>
+  <native qname="FieldBus::BacnetIP.eD" id="4::16"/>
+  <native qname="FieldBus::BacnetIP.eF" id="4::17"/>
+  <native qname="FieldBus::BacnetIP.eUI" id="4::18"/>
+  
+</sedonaKit>

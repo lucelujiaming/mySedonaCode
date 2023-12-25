@@ -1,0 +1,290 @@
+class BacnetMSTP
+  extends FieldBusNet
+{
+  @config
+  @min = 0
+  @max = 1
+  @range = "Port1, Port2"
+  @fieldWidth = 10
+  property int port = 0
+
+  @config
+  @defaultOnClone
+  @min = 1200
+  @max = 115200
+  @fieldWidth=10
+  property int band = 38400
+
+  @config
+  property int deviceInstance = 0
+
+  @config
+  @min = 1
+  @max = 254
+  property int macAddress = 1
+
+  @config
+  @unit = Units.second
+  property int retryDelay = 60
+
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void loaded()
+  {
+    update()
+  }
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if (slot == BacnetMSTP.port || slot == BacnetMSTP.band || slot == BacnetMSTP.deviceInstance || slot == BacnetMSTP.macAddress || slot == BacnetMSTP.retryDelay) {
+      update()
+    }
+  }
+  override void stop()
+  {
+    if (ctx != -1) {
+      cleanCache()
+      dC(ctx)
+      ctx = -1
+      busId = 0
+    }
+  }
+  override void execute()
+  {
+    if (status != STATUSNODEV && needFlush) {
+      flush()
+      needFlush = false
+    }
+    if (status == STATUSOK) {
+      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status <= BacnetRemDev.STATUSREADY) {
+          if (readReg( // ((bacDevice)d).deviceInstance, 
+                       deviceInstance, 0, 10000, buffer) == 1) {
+            // ((bacDevice)d).elapsedTime := (int)buffer[0]
+            ((BacnetRemDev)d).status := BacnetRemDev.STATUSOK
+          } else {
+            // ((bacDevice)d).elapsedTime := -1
+            ((BacnetRemDev)d).status := BacnetRemDev.STATUSOFFLINE
+          }
+          /*
+          // update schedule
+          if (((bacDevice)d).deviceInstance == deviceInstance) {
+            for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
+              if (s.type.is(BacnetSchedule.type) && ((BacnetSchedule)s).index != -1) {
+                int scheduleStatus = dT(ctx, ((BacnetSchedule)s).index, ((BacnetSchedule)s).timeBuf, ((BacnetSchedule)s).valueBuf)
+                if (scheduleStatus >= 0) {
+                  ((BacnetSchedule)s).bufToConfig()
+                }
+                if (scheduleStatus == 1) {
+                    // save
+                    Sys.app.save()
+                }
+              }
+            }
+          }
+          */
+        }
+      }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // App support
+  ////////////////////////////////////////////////////////////////
+  private void flush()
+  {
+    if (ctx != -1) {
+      cleanCache()
+      dC(ctx)
+      ctx = -1
+      busId = 0
+    }
+    ctx = dO(port, band, deviceInstance, macAddress, retryDelay)
+    if (ctx != -1) {
+      if (updateCache()) {
+        // 结束添加标记。
+        dA(ctx, 0, 0, 0, 0, 1)
+        status := STATUSOK
+      } else {
+        status := STATUSNOREG
+      }
+    } else {
+      status := STATUSBUSY
+    }
+  }
+  private void cleanCache()
+  {
+    Component root
+    Component p = this
+    int id = 0
+    if (ctx != -1) {
+      id = 22
+    }
+
+    if (id == 0) {
+      return
+    }
+
+    // clean schedule
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status < BacnetRemDev.STATUSEADDR 
+                   // && ((bacDevice)d).deviceInstance == deviceInstance
+         ) {
+          for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
+              if (s.type.is(BacnetSchedule.type)) {
+                ((BacnetSchedule)s).index = -1
+              }
+          }
+      }
+    }
+
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+          if (r.type.is(FieldBusIO.type) && ((FieldBusIO)r).busId == id) {
+            ((FieldBusIO)r).bus = null
+            ((FieldBusIO)r).cache = 0
+            ((FieldBusIO)r).busId = 0
+            ((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+          }
+        }
+      }
+    }
+  }
+  private bool updateCache()
+  {
+    Component root
+    Component p = this
+    bool result = false
+    if (ctx != -1) {
+      busId = 22 // mstp
+    }
+    if (busId == 0) {
+      return result
+    }
+
+    // add device node.
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status < BacnetRemDev.STATUSEADDR) {
+        if (dA(ctx, // ((bacDevice)d).deviceInstance, 
+               deviceInstance, 0, 0, 0, 0) != 0) {
+          ((BacnetRemDev)d).status := BacnetRemDev.STATUSEINNER
+        } else {
+          ((BacnetRemDev)d).status := BacnetRemDev.STATUSNOREG
+        }
+      }
+    }
+
+    // add register node in play.
+    while (Sys.app.lookup(p.parent) != null) {
+      p = Sys.app.lookup(p.parent)
+    }
+
+    root = p
+    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+        for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+          if (r.type.is(FieldBusIO.type) && ((FieldBusIO)r).status < FieldBusIO.STATUSEURL && ((FieldBusIO)r).busId == 0) {
+            BacnetRemDev dev = null
+            for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+              if (d.type.is(BacnetRemDev.type) && ((FieldBusIO)r).devStr.equals(((BacnetRemDev)d).deviceName.toStr())) {
+                dev = (BacnetRemDev)d
+                break
+              }
+            }
+            if (dev != null) {
+              ((FieldBusIO)r).cache = dA(ctx, // dev.deviceInstance, 
+                   deviceInstance, ((FieldBusIO)r).typeId, ((FieldBusIO)r).regId, 85, 0)
+              if (((FieldBusIO)r).cache >= 0) {
+                if (((FieldBusIO)r).bus == null) {
+                  ((FieldBusIO)r).bus = this
+                }
+                ((FieldBusIO)r).status := FieldBusIO.STATUSREADY
+                dev.status := BacnetRemDev.STATUSREADY
+                result = true
+              } else {
+                ((FieldBusIO)r).status := FieldBusIO.STATUSEADDR
+              }
+            } else {
+              //((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+            }
+          }
+        }
+      }
+    }
+
+    // add schedule
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status < BacnetRemDev.STATUSEADDR 
+                     // && ((bacDevice)d).deviceInstance == deviceInstance
+         ) {
+          for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
+              if (s.type.is(BacnetSchedule.type) && ((BacnetSchedule)s).configToBuf()) {
+                ((BacnetSchedule)s).index = dS(ctx, ((BacnetSchedule)s).urlBuf.toBytes(), ((BacnetSchedule)s).timeBuf, ((BacnetSchedule)s).valueBuf)
+              }
+          }
+      }
+    }
+
+    return result
+  }
+  override void update()
+  {
+    bool isDevFound = false
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
+        isDevFound = true
+        break
+      }
+    }
+    if (isDevFound) {
+      status := STATUSNOREG
+    } else {
+      status := STATUSNODEV
+    }
+    needFlush = true
+  }
+
+  override int readReg(int deviceAddr, int addr, int type, float[] buf)
+  {
+      if(ctx == -1){
+          return -1
+      }
+      return dR(ctx, deviceAddr, addr, type, buf)
+  }
+
+  override int writeReg(int deviceAddr, int addr, int type, float[] buf)
+  {
+      if(ctx == -1){
+          return -1
+      }
+      return dW(ctx, deviceAddr, addr, type, buf)
+  }
+  
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  private int ctx = -1
+
+  native int dO(int port, int band, int device_instance, int mac_address, int retry_delay)
+
+  native int dC(int ctx)
+
+  native int dA(int ctx, int device_instance, int object_type, int object_instance, int object_property, int refreshms)
+
+  native int dR(int ctx, int cache_ptr, int object_instance, int type, float[] buf)
+
+  native int dW(int ctx, int cache_ptr, int object_instance, int type, float[] buf)
+
+  // set sche
+  native int dS(int ctx, byte[] url, int[] time, float[] value)
+
+  // get sche, return 1 if update needed.
+  native int dT(int ctx, int idx, int[] time, float[] value)
+}

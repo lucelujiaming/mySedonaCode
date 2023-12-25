@@ -25,7 +25,7 @@ abstract class FieldBusDevice
   {
      return true
   }
-  // Used by ModbusRTURemDev in the ModbusRTU
+  // Used by ModbusRemDev in the ModbusRTU
   virtual int modbusRTUMasterOpen(int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
   {
      return 0
@@ -46,7 +46,7 @@ abstract class FieldBusDevice
   {
      return 0
   }
-  // Used by ModbusRTULocDev in the ModbusRTU
+  // Used by ModbusLocDev in the ModbusRTU
   virtual int modbusRTUSlaveOpen(int port, int band, int parity, int dataBits, int stopBits)
   {
      return 0
@@ -64,6 +64,48 @@ abstract class FieldBusDevice
      return 0
   }
   virtual int modbusRTUSlaveWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+     return 0
+  }
+  // Used by ModbusRemDev in the ModbusTCP
+  virtual int modbusTCPServerOpen(int port)
+  {
+     return 0
+  }
+  virtual int modbusTCPServerClose(int ctx)
+  {
+     return 0
+  }
+  virtual int  modbusTCPServerAdd(int ctx, int deviceAddr, int addr, int len)
+  {
+     return 0
+  }
+  virtual int modbusTCPServerRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+     return 0
+  }
+  virtual int modbusTCPServerWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+     return 0
+  }
+  // Used by ModbusLocDev in the ModbusTCP
+  virtual int modbusTCPClientOpen(Str ip, int port)
+  {
+     return 0
+  }
+  virtual int modbusTCPClientClose(int ctx)
+  {
+     return 0
+  }
+  virtual int  modbusTCPClientAdd(int ctx, int deviceAddr, int addr, int len, int refreshms)
+  {
+     return 0
+  }
+  virtual int modbusTCPClientRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  {
+     return 0
+  }
+  virtual int modbusTCPClientWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
   {
      return 0
   }
@@ -116,4 +158,13 @@ abstract class FieldBusDevice
    public int iDeviceReadPropertyCount = 0
    
   int ctx = -1
+  
+  define int SUB_FIELDBUSDEVICE_TYPE_FIELDBUSDEVICE    = 0
+  define int SUB_FIELDBUSDEVICE_TYPE_BACNETLOCDEV      = 1
+  define int SUB_FIELDBUSDEVICE_TYPE_BACNETREMDEV      = 2
+  define int SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV      = 3
+  define int SUB_FIELDBUSDEVICE_TYPE_MODBUSLOCDEV      = 4
+  // define int SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV   = 5
+  int sub_fieldbusdevice_type_id = SUB_FIELDBUSDEVICE_TYPE_FIELDBUSDEVICE
+  
 }

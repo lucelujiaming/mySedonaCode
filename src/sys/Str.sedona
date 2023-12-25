@@ -143,6 +143,19 @@ final class Str
     this.buf[max-1] = 0
     return false
   }  
+
+  bool appendFromStr(Str from, int max)
+  {
+    int iLen = length()
+    for (int i=0; i<max; ++i)
+    {
+      int ch = from.buf[i]
+      this.buf[i + iLen] = ch
+      if (ch == 0) return true
+    }
+    this.buf[max + iLen -1] = 0
+    return false
+  }  
   
   **
   ** Return a Str reference into the byte array at the specified
@@ -150,7 +163,7 @@ final class Str
   ** we return a new StrRef with the specified offset.  No guarantee 
   ** is made that the buffer contains the null terminator.
   **  
-  native static Str fromBytes(byte[] buf, int off)   
+  native static Str fromBytes(byte[] buf, int off)
   
   **
   ** Return number of characters in the string not including

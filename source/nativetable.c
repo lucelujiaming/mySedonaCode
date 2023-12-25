@@ -439,132 +439,92 @@ NativeMethod kitNatives2[] =
 // ModBus (kitId=3)
 ////////////////////////////////////////////////////////////////
 
-// int rtuMaster.dO(int, int, int, int, int, int, int)
-Cell ModBus_rtuMaster_dO(SedonaVM* vm, Cell* params);
-
-// int rtuMaster.dC(int)
-Cell ModBus_rtuMaster_dC(SedonaVM* vm, Cell* params);
-
-// int rtuMaster.dA(int, int, int, int, int, int)
-Cell ModBus_rtuMaster_dA(SedonaVM* vm, Cell* params);
-
-// int rtuMaster.dR(int, int, int, int, float[])
-Cell ModBus_rtuMaster_dR(SedonaVM* vm, Cell* params);
-
-// int rtuMaster.dW(int, int, int, int, float[])
-Cell ModBus_rtuMaster_dW(SedonaVM* vm, Cell* params);
-
-// int rtuSlave.dO(int, int, int, int, int)
-Cell ModBus_rtuSlave_dO(SedonaVM* vm, Cell* params);
-
-// int rtuSlave.dC(int)
-Cell ModBus_rtuSlave_dC(SedonaVM* vm, Cell* params);
-
-// int rtuSlave.dA(int, int, int, int)
-Cell ModBus_rtuSlave_dA(SedonaVM* vm, Cell* params);
-
-// int rtuSlave.dR(int, int, int, int, float[])
-Cell ModBus_rtuSlave_dR(SedonaVM* vm, Cell* params);
-
-// int rtuSlave.dW(int, int, int, int, float[])
-Cell ModBus_rtuSlave_dW(SedonaVM* vm, Cell* params);
-
-// int tcpClient.dO(sys::Str, int)
-Cell ModBus_tcpClient_dO(SedonaVM* vm, Cell* params);
-
-// int tcpClient.dC(int)
-Cell ModBus_tcpClient_dC(SedonaVM* vm, Cell* params);
-
-// int tcpClient.dA(int, int, int, int, int)
-Cell ModBus_tcpClient_dA(SedonaVM* vm, Cell* params);
-
-// int tcpClient.dR(int, int, int, int, float[])
-Cell ModBus_tcpClient_dR(SedonaVM* vm, Cell* params);
-
-// int tcpClient.dW(int, int, int, int, float[])
-Cell ModBus_tcpClient_dW(SedonaVM* vm, Cell* params);
-
-// int tcpServer.dO(int)
-Cell ModBus_tcpServer_dO(SedonaVM* vm, Cell* params);
-
-// int tcpServer.dC(int)
-Cell ModBus_tcpServer_dC(SedonaVM* vm, Cell* params);
-
-// int tcpServer.dA(int, int, int, int)
-Cell ModBus_tcpServer_dA(SedonaVM* vm, Cell* params);
-
-// int tcpServer.dR(int, int, int, int, float[])
-Cell ModBus_tcpServer_dR(SedonaVM* vm, Cell* params);
-
-// int tcpServer.dW(int, int, int, int, float[])
-Cell ModBus_tcpServer_dW(SedonaVM* vm, Cell* params);
-
 // Lujiaming add at 231025
 // int rtuRemDev.dO(int, int, int, int, int, int, int)
-Cell ModBus_rtuRemDev_dO(SedonaVM* vm, Cell* params);
+Cell ModBus_remDev_dRtuO(SedonaVM* vm, Cell* params);
 
 // int rtuRemDev.dC(int)
-Cell ModBus_rtuRemDev_dC(SedonaVM* vm, Cell* params);
+Cell ModBus_remDev_dRtuC(SedonaVM* vm, Cell* params);
 
 // int rtuRemDev.dA(int, int, int, int, int, int)
-Cell ModBus_rtuRemDev_dA(SedonaVM* vm, Cell* params);
+Cell ModBus_remDev_dRtuA(SedonaVM* vm, Cell* params);
 
 // int rtuRemDev.dR(int, int, int, int, float[])
-Cell ModBus_rtuRemDev_dR(SedonaVM* vm, Cell* params);
+Cell ModBus_remDev_dRtuR(SedonaVM* vm, Cell* params);
 
 // int rtuRemDev.dW(int, int, int, int, float[])
-Cell ModBus_rtuRemDev_dW(SedonaVM* vm, Cell* params);
+Cell ModBus_remDev_dRtuW(SedonaVM* vm, Cell* params);
 
 // int rtuLocDev.dO(int, int, int, int, int)
-Cell ModBus_rtuLocDev_dO(SedonaVM* vm, Cell* params);
+Cell ModBus_locDev_dRtuO(SedonaVM* vm, Cell* params);
 
 // int rtuLocDev.dC(int)
-Cell ModBus_rtuLocDev_dC(SedonaVM* vm, Cell* params);
+Cell ModBus_locDev_dRtuC(SedonaVM* vm, Cell* params);
 
 // int rtuLocDev.dA(int, int, int, int)
-Cell ModBus_rtuLocDev_dA(SedonaVM* vm, Cell* params);
+Cell ModBus_locDev_dRtuA(SedonaVM* vm, Cell* params);
 
 // int rtuLocDev.dR(int, int, int, int, float[])
-Cell ModBus_rtuLocDev_dR(SedonaVM* vm, Cell* params);
+Cell ModBus_locDev_dRtuR(SedonaVM* vm, Cell* params);
 
 // int rtuLocDev.dW(int, int, int, int, float[])
-Cell ModBus_rtuLocDev_dW(SedonaVM* vm, Cell* params);
-// Lujiaming add at 231025 end 
+Cell ModBus_locDev_dRtuW(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dTcpO(int, int, int, int, int)
+Cell ModBus_locDev_dTcpO(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dTcpC(int)
+Cell ModBus_locDev_dTcpC(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dTcpA(int, int, int, int)
+Cell ModBus_locDev_dTcpA(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dTcpR(int, int, int, int, float[])
+Cell ModBus_locDev_dTcpR(SedonaVM* vm, Cell* params);
+
+// int rtuLocDev.dTcpW(int, int, int, int, float[])
+Cell ModBus_locDev_dTcpW(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dO(int, int, int, int, int, int, int)
+Cell ModBus_remDev_dTcpO(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dC(int)
+Cell ModBus_remDev_dTcpC(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dA(int, int, int, int, int, int)
+Cell ModBus_remDev_dTcpA(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dR(int, int, int, int, float[])
+Cell ModBus_remDev_dTcpR(SedonaVM* vm, Cell* params);
+
+// int rtuRemDev.dW(int, int, int, int, float[])
+Cell ModBus_remDev_dTcpW(SedonaVM* vm, Cell* params);
+// Lujiaming add at 231218 end 
 
 // native table for kit 3
 NativeMethod kitNatives3[] = 
 {
-  ModBus_rtuMaster_dO,            // 3::0
-  ModBus_rtuMaster_dC,            // 3::1
-  ModBus_rtuMaster_dA,            // 3::2
-  ModBus_rtuMaster_dR,            // 3::3
-  ModBus_rtuMaster_dW,            // 3::4
-  ModBus_rtuSlave_dO,             // 3::5
-  ModBus_rtuSlave_dC,             // 3::6
-  ModBus_rtuSlave_dA,             // 3::7
-  ModBus_rtuSlave_dR,             // 3::8
-  ModBus_rtuSlave_dW,             // 3::9
-  ModBus_tcpClient_dO,            // 3::10
-  ModBus_tcpClient_dC,            // 3::11
-  ModBus_tcpClient_dA,            // 3::12
-  ModBus_tcpClient_dR,            // 3::13
-  ModBus_tcpClient_dW,            // 3::14
-  ModBus_tcpServer_dO,            // 3::15
-  ModBus_tcpServer_dC,            // 3::16
-  ModBus_tcpServer_dA,            // 3::17
-  ModBus_tcpServer_dR,            // 3::18
-  ModBus_tcpServer_dW,            // 3::19
-  // Lujiaming add at 2310125
-  ModBus_rtuRemDev_dO,             // 3::20
-  ModBus_rtuRemDev_dC,             // 3::21
-  ModBus_rtuRemDev_dA,             // 3::22
-  ModBus_rtuRemDev_dR,             // 3::23
-  ModBus_rtuRemDev_dW,             // 3::24
-  ModBus_rtuLocDev_dO,             // 3::25
-  ModBus_rtuLocDev_dC,             // 3::26
-  ModBus_rtuLocDev_dA,             // 3::27
-  ModBus_rtuLocDev_dR,             // 3::28
-  ModBus_rtuLocDev_dW,             // 3::29
+  // Lujiaming add at 231218
+  ModBus_remDev_dRtuO,             // 3::0
+  ModBus_remDev_dRtuC,             // 3::1
+  ModBus_remDev_dRtuA,             // 3::2
+  ModBus_remDev_dRtuR,             // 3::3
+  ModBus_remDev_dRtuW,             // 3::4
+  ModBus_locDev_dRtuO,             // 3::5
+  ModBus_locDev_dRtuC,             // 3::6
+  ModBus_locDev_dRtuA,             // 3::7
+  ModBus_locDev_dRtuR,             // 3::8
+  ModBus_locDev_dRtuW,             // 3::9
+  ModBus_remDev_dTcpO,             // 3::10
+  ModBus_remDev_dTcpC,             // 3::11
+  ModBus_remDev_dTcpA,             // 3::12
+  ModBus_remDev_dTcpR,             // 3::13
+  ModBus_remDev_dTcpW,             // 3::14
+  ModBus_locDev_dTcpO,             // 3::15
+  ModBus_locDev_dTcpC,             // 3::16
+  ModBus_locDev_dTcpA,             // 3::17
+  ModBus_locDev_dTcpR,             // 3::18
+  ModBus_locDev_dTcpW,             // 3::19
 };
 
 ////////////////////////////////////////////////////////////////
@@ -711,7 +671,7 @@ int isNativeIdValid(int kitId, int methodId)
       if (methodId >= 21) return 0;
       else return kitNatives2[methodId] != NULL;
     case 3:
-      if (methodId >= 30) return 0;
+      if (methodId >= 20) return 0;
       else return kitNatives3[methodId] != NULL;
     case 4:
       // jiaming.lu adjust it @03/20/2023

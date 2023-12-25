@@ -1,0 +1,119 @@
+@niagaraIcon="module://icons/x16/control/numericPoint.png"
+class BacnetLocalInputVar
+  extends BacNetFieldBusIO
+{
+  // Lujiaming add these at 23/02/24
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////
+  // config Properties
+  ////////////////////////////////////////////////////////////////
+  // 
+  property float present_value = 0.0f
+  // property float in = 0.0f
+
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+
+  override void start()
+  {
+    status := STATUSREADY
+  }
+
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    ** log.message("changed")
+    
+  }
+
+  override void execute()
+  {
+    if (bus == null) {
+        return 
+    }
+      Str aliasStr = alias.toStr()
+      ** log.message("111111111 Variable name=$name")
+      // find bus and dev
+      Component p = Sys.app.lookup(this.parent)
+      Component root = null
+      while (p != null) {
+        root = p
+        p = Sys.app.lookup(p.parent)
+      }
+      if (root != null) {
+        // log.message("root:: aliasStr=$aliasStr")
+        ** log.message("222222222 Variable name=$name and aliasStr=$aliasStr")
+        //  for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+        //    ** log.message("3333 Variable f.name=${f.name}")
+        //    if (f.type.is(Folder.type) && f.name.equals("play")) {
+        //         ** log.message("4444 Variable f.name=${f.name}")
+        //         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+        //              ** log.message("5555 Variable r.name=${r.name}")
+        //              if (r.type.is(Variable.type))
+        //              {
+        //                  ** log.message("5555 Variable r.alias=${((Variable)r).alias.toStr()}")
+        //                  ** log.message("5555 Variable aliasStr=$aliasStr")
+        //                  if(((Variable)r).alias.toStr().equals(aliasStr))  {
+        //                      ** log.message("6666 r.value=${((Variable)r).value}")
+        //                     ** present_value := ((Variable)r).value
+        //                     **  log.message("-------------------------------------------------------------------------------")
+        //                     **  log.message("-------------------------name=$name and type.name=$type.name-------------------------")
+        //                     **  log.message("-------------------------execute::present_value = $present_value------------------")
+        //                     **  log.message("-------------------------------------------------------------------------------")
+        //                  }
+        //              }
+        //         }
+        //    }
+        //  }
+
+        // Device status
+        int iAliasLen  = alias.toStr().length()
+        int iSuffixLen = device_status_suffix.length()
+
+        if(iAliasLen > iSuffixLen)
+        {
+	        strDeviceName.copyFromStr(alias.toStr(), iAliasLen - iSuffixLen + 1)
+	        log.message("7777 strDeviceName=$strDeviceName from ($iAliasLen, $iSuffixLen)")
+	        if(strDeviceName.length() > 0)
+	        {
+		        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+		          ** log.message("888 Variable f.name=${f.name}")
+		          if (f.type.is(Folder.type) && f.name.equals("service")) {
+		               ** log.message("999 Variable f.name=${f.name}")
+		               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+		                    ** log.message("AAAA FieldBusNet r.name=${r.name}")
+		                    if (r.type.is(FieldBusNet.type))
+		                    {
+				               for (Component s = Sys.app.lookup(r.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
+				                    ** log.message("BBBBB FieldBusDevice s.name=${s.name}")
+				                    if (s.type.is(FieldBusDevice.type) && s.name.equals(strDeviceName))
+				                    {
+				                    	float iReadCount  =  (float)(((FieldBusDevice)s).iDeviceReadPropertyCount)
+				                    	float iWriteCount =  (float)(((FieldBusDevice)s).iDeviceWritePropertyCount)
+				                        present_value := iReadCount + iWriteCount
+				                    	** log.message("CCCCC FieldBusDevice present_value=$present_value with (iDeviceReadPropertyCount = $iReadCount, iDeviceWritePropertyCount = $iWriteCount)")
+				                    }
+				               }
+		                        
+		                    }
+		               }
+		          }
+		        }
+	        }
+        }
+      }
+  }
+
+  // define Log log
+  inline float[8] buffer
+
+  // Device status
+  inline  Str(64) device_status_suffix = "_device_status"
+  private inline Str(128)  strDeviceName
+  
+}
