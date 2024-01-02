@@ -13,7 +13,7 @@ class ModbusNetVarOut
   property Buf(64) alias = ""
 
   @config
-  property bool isOutofService = false
+  property bool OutOfService = false
   
   @config
   property float outofservice_value = 0.0f
@@ -28,7 +28,7 @@ class ModbusNetVarOut
         iRet = bus.writeReg(cache, regId, typeId, buf)
         if(iRet <= 0)
         {
-            if((device != null) && (bus.status == FieldBusNet.STATUSOK))
+            if((device != null) && (device.status == FieldBusDevice.STATUSOK))
 	        {
 	           // if (device.type.is(ModbusRTURemDev.type))
           	   if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV)
@@ -38,7 +38,7 @@ class ModbusNetVarOut
 	           			  device.ctx, cache, regId, typeId, buf)
 		           }
 		           else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
-                      device.modbusTCPServerWrite(
+                      device.modbusTCPClientWrite(
 	           			  device.ctx, cache, regId, typeId, buf)
 		           }
 		       }
@@ -50,8 +50,8 @@ class ModbusNetVarOut
 	           			     device.ctx, cache, regId, typeId, buf)
 		           }
 		           else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
-                      log.message("modbusTCPClientWrite regId=$regId typeId=$typeId buf[0]=${buf[0]} ")
-		               device.modbusTCPClientWrite(
+                      log.message("modbusTCPServerWrite regId=$regId typeId=$typeId buf[0]=${buf[0]} ")
+		               device.modbusTCPServerWrite(
 	           			     device.ctx, cache, regId, typeId, buf)
 		           }
         	   }
@@ -78,10 +78,10 @@ class ModbusNetVarOut
     if (bus != null) {
         ** log.message("11111 bus.busId=$busId ")
     }
-    if(isOutofService == true)
+    if(OutOfService == true)
     {
     	out := outofservice_value
-        log.message("ModbusNetVarOut:: isOutofService == true")  // status=4 -> STATUSNODEV
+        log.message("ModbusNetVarOut:: OutOfService == true")  // status=4 -> STATUSNODEV
         return
     }
     if (cache != 0 && bus != null && bus.status == FieldBusNet.STATUSOK && status <= STATUSREADY) {
@@ -92,7 +92,7 @@ class ModbusNetVarOut
         status := STATUSOK
       } else {
         log.message("343434 ModbusNetVarOut::regId=$regId typeId=$typeId")
-        if((device != null) && (bus.status == FieldBusNet.STATUSOK))
+        if((device != null)  && (device.status == FieldBusDevice.STATUSOK))
         {
            // if (device.type.is(ModbusRTURemDev.type))
            if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV)
@@ -111,7 +111,7 @@ class ModbusNetVarOut
 		       }
 		       else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
 	           	  ** log.message("4343434 ModbusNetVarOut REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
-                   if (device.modbusTCPServerRead(
+                   if (device.modbusTCPClientRead(
                             device.ctx, cache, regId, typeId, buf) == dataLen) {
                      out := buf[0]
                      ** log.message("4444 ModbusNetVarOut REM_TCP ModbusNetVarIn::out=$out")
@@ -140,7 +140,7 @@ class ModbusNetVarOut
                    }
 		       }
 		       else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
-                   if (device.modbusTCPClientRead(
+                   if (device.modbusTCPServerRead(
                             device.ctx, cache, regId, typeId, buf) == dataLen) {
                      out := buf[0]
                      ** log.message("66666 LOC_TCP ModbusNetVarIn::out=$out")
@@ -166,7 +166,7 @@ class ModbusNetVarOut
       iRet = bus.writeReg(cache, regId, typeId, buf)
       if(iRet <= 0)
       {
-          if((device != null) && (bus.status == FieldBusNet.STATUSOK))
+          if((device != null)  && (device.status == FieldBusDevice.STATUSOK))
 	      {
 	           // if (device.type.is(ModbusRTURemDev.type))
           	   if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV)
@@ -176,7 +176,7 @@ class ModbusNetVarOut
                             device.ctx, cache, regId, typeId, buf)
                    }
 		           else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
-                       device.modbusTCPServerWrite(
+                       device.modbusTCPClientWrite(
                             device.ctx, cache, regId, typeId, buf)
 		           }
 		       }
@@ -188,7 +188,7 @@ class ModbusNetVarOut
                             device.ctx, cache, regId, typeId, buf)
                    }
 		           else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
-                       device.modbusRTUSlaveWrite(
+                       device.modbusTCPServerWrite(
                             device.ctx, cache, regId, typeId, buf)
 		           }
         	   }

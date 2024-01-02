@@ -11,7 +11,7 @@ class ModbusNetVarIn
   property Buf(64) alias = ""
 
   @config
-  property bool isOutofService = false
+  property bool OutOfService = false
   
   @config
   property float outofservice_value = 0.0f
@@ -36,10 +36,10 @@ class ModbusNetVarIn
     if (bus != null) {
         ** log.message("11111 bus.busId=$busId ")
     }
-    if(isOutofService == true)
+    if(OutOfService == true)
     {
     	out := outofservice_value
-        log.message("ModbusNetVarIn:: isOutofService == true")  // status=4 -> STATUSNODEV
+        log.message("ModbusNetVarIn:: OutOfService == true")  // status=4 -> STATUSNODEV
         return
     }
     if (cache != 0 && bus != null && bus.status == FieldBusNet.STATUSOK && status <= STATUSREADY) {
@@ -50,7 +50,7 @@ class ModbusNetVarIn
         status := STATUSOK
       } else {
         log.message("232323 ModbusNetVarIn::regId=$regId typeId=$typeId")
-        if((device != null) && (bus.status == FieldBusNet.STATUSOK))
+        if((device != null) && (device.status == FieldBusDevice.STATUSOK))
         {
            log.message("242424 device.status=${device.status}")
 	       // if (device.type.is(ModbusRTURemDev.type))
@@ -71,10 +71,10 @@ class ModbusNetVarIn
 		       }
 		       else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
 	           	  ** log.message("4343434 ModbusNetVarIn REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
-		           if (device.modbusTCPServerRead(
+		           if (device.modbusTCPClientRead(
 		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
 			         out := buf[0]
-			         ** log.message("4444 ModbusNetVarIn REM_TCP modbusRTUMasterRead ModbusNetVarIn::out=$out and dataLen = $dataLen")
+			         ** log.message("4444 ModbusNetVarIn REM_TCP modbusTCPClientRead ModbusNetVarIn::out=$out and dataLen = $dataLen")
 			         status := STATUSOK
 			       } else {
 			           ** log.message("55555 ModbusNetVarIn REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
@@ -101,10 +101,10 @@ class ModbusNetVarIn
 		       }
 		       else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
 	           	   ** log.message("56565656 ModbusNetVarIn LOC_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
-		           if (device.modbusTCPClientRead(
+		           if (device.modbusTCPServerRead(
 		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
 			         out := buf[0]
-			         ** log.message("6666 ModbusNetVarIn LOC_TCP modbusTCPClientRead ModbusNetVarIn::out=$out")
+			         ** log.message("6666 ModbusNetVarIn LOC_TCP modbusTCPServerRead ModbusNetVarIn::out=$out")
 			         status := STATUSOK
 			       } else {
 			           ** log.message("7777 ModbusNetVarIn LOC_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")

@@ -171,7 +171,10 @@ static inline void exec_single_element_read(context_t *c, device_t *device, elem
             element->val = v;
             element->err_cnt = 0;
         } else {
-            if (element->err_cnt < MAX_ERROR_COUNT) element->err_cnt ++;
+            if (element->err_cnt < MAX_ERROR_COUNT) 
+            {
+                element->err_cnt ++;
+            }
         }
     }
 }
@@ -187,28 +190,28 @@ static inline void exec_one_list_read(context_t *c, device_t *device, list_head_
     }
 }
 
-static inline int is_device_offline(device_t *device)
+static inline int is_device_offline(context_t *c, device_t *device)
 {
     list_node_t *reg_node = device->DO.first;
-    while (reg_node != NULL) {
+    while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
         element_t *element = list_entry_safe(reg_node, element_t);
         if (element->err_cnt != MAX_ERROR_COUNT) return 0;
         reg_node = reg_node->next;
     }
     reg_node = device->DI.first;
-    while (reg_node != NULL) {
+    while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
         element_t *element = list_entry_safe(reg_node, element_t);
         if (element->err_cnt != MAX_ERROR_COUNT) return 0;
         reg_node = reg_node->next;
     }
     reg_node = device->INPUT.first;
-    while (reg_node != NULL) {
+    while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
         element_t *element = list_entry_safe(reg_node, element_t);
         if (element->err_cnt != MAX_ERROR_COUNT) return 0;
         reg_node = reg_node->next;
     }
     reg_node = device->HOLD.first;
-    while (reg_node != NULL) {
+    while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
         element_t *element = list_entry_safe(reg_node, element_t);
         if (element->err_cnt != MAX_ERROR_COUNT) return 0;
         reg_node = reg_node->next;
@@ -218,7 +221,7 @@ static inline int is_device_offline(device_t *device)
 
 static inline void exec_one_device_read(context_t *c, device_t *device)
 {
-    if (is_device_offline(device) == 1) {
+    if (is_device_offline(c, device) == 1) {
         // 检测掉线设备。
         element_t *element = NULL;
         if (device->DO.first != NULL) {
@@ -232,23 +235,31 @@ static inline void exec_one_device_read(context_t *c, device_t *device)
         }
         if (element != NULL) {
             exec_single_element_read(c, device, element);
-            if (is_device_offline(device) == 1) {
+            if (is_device_offline(c, device) == 1) {
                 device->next_update = device->next_update - (unsigned long long)device->refresh_ms + c->retry_delay_ms;
             } else {
                 // 新上线设备。
                 list_node_t *reg_node = NULL;
                 // 读取全部寄存器。
                 if (c->ctx_thread_running != 0)
+                {
                     exec_one_list_read(c, device, &device->DO);
+                }
                 if (c->ctx_thread_running != 0)
+                {
                     exec_one_list_read(c, device, &device->DI);
+                }
                 if (c->ctx_thread_running != 0)
+                {
                     exec_one_list_read(c, device, &device->INPUT);
+                }
                 if (c->ctx_thread_running != 0)
+                {
                     exec_one_list_read(c, device, &device->HOLD);
+                }
                 // 更新写入数据。
                 reg_node = device->DO.first;
-                while (reg_node != NULL) {
+                while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
                     element = list_entry_safe(reg_node, element_t);
                     if (element->err_cnt == 0 && element->is_force_update == 1) {
                         unsigned char devid = device->addr;
@@ -260,7 +271,7 @@ static inline void exec_one_device_read(context_t *c, device_t *device)
                     reg_node = reg_node->next;
                 }
                 reg_node = device->HOLD.first;
-                while (reg_node != NULL) {
+                while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
                     element = list_entry_safe(reg_node, element_t);
                     if (element->err_cnt == 0 && element->is_force_update == 1) {
                         unsigned char devid = device->addr;
@@ -281,15 +292,23 @@ static inline void exec_one_device_read(context_t *c, device_t *device)
 
     unsigned long long delta = get_tick_ms();
     if (c->ctx_thread_running != 0)
+    {
         exec_one_list_read(c, device, &device->DO);
+    }
     if (c->ctx_thread_running != 0)
+    {
         exec_one_list_read(c, device, &device->DI);
+    }
     if (c->ctx_thread_running != 0)
+    {
         exec_one_list_read(c, device, &device->INPUT);
+    }
     if (c->ctx_thread_running != 0)
+    {
         exec_one_list_read(c, device, &device->HOLD);
+    }
 
-    if (is_device_offline(device) == 1) {
+    if (is_device_offline(c, device) == 1) {
         device->next_update = device->next_update - (unsigned long long)device->refresh_ms + c->retry_delay_ms;
         device->spent_time_ms = 0;
     } else {
@@ -328,25 +347,25 @@ static void* thread_modbus_tcp_update(void* arg)
             device_t *device = list_entry_safe(dev_node, device_t);
             printf("Device [%d]\n", device->addr);
             list_node_t *reg_node = device->DO.first;
-            while (reg_node != NULL) {
+            while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
                 element_t *element = list_entry_safe(reg_node, element_t);
                 printf("  %d\n", element->addr);
                 reg_node = reg_node->next;
             }
             reg_node = device->DI.first;
-            while (reg_node != NULL) {
+            while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
                 element_t *element = list_entry_safe(reg_node, element_t);
                 printf("  %d\n", element->addr);
                 reg_node = reg_node->next;
             }
             reg_node = device->INPUT.first;
-            while (reg_node != NULL) {
+            while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
                 element_t *element = list_entry_safe(reg_node, element_t);
                 printf("  %d\n", element->addr);
                 reg_node = reg_node->next;
             }
             reg_node = device->HOLD.first;
-            while (reg_node != NULL) {
+            while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
                 element_t *element = list_entry_safe(reg_node, element_t);
                 printf("  %d\n", element->addr);
                 reg_node = reg_node->next;
@@ -447,7 +466,7 @@ int tcp_read(int ctx_idx, int device_addr, int addr, float *buf, int len)
         while (dev_node != NULL) {
             device_t *device = list_entry_safe(dev_node, device_t);
             if (device->addr == device_addr) {
-                if (is_device_offline(device) == 1) {
+                if (is_device_offline(c, device) == 1) {
                     return 0;
                 }
                 if (device->spent_time_ms > 65535) {
@@ -516,7 +535,7 @@ int tcp_read(int ctx_idx, int device_addr, int addr, float *buf, int len)
                     } else {
                         data = (next_element->val << 16) | element->val;
                     }
-                    float *p = (float *)(&data);
+                    float *p = (float *)((char *)&data);
                     buf[0] = *p;
                     return 2;
                 }
@@ -548,7 +567,7 @@ static inline void write_queue_put(int ctx_idx, element_t *element)
         }
         if (reg_head != NULL) {
             list_node_t *reg_node = reg_head->first;
-            while (reg_node != NULL) {
+            while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
                 element_t *curr_element = list_entry_safe(reg_node, element_t);
                 if (curr_element == element) {
                     device = curr_device;
@@ -822,7 +841,7 @@ int tcp_add(int ctx_idx, int device_addr, int addr, int len, int refreshms)
     }
     if (reg_head != NULL) {
         list_node_t *reg_node = reg_head->first;
-        while (reg_node != NULL) {
+        while ((reg_node != NULL) && (c->ctx_thread_running != 0)) {
             element_t *element = list_entry_safe(reg_node, element_t);
             if (element->addr == addr) {
                 register_node_addr = (int)element;
@@ -879,8 +898,11 @@ int tcp_open(char *ip, int port)
         return -1;
     }
 
+    modbus_set_response_timeout(ctx, 0, 500000);
+    modbus_set_byte_timeout(ctx, 0, 100000);
     modbus_set_debug(ctx, FALSE);
     modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
+    modbus_rtu_set_rts_delay(ctx, 10000);
 
     c->ctx_modbus = ctx;
     memset(&c->devices, 0, sizeof(list_head_t));
@@ -893,17 +915,22 @@ int tcp_open(char *ip, int port)
 
 int tcp_close(int ctx_idx)
 {
+    int iRet = -1 ;
     context_t *c = &context_table[ctx_idx];
     if (c->ctx_modbus == NULL || c->ctx_thread_running == 0) {
         return -1;
     }
 
     c->ctx_thread_running = 0;
-    pthread_join(c->ctx_thread, NULL);
-
-    while (c->ctx_modbus != NULL) {
-        usleep(10*1000);
+    // pthread_join(c->ctx_thread, NULL);
+    // pthread_join can not work in the client mode.
+    iRet = pthread_cancel(c->ctx_thread);
+    if(iRet != 0)
+    {
+        while (c->ctx_modbus != NULL) {
+            printf("[%s:%s:%d] arrive \n", __FILE__, __FUNCTION__, __LINE__);
+            usleep(10*1000);
+        }
     }
-
     return 0;
 }

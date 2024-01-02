@@ -3,10 +3,6 @@ class ModbusLocDev
   extends FieldBusDevice
 {
   @config
-  @asStr
-  property Buf(20) ipaddr = "127.0.0.1"
-  
-  @config
   @min = 1
   @max = 250
   property int address = 1
@@ -150,47 +146,47 @@ class ModbusLocDev
      // log.message("ModbusRTULocDev::modbusRTUSlaveWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
      return dRtuW(ctx, deviceAddr, addr, len, buf)
   }
-  // 
-  override int modbusTCPClientOpen(Str ip, int port)
+  // TCP
+  override int modbusTCPServerOpen(int port)
   {
-     log.message("ModbusRTULocDev::modbusRTUSlaveOpen ip=$ip and port=$port");
-     return dTcpO(ip, port)
+     log.message("ModbusRemDev::modbusTCPServerOpen port=$port");
+     return dTcpO(port)
   }
-  override int modbusTCPClientClose(int ctx)
+  override int modbusTCPServerClose(int ctx)
   {
-     log.message("ModbusRTULocDev::modbusRTUSlaveClose ctx=$ctx");
+     log.message("ModbusRemDev::modbusTCPServerClose ctx=$ctx");
      // It will block the whole system 
      return dTcpC(ctx)
   }
-  override int  modbusTCPClientAdd(int ctx, int deviceAddr, int addr, int len, int refreshms)
+  override int  modbusTCPServerAdd(int ctx, int deviceAddr, int addr, int len)
   {
       if(ctx == -1){
-          log.message("ModbusRTULocDev::modbusRTUSlaveAdd failed ctx=$ctx");
+          log.message("ModbusRemDev::modbusTCPServerAdd failed ctx=$ctx");
           return -1
       }
-     log.message("ModbusRTURemDev::modbusRTUSlaveAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
-     return dTcpA(ctx, deviceAddr, addr, len, refreshms)
+     // log.message("ModbusRemDev::modbusTCPMasterAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpA(ctx, deviceAddr, addr, len)
   }
-  override int modbusTCPClientRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  override int modbusTCPServerRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
   {
       if(ctx == -1){
-          log.message("ModbusRTULocDev::modbusTCPClientRead failed ctx=$ctx");
+          log.message("ModbusRemDev::modbusTCPServerRead failed ctx=$ctx");
           return -1
       }
-     ** log.message("ModbusRTULocDev::modbusTCPClientRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
-     return dTcpR(ctx, deviceAddr, addr, len, buf)
+      ** log.message("ModbusRemDev::modbusTCPMasterRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+      return dTcpR(ctx, deviceAddr, addr, len, buf)
   }
-  override int modbusTCPClientWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  override int modbusTCPServerWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
   {
       if(ctx == -1){
-          log.message("ModbusRTULocDev::modbusRTUSlaveWrite failed ctx=$ctx");
+          log.message("ModbusRemDev::modbusTcpServerWrite failed ctx=$ctx");
           return -1
       }
-      if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
-          log.message("ModbusRTULocDev::modbusRTUSlaveWrite failed addr=$addr");
-          return -1
-      }
-     // log.message("ModbusRTULocDev::modbusRTUSlaveWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+   //   if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
+   //       log.message("ModbusRemDev::modbusTcpServerWrite failed addr=$addr");
+   //       return -1
+   //   }
+     // log.message("ModbusRemDev::modbusTcpMasterWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
      return dTcpW(ctx, deviceAddr, addr, len, buf)
   }
   // define Log log
@@ -210,13 +206,14 @@ class ModbusLocDev
   native int dRtuW(int ctx, int deviceAddr, int addr, int len, float[] buf)
   
   ////////////////////////////////////////////////////////////////
-  native int dTcpO(Str ip, int port)
+  native int dTcpO(int port)
 
   native int dTcpC(int ctx)
 
-  native int dTcpA(int ctx, int deviceAddr, int addr, int len, int refreshms)
+  native int dTcpA(int ctx, int deviceAddr, int addr, int len)
 
   native int dTcpR(int ctx, int deviceAddr, int addr, int len, float[] buf)
 
   native int dTcpW(int ctx, int deviceAddr, int addr, int len, float[] buf)
+
 }

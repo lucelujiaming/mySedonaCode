@@ -1078,8 +1078,9 @@ int rtu_read(int ctx_idx, int device_addr, int addr, float *buf, int len)
                     } else {
                         data = (next_element->val << 16) | element->val;
                     }
-                    float *p = (float *)((char *)&data);
-                    buf[0] = *p;
+                    // float *p = (float *)(&data);
+                    // buf[0] = *p;
+                    buf[0] = (float)data;
                     return 2;
                 }
             }
@@ -1327,6 +1328,9 @@ int rtu_add(int ctx_idx, int device_addr, int addr, int len, int refreshms, int 
     int endian = (device_addr >> 8) & 0xFF;
     device_addr = device_addr & 0xFF;
 
+    printf("[%s:%s:%d] log output: %d \r\n",
+             __FILE__, __FUNCTION__, __LINE__, len);
+
     if (device_addr == 0 && addr == 0 && len == 0 && refreshms == 0 && reg_delay == 0) {
         // add END.
         c->ctx_added = 1;
@@ -1428,6 +1432,9 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
     char uart_name[32] = { 0 };
     char parity_name[] = {'N', 'E', 'O'};
 
+    printf("[%s:%s:%d] log output\r\n",
+             __FILE__, __FUNCTION__, __LINE__);
+
     if (acquire_uart(ctx_idx, uart_name) >= 0) {
         context_t *c = &context_table[ctx_idx];
         if (c->ctx_modbus != NULL || c->ctx_thread_running != 0){
@@ -1479,6 +1486,9 @@ int rtu_close(int ctx_idx)
     if (c->ctx_modbus == NULL || c->ctx_thread_running == 0) {
         return -1;
     }
+
+    printf("[%s:%s:%d] log output\r\n",
+             __FILE__, __FUNCTION__, __LINE__);
 
     c->ctx_thread_running = 0;
     pthread_join(c->ctx_thread, NULL);

@@ -166,18 +166,26 @@ Cell ModBus_locDev_dRtuA(SedonaVM* vm, Cell* params)
 
 Cell ModBus_locDev_dRtuR(SedonaVM* vm, Cell* params)
 {
+    printf("[%s:%s:%d] Enter\n", __FILE__, __FUNCTION__, __LINE__);
     int ctx_idx = params[1].ival;
+    printf("[%s:%s:%d] ctx_idx = %d \n",__FILE__, __FUNCTION__, __LINE__, ctx_idx);
     int device_addr = params[2].ival;
+    printf("[%s:%s:%d] device_addr = %d \n",__FILE__, __FUNCTION__, __LINE__, device_addr);
     int addr = params[3].ival;
+    printf("[%s:%s:%d] addr = %d \n",__FILE__, __FUNCTION__, __LINE__, addr);
     int len = params[4].ival;
+    printf("[%s:%s:%d] len = %d \n",__FILE__, __FUNCTION__, __LINE__, len);
     float *buf = params[5].aval;
+    printf("[%s:%s:%d] len = %f \n",__FILE__, __FUNCTION__, __LINE__, buf[0]);
 
     Cell ret;
     ret.ival = -1;
     if (len > 0) {
         extern int rtu_master_read(int ctx_idx, int device_addr, int addr, float *buf, int len);
+    	printf("[%s:%s:%d] Enter\n", __FILE__, __FUNCTION__, __LINE__);
         int result = rtu_master_read(ctx_idx, device_addr, addr, buf, len);
-	// printf("[%s:%s:%d] return %d\n", __FILE__, __FUNCTION__, __LINE__, result);
+		printf("[%s:%s:%d] return %d\n",
+                 __FILE__, __FUNCTION__, __LINE__, result);
         if (result > 0) {
             ret.ival = result;
         }
@@ -209,7 +217,7 @@ Cell ModBus_locDev_dRtuW(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_locDev_dTcpO(SedonaVM* vm, Cell* params)
+Cell ModBus_remDev_dTcpO(SedonaVM* vm, Cell* params)
 {
     char *ip = params[1].aval;
     int port = params[2].ival;
@@ -225,7 +233,7 @@ Cell ModBus_locDev_dTcpO(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_locDev_dTcpC(SedonaVM* vm, Cell* params)
+Cell ModBus_remDev_dTcpC(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
 
@@ -242,7 +250,7 @@ Cell ModBus_locDev_dTcpC(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_locDev_dTcpA(SedonaVM* vm, Cell* params)
+Cell ModBus_remDev_dTcpA(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
     int device_addr = params[2].ival;
@@ -261,7 +269,7 @@ Cell ModBus_locDev_dTcpA(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_locDev_dTcpR(SedonaVM* vm, Cell* params)
+Cell ModBus_remDev_dTcpR(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
     int device_addr = params[2].ival;
@@ -274,8 +282,8 @@ Cell ModBus_locDev_dTcpR(SedonaVM* vm, Cell* params)
     if (len > 0) {
         extern int tcp_read(int ctx_idx, int device_addr, int addr, float *buf, int len);
         int result = tcp_read(ctx_idx, device_addr, addr, buf, len);
-	//	printf("[%s:%s:%d] return %d\n",
-        //         __FILE__, __FUNCTION__, __LINE__, result);
+		// printf("[%s:%s:%d] return %d\n",
+        //          __FILE__, __FUNCTION__, __LINE__, result);
         if (result > 0) {
             ret.ival = result;
         }
@@ -284,7 +292,7 @@ Cell ModBus_locDev_dTcpR(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_locDev_dTcpW(SedonaVM* vm, Cell* params)
+Cell ModBus_remDev_dTcpW(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
     int device_addr = params[2].ival;
@@ -307,7 +315,7 @@ Cell ModBus_locDev_dTcpW(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_remDev_dTcpO(SedonaVM* vm, Cell* params)
+Cell ModBus_locDev_dTcpO(SedonaVM* vm, Cell* params)
 {
     int port = params[1].ival;
 
@@ -322,7 +330,7 @@ Cell ModBus_remDev_dTcpO(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_remDev_dTcpC(SedonaVM* vm, Cell* params)
+Cell ModBus_locDev_dTcpC(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
 
@@ -339,7 +347,7 @@ Cell ModBus_remDev_dTcpC(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_remDev_dTcpA(SedonaVM* vm, Cell* params)
+Cell ModBus_locDev_dTcpA(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
     int device_addr = params[2].ival;
@@ -357,7 +365,7 @@ Cell ModBus_remDev_dTcpA(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_remDev_dTcpR(SedonaVM* vm, Cell* params)
+Cell ModBus_locDev_dTcpR(SedonaVM* vm, Cell* params)
 {
     //	printf("[%s:%s:%d] Enter\n",
     //	 __FILE__, __FUNCTION__, __LINE__);
@@ -389,7 +397,7 @@ Cell ModBus_remDev_dTcpR(SedonaVM* vm, Cell* params)
     return ret;
 }
 
-Cell ModBus_remDev_dTcpW(SedonaVM* vm, Cell* params)
+Cell ModBus_locDev_dTcpW(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
     int device_addr = params[2].ival;

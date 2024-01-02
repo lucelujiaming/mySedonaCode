@@ -41,7 +41,7 @@ class ModbusTCP
         if (d.type.is(ModbusRemDev.type)) {
           if (((ModbusRemDev)d).ctx != -1) {
               cleanCache()
-              ((ModbusRemDev)d).modbusTCPServerClose(((ModbusRemDev)d).ctx)
+              ((ModbusRemDev)d).modbusTCPClientClose(((ModbusRemDev)d).ctx)
               ((ModbusRemDev)d).ctx = -1
             busId = 0
           } 
@@ -49,7 +49,7 @@ class ModbusTCP
         else if (d.type.is(ModbusLocDev.type)) {
           if (((ModbusLocDev)d).ctx != -1) {
               cleanCache()
-              ((ModbusLocDev)d).modbusTCPClientClose(((ModbusLocDev)d).ctx)
+              ((ModbusLocDev)d).modbusTCPServerClose(((ModbusLocDev)d).ctx)
               ((ModbusLocDev)d).ctx = -1
             busId = 0
           } 
@@ -69,9 +69,9 @@ class ModbusTCP
 	      ** log.message("4343434 ModbusTCP execute")
           if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status <= ModbusRemDev.STATUSREADY) {
 		      ** log.message("4343434 ModbusTCP REM_TCP ModbusNetVarIn")
-	          if (((ModbusRemDev)d).modbusTCPServerRead(
+	          if (((ModbusRemDev)d).modbusTCPClientRead(
 	                    ((ModbusRemDev)d).ctx, ((ModbusRemDev)d).address, 0, 1, buffer) == 1) {
-			    ** log.message("4444 ModbusTCP REM_TCP modbusRTUMasterRead ModbusNetVarIn::buffer[0]=${buffer[0]}")
+			    ** log.message("4444 ModbusTCP REM_TCP modbusTCPClientRead ModbusNetVarIn::buffer[0]=${buffer[0]}")
 	            ((ModbusRemDev)d).elapsedTime := (int)buffer[0]
 	            ((ModbusRemDev)d).status := ModbusRemDev.STATUSOK
 	          } else {
@@ -80,7 +80,7 @@ class ModbusTCP
 	          }
           }
           else if (d.type.is(ModbusLocDev.type) && ((ModbusLocDev)d).status <= ModbusLocDev.STATUSREADY) {
-	          if (((ModbusLocDev)d).modbusTCPClientRead(
+	          if (((ModbusLocDev)d).modbusTCPServerRead(
 	                    ((ModbusLocDev)d).ctx, ((ModbusLocDev)d).address, 0, 1, buffer) == 1) {
 	            ((ModbusLocDev)d).elapsedTime := (int)buffer[0]
 	            ((ModbusLocDev)d).status := ModbusLocDev.STATUSOK
@@ -109,9 +109,9 @@ class ModbusTCP
         if (d.type.is(ModbusRemDev.type)) {
             if (((ModbusRemDev)d).ctx != -1) {
 				log.message("4343434 ModbusTCP ModbusRemDev cleanCache")
-               cleanCache()
-				log.message("4343434 ModbusTCP ModbusRemDev modbusTCPServerClose")
-               ((ModbusRemDev)d).modbusTCPServerClose(((ModbusRemDev)d).ctx)
+                cleanCache()
+				log.message("4343434 ModbusTCP ModbusRemDev modbusTCPClientClose")
+               ((ModbusRemDev)d).modbusTCPClientClose(((ModbusRemDev)d).ctx)
                ((ModbusRemDev)d).ctx = -1
                busId = 0
                log.message("11111 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
@@ -121,8 +121,8 @@ class ModbusTCP
             if (((ModbusLocDev)d).ctx != -1) {
 				log.message("4343434 ModbusTCP ModbusLocDev cleanCache")
                cleanCache()
-				log.message("4343434 ModbusTCP ModbusLocDev modbusTCPClientClose")
-               ((ModbusLocDev)d).modbusTCPClientClose(((ModbusLocDev)d).ctx)
+				log.message("4343434 ModbusTCP ModbusLocDev modbusTCPServerClose")
+               ((ModbusLocDev)d).modbusTCPServerClose(((ModbusLocDev)d).ctx)
                ((ModbusLocDev)d).ctx = -1
                busId = 0
                log.message("11111 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
@@ -137,13 +137,13 @@ class ModbusTCP
       if (d.type.is(ModbusRemDev.type)) {
           ((ModbusRemDev)d).bus = this
             log.message("22222 flush ((ModbusRemDev)d).deviceName=${((ModbusRemDev)d).deviceName.toStr()}")
-          ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusTCPServerOpen(port)
+          ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusTCPClientOpen(
+                     ((ModbusRemDev)d).ipaddr.toStr(), port)
             log.message("22222 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
       }
       else if (d.type.is(ModbusLocDev.type)) {
           ((ModbusLocDev)d).bus = this
-          ((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusTCPClientOpen(
-                     ((ModbusLocDev)d).ipaddr.toStr(), port)
+          ((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusTCPServerOpen(port)
             log.message("22222 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
       }
     }
@@ -155,17 +155,17 @@ class ModbusTCP
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
             if (d.type.is(ModbusRemDev.type)) {
                 // dA(ctx, 0, 0, 0, 0, 0)
-                ((ModbusRemDev)d).modbusTCPServerAdd(
-                         ((ModbusRemDev)d).ctx, 0, 0, 0)
-                log.message("ModbusTCP modbusTCPServerAdd flush status=$status");
+                ((ModbusRemDev)d).modbusTCPClientAdd(
+                         ((ModbusRemDev)d).ctx, 0, 0, 0, 0)
+                log.message("ModbusTCP modbusTCPClientAdd flush status=$status");
                 log.message("33333 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
             }
             else if (d.type.is(ModbusLocDev.type)) {
                 // dA(ctx, 0, 0, 0, 0)
-                ((ModbusLocDev)d).modbusTCPClientAdd(
-                         ((ModbusLocDev)d).ctx, 0, 0, 0, 0)
-                log.message("ModbusTCP modbusTCPClientAdd flush status=$status");
-                log.message("3333 ModbusTCP modbusTCPClientAdd updateCache ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
+                ((ModbusLocDev)d).modbusTCPServerAdd(
+                         ((ModbusLocDev)d).ctx, 0, 0, 0)
+                log.message("ModbusTCP modbusTCPServerAdd flush status=$status");
+                log.message("3333 ModbusTCP modbusTCPServerAdd updateCache ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
             }
         }
         status := STATUSOK
@@ -224,8 +224,8 @@ class ModbusTCP
         if(devRemInited == false)
         {
           log.message("CCCC updateCache ctx = ${((ModbusRemDev)d).ctx}");
-          int iRet = ((ModbusRemDev)d).modbusTCPServerAdd(((ModbusRemDev)d).ctx, 
-                            ((ModbusRemDev)d).address, 0, 0)
+          int iRet = ((ModbusRemDev)d).modbusTCPClientAdd(((ModbusRemDev)d).ctx, 
+                            ((ModbusRemDev)d).address, 0, 0, ((ModbusLocDev)d).refreshTime)
           if (iRet != 0) {
             ((ModbusRemDev)d).status := ModbusRemDev.STATUSEINNER
              devRemInited = true
@@ -241,8 +241,8 @@ class ModbusTCP
         if(devRemInited == false)
         {
           log.message("CCCC updateCache ctx = ${((ModbusLocDev)d).ctx}");
-          int iRet = ((ModbusLocDev)d).modbusTCPClientAdd(((ModbusLocDev)d).ctx, 
-                            ((ModbusLocDev)d).address, 0, 0, ((ModbusLocDev)d).refreshTime)
+          int iRet = ((ModbusLocDev)d).modbusTCPServerAdd(((ModbusLocDev)d).ctx, 
+                            ((ModbusLocDev)d).address, 0, 0)
           if (iRet != 0) {
             ((ModbusLocDev)d).status := ModbusLocDev.STATUSEINNER
           } else {
@@ -283,20 +283,20 @@ class ModbusTCP
             if (dev != null) {
                 if (dev.type.is(ModbusRemDev.type)) {
                   if (((FieldBusIO)r).dataLen == 1) {
-                    ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPServerAdd(
+                    ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPClientAdd(
                     		((ModbusRemDev)dev).ctx, 
                             ((ModbusRemDev)dev).address + (((ModbusRemDev)dev).endian << 8), 
-                            ((FieldBusIO)r).regId, 1)
+                            ((FieldBusIO)r).regId, 1, ((ModbusLocDev)dev).refreshTime)
                   } else if (((FieldBusIO)r).dataLen == 2) {
-                    ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPServerAdd(
+                    ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPClientAdd(
                     		((ModbusRemDev)dev).ctx, 
                             ((ModbusRemDev)dev).address + (((ModbusRemDev)dev).endian << 8), 
-                            ((FieldBusIO)r).regId + 1, 1)
+                            ((FieldBusIO)r).regId + 1, 1, ((ModbusLocDev)dev).refreshTime)
                     if (((FieldBusIO)r).cache != 0) {
-                      ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPServerAdd(
+                      ((FieldBusIO)r).cache = ((ModbusRemDev)dev).modbusTCPClientAdd(
                       		((ModbusRemDev)dev).ctx, 
                             ((ModbusRemDev)dev).address + (((ModbusRemDev)dev).endian << 8), 
-                            ((FieldBusIO)r).regId, 1)
+                            ((FieldBusIO)r).regId, 1, ((ModbusLocDev)dev).refreshTime)
                     }
                   }
                   if (((FieldBusIO)r).cache != 0) {
@@ -317,20 +317,20 @@ class ModbusTCP
                 }
                 else if (dev.type.is(ModbusLocDev.type)) {
                   if (((FieldBusIO)r).dataLen == 1) {
-                    ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPClientAdd(
+                    ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPServerAdd(
                     		((ModbusLocDev)dev).ctx, 
                             ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
-                            ((FieldBusIO)r).regId, 1, ((ModbusLocDev)dev).refreshTime)
+                            ((FieldBusIO)r).regId, 1)
                   } else if (((FieldBusIO)r).dataLen == 2) {
-                    ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPClientAdd(
+                    ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPServerAdd(
                     		((ModbusLocDev)dev).ctx, 
                             ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
-                            ((FieldBusIO)r).regId + 1, 1, ((ModbusLocDev)dev).refreshTime)
+                            ((FieldBusIO)r).regId + 1, 1)
                     if (((FieldBusIO)r).cache != 0) {
-                      ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPClientAdd(
+                      ((FieldBusIO)r).cache = ((ModbusLocDev)dev).modbusTCPServerAdd(
                       		((ModbusLocDev)dev).ctx, 
                             ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
-                            ((FieldBusIO)r).regId, 1, ((ModbusLocDev)dev).refreshTime)
+                            ((FieldBusIO)r).regId, 1)
                     }
                   }
                   if (((FieldBusIO)r).cache != 0) {

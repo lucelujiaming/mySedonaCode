@@ -3,6 +3,10 @@ class ModbusRemDev
   extends FieldBusDevice
 {
   @config
+  @asStr
+  property Buf(20) ipaddr = "127.0.0.1"
+  
+  @config
   @min = 1
   @max = 250
   property int address = 1
@@ -147,46 +151,46 @@ class ModbusRemDev
      return dRtuW(ctx, deviceAddr, addr, len, buf)
   }
   // TCP
-  override int modbusTCPServerOpen(int port)
+  override int modbusTCPClientOpen(Str ip, int port)
   {
-     log.message("ModbusRemDev::modbusTCPServerOpen port=$port");
-     return dTcpO(port)
+     log.message("ModbusRTULocDev::modbusTCPClientOpen ip=$ip and port=$port");
+     return dTcpO(ip, port)
   }
-  override int modbusTCPServerClose(int ctx)
+  override int modbusTCPClientClose(int ctx)
   {
-     log.message("ModbusRemDev::modbusTCPServerClose ctx=$ctx");
+     log.message("ModbusRTULocDev::modbusTCPClientClose ctx=$ctx");
      // It will block the whole system 
      return dTcpC(ctx)
   }
-  override int  modbusTCPServerAdd(int ctx, int deviceAddr, int addr, int len)
+  override int  modbusTCPClientAdd(int ctx, int deviceAddr, int addr, int len, int refreshms)
   {
       if(ctx == -1){
-          log.message("ModbusRemDev::modbusTCPServerAdd failed ctx=$ctx");
+          log.message("ModbusRTULocDev::modbusTCPClientAdd failed ctx=$ctx");
           return -1
       }
-     // log.message("ModbusRemDev::modbusTCPMasterAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
-     return dTcpA(ctx, deviceAddr, addr, len)
+     log.message("ModbusRTURemDev::modbusTCPClientAdd ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpA(ctx, deviceAddr, addr, len, refreshms)
   }
-  override int modbusTCPServerRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  override int modbusTCPClientRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
   {
       if(ctx == -1){
-          log.message("ModbusRemDev::modbusTCPServerRead failed ctx=$ctx");
+          log.message("ModbusRTULocDev::modbusTCPClientRead failed ctx=$ctx");
           return -1
       }
-      ** log.message("ModbusRemDev::modbusTCPMasterRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
-      return dTcpR(ctx, deviceAddr, addr, len, buf)
+     ** log.message("ModbusRTULocDev::modbusTCPClientRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+     return dTcpR(ctx, deviceAddr, addr, len, buf)
   }
-  override int modbusTCPServerWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
+  override int modbusTCPClientWrite(int ctx, int deviceAddr, int addr, int len, float[] buf)
   {
       if(ctx == -1){
-          log.message("ModbusRemDev::modbusTcpServerWrite failed ctx=$ctx");
+          log.message("ModbusRTULocDev::modbusTCPClientWrite failed ctx=$ctx");
           return -1
       }
-   //   if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
-   //       log.message("ModbusRemDev::modbusTcpServerWrite failed addr=$addr");
-   //       return -1
-   //   }
-     // log.message("ModbusRemDev::modbusTcpMasterWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
+      if (!((addr > 0 && addr < 10000) || (addr > 40000 && addr < 50000))) {
+          log.message("ModbusRTULocDev::modbusTCPClientWrite failed addr=$addr");
+          return -1
+      }
+     // log.message("ModbusRTULocDev::modbusTCPClientWrite ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");
      return dTcpW(ctx, deviceAddr, addr, len, buf)
   }
   // define Log log
@@ -206,15 +210,13 @@ class ModbusRemDev
   native int dRtuW(int ctx, int deviceAddr, int addr, int len, float[] buf)
 
   ////////////////////////////////////////////////////////////////
-
-  native int dTcpO(int port)
+  native int dTcpO(Str ip, int port)
 
   native int dTcpC(int ctx)
 
-  native int dTcpA(int ctx, int deviceAddr, int addr, int len)
+  native int dTcpA(int ctx, int deviceAddr, int addr, int len, int refreshms)
 
   native int dTcpR(int ctx, int deviceAddr, int addr, int len, float[] buf)
 
   native int dTcpW(int ctx, int deviceAddr, int addr, int len, float[] buf)
-
 }
