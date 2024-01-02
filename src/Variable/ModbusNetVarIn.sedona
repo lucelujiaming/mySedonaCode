@@ -61,7 +61,7 @@ class ModbusNetVarIn
 		           if (device.modbusRTUMasterRead(
 		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
 			           out := buf[0]
-			           log.message("4444 ModbusNetVarIn REM_RTU modbusRTUMasterRead ModbusNetVarIn::out=$out")
+			           ** log.message("4444 ModbusNetVarIn REM_RTU modbusRTUMasterRead ModbusNetVarIn::out=$out")
 			           status := STATUSOK
 			       } else {
 			           ** log.message("55555 ModbusNetVarIn REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")

@@ -142,17 +142,17 @@ class ModbusRTU
  
   private void updateVariable()
   {
-     log.message("Enter updateVariable name=$name")
+     ** log.message("Enter updateVariable name=$name")
      // log.message("root:: aliasStr=$aliasStr")
      for (Component f = Sys.app.lookup(children); f != null; f = Sys.app.lookup(f.nextSibling)) {
         log.message("children updateVariable name=$name")
        if (f.type.is(Variable.type) && !f.name.equals("service")) {
          Str nameComponentStr = ((Variable)f).name
-         log.message("updateVariable nameComponentStr=$nameComponentStr and name=$name")
+         ** log.message("updateVariable nameComponentStr=$nameComponentStr and name=$name")
          f.execute()
        }
      }
-     log.message("Left updateVariable name=$name")
+     ** log.message("Left updateVariable name=$name")
   }
 
  
@@ -168,24 +168,38 @@ class ModbusRTU
     //   ctx = -1
     //   busId = 0
     // }
+    int iRemCtxIdx = 0
+    int iLocCtxIdx = 0
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(ModbusRemDev.type)) {
-          if (((ModbusRemDev)d).ctx != -1) {
-              cleanCache()
-              ((ModbusRemDev)d).modbusRTUMasterClose(((ModbusRemDev)d).ctx)
-              ((ModbusRemDev)d).ctx = -1
-            busId = 0
-            log.message("11111 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
-          } 
+          // if (((ModbusRemDev)d).ctx != -1) {
+               log.message("4343434 ModbusRTU ModbusRemDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
+               cleanCache()
+               log.message("4343434 ModbusRTU ModbusRemDev modbusTCPClientClose")
+               ((ModbusRemDev)d).modbusRTUMasterClose(iRemCtxIdx)
+               iRemCtxIdx = iRemCtxIdx + 1
+               ((ModbusRemDev)d).ctx = -1
+               busId = 0
+               log.message("11111 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
+            // } 
+            // else {
+			//    log.message("ModbusRemDev)d).ctx == -1")
+            // } 
         }
         else if (d.type.is(ModbusLocDev.type)) {
-          if (((ModbusLocDev)d).ctx != -1) {
-              cleanCache()
-              ((ModbusLocDev)d).modbusRTUSlaveClose(((ModbusLocDev)d).ctx)
-              ((ModbusLocDev)d).ctx = -1
-            busId = 0
-            log.message("11111 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
-          } 
+            // if (((ModbusLocDev)d).ctx != -1) {
+               log.message("4343434 ModbusRTU ModbusLocDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
+               cleanCache()
+               log.message("4343434 ModbusRTU ModbusLocDev modbusTCPServerClose")
+              ((ModbusLocDev)d).modbusRTUSlaveClose(iLocCtxIdx)
+               iLocCtxIdx = iLocCtxIdx + 1
+               ((ModbusLocDev)d).ctx = -1
+               busId = 0
+               log.message("11111 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
+            // } 
+            // else {
+            //    log.message("ModbusLocDev)d).ctx == -1")
+            // } 
         }
     }
 	log.message("4343434 ModbusRTU ctx = dO(port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)")

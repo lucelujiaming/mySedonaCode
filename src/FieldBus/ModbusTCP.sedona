@@ -110,9 +110,9 @@ class ModbusTCP
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(ModbusRemDev.type)) {
             // if (((ModbusRemDev)d).ctx != -1) {
-			   log.message("4343434 ModbusTCP ModbusRemDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
+               log.message("4343434 ModbusTCP ModbusRemDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
                cleanCache()
-			   log.message("4343434 ModbusTCP ModbusRemDev modbusTCPClientClose")
+               log.message("4343434 ModbusTCP ModbusRemDev modbusTCPClientClose")
                ((ModbusRemDev)d).modbusTCPClientClose(iRemCtxIdx)
                iRemCtxIdx = iRemCtxIdx + 1
                ((ModbusRemDev)d).ctx = -1
@@ -120,14 +120,14 @@ class ModbusTCP
                log.message("11111 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
             // } 
             // else {
-			//    log.message("ModbusRemDev)d).ctx == -1")
+            //    log.message("ModbusRemDev)d).ctx == -1")
             // } 
         }
         else if (d.type.is(ModbusLocDev.type)) {
             // if (((ModbusLocDev)d).ctx != -1) {
-			   log.message("4343434 ModbusTCP ModbusLocDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
+               log.message("4343434 ModbusTCP ModbusLocDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
                cleanCache()
-			   log.message("4343434 ModbusTCP ModbusLocDev modbusTCPServerClose")
+               log.message("4343434 ModbusTCP ModbusLocDev modbusTCPServerClose")
                ((ModbusLocDev)d).modbusTCPServerClose(iLocCtxIdx)
                iLocCtxIdx = iLocCtxIdx + 1
                ((ModbusLocDev)d).ctx = -1
@@ -135,11 +135,11 @@ class ModbusTCP
                log.message("11111 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
             // } 
             // else {
-			//    log.message("ModbusLocDev)d).ctx == -1")
+            //    log.message("ModbusLocDev)d).ctx == -1")
             // } 
         }
     }
-	log.message("4343434 ModbusTCP ctx = dO(port)")
+    log.message("4343434 ModbusTCP ctx = dO(port)")
     // ctx = dO(port)
     // add device node.
     bool bRet = false
