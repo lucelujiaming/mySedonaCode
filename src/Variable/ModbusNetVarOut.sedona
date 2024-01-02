@@ -74,7 +74,7 @@ class ModbusNetVarOut
     if (device == null) {
         return 
     }
-    log.message("11111 name=$name")
+    ** log.message("11111 name=$name")
     if (bus != null) {
         ** log.message("11111 bus.busId=$busId ")
     }
@@ -85,13 +85,13 @@ class ModbusNetVarOut
         return
     }
     if (cache != 0 && bus != null && bus.status == FieldBusNet.STATUSOK && status <= STATUSREADY) {
-      log.message("22222 ModbusNetVarOut::regId=$regId typeId=$typeId")
+      ** log.message("22222 ModbusNetVarOut::regId=$regId typeId=$typeId")
       if (bus.readReg(cache, regId, typeId, buf) == dataLen) {
         out := buf[0]
         log.message("33333 ModbusNetVarOut::out=$out")
         status := STATUSOK
       } else {
-        log.message("343434 ModbusNetVarOut::regId=$regId typeId=$typeId")
+        ** log.message("343434 ModbusNetVarOut::regId=$regId typeId=$typeId")
         if((device != null)  && (device.status == FieldBusDevice.STATUSOK))
         {
            // if (device.type.is(ModbusRTURemDev.type))

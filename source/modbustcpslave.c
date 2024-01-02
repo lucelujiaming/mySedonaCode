@@ -932,5 +932,12 @@ int tcp_close(int ctx_idx)
             usleep(10*1000);
         }
     }
+    else 
+    {
+        modbus_close(c->ctx_modbus);
+        modbus_free(c->ctx_modbus);
+        c->ctx_modbus = NULL;
+        c->ctx_thread_running = 0;
+    }
     return 0;
 }

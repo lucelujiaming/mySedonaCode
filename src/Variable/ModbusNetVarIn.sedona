@@ -49,15 +49,15 @@ class ModbusNetVarIn
         log.message("33333 ModbusNetVarIn::out=$out")
         status := STATUSOK
       } else {
-        log.message("232323 ModbusNetVarIn::regId=$regId typeId=$typeId")
+        ** log.message("232323 ModbusNetVarIn::regId=$regId typeId=$typeId")
         if((device != null) && (device.status == FieldBusDevice.STATUSOK))
         {
-           log.message("242424 device.status=${device.status}")
+           ** log.message("242424 device.status=${device.status}")
 	       // if (device.type.is(ModbusRTURemDev.type))
            if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV)
            {
                if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_RTU) {
-	           	   log.message("4343434 ModbusNetVarIn REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
+	           	   ** log.message("4343434 ModbusNetVarIn REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
 		           if (device.modbusRTUMasterRead(
 		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
 			           out := buf[0]
@@ -87,7 +87,7 @@ class ModbusNetVarIn
 	       else if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSLOCDEV)
            {
                if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_RTU) {
-	           	   log.message("56565656 ModbusNetVarIn LOC_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
+	           	   ** log.message("56565656 ModbusNetVarIn LOC_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
 		           if (device.modbusRTUSlaveRead(
 		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
 			         out := buf[0]
