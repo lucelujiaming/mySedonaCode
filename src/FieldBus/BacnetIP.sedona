@@ -220,7 +220,7 @@ class BacnetIP
         if (r.type.is(BacnetLocDev.type)) {
           ((BacnetLocDev)r).bus = this
         }
-        if (r.type.is(BacnetRemDev.type)) {
+        else if (r.type.is(BacnetRemDev.type)) {
           log.message("SetBus: 3333 updateCache r.name=$r.name and type.name=$r.type.name");
           // dev = (bacDevice)r
           ((BacnetRemDev)r).bus = this

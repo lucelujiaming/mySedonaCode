@@ -148,11 +148,11 @@ class BacnetMSTP
     for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
       if (f.type.is(Folder.type) && !f.name.equals("service")) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-          if (r.type.is(FieldBusIO.type) && ((FieldBusIO)r).busId == id) {
-            ((FieldBusIO)r).bus = null
-            ((FieldBusIO)r).cache = 0
-            ((FieldBusIO)r).busId = 0
-            ((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+          if (r.type.is(BacNetFieldBusIO.type) && ((BacNetFieldBusIO)r).busId == id) {
+            ((BacNetFieldBusIO)r).bus = null
+            ((BacNetFieldBusIO)r).cache = 0
+            ((BacNetFieldBusIO)r).busId = 0
+            ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSNODEV
           }
         }
       }
@@ -191,29 +191,32 @@ class BacnetMSTP
     for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
       if (f.type.is(Folder.type) && !f.name.equals("service")) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-          if (r.type.is(FieldBusIO.type) && ((FieldBusIO)r).status < FieldBusIO.STATUSEURL && ((FieldBusIO)r).busId == 0) {
+          if (r.type.is(BacNetFieldBusIO.type) && ((BacNetFieldBusIO)r).status < BacNetFieldBusIO.STATUSEURL && ((BacNetFieldBusIO)r).busId == 0) {
             BacnetRemDev dev = null
             for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-              if (d.type.is(BacnetRemDev.type) && ((FieldBusIO)r).devStr.equals(((BacnetRemDev)d).deviceName.toStr())) {
+              // if (d.type.is(BacnetRemDev.type) && ((BacNetFieldBusIO)r).devStr.equals(((BacnetRemDev)d).deviceName.toStr())) {
+              if (d.type.is(BacnetRemDev.type)) {
                 dev = (BacnetRemDev)d
                 break
               }
             }
             if (dev != null) {
-              ((FieldBusIO)r).cache = dA(ctx, // dev.deviceInstance, 
-                   deviceInstance, ((FieldBusIO)r).typeId, ((FieldBusIO)r).regId, 85, 0)
-              if (((FieldBusIO)r).cache >= 0) {
-                if (((FieldBusIO)r).bus == null) {
-                  ((FieldBusIO)r).bus = this
+              ((BacNetFieldBusIO)r).cache = dA(ctx, 0, // deviceInstance, // dev.deviceInstance, 
+                       0, // ((BacNetFieldBusIO)r).regId, 
+                       0, // ((BacNetFieldBusIO)r).typeId, 
+                       85, 0)
+              if (((BacNetFieldBusIO)r).cache >= 0) {
+                if (((BacNetFieldBusIO)r).bus == null) {
+                  ((BacNetFieldBusIO)r).bus = this
                 }
-                ((FieldBusIO)r).status := FieldBusIO.STATUSREADY
+                ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSREADY
                 dev.status := BacnetRemDev.STATUSREADY
                 result = true
               } else {
-                ((FieldBusIO)r).status := FieldBusIO.STATUSEADDR
+                ((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSEADDR
               }
             } else {
-              //((FieldBusIO)r).status := FieldBusIO.STATUSNODEV
+              //((BacNetFieldBusIO)r).status := BacNetFieldBusIO.STATUSNODEV
             }
           }
         }

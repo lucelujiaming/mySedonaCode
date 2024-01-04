@@ -1,6 +1,6 @@
 @niagaraIcon="module://icons/x16/control/numericPoint.png"
 class ModbusNetVarIn
-  extends FieldBusIO
+  extends ModbusFieldBusIO
 {
   @readonly
   property float out = 0.0f
