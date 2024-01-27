@@ -3,6 +3,10 @@ class BacnetLocalVar
   extends BacNetFieldBusIO
 {
   // Lujiaming add these at 23/02/24
+  define Str OPMODE_RANGE = "In, Out, END"
+  define int OPMODE_IN  = 0
+  define int OPMODE_OUT = 1
+  define int OPMODE_END = 2
   ////////////////////////////////////////////////////////////////
   // Properties
   ////////////////////////////////////////////////////////////////
@@ -11,6 +15,11 @@ class BacnetLocalVar
   // config Properties
   ////////////////////////////////////////////////////////////////
   // 
+  @config
+  @range = OPMODE_RANGE
+  @fieldWidth = 200
+  property int opmode = OPMODE_IN
+  
   property float present_value = 0.0f
   // property float in = 0.0f
 

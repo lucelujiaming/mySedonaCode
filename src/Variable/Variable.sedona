@@ -203,11 +203,25 @@ class Variable
                                 ** log.message("BacnetNetVarOut.name=${q.name}")
                                 ((BacnetNetVarOut)q).present_value := value
                             }
-                            else if (q.type.is(ModbusNetVarIn.type))  {
+                            else if (q.type.is(BacnetLocalVar.type) 
+                                && ((BacnetLocalVar)q).alias.toStr().equals(aliasStr))  {
+                                ** log.message("BacnetLocalVar.name=${q.name}")
+                                if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_OUT)
+                                {
+                                    ((BacnetLocalVar)q).present_value := value
+                                }
+                                else if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_IN)
+                                {
+                                    value := ((BacnetLocalVar)q).present_value
+                                }
+                            }
+                            else if (q.type.is(ModbusNetVarIn.type) 
+                                && ((ModbusNetVarIn)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("ModbusNetVarIn.name=${q.name}")
                                 value := ((ModbusNetVarIn)q).out
                             }
-                            else if (q.type.is(ModbusNetVarOut.type))  {
+                            else if (q.type.is(ModbusNetVarOut.type)
+                                && ((ModbusNetVarOut)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("ModbusNetVarOut.name=${q.name}")
                                 ((ModbusNetVarOut)q).in := value
                             }

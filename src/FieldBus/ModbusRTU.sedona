@@ -120,6 +120,7 @@ class ModbusRTU
             ((ModbusRemDev)d).packetsError := -1
             ((ModbusRemDev)d).status := ModbusRemDev.STATUSOFFLINE
           }
+          d.execute()
         }
         else if (d.type.is(ModbusLocDev.type) && ((ModbusLocDev)d).status <= ModbusLocDev.STATUSREADY) {
           ** log.message("ModbusRTU::execute ((ModbusLocDev)d).modbusRTUSlaveRead")
@@ -133,6 +134,7 @@ class ModbusRTU
 	            ((ModbusLocDev)d).elapsedTime := -1
 	            ((ModbusLocDev)d).status := ModbusLocDev.STATUSOFFLINE
           }
+          d.execute()
         }
       }
       updateVariable()
@@ -288,14 +290,14 @@ class ModbusRTU
     log.message("AAAAAA updateCache ");
     // add device node.
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-      log.message("ABABBAA updateCache ");
+      log.message("ABABBAA ModbusRTU::updateCache ");
       if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status < ModbusRemDev.STATUSEADDR) {
           // if (dA(ctx, ((ModbusRemDev)d).address, 0, 0, ((ModbusRemDev)d).refreshTime, ((ModbusRemDev)d).pointDelay) != 0) {
           //   ((ModbusRemDev)d).status := ModbusRemDev.STATUSEINNER
           // } else {
           //   ((ModbusRemDev)d).status := ModbusRemDev.STATUSNOREG
           // }
-          log.message("CCCC updateCache ctx = ${((ModbusRemDev)d).ctx}");
+          log.message("CCCC ModbusRTU::updateCache ModbusRemDev::ctx = ${((ModbusRemDev)d).ctx}");
           int iRet = ((ModbusRemDev)d).modbusRTUMasterAdd(((ModbusRemDev)d).ctx, 
                             ((ModbusRemDev)d).address, 0, 0, ((ModbusRemDev)d).refreshTime, ((ModbusRemDev)d).pointDelay)
           if (iRet != 0) {
@@ -310,10 +312,10 @@ class ModbusRTU
           // } else {
           //   ((ModbusRemDev)d).status := ModbusRemDev.STATUSNOREG
           // }
-          log.message("CCCC updateCache ctx = ${((ModbusLocDev)d).ctx}");
+          log.message("CCCC ModbusRTU::updateCache ModbusLocDev::ctx = ${((ModbusLocDev)d).ctx}");
           int iRet = ((ModbusLocDev)d).modbusRTUSlaveAdd(((ModbusLocDev)d).ctx, 
                             ((ModbusLocDev)d).address, 0, 0)
-          log.message("DDDD updateCache ");
+          log.message("DDDD ModbusRTU::updateCache ");
           if (iRet != 0) {
             ((ModbusLocDev)d).status := ModbusLocDev.STATUSEINNER
           } else {
@@ -322,21 +324,15 @@ class ModbusRTU
           log.message("DDDD updateCache ");
       }
     }
-
-    // add register node in play.
-    while (Sys.app.lookup(p.parent) != null) {
-      p = Sys.app.lookup(p.parent)
-    }
-
-    root = p
-    for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-      log.message("11111 updateCache f.name=$f.name and type.name=$f.type.name");
-      if (f.type.is(Folder.type) && !f.name.equals("service")) {
+    
+    for (Component f = Sys.app.lookup(children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+      log.message("11111 ModbusRTU::updateCache f.name=$f.name and type.name=$f.type.name");
+      if (f.type.is(ModbusRemDev.type) || f.type.is(ModbusLocDev.type)) {
         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-          log.message("22222 updateCache r.name=$r.name and r.type.name=$r.type.name");
+          log.message("22222 ModbusRTU::updateCache r.name=$r.name and r.type.name=$r.type.name");
           if (r.type.is(ModbusFieldBusIO.type) && ((ModbusFieldBusIO)r).status < ModbusFieldBusIO.STATUSEURL && ((ModbusFieldBusIO)r).busId == 0) {
             FieldBusDevice dev = null
-            log.message("333333 updateCache r.name=$r.name and r.type.name=$r.type.name");
+            log.message("333333 ModbusRTU::updateCache r.name=$r.name and r.type.name=$r.type.name");
             // Find dev for ModbusFieldBusIO
             for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
                 if (d.type.is(ModbusRemDev.type) && 
@@ -352,7 +348,7 @@ class ModbusRTU
                   break
                 }
             }
-            log.message("44444 updateCache r.name=$r.name and r.type.name=$r.type.name");
+            log.message("44444 ModbusRTU::updateCache r.name=$r.name and r.type.name=$r.type.name");
             if (dev != null) {
                 if (dev.type.is(ModbusRemDev.type)) {
                     if (((ModbusFieldBusIO)r).dataLen == 1) {
@@ -362,7 +358,7 @@ class ModbusRTU
                                 ((ModbusFieldBusIO)r).regId, 1, 
                                 ((ModbusRemDev)dev).refreshTime, 
                                 ((ModbusRemDev)dev).pointDelay)
-                       log.message("45454545 updateCache r.name=$r.name and r.type.name=$r.type.name");
+                       log.message("45454545 ModbusRTU::updateCache r.name=$r.name and r.type.name=$r.type.name");
                     } else if (((ModbusFieldBusIO)r).dataLen == 2) {
                         ((ModbusFieldBusIO)r).cache = ((ModbusRemDev)dev).modbusRTUMasterAdd(
                                 ((ModbusRemDev)dev).ctx, 
@@ -370,7 +366,7 @@ class ModbusRTU
                                 ((ModbusFieldBusIO)r).regId + 1, 1, 
                                 ((ModbusRemDev)dev).refreshTime, 
                                 ((ModbusRemDev)dev).pointDelay)
-                       log.message("4646464 updateCache r.name=$r.name and r.type.name=$r.type.name");
+                       log.message("4646464 ModbusRTU::updateCache r.name=$r.name and r.type.name=$r.type.name");
                         if (((ModbusFieldBusIO)r).cache != 0) {
                            ((ModbusFieldBusIO)r).cache = ((ModbusRemDev)dev).modbusRTUMasterAdd(
                                 ((ModbusRemDev)dev).ctx, 
@@ -378,13 +374,13 @@ class ModbusRTU
                                 ((ModbusFieldBusIO)r).regId, 1, 
                                 ((ModbusRemDev)dev).refreshTime, 
                                 ((ModbusRemDev)dev).pointDelay)
-                           log.message("474747 updateCache r.name=$r.name and r.type.name=$r.type.name");
+                           log.message("474747 ModbusRTU::updateCache r.name=$r.name and r.type.name=$r.type.name");
                         }
                     }
-                    log.message("55555 updateCache r.name=$r.name");
+                    log.message("55555 ModbusRTU::updateCache r.name=$r.name");
                     if (((ModbusFieldBusIO)r).cache != 0) {
                       if (((ModbusFieldBusIO)r).bus == null) {
-                        log.message("updateCache::SetBus r.name=$r.name");
+                        log.message("ModbusRTU::updateCache::SetBus r.name=$r.name");
                         ((ModbusFieldBusIO)r).bus = this
                       }
                       if (((ModbusFieldBusIO)r).device == null) {
@@ -397,7 +393,7 @@ class ModbusRTU
                       result = true
                     } else {
                       ((ModbusFieldBusIO)r).status := ModbusFieldBusIO.STATUSEADDR
-                      log.message("9999 updateCache r.name=$r.name");
+                      log.message("9999 ModbusRTU::updateCache r.name=$r.name");
                     }
                 }
                 else if (dev.type.is(ModbusLocDev.type)) {
@@ -406,25 +402,25 @@ class ModbusRTU
                                 ((ModbusLocDev)dev).ctx, 
                                 ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
                                 ((ModbusFieldBusIO)r).regId, 1)
-                       log.message("565656 updateCache r.name=$r.name");
+                       log.message("565656 ModbusRTU::updateCache r.name=$r.name");
                     } else if (((ModbusFieldBusIO)r).dataLen == 2) {
                       ((ModbusFieldBusIO)r).cache = ((ModbusLocDev)dev).modbusRTUSlaveAdd(
                                 ((ModbusLocDev)dev).ctx, 
                                 ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
                                 ((ModbusFieldBusIO)r).regId + 1, 1)
-                      log.message("575757 updateCache r.name=$r.name");
+                      log.message("575757 ModbusRTU::updateCache r.name=$r.name");
                       if (((ModbusFieldBusIO)r).cache != 0) {
                         ((ModbusFieldBusIO)r).cache = ((ModbusLocDev)dev).modbusRTUSlaveAdd(
                                 ((ModbusLocDev)dev).ctx, 
                                 ((ModbusLocDev)dev).address + (((ModbusLocDev)dev).endian << 8), 
                                 ((ModbusFieldBusIO)r).regId, 1)
-                        log.message("585858 updateCache r.name=$r.name"); 
+                        log.message("585858 ModbusRTU::updateCache r.name=$r.name"); 
                       }
                     }
-                    log.message("666666 updateCache r.name=$r.name");
+                    log.message("666666 ModbusRTU::updateCache r.name=$r.name");
                     if (((ModbusFieldBusIO)r).cache != 0) {
                       if (((ModbusFieldBusIO)r).bus == null) {
-                        log.message("updateCache::SetBus r.name=$r.name");
+                        log.message("ModbusRTU::updateCache::SetBus r.name=$r.name");
                         ((ModbusFieldBusIO)r).bus = this
                       }
                       if (((ModbusFieldBusIO)r).device == null) {
@@ -434,11 +430,11 @@ class ModbusRTU
                       log.message("8888 updateCache r.name=$r.name");
                       ((ModbusFieldBusIO)r).status := ModbusFieldBusIO.STATUSREADY
                       dev.status := ModbusLocDev.STATUSREADY
-                      log.message("242424 updateCache dev.status=${dev.status}")
+                      log.message("242424 ModbusRTU::updateCache dev.status=${dev.status}")
                       result = true
                     } else {
                       ((ModbusFieldBusIO)r).status := ModbusFieldBusIO.STATUSEADDR
-                      log.message("AAAAA updateCache r.name=$r.name");
+                      log.message("AAAAA ModbusRTU::updateCache r.name=$r.name");
                     }
                 }
             } else {

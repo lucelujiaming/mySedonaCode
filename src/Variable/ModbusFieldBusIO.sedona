@@ -75,6 +75,7 @@ abstract class ModbusFieldBusIO
   void update()
   {
     if (bus != null) {
+      log.message("111111 bus.notifyFlush()")
       bus.notifyFlush()
     }
     status := STATUSNODEV
@@ -146,7 +147,7 @@ abstract class ModbusFieldBusIO
       dataLen = 1
       break
     }
-    ** log.message("222222 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+    log.message("222222 aLen=$aLen ")
     if (aLen > 0 && Address.bytesLen > 0) {
         int tmpInt = Address.toStr().parseInt()
         if (tmpInt != -1) {
@@ -165,15 +166,15 @@ abstract class ModbusFieldBusIO
               return
             }
           }
-          ** log.message("33333 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+          log.message("33333 aLen=$aLen ")
           // find device and bus id.
           FieldBusNet tmpBus = lookupNetByDeviceName(device_name.toStr())
           if (tmpBus != null) {
-            ** log.message("444444 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+            log.message("444444 aLen=$aLen ")
             busId = tmpBus.busId
             // trigger notify flush.
             if (busId != 0) {
-             **  log.message("55555 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+              log.message("55555 aLen=$aLen ")
               bus = lookupNetById(busId)
               if (bus != null) {
                 bus.notifyFlush()
@@ -186,11 +187,11 @@ abstract class ModbusFieldBusIO
             regId = tmpInt
           }
         } else {
-          ** log.message("10101010 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+          log.message("10101010 aLen=$aLen ")
           status := STATUSEURL
         }
     } else {
-        ** log.message("123123123 aLen=$aLen and findState=$findState and tmpBuf=$tmpBuf")
+        log.message("123123123 aLen=$aLen ")
         status := STATUSEURL
     }
     if(bus != null)
@@ -216,7 +217,8 @@ abstract class ModbusFieldBusIO
       if (f.type.is(Folder.type) && f.name.equals("service")) {
         for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
           if (n.type.is(FieldBusNet.type) && ((FieldBusNet)n).busId == id) {
-            return (FieldBusNet)n
+             log.message("Found FieldBusNet in the lookupNetById")
+             return (FieldBusNet)n
           }
         }
       }
@@ -242,7 +244,8 @@ abstract class ModbusFieldBusIO
           if (n.type.is(FieldBusNet.type)) {
             for (p = Sys.app.lookup(n.children); p != null; p = Sys.app.lookup(p.nextSibling)) {
               if (p.type.is(FieldBusDevice.type) && devName.equals(((FieldBusDevice)p).deviceName.toStr())) {
-                return (FieldBusNet)n
+                  log.message("Found FieldBusNet in the lookupNetByDeviceName")
+                  return (FieldBusNet)n
               }
             }
           }

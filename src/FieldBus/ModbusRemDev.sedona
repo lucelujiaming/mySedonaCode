@@ -108,6 +108,16 @@ class ModbusRemDev
       status := STATUSNONET
     }
   }
+
+  override void execute()
+  {
+    ** log.message("ModbusRemDev::execute status = $status")
+    if (status == STATUSOK) {
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+           d.execute()
+        }
+    }
+  }
   
   override int modbusRTUMasterOpen(int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
   {

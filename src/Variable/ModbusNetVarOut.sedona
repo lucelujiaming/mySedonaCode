@@ -21,6 +21,7 @@ class ModbusNetVarOut
   override void changed(Slot slot)
   {
     int iRet = -1
+    ** log.message("ModbusNetVarOut::super.changed")
     super.changed(slot)
     if (slot == ModbusNetVarOut.in) {
       if (cache != 0 && bus != null && bus.status == FieldBusNet.STATUSOK && status <= STATUSOK) {
@@ -60,7 +61,7 @@ class ModbusNetVarOut
       }
     } 
     if (slot == ModbusNetVarOut.device_name || slot == ModbusNetVarOut.io_type || slot == ModbusNetVarOut.Address) {
-      log.message("changed slot.name=$slot.name")
+      log.message("ModbusNetVarOut::changed slot.name=$slot.name")
       update()
       needUpdate = true
     }
