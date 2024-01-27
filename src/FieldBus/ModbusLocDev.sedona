@@ -104,6 +104,23 @@ class ModbusLocDev
       status := STATUSNONET
     }
   }
+  
+  override void execute()
+  {
+     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        if (d.type.is(ModbusNetVarIn.type))  {
+           ** log.message("111111111 BacnetLocalVar.execute name=$name")
+           ((ModbusNetVarIn)d).execute()
+        }
+        else if (d.type.is(ModbusNetVarOut.type))  {
+           ** log.message("111111111 BacnetLocalVar.execute name=$name")
+           ((ModbusNetVarOut)d).execute()
+        }
+        else  {
+           log.message("Only ModbusNetVarIn and ModbusNetVarOut can work in the ModbusLocDev ")
+        }
+     }
+  }
 
   override int modbusRTUSlaveOpen(int port, int band, int parity, int dataBits, int stopBits)
   {

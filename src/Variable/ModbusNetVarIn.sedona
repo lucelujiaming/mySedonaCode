@@ -19,7 +19,9 @@ class ModbusNetVarIn
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == ModbusNetVarIn.device_name || slot == ModbusNetVarIn.io_type || slot == ModbusNetVarIn.Address) {
+    if (slot == ModbusNetVarIn.device_name ||
+        slot == ModbusNetVarIn.io_type || 
+        slot == ModbusNetVarIn.Address) {
       log.message("changed slot.name=$slot.name")
       update()
     }

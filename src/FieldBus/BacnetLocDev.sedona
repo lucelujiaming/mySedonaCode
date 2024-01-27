@@ -61,16 +61,23 @@ class BacnetLocDev
             ((BacnetIP)bus).updateCache()
         }
     }
-    log.message("BacnetRemDev update 1111 status=$status") 
+    log.message("BacnetLocDev update 1111 status=$status") 
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-         if(((BacNetFieldBusIO)d).device == null)
-         {
-            ((BacNetFieldBusIO)d).device = this
-         }
-         ** log.message("BacnetRemDev update 22222 status=$status") 
+        if (d.type.is(BacnetLocalVar.type))  {
+	         if(((BacnetLocalVar)d).bus == null)
+	         {
+                log.message("BacnetLocalVar::setBus with alias=${((BacnetLocalVar)d).alias.toStr()}")
+	            ((BacnetLocalVar)d).bus = bus
+	         }
+	         if(((BacnetLocalVar)d).device == null)
+	         {
+                log.message("BacnetLocalVar::setDevice with alias=${((BacnetLocalVar)d).alias.toStr()}")
+	            ((BacnetLocalVar)d).device = this
+	         }
+        }
     } 
     status := STATUSREADY
-    log.message("BacnetRemDev update 3333 status=$status") 
+    log.message("BacnetLocDev update 3333 status=$status") 
   }
 
   override void execute()
@@ -78,7 +85,7 @@ class BacnetLocDev
     if (bus == null) {
         return 
     }
-    ** log.message("BacnetRemDev execute 11111 status=$status") 
+    ** log.message("BacnetLocDev execute 11111 status=$status") 
     if (bus != null) {
         if (bus.needFlush == false) {
             
@@ -89,13 +96,12 @@ class BacnetLocDev
         }
         ** log.message("111111111 execute name=$name")
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            if (d.type.is(BacnetLocalInputVar.type))  {
+            if (d.type.is(BacnetLocalVar.type))  {
                ** log.message("111111111 BacnetLocalVar.execute name=$name")
-               ((BacnetLocalInputVar)d).execute()
+               ((BacnetLocalVar)d).execute()
             }
-            else if (d.type.is(BacnetLocalOutputVar.type))  {
-               ** log.message("111111111 BacnetLocalVar.execute name=$name")
-               ((BacnetLocalOutputVar)d).execute()
+            else  {
+               log.message("Only BacnetLocalVar can work in the BacnetLocDev ")
             }
         }
     }
@@ -115,24 +121,24 @@ class BacnetLocDev
         log.message("AAAA writeProperty with iLen=$iLen")
 
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            if (d.type.is(BacnetLocalInputVar.type))  {
-                int iBacNetObjectType = ((BacnetLocalInputVar)d).convertObjectTypeToBacNetObjectType( 
-                                            ((BacnetLocalInputVar)d).objectType) 
-                log.message("writeProperty::Found BacnetLocalInputVar with ${((BacnetLocalInputVar)d).objectType}->$iBacNetObjectType")
+            if (d.type.is(BacnetLocalVar.type))  {
+                int iBacNetObjectType = ((BacnetLocalVar)d).convertObjectTypeToBacNetObjectType( 
+                                            ((BacnetLocalVar)d).objectType) 
+                log.message("writeProperty::Found BacnetLocalVar with ${((BacnetLocalVar)d).objectType}->$iBacNetObjectType")
                 if((iBacNetObjectType == iObjectType) && 
-                  (((BacnetLocalInputVar)d).instanceNumber == iInstanceNumber))
+                  (((BacnetLocalVar)d).instanceNumber == iInstanceNumber))
                 {
 				    isFound = 1
                     switch (tagNumber)
                     {
                         case BacNetFieldBusIO.BANET_PROPVAR_BOOLEANAPPTAG:
                             if(data[0] != 0x00)
-                                ((BacnetLocalInputVar)d).present_value := 1.0
+                                ((BacnetLocalVar)d).present_value := 1.0
                             else
-                                ((BacnetLocalInputVar)d).present_value := 0.0
+                                ((BacnetLocalVar)d).present_value := 0.0
                             log.message("-------------------------------------------------------------------------------")
                             log.message("-------------------------d.name=$d.name and d.type.name=$d.type.name-------------------------")
-                            log.message("-------------------------writeProperty::ReadPropertyMultipleBool = ${((BacnetLocalInputVar)d).present_value}------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleBool = ${((BacnetLocalVar)d).present_value}------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_OBJECTIDENTIFIERAPPTAG:
@@ -142,10 +148,10 @@ class BacnetLocDev
                             objectID = data[1] % 0x40
                             objectID = objectID * 0x100 + data[2]
                             objectID = objectID * 0x100 + data[3]
-                            ((BacnetLocalInputVar)d).present_value := (float)objectID
+                            ((BacnetLocalVar)d).present_value := (float)objectID
                             log.message("-------------------------------------------------------------------------------")
                             log.message("-------------------------d.name=$d.name and d.type.name=$d.type.name-------------------------")
-                            log.message("-------------------------writeProperty::ReadPropertyMultipleObjectIndentifier = ${((BacnetLocalInputVar)d).present_value}------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleObjectIndentifier = ${((BacnetLocalVar)d).present_value}------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_ENUMERATEDAPPTAG:
@@ -153,33 +159,33 @@ class BacnetLocDev
                             bus.decodeUnsigned(data, iLen, bufInteger)
                             log.message("-------------------------------------------------------------------------------")
                             log.message("-------------------------d.name=$d.name and d.type.name=$d.type.name-------------------------")
-                            log.message("-------------------------writeProperty::ReadPropertyMultipleUnsignedInteger oldValue= ${((BacnetLocalInputVar)d).present_value}------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleUnsignedInteger oldValue= ${((BacnetLocalVar)d).present_value}------------------")
                             log.message("-------------------------------------------------------------------------------")
-                            ((BacnetLocalInputVar)d).present_value := (float)bufInteger[0]
+                            ((BacnetLocalVar)d).present_value := (float)bufInteger[0]
                             log.message("-------------------------------------------------------------------------------")
                             log.message("-------------------------d.name=$d.name and d.type.name=$d.type.name-------------------------")
-                            log.message("-------------------------writeProperty::ReadPropertyMultipleUnsignedInteger = ${((BacnetLocalInputVar)d).present_value}------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleUnsignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
                             bus.decodeUnsigned(data, iLen, bufInteger)
-                            ((BacnetLocalInputVar)d).present_value := (float)bufInteger[0]
+                            ((BacnetLocalVar)d).present_value := (float)bufInteger[0]
                             log.message("-------------------------------------------------------------------------------")
-                            log.message("------------------------writeProperty::ReadPropertyMultipleSignedInteger = ${((BacnetLocalInputVar)d).present_value}------------------")
+                            log.message("------------------------writeProperty::ReadPropertyMultipleSignedInteger = ${((BacnetLocalVar)d).present_value}------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
                             bus.decodeFloat(data, bufFloat)
-                            ((BacnetLocalInputVar)d).present_value := (float)bufFloat[0]
+                            ((BacnetLocalVar)d).present_value := (float)bufFloat[0]
                             log.message("-------------------------------------------------------------------------------")
-                            log.message("--------------------------writeProperty::ReadPropertyMultipleFloat = ${((BacnetLocalInputVar)d).present_value}--------------------")
+                            log.message("--------------------------writeProperty::ReadPropertyMultipleFloat = ${((BacnetLocalVar)d).present_value}--------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
                             bus.decodeDouble(data, bufDouble)
-                            ((BacnetLocalInputVar)d).present_value := (float)bufDouble[0]
+                            ((BacnetLocalVar)d).present_value := (float)bufDouble[0]
                             log.message("-------------------------------------------------------------------------------")
-                            log.message("-------------------------writeProperty::ReadPropertyMultipleDouble = ${((BacnetLocalInputVar)d).present_value}--------------------")
+                            log.message("-------------------------writeProperty::ReadPropertyMultipleDouble = ${((BacnetLocalVar)d).present_value}--------------------")
                             log.message("-------------------------------------------------------------------------------")
                             break
                         // case BANET_PROPVAR_NULLAPPTAG:

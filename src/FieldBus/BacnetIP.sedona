@@ -68,6 +68,7 @@ class BacnetIP
       needFlush = false
     }
 
+    ** log.message("BacnetIP::execute status = $status")
     if (status != STATUSNODEV) {
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
            d.execute()
@@ -247,33 +248,38 @@ class BacnetIP
         }
     }
 
-    ** log.message("9999 add schedule");
+    log.message("9999 add schedule");
     // add schedule
     //
 
-    return result
+    // return result
+    return true
   }
   
   override void update()
   {
     bool isDevFound = false
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-           log.message("d.type  = $d.type.name")
-      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
-        isDevFound = true
-        break
-      }
+        log.message("d.type  = $d.type.name")
+        if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
+           isDevFound = true
+           break
+        }
     }
     if (isDevFound) {
-           log.message("status := STATUSNOREG")
-      status := STATUSNOREG
+        log.message("update::status := STATUSNOREG")
+        status := STATUSNOREG
     } else {
-           log.message("status := STATUSNODEV")
-      status := STATUSNODEV
+        log.message("update::status := STATUSNODEV")
+        status := STATUSNODEV
     }
     needFlush = true
     file.name = "current_ip"
-    if (!file.open("r")) return
+    if (!file.open("r"))
+    {
+        log.message("file.open failed")
+        return
+    }
     int size = file.size()
     file.in.readBytes(ipLocalAddress.bytes, ipLocalAddress.size, size)
     log.message("ipLocalAddress  = ${ipLocalAddress.toStr()}")

@@ -84,6 +84,7 @@ class BacnetRemDev
          ** log.message("BacnetRemDev update 22222 status=$status") 
     } 
     createRPMAndWPM()
+    log.message("BacnetRemDev getBacLocalDevice") 
     getBacLocalDevice()
     log.message("BacnetRemDev update 3333 status=$status") 
   }
@@ -99,7 +100,7 @@ class BacnetRemDev
             dataLength = readReg(0, 0, 2952, buf)
             if(dataLength > 0)
             {
-                ** log.message("We readReg and return $dataLength from ${dataRecvGramAddr}")
+                log.message("We readReg and return $dataLength from ${dataRecvGramAddr}")
                 for(int i =0 ; i < dataLength; i++)
                 {
                     //    log.message(
@@ -120,7 +121,7 @@ class BacnetRemDev
                 }
             }
             
-            ** log.message("Setting communicationMethod with ($lastInstanceNumber, $InstanceNumber)")
+            ** log.message("Setting communicationMethod with (${lastInstanceNumber.toStr()}, ${InstanceNumber.toStr()})")
             if(lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false)
             {
                bacnet_close(0)
@@ -181,7 +182,7 @@ class BacnetRemDev
             return 
         }
         // 
-        ** log.message("BacnetRemDev execute 33333 status=$status")
+        ** log.message("BacnetRemDev execute 33333 status=$status and execute_mode=$execute_mode")
         if(execute_mode == BACNET_PROPERTY_READ)
         {
             for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
@@ -192,7 +193,11 @@ class BacnetRemDev
                 //   ((BacReadPropertyVar)d).execute()
                 // } else 
                 if (d.type.is(BacnetNetVarIn.type))  {
+                   ** log.message("BacnetNetVarIn::alias = ${((BacnetNetVarIn)d).alias.toStr()} ")
                    ((BacnetNetVarIn)d).execute()
+                }
+                else  if (!d.type.is(BacnetNetVarOut.type))  {
+                   log.message("Only BacnetNetVarIn and BacnetNetVarOut can BACNET_PROPERTY_READ in the BacnetRemDev ")
                 }
             }
             execute_counter = execute_counter + 1
@@ -209,7 +214,11 @@ class BacnetRemDev
                 // d.execute()
                 ** log.message("WRITE::execute_mode = $execute_mode and execute_counter= $execute_counter ")
                 if (d.type.is(BacnetNetVarOut.type))  {
+                   ** log.message("BacnetNetVarOut::alias = ${((BacnetNetVarOut)d).alias.toStr()} ")
                    ((BacnetNetVarOut)d).execute()
+                }
+                else  if (!d.type.is(BacnetNetVarIn.type))  {
+                   log.message("Only BacnetNetVarIn and BacnetNetVarOut can BACNET_PROPERTY_WRITE in the BacnetRemDev ")
                 }
             }
             execute_counter = execute_counter + 1
@@ -2462,10 +2471,17 @@ class BacnetRemDev
             }
         }
     }
+    else {
+        log.message("getBacLocalDevice::Sys.app.lookup(this.parent) is null") 
+    }
   }
   
   int makeBACnetIAmPDU(int iStartIdx, int iEndIdx)
   {
+    if(localBacnetDevice == null)
+    {
+      getBacLocalDevice()
+    }
     if(localBacnetDevice != null)
     {
        int iDeviceInstance = localBacnetDevice.deviceInstance.toStr().parseInt()
@@ -2510,6 +2526,9 @@ class BacnetRemDev
       }
       return 15
     }
+    else {
+      log.message("localBacnetDevice is null")
+    }
     return 0
   }
 
@@ -2529,15 +2548,15 @@ class BacnetRemDev
         int iDeviceInstance = localBacnetDevice.deviceInstance.toStr().parseInt()
         log.message("fillObjectListPresentValue:: find the BacnetLocDev with $iDeviceInstance") 
         for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            if (d.type.is(BacnetLocalInputVar.type))  {
-                int iBacNetObjectType = ((BacnetLocalInputVar)d).convertObjectTypeToBacNetObjectType(
-                            ((BacnetLocalInputVar)d).objectType)
-                log.message("Found BacnetLocalInputVar with ${((BacnetLocalInputVar)d).objectType}->$iBacNetObjectType")
+            if (d.type.is(BacnetLocalVar.type))  {
+                int iBacNetObjectType = ((BacnetLocalVar)d).convertObjectTypeToBacNetObjectType(
+                            ((BacnetLocalVar)d).objectType)
+                log.message("Found BacnetLocalVar with ${((BacnetLocalVar)d).objectType}->$iBacNetObjectType")
                 if((iBacNetObjectType == iObjectType) && 
-                  (((BacnetLocalInputVar)d).instanceNumber == iInstanceNumber))
+                  (((BacnetLocalVar)d).instanceNumber == iInstanceNumber))
                 {
-                    myFloatPresentValue = ((BacnetLocalInputVar)d).present_value
-                    log.message("Found BacnetLocalInputVar = $myFloatPresentValue")
+                    myFloatPresentValue = ((BacnetLocalVar)d).present_value
+                    log.message("Found BacnetLocalVar = $myFloatPresentValue")
                     bFound = true
                     break
                 }
@@ -2546,7 +2565,7 @@ class BacnetRemDev
     }
     if(bFound == false)
     {
-        log.message("No BacnetLocalInputVar to use in the fillObjectListPresentValue with $iObjectType and $iInstanceNumber")
+        log.message("No BacnetLocalVar to use in the fillObjectListPresentValue with $iObjectType and $iInstanceNumber")
         return iPos
     }
     
@@ -2611,17 +2630,17 @@ class BacnetRemDev
         int iDeviceInstance = localBacnetDevice.deviceInstance.toStr().parseInt()
         log.message("makeBACnetObjectListCountACKPDU:: find the BacnetLocDev with $iDeviceInstance") 
         for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            if (d.type.is(BacnetLocalInputVar.type))  {
-                int iBacNetObjectType = ((BacnetLocalInputVar)d).convertObjectTypeToBacNetObjectType(
-                            ((BacnetLocalInputVar)d).objectType)
-                log.message("I Found BacnetLocalInputVar with ${((BacnetLocalInputVar)d).objectType}->$iBacNetObjectType")
+            if (d.type.is(BacnetLocalVar.type))  {
+                int iBacNetObjectType = ((BacnetLocalVar)d).convertObjectTypeToBacNetObjectType(
+                            ((BacnetLocalVar)d).objectType)
+                log.message("I Found BacnetLocalVar with ${((BacnetLocalVar)d).objectType}->$iBacNetObjectType")
                 log.message("We are at ${localBacnetDevice.localObjectListCount}")
                 // localObjectListCount start with 2, but localObjectListPropertyID start with 0
                 localBacnetDevice.localObjectListPropertyID[localBacnetDevice.localObjectListCount]
-                                 = iBacNetObjectType * 0x400000 + ((BacnetLocalInputVar)d).instanceNumber
-                log.message("I Found BacnetLocalInputVar.alias with ${((BacnetLocalInputVar)d).alias.toStr()}")
+                                 = iBacNetObjectType * 0x400000 + ((BacnetLocalVar)d).instanceNumber
+                log.message("I Found BacnetLocalVar.alias with ${((BacnetLocalVar)d).alias.toStr()}")
                 localBacnetDevice.localObjectListName[localBacnetDevice.localObjectListCount]
-                                 = ((BacnetLocalInputVar)d).alias.toStr()
+                                 = ((BacnetLocalVar)d).alias.toStr()
                 localBacnetDevice.localObjectListCount = localBacnetDevice.localObjectListCount + 1
                 log.message("We move to ${localBacnetDevice.localObjectListCount}")
                 bFound = true
@@ -2631,7 +2650,7 @@ class BacnetRemDev
     log.message("makeBACnetObjectListCountACKPDU search end")  
     if(bFound == false)
     {
-        log.message("No BacnetLocalInputVar to use in the makeBACnetObjectListCountACKPDU")
+        log.message("No BacnetLocalVar to use in the makeBACnetObjectListCountACKPDU")
         int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
         return iLen
     }
@@ -3101,19 +3120,19 @@ class BacnetRemDev
     // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
     int iInstanceNumber = iObjectIdentifierAndType % 0x400000
    
-    log.message("Search BacnetLocalInputVar with $iObjectType and $iInstanceNumber")
+    log.message("Search BacnetLocalVar with $iObjectType and $iInstanceNumber")
     bool bFound = false
     if(localBacnetDevice != null)
     {
         for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            if (d.type.is(BacnetLocalInputVar.type))  {
-                int iBacNetObjectType = ((BacnetLocalInputVar)d).convertObjectTypeToBacNetObjectType(
-                            ((BacnetLocalInputVar)d).objectType)
-                log.message("Found BacnetLocalInputVar with ${((BacnetLocalInputVar)d).objectType}->$iBacNetObjectType")
+            if (d.type.is(BacnetLocalVar.type))  {
+                int iBacNetObjectType = ((BacnetLocalVar)d).convertObjectTypeToBacNetObjectType(
+                            ((BacnetLocalVar)d).objectType)
+                log.message("Found BacnetLocalVar with ${((BacnetLocalVar)d).objectType}->$iBacNetObjectType")
                 if((iBacNetObjectType == iObjectType) && 
-                  (((BacnetLocalInputVar)d).instanceNumber == iInstanceNumber))
+                  (((BacnetLocalVar)d).instanceNumber == iInstanceNumber))
                 {
-                    myFloatPresentValue = ((BacnetLocalInputVar)d).present_value
+                    myFloatPresentValue = ((BacnetLocalVar)d).present_value
                     bFound = true
                     break
                 }
@@ -3122,7 +3141,7 @@ class BacnetRemDev
     }
     if(bFound == false)
     {
-        log.message("No BacnetLocalInputVar to use in the makeBACnetPresentValueACKPDU with $iObjectType and $iInstanceNumber")
+        log.message("No BacnetLocalVar to use in the makeBACnetPresentValueACKPDU with $iObjectType and $iInstanceNumber")
         int iLen = makeBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
         return iLen
     }
@@ -3225,19 +3244,19 @@ class BacnetRemDev
     // .... .... ..00 0000 0000 0000 0000 0000 = Instance Number: 0
     int iInstanceNumber = iObjectIdentifierAndType % 0x400000
    
-    log.message("Search BacnetLocalInputVar with $iObjectType and $iInstanceNumber")
+    log.message("Search BacnetLocalVar with $iObjectType and $iInstanceNumber")
     bool bFound = false
     if(localBacnetDevice != null)
     {
         for (Component d = Sys.app.lookup(localBacnetDevice.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            if (d.type.is(BacnetLocalInputVar.type))  {
-                int iBacNetObjectType = ((BacnetLocalInputVar)d).convertObjectTypeToBacNetObjectType(
-                            ((BacnetLocalInputVar)d).objectType)
-                log.message("Found BacnetLocalInputVar with ${((BacnetLocalInputVar)d).objectType}->$iBacNetObjectType")
+            if (d.type.is(BacnetLocalVar.type))  {
+                int iBacNetObjectType = ((BacnetLocalVar)d).convertObjectTypeToBacNetObjectType(
+                            ((BacnetLocalVar)d).objectType)
+                log.message("Found BacnetLocalVar with ${((BacnetLocalVar)d).objectType}->$iBacNetObjectType")
                 if((iBacNetObjectType == iObjectType) && 
-                  (((BacnetLocalInputVar)d).instanceNumber == iInstanceNumber))
+                  (((BacnetLocalVar)d).instanceNumber == iInstanceNumber))
                 {
-                    myFloatPresentValue = ((BacnetLocalInputVar)d).present_value
+                    myFloatPresentValue = ((BacnetLocalVar)d).present_value
                     bFound = true
                     break
                 }
@@ -3246,7 +3265,7 @@ class BacnetRemDev
     }
     if(bFound == false)
     {
-        log.message("No BacnetLocalInputVar to use in the complementBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
+        log.message("No BacnetLocalVar to use in the complementBACnetPresentValueComplexACKPDU with $iObjectType and $iInstanceNumber")
         int iLen = complementBACnetAccessErrorComplexACKPDU(iObjectIdentifierAndType)
         return iLen
     }

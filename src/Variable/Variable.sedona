@@ -36,9 +36,12 @@ class Variable
         }
         if (root != null) {
           for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-            if (f.type.is(Folder.type) && !f.name.equals("service")) {
+            if (f.type.is(Folder.type) && !f.name.equals("service") // && !f.name.equals("init")
+               ) {
               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                 log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
                 if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
+                  log.message("56565 Variable value=$value")
                   ((Variable)r).value := value
                 }
               }
@@ -75,12 +78,13 @@ class Variable
         }
       }
     }
-    ** log.message("changed")
+    ** log.message("Variable changed")
     
   }
 
   override void execute()
   {
+    bool bIsInInit = false
     if (isStatus) {
       Str urlStr = url.toStr()
       Str devStr = ""
@@ -119,7 +123,6 @@ class Variable
       Str urlStr = url.toStr()
       Str scheduleStr = ""
       log.message("isSchedule::urlStr=$urlStr")
-
 
       int len = urlStr.length()
       for (int i=0; i<len-9; i++) {
@@ -164,17 +167,21 @@ class Variable
       Component root = null
       while (p != null) {
         root = p
-      **  if(p.name.equals("play"))
-      **  {
-      **       ** log.message("Not deal play node and return with name=$name")
-      **       return
-      **  }
+        // **  if(p.name.equals("play"))
+        // **  {
+        // **       ** log.message("Not deal play node and return with name=$name")
+        // **       return
+        // **  }
+        if (p.type.is(Folder.type) && p.name.equals("init")) {
+           bIsInInit = true
+        }
         p = Sys.app.lookup(p.parent)
       }
       if (root != null) {
         // log.message("root:: aliasStr=$aliasStr")
-        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr")
+        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr and value=$value")
         for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+          // Sync from service to play
           if (f.type.is(Folder.type) && f.name.equals("service")) {
              for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
                 if (n.type.is(FieldBusNet.type))  {
@@ -197,16 +204,25 @@ class Variable
                                 ((BacnetNetVarOut)q).present_value := value
                             }
                             else if (q.type.is(ModbusNetVarIn.type))  {
-                                log.message("ModbusNetVarIn.name=${q.name}")
+                                ** log.message("ModbusNetVarIn.name=${q.name}")
                                 value := ((ModbusNetVarIn)q).out
                             }
                             else if (q.type.is(ModbusNetVarOut.type))  {
-                                log.message("ModbusNetVarOut.name=${q.name}")
+                                ** log.message("ModbusNetVarOut.name=${q.name}")
                                 ((ModbusNetVarOut)q).in := value
                             }
                          }
                       }
                    }
+                }
+             }
+          }
+          // Sync from init to play
+          else if (f.type.is(Folder.type) && f.name.equals("play") && bIsInInit) {
+             ** log.message("44444 Variable name=$name and aliasStr]=$aliasStr and value=$value")
+             for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                if (((Variable)n).alias.toStr().equals(alias.toStr()))  {
+                    ((Variable)n).value := value
                 }
              }
           }

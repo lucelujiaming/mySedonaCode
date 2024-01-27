@@ -222,7 +222,10 @@ Cell sys_FileStore_doOpen(SedonaVM* vm, Cell* params)
 
   // DIAG
   if (result.aval==NULL)
-    printf("fopen('%s', '%s') failed, errno=%d (%s)\n", name, fopenMode, errno, strerror(errno));
+  {
+    printf("fopen('%s', '%s') failed, errno=%d (%s)\n", 
+                  name, fopenMode, errno, strerror(errno));
+  }
   // DIAG
 
   return result;

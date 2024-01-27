@@ -7,7 +7,7 @@ class Setpoint
 
   @asStr
   @readonly
-  property Buf(32) pointName = ""
+  property Buf(128) pointName = ""
 
   @readonly
   property float out = 0.0f
@@ -16,14 +16,25 @@ class Setpoint
 
   override void start()
   {
-    Runtime.load()
+    // Runtime.load()
     if (url.toStr().length() > 0) {
       pointName.clear()
-      pointName.copyFromStr(url.toStr())
-      ctx = Runtime.dataOpen(pointName.toStr())
-      if (ctx != -1) {
-        Runtime.dataRead(ctx, buf)
-        out := buf[0]
+      pointName.copyFromStr("/data/svm/Points/")
+      pointName.appendFromStr(url.toStr())
+      file.name = pointName.toStr()
+      // ctx = Runtime.dataOpen(pointName.toStr())
+      ctx = 1
+      log.message("start pointName=${pointName.toStr()} and Setpoint::file.name=${file.name}")
+      if (file.open("r")) {
+           // Runtime.dataRead(ctx, buf)
+           file.in.readBytes((byte[])buf, 0, 4)
+           /* dF(fileBuf, buf) */
+           out := buf[0]
+           file.close()
+      }
+      else 
+      {
+         log.message("start open ${file.name} failed")
       }
     }
   }
@@ -32,16 +43,29 @@ class Setpoint
     super.changed(slot)
     if (slot == Setpoint.url) {
       if (ctx != -1) {
-        Runtime.dataClose(ctx)
+        // Runtime.dataClose(ctx)
+        /* file.close() */
         ctx = -1
       }
       if (url.toStr().length() > 0) {
         pointName.clear()
-        pointName.copyFromStr(url.toStr())
-        ctx = Runtime.dataOpen(pointName.toStr())
-        if (ctx != -1) {
-          Runtime.dataRead(ctx, buf)
-          out := buf[0]
+        pointName.copyFromStr("/data/svm/Points/")
+        pointName.appendFromStr(url.toStr())
+        file.name = pointName.toStr()
+        // ctx = Runtime.dataOpen(pointName.toStr())
+        ctx = 1
+        log.message("changed pointName=${pointName.toStr()} and Setpoint::file.name=${file.name}")
+        if (file.open("r")) {
+           // Runtime.dataRead(ctx, buf)
+           file.in.readBytes((byte[])buf, 0, 4)
+           /* dF(fileBuf, buf) */
+           out := buf[0]
+           log.message("ASASAS Setpoint::out=$out ")
+           file.close()
+        }
+        else 
+        {
+           log.message("changed open {file.name} failed")
         }
       }
     }
@@ -49,31 +73,65 @@ class Setpoint
   override void stop()
   {
     if (ctx != -1) {
-      Runtime.dataClose(ctx)
+      // Runtime.dataClose(ctx)
+        /* file.close() */
       ctx = -1
     }
   }
   override void execute()
   {
+    ** log.message("11111 Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt")
     if (ctx != -1 && isSlotLinkToIN()) {
+      ** log.message("2222 Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt")
       if (initCnt < 0) {
+        ** log.message("2323 Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt")
         initCnt++
         lastIn = in
       } else if (lastIn != in) {
-        lastIn = in
-        buf[0] = in
-        Runtime.dataWrite(ctx, buf)
+       	 log.message("33333 Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt")
+          lastIn = in
+          buf[0] = in
+          // Runtime.dataWrite(ctx, buf)
+          log.message("execute Write pointName=${pointName.toStr()} and Setpoint::file.name=${file.name}")
+          if (file.open("w")) {
+              // Runtime.dataRead(ctx, buf)
+              /* eF(buf, fileBuf) */
+              file.out.writeBytes((byte[])buf, 0, 4)
+              file.close()
+          }
+          else 
+          {
+              log.message("execute write {file.name} failed")
+          }
       }
     } else {
+      ** log.message("44444 Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt")
       initCnt = -20
     }
     if (ctx != -1) {
-      Runtime.dataRead(ctx, buf)
-      out := buf[0]
+        ** log.message("5555 Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt")
+        // Runtime.dataRead(ctx, buf)
+        // out := buf[0]
+        ** log.message("execute Read pointName=${pointName.toStr()} and Setpoint::file.name=${file.name}")
+        if (file.open("r")) {
+           // Runtime.dataRead(ctx, buf)
+           file.in.readBytes((byte[])buf, 0, 4)
+           /* dF(fileBuf, buf) */
+           out := buf[0]
+           ** log.message("6666 Setpoint::out=$out Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt and file.name=${file.name}")
+           file.close()
+        }
+        else
+        {
+           log.message("execute read ${file.name} failed")
+        }
     }
-    if (url.toStr().length() != pointName.toStr().length()) {
+    // 17 is length if "/data/svm/Points/".
+    if (url.toStr().length() + 17 != pointName.toStr().length()) {
+      log.message("7777 Setpoint::lastIn=$lastIn and in=$in and initCnt=$initCnt")
       pointName.clear()
-      pointName.copyFromStr(url.toStr())
+      pointName.copyFromStr("/data/svm/Points/")
+      pointName.appendFromStr(url.toStr())
     }
   }
 
@@ -82,9 +140,11 @@ class Setpoint
     for (Link link = linksTo; link != null; link = link.nextTo) {
       Slot slot = type.slot(link.toSlot)
       if (slot == Setpoint.in) {
-        return true
+       	 ** log.message("is SlotLinkToIN")
+         return true
       }
     }
+    ** log.message("is not SlotLinkToIN")
     return false
   }
 
@@ -92,4 +152,8 @@ class Setpoint
   private int initCnt = -20
   private float lastIn
   private inline float[1] buf
+  private inline byte[8] fileBuf
+
+  inline File file
+
 }

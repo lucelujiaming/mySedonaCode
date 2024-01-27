@@ -365,11 +365,11 @@ class BacnetNetVarIn
       long nowMilliSecond = nowNanoSecond / (long)1000000
       ** log.message("23232323 sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
       if(sendInterval < nowMilliSecond) {
-         ** log.message("23232323 device.readPropertyMultipleSupport=${device.readPropertyMultipleSupport}")
+         log.message("23232323 device.readPropertyMultipleSupport=${device.readPropertyMultipleSupport}")
          if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_NOT_SUPPORT)
          {
             makeReadPropertyPacket()
-            ** log.message("111111 makeReadPropertyPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+            log.message("111111 makeReadPropertyPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
             if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
               ** log.message("device.readReg")
 			  if(device.iDeviceReadPropertyCount <= 255)

@@ -104,8 +104,14 @@ final class Str
     {
       ch = buf[i]
       int x = that.buf[i]
-      if (x == 0) return true
-      if (ch != x) return false
+      if (x == 0) 
+      {
+          return true
+      }
+      if (ch != x)
+      {
+          return false
+      }
     }
     return false
   }
@@ -194,14 +200,118 @@ final class Str
     int len = ((Str)buf).length()
     for (int i=len-1; i>=0; --i)
     {
-      if (buf[i] == ' ') buf[i] = 0
-      else break
+      if (buf[i] == ' ') 
+         buf[i] = 0
+      else 
+         break
     }
 
     return Str.fromBytes(buf, off)
   }
 
+  // Not test yet
+  Str subStr(int from, int length)
+  {
+    Str strRet = suffix(0)
+    int len = length()
+    if(from + length > len)
+    {
+       return Str.fromBytes(buf, len - 1)
+    }
+    if(length != -1)
+    {
+	    for (int i=0; i < length; i++)
+	    {
+	      strRet.set(i, buf[i + from])
+	    }
+	    strRet.set(length, 0)
+    }
+    else 
+    {
+	    for (int i=0; i < len - from; i++)
+	    {
+	      strRet.set(i, buf[i + from])
+	    }
+	    strRet.set(len - from, 0)
+    }
+    return Str.fromBytes(strRet.toBytes(), 0)
+  }
 
+  // Not test yet
+  bool erase(int from, int length)
+  {
+    int len = ((Str)buf).length()
+    if(from + length > len)
+    {
+       return false
+    }
+    for (int i=0; i < length; i++)
+    {
+      buf[i + from] = 0
+    }
+    return true
+  }
+
+  // Not test yet
+  int find(Str that)
+  {
+	bool bFound = false;
+    int iLen = length()
+    int thatLen = that.length()
+	for (int i = 0; i < iLen - thatLen; i++)
+	{
+		bFound = true;
+		for (int j = 0; j < thatLen; j++)
+		{
+			if (buf[i + j] != that.buf[j])
+			{
+				bFound = false;
+				break;
+			}
+		}
+		if (bFound)
+		{
+			return i;
+		}
+	}
+	return -1;
+  }
+
+  // Not test yet
+  int rfind(Str that)
+  {
+	bool bFound = false;
+    int iLen = length()
+    int thatLen = that.length()
+	for (int i = iLen - thatLen; i >= 0; i--)
+	{
+		bFound = true;
+		for (int j = 0; j < thatLen; j++)
+		{
+			if (buf[i + j] != that.buf[j])
+			{
+				bFound = false;
+				break;
+			}
+		}
+		if (bFound)
+		{
+			return i;
+		}
+	}
+	return -1;
+  }
+
+  void revert()
+  {
+    int iLen = length()
+	for (int i = 0; i < iLen / 2; i++)
+	{
+		int cTemp = buf[iLen - i - 1];
+		buf[iLen - i - 1] = buf[i];
+		buf[i] = cTemp;
+	}
+  }
   **
   ** Perform an in-place trim on the string pointer by
   ** removing leading characters up to index 'newStart'.

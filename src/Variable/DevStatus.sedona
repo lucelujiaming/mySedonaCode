@@ -38,9 +38,9 @@ class DevStatus
 	if(sendInterval < nowMilliSecond) {
 		if (root != null) {
 			for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-				** log.message("888 Variable f.name=${f.name}")
+				// ** log.message("888 Variable f.name=${f.name}")
 				if (f.type.is(Folder.type) && f.name.equals("service")) {
-					** log.message("999 Variable f.name=${f.name}")
+					// ** log.message("999 Variable f.name=${f.name}")
 					for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
 						** log.message("AAAA FieldBusNet r.name=${r.name}")
 						if (r.type.is(FieldBusNet.type))

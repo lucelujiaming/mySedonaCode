@@ -105,13 +105,34 @@ final class Buf
     {
       int ch = s.get(i)
       bytes[i] = ch
-      if (ch == 0) { size = (i+1); return true }
+      if (ch == 0) 
+      {
+         size = (i+1); 
+         return true 
+      }
     }
     bytes[max-1] = 0
     size = max
     return false
   }
 
+  bool appendFromStr(Str s)
+  {
+    int max = bytesLen
+    for (int i=0; i<max - size; ++i)
+    {
+      int ch = s.get(i)
+      bytes[i + size - 1] = ch
+      if (ch == 0) 
+      { 
+          size = (i + size)
+          return true 
+      }
+    }
+    bytes[max-1] = 0
+    size = max
+    return false
+  }
 ////////////////////////////////////////////////////////////////
 // Fields
 ////////////////////////////////////////////////////////////////

@@ -31,10 +31,44 @@ class BacnetLocalVar
     
   }
 
+  void getParentDevice()
+  {
+    if(Sys.app.lookup(this.parent) != null)
+    {
+        log.message("bacreadProperty:: get this.parent as Device") 
+        Component objDevice = Sys.app.lookup(this.parent)
+        if(objDevice.type.is(FieldBusDevice.type)) {
+            log.message("bacreadProperty:: set this.parent as Device") 
+            device = (FieldBusDevice)objDevice
+        }
+    }
+  }
+  
+  void getParentBus()
+  {
+    if(device != null)
+    {
+        if(Sys.app.lookup(device.parent) != null)
+        {
+            log.message("bacreadProperty:: get device.parent as Bus") 
+            Component objBus = Sys.app.lookup(device.parent)
+            if(objBus.type.is(FieldBusNet.type)) {
+                log.message("bacreadProperty:: set device.parent as Bus") 
+                bus = (FieldBusNet)objBus
+            }
+        }
+    }
+  }
+  
   override void execute()
   {
+    if (bus == null) {
+        log.message("BacnetLocalVar::bus == null with alias=${alias.toStr()}")
+        getParentBus()
+        return 
+    }
       Str aliasStr = alias.toStr()
-      ** log.message("111111111 Variable name=$name")
+      // ** log.message("111111111 Variable name=$name")
       // find bus and dev
       Component p = Sys.app.lookup(this.parent)
       Component root = null
@@ -44,29 +78,29 @@ class BacnetLocalVar
       }
       if (root != null) {
         // log.message("root:: aliasStr=$aliasStr")
-        ** log.message("222222222 Variable name=$name and aliasStr=$aliasStr")
-        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-          ** log.message("3333 Variable f.name=${f.name}")
-          if (f.type.is(Folder.type) && f.name.equals("play")) {
-               ** log.message("4444 Variable f.name=${f.name}")
-               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                    ** log.message("5555 Variable r.name=${r.name}")
-                    if (r.type.is(Variable.type))
-                    {
-                        ** log.message("5555 Variable r.alias=${((Variable)r).alias.toStr()}")
-                        ** log.message("5555 Variable aliasStr=$aliasStr")
-                        if(((Variable)r).alias.toStr().equals(aliasStr))  {
-                            ** log.message("6666 r.value=${((Variable)r).value}")
-                            present_value := ((Variable)r).value
-                           **  log.message("-------------------------------------------------------------------------------")
-                           **  log.message("-------------------------name=$name and type.name=$type.name-------------------------")
-                           **  log.message("-------------------------execute::present_value = $present_value------------------")
-                           **  log.message("-------------------------------------------------------------------------------")
-                        }
-                    }
-               }
-          }
-        }
+        // ** log.message("222222222 Variable name=$name and aliasStr=$aliasStr")
+        //  for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+        //    ** log.message("3333 Variable f.name=${f.name}")
+        //    if (f.type.is(Folder.type) && f.name.equals("play")) {
+        //         ** log.message("4444 Variable f.name=${f.name}")
+        //         for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+        //              ** log.message("5555 Variable r.name=${r.name}")
+        //              if (r.type.is(Variable.type))
+        //              {
+        //                  ** log.message("5555 Variable r.alias=${((Variable)r).alias.toStr()}")
+        //                  ** log.message("5555 Variable aliasStr=$aliasStr")
+        //                  if(((Variable)r).alias.toStr().equals(aliasStr))  {
+        //                      ** log.message("6666 r.value=${((Variable)r).value}")
+        //                     ** present_value := ((Variable)r).value
+        //                     **  log.message("-------------------------------------------------------------------------------")
+        //                     **  log.message("-------------------------name=$name and type.name=$type.name-------------------------")
+        //                     **  log.message("-------------------------execute::present_value = $present_value------------------")
+        //                     **  log.message("-------------------------------------------------------------------------------")
+        //                  }
+        //              }
+        //         }
+        //    }
+        //  }
 
         // Device status
         int iAliasLen  = alias.toStr().length()
@@ -79,9 +113,9 @@ class BacnetLocalVar
 	        if(strDeviceName.length() > 0)
 	        {
 		        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-		          ** log.message("888 Variable f.name=${f.name}")
+		          // ** log.message("888 Variable f.name=${f.name}")
 		          if (f.type.is(Folder.type) && f.name.equals("service")) {
-		               ** log.message("999 Variable f.name=${f.name}")
+		               // ** log.message("999 Variable f.name=${f.name}")
 		               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
 		                    ** log.message("AAAA FieldBusNet r.name=${r.name}")
 		                    if (r.type.is(FieldBusNet.type))
