@@ -147,7 +147,7 @@ class ModbusRTU
      ** log.message("Enter updateVariable name=$name")
      // log.message("root:: aliasStr=$aliasStr")
      for (Component f = Sys.app.lookup(children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-        log.message("children updateVariable name=$name")
+       ** log.message("children updateVariable name=$name")
        if (f.type.is(Variable.type) && !f.name.equals("service")) {
          Str nameComponentStr = ((Variable)f).name
          ** log.message("updateVariable nameComponentStr=$nameComponentStr and name=$name")
@@ -206,19 +206,37 @@ class ModbusRTU
     }
 	log.message("4343434 ModbusRTU ctx = dO(port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)")
     // ctx = dO(port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)
+    int modbus_remdev_ctx = -1
+    int modbus_locdev_ctx = -1
     // add device node.
     bool bRet = false
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       if (d.type.is(ModbusRemDev.type)) {
-          ((ModbusRemDev)d).bus = this
-          ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusRTUMasterOpen(
+            ((ModbusRemDev)d).bus = this
+            if(modbus_remdev_ctx == -1)
+            {
+          	    ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusRTUMasterOpen(
                      port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)
+	            modbus_remdev_ctx = ((ModbusRemDev)d).ctx
+            }
+            else 
+            {
+	            ((ModbusRemDev)d).ctx = modbus_remdev_ctx
+            }
             log.message("22222 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
       }
       else if (d.type.is(ModbusLocDev.type)) {
-          ((ModbusLocDev)d).bus = this
-          ((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusRTUSlaveOpen(
+            ((ModbusLocDev)d).bus = this
+            if(modbus_locdev_ctx == -1)
+            {
+            	((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusRTUSlaveOpen(
                      port, band, parity, dataBits, stopBits)
+	            modbus_locdev_ctx = ((ModbusLocDev)d).ctx
+            }
+            else 
+            {
+	            ((ModbusLocDev)d).ctx = modbus_locdev_ctx
+            }
             log.message("22222 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
       }
     }

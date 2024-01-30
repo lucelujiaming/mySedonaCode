@@ -143,20 +143,38 @@ class ModbusTCP
     }
     log.message("4343434 ModbusTCP ctx = dO(port)")
     // ctx = dO(port)
+    int modbus_remdev_ctx = -1
+    int modbus_locdev_ctx = -1
     // add device node.
     bool bRet = false
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
       if (d.type.is(ModbusRemDev.type)) {
           ((ModbusRemDev)d).bus = this
             log.message("22222 flush ((ModbusRemDev)d).deviceName=${((ModbusRemDev)d).deviceName.toStr()}")
-            ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusTCPClientOpen(
-                     ((ModbusRemDev)d).ipaddr.toStr(), port)
+            if(modbus_remdev_ctx == -1)
+            {
+	            ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusTCPClientOpen(
+	                     ((ModbusRemDev)d).ipaddr.toStr(), port)
+	            modbus_remdev_ctx = ((ModbusRemDev)d).ctx
+            }
+            else 
+            {
+	            ((ModbusRemDev)d).ctx = modbus_remdev_ctx
+            }
             // tcp_rem_max_ctx = ((ModbusRemDev)d).ctx
             log.message("22222 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
       }
       else if (d.type.is(ModbusLocDev.type)) {
             ((ModbusLocDev)d).bus = this
-            ((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusTCPServerOpen(port)
+            if(modbus_locdev_ctx == -1)
+            {
+           		((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusTCPServerOpen(port)
+	            modbus_locdev_ctx = ((ModbusLocDev)d).ctx
+            }
+            else 
+            {
+	            ((ModbusLocDev)d).ctx = modbus_locdev_ctx
+            }
             // tcp_loc_max_ctx = ((ModbusRemDev)d).ctx
             log.message("22222 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
       }

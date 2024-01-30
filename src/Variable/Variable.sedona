@@ -2,6 +2,19 @@
 class Variable
   extends Component
 {
+  define Str IO_MODE_RANGE = "Input, Output, END"
+  define int IO_MODE_INPUT                      = 0x00
+  define int IO_MODE_OUTPUT                     = 0x01
+  define int IO_MODE_END                        = 0x02
+  
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @config
+  @range = IO_MODE_RANGE
+  @fieldWidth = 200
+  property int ioMode = IO_MODE_INPUT
+  
   @summary=true
   @config
   @asStr
@@ -39,9 +52,9 @@ class Variable
             if (f.type.is(Folder.type) && !f.name.equals("service") // && !f.name.equals("init")
                ) {
               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                 log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
+                ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
                 if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
-                  log.message("56565 Variable value=$value")
+                  ** log.message("56565 Variable value=$value")
                   ((Variable)r).value := value
                 }
               }

@@ -20,24 +20,11 @@ class ModbusNetVarIn
   {
     ** log.message("ModbusNetVarIn::super.changed")
     super.changed(slot)
-    if (slot == ModbusNetVarIn.device_name ||
-        slot == ModbusNetVarIn.io_type || 
+    // if (slot == ModbusNetVarIn.device_name ||
+    if (slot == ModbusNetVarIn.io_type || 
         slot == ModbusNetVarIn.Address) {
       log.message("ModbusNetVarIn::changed slot.name=$slot.name")
       update()
-    }
-  }
-
-  void getParentDevice()
-  {
-    if(Sys.app.lookup(this.parent) != null)
-    {
-        log.message("bacreadProperty:: get this.parent as Device") 
-        Component objDevice = Sys.app.lookup(this.parent)
-        if(objDevice.type.is(FieldBusDevice.type)) {
-            log.message("bacreadProperty:: set this.parent as Device") 
-            device = (FieldBusDevice)objDevice
-        }
     }
   }
   

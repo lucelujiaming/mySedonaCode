@@ -45,9 +45,9 @@ abstract class ModbusFieldBusIO
   @fieldWidth = 20
   property int status = STATUSNODEV
 
-  @asStr
-  @config
-  property Buf(64) device_name = ""
+  // @asStr
+  // @config
+  // property Buf(64) device_name = ""
 
   @range = IO_TYPE_RANGE
   @fieldWidth = 20
@@ -72,11 +72,34 @@ abstract class ModbusFieldBusIO
   ////////////////////////////////////////////////////////////////
   // App support
   ////////////////////////////////////////////////////////////////
+  
+  void getParentDevice()
+  {
+    if(Sys.app.lookup(this.parent) != null)
+    {
+        log.message("bacreadProperty:: get this.parent as Device") 
+        Component objDevice = Sys.app.lookup(this.parent)
+        if(objDevice.type.is(FieldBusDevice.type)) {
+            log.message("bacreadProperty:: set this.parent as Device") 
+            device = (FieldBusDevice)objDevice
+        }
+    }
+  }
+  
   void update()
   {
     if (bus != null) {
       log.message("111111 bus.notifyFlush()")
       bus.notifyFlush()
+    }
+    
+    if (device == null) {
+        getParentDevice()
+	    if (device == null) {
+	        getParentDevice()
+	        log.message("ModbusFieldBusIO::getParentDevice == null and status=$status")  // status=4 -> STATUSNODEV
+	        return 
+	    }
     }
     status := STATUSNODEV
     bus = null
@@ -87,7 +110,9 @@ abstract class ModbusFieldBusIO
     typeId = 0
     dataLen = 0
     
-    int aLen = device_name.bytesLen
+    // int aLen = device_name.bytesLen
+    int aLen = device.deviceName.bytesLen
+    
     bool isModBus = false
 
     switch(io_type)
@@ -168,7 +193,8 @@ abstract class ModbusFieldBusIO
           }
           log.message("33333 aLen=$aLen ")
           // find device and bus id.
-          FieldBusNet tmpBus = lookupNetByDeviceName(device_name.toStr())
+          // FieldBusNet tmpBus = lookupNetByDeviceName(device_name.toStr())
+          FieldBusNet tmpBus = lookupNetByDeviceName(device.deviceName.toStr())
           if (tmpBus != null) {
             log.message("444444 aLen=$aLen ")
             busId = tmpBus.busId
@@ -182,7 +208,8 @@ abstract class ModbusFieldBusIO
             } else {
               tmpBus.notifyFlush()
             }
-            devStr.copyFromStr(device_name.toStr(), 64)
+            // devStr.copyFromStr(device_name.toStr(), 64)
+            devStr.copyFromStr(device.deviceName.toStr(), 64)
             devStr.set(aLen, 0)
             regId = tmpInt
           }

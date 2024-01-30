@@ -60,7 +60,9 @@ class ModbusNetVarOut
         }
       }
     } 
-    if (slot == ModbusNetVarOut.device_name || slot == ModbusNetVarOut.io_type || slot == ModbusNetVarOut.Address) {
+    // if (slot == ModbusNetVarOut.device_name ||
+    if (slot == ModbusNetVarOut.io_type ||
+        slot == ModbusNetVarOut.Address) {
       log.message("ModbusNetVarOut::changed slot.name=$slot.name")
       update()
       needUpdate = true

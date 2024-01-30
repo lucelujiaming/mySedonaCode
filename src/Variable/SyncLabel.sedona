@@ -2,13 +2,15 @@
 class SyncLabel
   extends Component
 {
-  define Str IO_MODE_RANGE = "Input, Output"
+  define Str IO_MODE_RANGE = "Input, Output, END"
   define int IO_MODE_INPUT                      = 0x00
   define int IO_MODE_OUTPUT                     = 0x01
+  define int IO_MODE_END                        = 0x02
   
-  define Str DATA_TYPE_RANGE = "FloatData, IntData"
+  define Str DATA_TYPE_RANGE = "FloatData, IntData, END"
   define int DATA_TYPE_FLOAT                       = 0x00
   define int DATA_TYPE_INTEGAR                     = 0x01
+  define int DATA_TYPE_END                         = 0x02
   
   ////////////////////////////////////////////////////////////////
   // Properties
@@ -81,14 +83,14 @@ class SyncLabel
                              (ioMode == IO_MODE_OUTPUT)) {
                          ** log.message("555 SyncLabel n.inFloatValue=${((SyncLabel)n).inFloatValue} and n.inIntValue=${((SyncLabel)n).inIntValue} with n.name=${((SyncLabel)n).name}")
                          ** log.message("555 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name")
-                         if(dataType == DATA_TYPE_FLOAT)
-                         {
-                            outFloatValue := ((SyncLabel)n).inFloatValue
-                         } 
-                         else if(dataType == DATA_TYPE_INTEGAR)
-                         {
-                            outIntValue := ((SyncLabel)n).inIntValue
-                         }                 
+                         // if(dataType == DATA_TYPE_FLOAT)
+                         // {
+                         outFloatValue := ((SyncLabel)n).inFloatValue
+                         // } 
+                         // else if(dataType == DATA_TYPE_INTEGAR)
+                         // {
+                         outIntValue := ((SyncLabel)n).inIntValue
+                         //}                 
                      }
                      ** log.message("666 SyncLabel outFloatValue=$outFloatValue and outIntValue=$outIntValue with name=$name and aliasStr]=$aliasStr")
                 }
