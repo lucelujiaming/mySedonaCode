@@ -25,7 +25,10 @@ class Variable
   @asStr
   property Buf(64) alias = ""
 
-  property float value = 0.0f
+  @readonly
+  property float outFloatValue = 0.0f
+
+  property float inFloatValue = 0.0f
 
   override void start()
   {
@@ -36,7 +39,7 @@ class Variable
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == Variable.value) {
+    if (slot == Variable.inFloatValue) {
       if (url.toStr().length() > 0) {
         if (isStatus) {
           return
@@ -54,8 +57,8 @@ class Variable
               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
                 ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
                 if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
-                  ** log.message("56565 Variable value=$value")
-                  ((Variable)r).value := value
+                  ** log.message("56565 Variable inFloatValue=$inFloatValue")
+                  ((Variable)r).inFloatValue := inFloatValue
                 }
               }
             }
@@ -64,7 +67,8 @@ class Variable
       }
     } else if (slot == Variable.url) {
       if (url.toStr().length() > 0) {
-        value := 0.0f
+        inFloatValue := 0.0f
+        outFloatValue := 0.0f
         isStatus = false
         checkURLforStatus()
         checkURLforSchedule()
@@ -82,7 +86,8 @@ class Variable
             if (f.type.is(Folder.type) && !f.name.equals("service")) {
               for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
                 if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
-                  value := ((Variable)r).value
+                  inFloatValue := ((Variable)r).inFloatValue
+                  outFloatValue := inFloatValue
                   return
                 }
               }
@@ -121,7 +126,8 @@ class Variable
                 for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
                   if (d.type.is(FieldBusDevice.type) && ((FieldBusDevice)d).deviceName.toStr().equals(devStr)) {
                     if (((FieldBusDevice)d).status == FieldBusDevice.STATUSOK) {
-                      value := 1.0f
+                      inFloatValue := 1.0f
+                      outFloatValue := 1.0f
                       return
                     }
                   }
@@ -131,7 +137,8 @@ class Variable
           }
         }
       }
-      value := 0.0f
+      inFloatValue := 0.0f
+      outFloatValue := 0.0f
     } else if (isSchedule) {
       Str urlStr = url.toStr()
       Str scheduleStr = ""
@@ -159,7 +166,8 @@ class Variable
                   if (d.type.is(FieldBusDevice.type)) {
                       for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
                           if (s.type.is(FieldBusSchedule.type) && ((FieldBusSchedule)s).url.toStr().equals(scheduleStr)) {
-                              value := ((FieldBusSchedule)s).presentValue
+                              inFloatValue := ((FieldBusSchedule)s).presentValue
+                              outFloatValue := inFloatValue
                               return
                           }
                       }
@@ -170,7 +178,8 @@ class Variable
           }
         }
       }
-      value := 0.0f
+      inFloatValue := 0.0f
+      outFloatValue := 0.0f
     }
     else {
       Str aliasStr = alias.toStr()
@@ -192,7 +201,7 @@ class Variable
       }
       if (root != null) {
         // log.message("root:: aliasStr=$aliasStr")
-        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr and value=$value")
+        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr and inFloatValue=$inFloatValue")
         for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
           // Sync from service to play
           if (f.type.is(Folder.type) && f.name.equals("service")) {
@@ -204,39 +213,42 @@ class Variable
                             // if (q.type.is(BacReadPropertyVar.type) 
                             //    && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
                             //    ** log.message("BacReadPropertyVar.name=${q.name}")
-                            //    value := ((BacReadPropertyVar)q).present_value
+                            //    inFloatValue := ((BacReadPropertyVar)q).present_value
                             // }  else 
                             if (q.type.is(BacnetNetVarIn.type) 
                                 && ((BacnetNetVarIn)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("BacnetNetVarIn.name=${q.name}")
-                                value := ((BacnetNetVarIn)q).present_value
+                                inFloatValue := ((BacnetNetVarIn)q).present_value
+                                outFloatValue := inFloatValue
                             }
                             else if (q.type.is(BacnetNetVarOut.type) 
                                 && ((BacnetNetVarOut)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("BacnetNetVarOut.name=${q.name}")
-                                ((BacnetNetVarOut)q).present_value := value
+                                ((BacnetNetVarOut)q).present_value := inFloatValue
                             }
                             else if (q.type.is(BacnetLocalVar.type) 
                                 && ((BacnetLocalVar)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("BacnetLocalVar.name=${q.name}")
                                 if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_OUT)
                                 {
-                                    ((BacnetLocalVar)q).present_value := value
+                                    ((BacnetLocalVar)q).present_value := inFloatValue
                                 }
                                 else if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_IN)
                                 {
-                                    value := ((BacnetLocalVar)q).present_value
+                                    inFloatValue := ((BacnetLocalVar)q).present_value
+                                    outFloatValue := inFloatValue
                                 }
                             }
                             else if (q.type.is(ModbusNetVarIn.type) 
                                 && ((ModbusNetVarIn)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("ModbusNetVarIn.name=${q.name}")
-                                value := ((ModbusNetVarIn)q).out
+                                inFloatValue := ((ModbusNetVarIn)q).out
+                                outFloatValue := inFloatValue
                             }
                             else if (q.type.is(ModbusNetVarOut.type)
                                 && ((ModbusNetVarOut)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("ModbusNetVarOut.name=${q.name}")
-                                ((ModbusNetVarOut)q).in := value
+                                ((ModbusNetVarOut)q).in := inFloatValue
                             }
                          }
                       }
@@ -246,10 +258,10 @@ class Variable
           }
           // Sync from init to play
           else if (f.type.is(Folder.type) && f.name.equals("play") && bIsInInit) {
-             ** log.message("44444 Variable name=$name and aliasStr]=$aliasStr and value=$value")
+             ** log.message("44444 Variable name=$name and aliasStr]=$aliasStr and inFloatValue=$inFloatValue")
              for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
                 if (((Variable)n).alias.toStr().equals(alias.toStr()))  {
-                    ((Variable)n).value := value
+                    ((Variable)n).inFloatValue := inFloatValue
                 }
              }
           }
