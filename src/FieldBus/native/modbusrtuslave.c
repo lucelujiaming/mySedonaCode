@@ -1078,8 +1078,9 @@ int rtu_read(int ctx_idx, int device_addr, int addr, float *buf, int len)
                     } else {
                         data = (next_element->val << 16) | element->val;
                     }
-                    float *p = (float *)(&data);
-                    buf[0] = *p;
+                    // float *p = (float *)(&data);
+                    // buf[0] = *p;
+                    buf[0] = (float)data;
                     return 2;
                 }
             }
@@ -1431,9 +1432,6 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
     char uart_name[32] = { 0 };
     char parity_name[] = {'N', 'E', 'O'};
 
-    printf("[%s:%s:%d] log output\r\n",
-             __FILE__, __FUNCTION__, __LINE__);
-
     if (acquire_uart(ctx_idx, uart_name) >= 0) {
         context_t *c = &context_table[ctx_idx];
         if (c->ctx_modbus != NULL || c->ctx_thread_running != 0){
@@ -1473,6 +1471,9 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
         pthread_create(&c->ctx_thread, NULL, thread_modbus_rtu_update, c);
         led_blink(ctx_idx);
 
+        printf("[%s:%s:%d] log output\r\n",
+                 __FILE__, __FUNCTION__, __LINE__);
+
         return ctx_idx;
     }
 
@@ -1486,11 +1487,10 @@ int rtu_close(int ctx_idx)
         return -1;
     }
 
-    printf("[%s:%s:%d] log output\r\n",
-             __FILE__, __FUNCTION__, __LINE__);
-
     c->ctx_thread_running = 0;
     pthread_join(c->ctx_thread, NULL);
+    printf("[%s:%s:%d] pthread_join\r\n",
+             __FILE__, __FUNCTION__, __LINE__);
 
     while (c->ctx_modbus != NULL) {
         usleep(10*1000);
@@ -1498,5 +1498,7 @@ int rtu_close(int ctx_idx)
 
     release_uart(ctx_idx);
 
+    printf("[%s:%s:%d] release_uart\r\n",
+             __FILE__, __FUNCTION__, __LINE__);
     return 0;
 }

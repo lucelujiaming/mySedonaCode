@@ -49,6 +49,12 @@ class SyncLabel
   {
     super.changed(slot)
     ** log.message("changed It cannot delete")
+    if (slot == SyncLabel.inFloatValue) {
+       ** log.message("33333 SyncLabel inFloatValue=$inFloatValue and outFloatValue=$outFloatValue")
+    } else if (slot == SyncLabel.inIntValue) {
+       ** log.message("44444 SyncLabel inIntValue=$inIntValue and outIntValue=$outIntValue")
+       inFloatValue := (float)inIntValue
+    }
   }
 
   virtual override void execute()

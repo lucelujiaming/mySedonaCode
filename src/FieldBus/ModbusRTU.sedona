@@ -67,7 +67,10 @@ class ModbusRTU
         slot == ModbusRTU.parity || slot == ModbusRTU.dataBits || 
         slot == ModbusRTU.stopBits || slot == ModbusRTU.retryDelay || 
         slot == ModbusRTU.responseTimeout) {
-      update()
+        update()
+    }
+    else if (slot.name.equals("status")) {
+        log.message("ModbusRTU::slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
     }
   }
   override void stop()

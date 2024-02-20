@@ -40,6 +40,7 @@ class Variable
   {
     super.changed(slot)
     if (slot == Variable.inFloatValue) {
+      outFloatValue := inFloatValue
       if (url.toStr().length() > 0) {
         if (isStatus) {
           return

@@ -25,7 +25,10 @@ class ModbusTCP
   {
     super.changed(slot)
     if (slot == ModbusTCP.port) {
-      update()
+        update()
+    }
+    else if (slot.name.equals("status")) {
+        log.message("ModbusTCP::slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
     }
   }
   override void stop()

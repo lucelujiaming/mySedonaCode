@@ -49,7 +49,10 @@ class BacnetIP
     super.changed(slot)
     if (slot == BacnetIP.port  // || slot == BacnetIP.deviceInstance
      || slot == BacnetIP.retryDelay) {
-      update()
+        update()
+    }
+    else if (slot.name.equals("status")) {
+        log.message("BacnetIP::slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
     }
   }
   override void stop()
@@ -311,6 +314,7 @@ class BacnetIP
             ((BacnetRemDev)d).bus = this
          }
          ((BacnetRemDev)d).bacnetCurrentDeviceRet = ((BacnetRemDev)d).getBacnetCurrentDevice()
+         // bacnetCurrentDeviceRet is never zero. we just call getBacnetRouterDevice for each Device
          if(((BacnetRemDev)d).bacnetCurrentDeviceRet == 0)
          {
             return 0
@@ -329,6 +333,8 @@ class BacnetIP
          }
       }
     }
+    // When we reach here, it means we do not have BacnetRemDev
+    
     return bRet?1:0;
   }
 

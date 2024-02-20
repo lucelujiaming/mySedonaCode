@@ -2459,6 +2459,7 @@ class BacnetRemDev
   
   void getBacLocalDevice()
   {
+    localBacnetDevice = null
     if(Sys.app.lookup(this.parent) != null)
     {
         log.message("makeBACnetIAmPDU:: find the BacnetIP") 
@@ -4186,7 +4187,9 @@ class BacnetRemDev
 
    inline int[10]    ipRouterArrayList
    inline int[10]    networkNumberList
-      
+   // 0 - default value
+   // 1 - Not SubNetMac
+   // 2 - SubNetMac
    int               bacnetCurrentDeviceRet = 0
 
    BacnetLocDev localBacnetDevice = null
