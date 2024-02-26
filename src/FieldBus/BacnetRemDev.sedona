@@ -50,6 +50,9 @@ class BacnetRemDev
     if (slot == BacnetRemDev.deviceName) {
       update()
     }
+    else if (slot.name.equals("status")) {
+        log.message("BacnetRemDev::slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+    }
   }
   override void stop()
   {
@@ -59,15 +62,35 @@ class BacnetRemDev
       ((FieldBusNet)n).update()
       ((FieldBusNet)n).notifyFlush()
     }
+    log.message("socket.close")
+    socket.close()
+    isPortOpen = false
   }
 
   ////////////////////////////////////////////////////////////////
   // App support
   ////////////////////////////////////////////////////////////////
+  
+  void getParentBus()
+  {
+    if(Sys.app.lookup(this.parent) != null)
+    {
+        log.message("BacnetRemDev:: get this.parent as Bus") 
+        Component objBus = Sys.app.lookup(this.parent)
+        if(objBus.type.is(FieldBusNet.type)) {
+            log.message("BacnetRemDev:: set this.parent as Bus") 
+            bus = (FieldBusNet)objBus
+        }
+    }
+  }
   void update()
   {
     if (bus == null) {
-        return 
+        getParentBus()
+        if (bus == null) {
+            log.message("getParentBus failed") 
+            return 
+        }
     }
     if (bus != null) {
         if(bus.type.is(BacnetIP.type))
@@ -86,7 +109,7 @@ class BacnetRemDev
     createRPMAndWPM()
     log.message("BacnetRemDev getBacLocalDevice") 
     getBacLocalDevice()
-    log.message("BacnetRemDev update 3333 status=$status") 
+    log.message("BacnetRemDev update over status=$status") 
   }
 
   override void execute()
@@ -124,9 +147,14 @@ class BacnetRemDev
             ** log.message("Setting communicationMethod with (${lastInstanceNumber.toStr()}, ${InstanceNumber.toStr()})")
             if(lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false)
             {
-               bacnet_close(0)
-               getBacnetCurrentDevice()
-               openPort(true)
+               log.message("Restart with (${lastInstanceNumber.toStr()}, ${InstanceNumber.toStr()})")
+               // // closePort(0)
+               // // getBacnetCurrentDevice()
+               // // openPort(true)
+               if((bus != null) && (bus.type.is(BacnetIP.type)))
+               {
+                    ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
+               }
             }
             else 
             {
@@ -135,9 +163,14 @@ class BacnetRemDev
                     long nowNanoSecond  = Sys.ticks()
                     long nowMilliSecond = nowNanoSecond / (long)1000000
                     if(sendInterval < nowMilliSecond) {
-                       bacnet_close(0)
-                       getBacnetCurrentDevice()
-                       openPort(true)
+                       log.message("Restart with communicationMethod == COMMUNICATIONNONE")
+                       // closePort(0)
+                       // getBacnetCurrentDevice()
+                       // openPort(true)
+                       if((bus != null) && (bus.type.is(BacnetIP.type)))
+                       {
+                            ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
+                       }
                        // Offline timespan is 30 seconds at 08/22/23
                        sendInterval = nowMilliSecond + (long)30000
                     }
@@ -158,7 +191,7 @@ class BacnetRemDev
             }
             else
             {
-                ** log.message("Sending makeDevice4194303MaxAPDULengthAccepted with ${InstanceNumber.toStr()}")
+                log.message("Sending makeDevice4194303MaxAPDULengthAccepted with ${InstanceNumber.toStr()}")
                 // Get max-apdu-length-accepted by <B'0000' Up to MinimumMessageSize (50 octets)>
                 int iLen = makeDevice4194303MaxAPDULengthAccepted()
                 if(iLen > 0)
@@ -171,7 +204,7 @@ class BacnetRemDev
         }
         if(readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
         {
-            ** log.message("Sending makeDevice4194303ProtocolServicesSupported")
+            log.message("Sending makeDevice4194303ProtocolServicesSupported")
             // Get device information
             int iLen = makeDevice4194303ProtocolServicesSupported()
             if(iLen > 0)
@@ -311,6 +344,11 @@ class BacnetRemDev
     {   
       ** log.message("Error dataExpectingReplyNPCI with (${sourceNetworkAddress}, ${sadr})") 
       log.message("Error dataExpectingReplyNPCI:: I am $name and type is ${type.name}")
+      // Lujiaming add at 022024
+      // if(bus.type.is(BacnetIP.type))
+      // {
+      //      ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
+      // }
       return -1
     }
   }
@@ -358,14 +396,27 @@ class BacnetRemDev
     int headLength = 0
     dataRecvGram.len = iLen
     dataRecvGram.buf = packetRecv.bytes
-    if (socket.isClosed())
-    { 
-      if (socket.open() == false)
-      { 
-         log.warning("cannot open socket")
-         return -1
-      }
-    }
+
+//    if(bus.type.is(BacnetIP.type))
+//    {
+//        log.message("readReg ((BacnetIP)bus).currentSocket = ${((BacnetIP)bus).currentSocket}")
+//    }
+//    // if(socket.currentSocket <= 0)
+//    if (socket.isClosed())
+//    {
+//        socket.currentSocket = socket.open()
+//        log.message("readReg::open socket.currentSocket = ${socket.currentSocket}")
+//        if (socket.currentSocket <= 0)
+//        { 
+//           log.warning("cannot open socket")
+//          return -1
+//        }
+//        if(bus.type.is(BacnetIP.type))
+//        {
+//            ((BacnetIP)bus).currentSocket = socket.currentSocket
+//        }
+//    }
+    // log.message("readReg::receive socket.currentSocket = ${socket.currentSocket}")
     bool bRet = socket.receive(dataRecvGram)
     if (bRet == false) 
     {
@@ -427,6 +478,7 @@ class BacnetRemDev
        forwardToVTS(dataBroadcastGram.buf, dataBroadcastGram.len)
     }
     log.message("send dataBroadcastGram.len =${dataBroadcastGram.len}")
+    ** log.message("writeBroacastReg::send socket.currentSocket = ${socket.currentSocket}")
     return socket.send(dataBroadcastGram)?iLen:0
   }
   
@@ -454,6 +506,7 @@ class BacnetRemDev
                forwardToVTS(dataRecvGram.buf, dataRecvGram.len)
             }
             log.message("send dataRecvGram.len =${dataRecvGram.len}")
+            ** log.message("writeBusReg::dataRecvGram::send socket.currentSocket = ${socket.currentSocket}")
             return socket.send(dataRecvGram)?iLen:0
         }
         else
@@ -499,6 +552,7 @@ class BacnetRemDev
        forwardToVTS(dataSendGram.buf, dataSendGram.len)
     }
     log.message("send dataSendGram.len =${dataSendGram.len}")
+    ** log.message("writeBusReg::dataSendGram::send socket.currentSocket = ${socket.currentSocket}")
     return socket.send(dataSendGram)?iLen:0
   }
 
@@ -513,6 +567,7 @@ class BacnetRemDev
       ** log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
       dataVTSForwardSendGram.buf = bacnetRecvPacket
       log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
+      ** log.message("forwardToVTS::send socket.currentSocket = ${socket.currentSocket}")
       return socket.send(dataVTSForwardSendGram)?iPacketLen:0
   }
   
@@ -2462,7 +2517,7 @@ class BacnetRemDev
     localBacnetDevice = null
     if(Sys.app.lookup(this.parent) != null)
     {
-        log.message("makeBACnetIAmPDU:: find the BacnetIP") 
+        log.message("getBacLocalDevice:: find the BacnetLocDev") 
         Component objBus = Sys.app.lookup(this.parent)
         for (Component f = Sys.app.lookup(objBus.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
             if(f.type.is(BacnetLocDev.type)) {
@@ -3496,7 +3551,7 @@ class BacnetRemDev
     // Max Response Segments is zero
     bacnetPacket[1] = maxSendAPDULength % 0x10
     
-    log.message("BacReadPropertyVar::bacnetPacket[1] = ${bacnetPacket[1]}")
+    ** log.message("BacReadPropertyVar::bacnetPacket[1] = ${bacnetPacket[1]}")
     
     // invokeID: Invoke ID: 9
     bacnetPacket[2] = bus.invokeID
@@ -3749,6 +3804,7 @@ class BacnetRemDev
        }  
        if(isSubNetMac) {
             int iRouterDeviceCount = socketDetect.getBacnetRouterDevice((((BacnetIP)bus).ipLocalAddress).bytes, 
+            					((BacnetIP)bus).port, 
                                 sNetBuf.parseInt(), 
                                 ipRouterArrayList, networkNumberList)
      
@@ -3781,6 +3837,7 @@ class BacnetRemDev
        }
        else {
             int iDeviceCount = socketDetect.getBacnetDevice((((BacnetIP)bus).ipLocalAddress).bytes, 
+            					((BacnetIP)bus).port, 
                                 InstanceNumber.toStr().parseInt(), 
                                 ipArrayList, controlDstSpecList, 
                                 NPDUList, objectIdentifierList, 
@@ -3833,12 +3890,18 @@ class BacnetRemDev
       return false
     }
     log.message("socket.open")
-
+    // If bind failed, we would not be able to receive packet, but we still be able to send packet. 
+    // So we can not return. We have to execute the following code.
     if (!socket.bind(((BacnetIP)bus).port))
     {
       if (logError) log.error("cannot bind to port=${((BacnetIP)bus).port}")
       // return false
     }
+    // Only Set bus.currentSocket when socket.bind is successful
+    // else if(bus.type.is(BacnetIP.type))
+    // {
+    //     ((BacnetIP)bus).currentSocket = socket.currentSocket
+    // }
 
     log.message("started port=${((BacnetIP)bus).port}")
 
@@ -3870,9 +3933,10 @@ class BacnetRemDev
     return isPortOpen = true
   }
 
-  int bacnet_close(int ctx)
+  int closePort(int ctx)
   {
     socket.close()
+    log.message("44444 close socket.currentSocket")
     isPortOpen = false
     return 1;
   }

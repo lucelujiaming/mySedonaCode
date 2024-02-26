@@ -451,31 +451,31 @@ class BacnetNetVarIn
         case BacNetFieldBusIO.BANET_PROPVAR_UNSIGNEDINTAPPTAG:
             bus.decodeUnsigned(data, iLen, bufInteger)
             present_value := (float)bufInteger[0]
-            log.message("-------------------------------------------------------------------------------")
-                            log.message("-------------------------name=$name and type.name=$type.name-------------------------")
-            log.message("-------------------------setBacReadPropertyVarByProperty::ReadPropertyMultipleUnsignedInteger = $present_value------------------")
-            log.message("-------------------------------------------------------------------------------")
+               log.message("------------------------------------------------------------------------------------------------------------")
+               log.message("-----------name=$name and type.name=$type.name--------------------------------------------------------------")
+               log.message("-----------setBacReadPropertyVarByProperty::ReadPropertyMultipleUnsignedInteger = $present_value------------")
+               log.message("------------------------------------------------------------------------------------------------------------")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_INTEGERAPPTAG:
             bus.decodeUnsigned(data, iLen, bufInteger)
             present_value := (float)bufInteger[0]
-            log.message("-------------------------------------------------------------------------------")
-            log.message("------------------------setBacReadPropertyVarByProperty::ReadPropertyMultipleSignedInteger = $present_value------------------")
-            log.message("-------------------------------------------------------------------------------")
+            log.message("---------------------------------------------------------------------------------------------------------------")
+            log.message("--------------setBacReadPropertyVarByProperty::ReadPropertyMultipleSignedInteger = $present_value--------------")
+            log.message("---------------------------------------------------------------------------------------------------------------")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_REALAPPTAG:
             bus.decodeFloat(data, bufFloat)
             present_value := (float)bufFloat[0]
-            log.message("-------------------------------------------------------------------------------")
-            log.message("--------------------------setBacReadPropertyVarByProperty::ReadPropertyMultipleFloat = $present_value--------------------")
-            log.message("-------------------------------------------------------------------------------")
+            log.message("---------------------------------------------------------------------------------------------------------------")
+            log.message("----------------setBacReadPropertyVarByProperty::ReadPropertyMultipleFloat = $present_value--------------------")
+            log.message("---------------------------------------------------------------------------------------------------------------")
             break
         case BacNetFieldBusIO.BANET_PROPVAR_DOUBLEAPPTAG:
             bus.decodeDouble(data, bufDouble)
             present_value := (float)bufDouble[0]
-            log.message("-------------------------------------------------------------------------------")
-            log.message("-------------------------setBacReadPropertyVarByProperty::ReadPropertyMultipleDouble = $present_value--------------------")
-            log.message("-------------------------------------------------------------------------------")
+            log.message("----------------------------------------------------------------------------------------------------------------")
+            log.message("----------------setBacReadPropertyVarByProperty::ReadPropertyMultipleDouble = $present_value--------------------")
+            log.message("----------------------------------------------------------------------------------------------------------------")
             break
         // case BANET_PROPVAR_NULLAPPTAG:
         case BacNetFieldBusIO.BANET_PROPVAR_BITSTRINGAPPTAG:

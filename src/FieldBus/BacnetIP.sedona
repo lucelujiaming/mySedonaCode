@@ -67,6 +67,7 @@ class BacnetIP
   override void execute()
   {
     if (status != STATUSNODEV && needFlush) {
+      log.message("BacnetIP::execute call flush")
       flush()
       needFlush = false
     }
@@ -90,8 +91,9 @@ class BacnetIP
       ctx = -1
       busId = 0
     }
+    log.message("bacnet_open start in flush")
     ctx = bacnet_open(port, 0, retryDelay)
-    log.message("bacnet_open flush")
+    log.message("bacnet_open end in flush")
     if (ctx != -1) {
       log.message("Call updateCache flush")
       if (updateCache()) {
@@ -263,7 +265,7 @@ class BacnetIP
   {
     bool isDevFound = false
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-        log.message("d.type  = $d.type.name")
+        log.message("update::d.type  = $d.type.name")
         if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
            isDevFound = true
            break
@@ -305,9 +307,17 @@ class BacnetIP
 
   int bacnet_open(int port, int device_instance, int retry_delay)
   {
+    // close before openPort
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      log.message("11111 closePort::d.type  = $d.type.name")
+      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
+         log.message("2222 closePort::d.type  = $d.type.name")
+         ((BacnetRemDev)d).closePort(0)
+      }
+    }
     // getBacnetCurrentDevice for each device
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-      log.message("d.type  = $d.type.name")
+      log.message("getBacnetCurrentDevice::d.type  = $d.type.name")
       if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
          if(((BacnetRemDev)d).bus == null)
          {

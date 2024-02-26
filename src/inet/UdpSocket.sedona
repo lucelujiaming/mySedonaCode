@@ -94,21 +94,21 @@ class UdpSocket
   **
   native void close()
 
-  native int getBacnetDeviceList(byte[] ipAddress, 
+  native int getBacnetDeviceList(byte[] ipAddress, int port, 
         int[] ipArrayList,  int[] controlDstSpecList, 
         int[] NPDUList,     int[] objectIdentifierList, 
         int[] maxADPUList)
         
-  native int getBacnetRouterDeviceList(byte[] ipAddress,
+  native int getBacnetRouterDeviceList(byte[] ipAddress, int port, 
         int[] ipRouterArrayList, int[] networkNumberList)
 
-  native int getBacnetDevice(byte[] ipAddress, 
+  native int getBacnetDevice(byte[] ipAddress, int port, 
         int instanceID,
         int[] ipArrayList,  int[] controlDstSpecList, 
         int[] NPDUList,     int[] objectIdentifierList, 
         int[] maxADPUList)
         
-  native int getBacnetRouterDevice(byte[] ipAddress,
+  native int getBacnetRouterDevice(byte[] ipAddress, int port, 
         int networkID, 
         int[] ipRouterArrayList, int[] networkNumberList)
 ////////////////////////////////////////////////////////////////

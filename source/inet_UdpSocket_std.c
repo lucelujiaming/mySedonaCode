@@ -142,11 +142,16 @@ Cell inet_UdpSocket_open(SedonaVM* vm, Cell* params)
   // windoze startup
   WSADATA wsaData;
   if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0)
+  {
     return falseCell;
+  }
 #endif
 
   // check for already initialized
-  if (!closed || sock != -1) return falseCell;
+  if (!closed || sock != -1) 
+  {
+     return falseCell;
+  }
 
   // create socket
 #ifdef SOCKET_FAMILY_INET
@@ -156,9 +161,15 @@ Cell inet_UdpSocket_open(SedonaVM* vm, Cell* params)
 #endif
 
 #ifdef _WIN32
-  if (sock == INVALID_SOCKET) return falseCell;
+  if (sock == INVALID_SOCKET) 
+  {
+    return falseCell;
+  }
 #else
-  if (sock < 0) return falseCell;
+  if (sock < 0) 
+  {
+    return falseCell;
+  }
 #endif
   
   int so_broadcast=1;
@@ -168,12 +179,14 @@ Cell inet_UdpSocket_open(SedonaVM* vm, Cell* params)
   // make socket non-blocking
   if (inet_setNonBlocking(sock) != 0)
   {
+    printf("inet_UdpSocket_open::closesocket with %d.\r\n", sock);
     closesocket(sock);
     return falseCell;
   }
 
   // udate UdpSocket instance
   setClosed(self, 0);
+  printf("inet_UdpSocket_open::setSocket with %d.\r\n", sock);
   setSocket(self, sock);
 
   return trueCell;
@@ -403,9 +416,11 @@ Cell inet_UdpSocket_close(SedonaVM* vm, Cell* params)
   void* self    = params[0].aval;
   socket_t sock = getSocket(self);
   bool closed   = getClosed(self);
-
+  
+  printf("inet_UdpSocket_close::sock with %d.\r\n", sock);
   if (!closed)
   {
+    printf("inet_UdpSocket_close::closesocket with %d.\r\n", sock);
     closesocket(sock);
     setClosed(self, 1);
     setSocket(self, -1);
@@ -414,7 +429,7 @@ Cell inet_UdpSocket_close(SedonaVM* vm, Cell* params)
 }
 
 // Bacbet device list searching
-#define PORT 47808
+// #define PORT 47808
 #define MAXDATASIZE 256
 
 
@@ -626,7 +641,7 @@ void recvSleep(float fMilliSeconds)
     }
 }
 
-socket_t initializeSendSocket(char * networkIP, 
+socket_t initializeSendSocket(char * networkIP, int port, 
                     struct sockaddr_in* my_addr)
 {
     socket_t clientSendSocket;
@@ -647,7 +662,8 @@ socket_t initializeSendSocket(char * networkIP,
     clientSendSocket = socket(AF_INET, SOCK_DGRAM, 0);
 
     my_addr->sin_family=AF_INET;
-    my_addr->sin_port=htons(PORT);
+    my_addr->sin_port=htons(port);
+	// NOTICE: It should not change into 192.168.168.255, otherwise the socket would crash.
     my_addr->sin_addr.s_addr=inet_addr("255.255.255.255");
     memset(&(my_addr->sin_zero), 0x00, 8);
 
@@ -658,17 +674,19 @@ socket_t initializeSendSocket(char * networkIP,
     inet_setNonBlocking(clientSendSocket);
     
     user_addr.sin_family=AF_INET;
-    user_addr.sin_port=htons(PORT);
+    user_addr.sin_port=htons(port);
     // user_addr->sin_addr.s_addr=htonl(INADDR_ANY);
     // printf("set IP to INADDR_ANY and bind to clientSocket. \r\n");
     user_addr.sin_addr.s_addr=inet_addr(networkIP);
-    printf("set user_addr to networkIP and bind to clientSocket. \r\n");
+    printf("set user_addr to networkIP (%s:%d) and bind to clientSendSocket(%d). \r\n", networkIP, port, clientSendSocket);
     memset(&(user_addr.sin_zero), 0x00, 8);
     
     if((bind(clientSendSocket, (struct sockaddr *)&user_addr,
                                     sizeof(struct sockaddr)))==-1)
     {
-        printf("initializeSendSocket::bind failed. \r\n");
+        printf("initializeSendSocket::bind failed we will close socket with %d. \r\n", clientSendSocket);
+        closesocket(clientSendSocket);
+		// We have to return -1 here otherwise we will create clientRecvSocket incorrectly
         return -1;
     }
     
@@ -676,6 +694,7 @@ socket_t initializeSendSocket(char * networkIP,
 }
 
 
+#define RECV_PORT 47808
 socket_t initializeRecvSocket()
 {
     socket_t clientRecvSocket;
@@ -699,7 +718,7 @@ socket_t initializeRecvSocket()
     bzero((char *)&recv_255_addr, sizeof(recv_255_addr));
     recv_255_addr.sin_family=AF_INET;
     recv_255_addr.sin_addr.s_addr=inet_addr("192.168.168.255");
-    recv_255_addr.sin_port=htons(PORT);
+    recv_255_addr.sin_port=htons(RECV_PORT);
     memset(&(recv_255_addr.sin_zero), 0x00, 8);
 
     
@@ -826,11 +845,12 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
     int iClientCount = 0;
   // void* self              = params[0].aval;
   char*     ipAddress               = params[1].aval;
-  uint32_t* ipArrayList             = params[2].aval;
-  uint32_t* controlDstSpecList      = params[3].aval;
-  uint32_t* NPDUList                = params[4].aval;
-  uint32_t* objectIdentifierList    = params[5].aval;
-  uint32_t* maxADPUList             = params[6].aval;
+  int32_t   port                    = params[2].ival;
+  uint32_t* ipArrayList             = params[3].aval;
+  uint32_t* controlDstSpecList      = params[4].aval;
+  uint32_t* NPDUList                = params[5].aval;
+  uint32_t* objectIdentifierList    = params[6].aval;
+  uint32_t* maxADPUList             = params[7].aval;
   
   
     printf("Enter inet_UdpSocket_getBacnetDeviceList(%s) \r\n", ipAddress);
@@ -847,7 +867,7 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
     socket_t clientSendSocket;
     struct sockaddr_in  my_addr;
     // struct sockaddr_in  recv_addr;
-    clientSendSocket = initializeSendSocket(ipAddress, &my_addr); // , &recv_addr);
+    clientSendSocket = initializeSendSocket(ipAddress, port, &my_addr); // , &recv_addr);
     if (clientSendSocket > 0)
     {
         socket_t clientRecvSocket;
@@ -862,7 +882,10 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
             maxADPUList);
         closesocket(clientRecvSocket);
     }
-    closesocket(clientSendSocket);
+	if(clientSendSocket > 0)
+	{
+        closesocket(clientSendSocket);
+	}
     
     Cell ret;
     ret.ival = iClientCount;  
@@ -875,12 +898,13 @@ Cell inet_UdpSocket_getBacnetDevice(SedonaVM* vm, Cell* params)
     int iClientCount = 0;
   // void* self              = params[0].aval;
   char*     ipAddress               = params[1].aval;
-  int32_t   iInstanceNumber         = params[2].ival;
-  uint32_t* ipArrayList             = params[3].aval;
-  uint32_t* controlDstSpecList      = params[4].aval;
-  uint32_t* NPDUList                = params[5].aval;
-  uint32_t* objectIdentifierList    = params[6].aval;
-  uint32_t* maxADPUList             = params[7].aval;
+  int32_t   port                    = params[2].ival;
+  int32_t   iInstanceNumber         = params[3].ival;
+  uint32_t* ipArrayList             = params[4].aval;
+  uint32_t* controlDstSpecList      = params[5].aval;
+  uint32_t* NPDUList                = params[6].aval;
+  uint32_t* objectIdentifierList    = params[7].aval;
+  uint32_t* maxADPUList             = params[8].aval;
   
   
     printf("Enter inet_UdpSocket_getBacnetDevice(%s) \r\n", ipAddress);
@@ -897,7 +921,7 @@ Cell inet_UdpSocket_getBacnetDevice(SedonaVM* vm, Cell* params)
     socket_t clientSendSocket;
     struct sockaddr_in  my_addr;
     // struct sockaddr_in  recv_addr;
-    clientSendSocket = initializeSendSocket(ipAddress, &my_addr); // , &recv_addr);
+    clientSendSocket = initializeSendSocket(ipAddress, port, &my_addr); // , &recv_addr);
     if (clientSendSocket > 0)
     {
         socket_t clientRecvSocket;
@@ -912,7 +936,10 @@ Cell inet_UdpSocket_getBacnetDevice(SedonaVM* vm, Cell* params)
             maxADPUList);
         closesocket(clientRecvSocket);
     }
-    closesocket(clientSendSocket);
+	if(clientSendSocket > 0)
+	{
+        closesocket(clientSendSocket);
+	}
     
     Cell ret;
     ret.ival = iClientCount;  
@@ -1074,8 +1101,9 @@ Cell inet_UdpSocket_getBacnetRouterDeviceList(SedonaVM* vm, Cell* params)
     int iClientCount = 0;
   // void* self              = params[0].aval;
   char*     ipAddress               = params[1].aval;
-  uint32_t* ipArrayList             = params[2].aval;
-  uint32_t* networkNumberList       = params[3].aval;
+  int32_t   port                    = params[2].ival;
+  uint32_t* ipArrayList             = params[3].aval;
+  uint32_t* networkNumberList       = params[4].aval;
   
   
     printf("Enter inet_UdpSocket_getBacnetRouterDeviceList(%s) \r\n", ipAddress);
@@ -1089,7 +1117,7 @@ Cell inet_UdpSocket_getBacnetRouterDeviceList(SedonaVM* vm, Cell* params)
     socket_t clientSendSocket;
     struct sockaddr_in  my_addr;
     // struct sockaddr_in  recv_addr;
-    clientSendSocket = initializeSendSocket(ipAddress, &my_addr); // , &recv_addr);
+    clientSendSocket = initializeSendSocket(ipAddress, port, &my_addr); // , &recv_addr);
     if (clientSendSocket > 0)
     {
         socket_t clientRecvSocket;
@@ -1101,7 +1129,10 @@ Cell inet_UdpSocket_getBacnetRouterDeviceList(SedonaVM* vm, Cell* params)
             networkNumberList);
         closesocket(clientRecvSocket);
     }
-    closesocket(clientSendSocket);
+	if(clientSendSocket > 0)
+	{
+        closesocket(clientSendSocket);
+	}
     
     Cell ret;
     ret.ival = iClientCount - 1;  
@@ -1113,9 +1144,10 @@ Cell inet_UdpSocket_getBacnetRouterDevice(SedonaVM* vm, Cell* params)
     int iClientCount = 0;
   // void* self              = params[0].aval;
   char*     ipAddress               = params[1].aval;
-  int32_t   iSubNetworkID           = params[2].ival;
-  uint32_t* ipArrayList             = params[3].aval;
-  uint32_t* networkNumberList       = params[4].aval;
+  int32_t   port                    = params[2].ival;
+  int32_t   iSubNetworkID           = params[3].ival;
+  uint32_t* ipArrayList             = params[4].aval;
+  uint32_t* networkNumberList       = params[5].aval;
   
   
     printf("Enter inet_UdpSocket_getBacnetRouterDevice(%s) \r\n", ipAddress);
@@ -1129,7 +1161,7 @@ Cell inet_UdpSocket_getBacnetRouterDevice(SedonaVM* vm, Cell* params)
     socket_t clientSendSocket;
     struct sockaddr_in  my_addr;
     // struct sockaddr_in  recv_addr;
-    clientSendSocket = initializeSendSocket(ipAddress, &my_addr); // , &recv_addr);
+    clientSendSocket = initializeSendSocket(ipAddress, port, &my_addr); // , &recv_addr);
     if (clientSendSocket > 0)
     {
         socket_t clientRecvSocket;
@@ -1142,7 +1174,10 @@ Cell inet_UdpSocket_getBacnetRouterDevice(SedonaVM* vm, Cell* params)
             networkNumberList);
         closesocket(clientRecvSocket);
     }
-    closesocket(clientSendSocket);
+	if(clientSendSocket > 0)
+	{
+        closesocket(clientSendSocket);
+	}
     
 //    printf("clientSendSocket ipArrayList[0] = %u \r\n", ipArrayList[0]);
 //    printf("clientSendSocket networkNumberList[0] = %d \r\n", networkNumberList[0]);

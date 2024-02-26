@@ -53,8 +53,27 @@ class BacnetLocDev
   ////////////////////////////////////////////////////////////////
   // App support
   ////////////////////////////////////////////////////////////////
+  void getParentBus()
+  {
+    if(Sys.app.lookup(this.parent) != null)
+    {
+        log.message("BacnetRemDev:: get this.parent as Bus") 
+        Component objBus = Sys.app.lookup(this.parent)
+        if(objBus.type.is(FieldBusNet.type)) {
+            log.message("BacnetRemDev:: set this.parent as Bus") 
+            bus = (FieldBusNet)objBus
+        }
+    }
+  }
   void update()
   {
+    if (bus == null) {
+    	getParentBus()
+	    if (bus == null) {
+        	log.message("getParentBus failed") 
+	        return 
+	    }
+    }
     if (bus != null) {
         if(bus.type.is(BacnetIP.type))
         {

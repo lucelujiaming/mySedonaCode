@@ -134,7 +134,7 @@ class ModbusNetVarOut
                    if (device.modbusRTUSlaveRead(
                             device.ctx, cache, regId, typeId, buf) == dataLen) {
                      out := buf[0]
-                     log.message("66666 LOC_RTU ModbusNetVarIn::cache=$cache regId=$regId typeId=$typeId out=$out")
+                     ** log.message("66666 LOC_RTU ModbusNetVarIn::cache=$cache regId=$regId typeId=$typeId out=$out")
                      status := STATUSOK
                    } else {
                        log.message("7777 LOC_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
