@@ -101,9 +101,9 @@ abstract class BacNetFieldBusIO
   void update()
   {
     busId = 0
-    if (bus != null) {
-      bus.notifyFlush()
-    }
+    // if (bus != null) {
+    //   bus.notifyFlush()
+    // }
     status := STATUSNODEV
     Str tmpBuf = ""
     FieldBusNet tmpBus = lookupNetByDeviceName(tmpBuf)

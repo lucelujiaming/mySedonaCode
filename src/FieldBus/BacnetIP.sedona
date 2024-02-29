@@ -234,26 +234,32 @@ class BacnetIP
           for (Component d = Sys.app.lookup(r.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
             log.message("3434 updateCache d.name=$d.name and type.name=$d.type.name");
             if (d.type.is(BacNetFieldBusIO.type)) {
-              log.message("5555 updateCache d.name=$d.name and type.name=$d.type.name");
-              ((BacNetFieldBusIO)d).cache = bacnet_add(ctx, 0, // (bacDevice)r.deviceInstance, 
+                log.message("5555 updateCache d.name=$d.name and type.name=$d.type.name");
+                ((BacNetFieldBusIO)d).cache = bacnet_add(ctx, 0, // (bacDevice)r.deviceInstance, 
                        0, // ((BacNetFieldBusIO)r).regId, 
                        0, // ((BacNetFieldBusIO)r).typeId, 
                        85, 0)
-              ((BacNetFieldBusIO)d).objectNodeType =
+                ((BacNetFieldBusIO)d).objectNodeType =
                     ((BacNetFieldBusIO)d).convertObjectTypeToBacNetObjectType(
                             ((BacNetFieldBusIO)d).objectType)
-              log.message("6666 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
-              ((BacNetFieldBusIO)d).bus = this
-              log.message("777 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
-            // ((BacNetFieldBusIO)d).device = (bacDevice)r
-              ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
-              log.message("888 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
+                log.message("6666 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
+                ((BacNetFieldBusIO)d).bus = this
+                log.message("777 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
+                // ((BacNetFieldBusIO)d).device = (bacDevice)r
+                ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
+                log.message("888 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
+                // When we had BacNetFieldBusIO and status == STATUSNODEV, we need to update BacnetIP
+                if(status == STATUSNODEV)
+                {
+                    log.message("9999 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
+                    update();
+                }
             }
           }
         }
     }
 
-    log.message("9999 add schedule");
+    log.message("AAAA add schedule");
     // add schedule
     //
 

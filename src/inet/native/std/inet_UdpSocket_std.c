@@ -694,8 +694,8 @@ socket_t initializeSendSocket(char * networkIP, int port,
 }
 
 
-#define RECV_PORT 47808
-socket_t initializeRecvSocket()
+// #define RECV_PORT 47808
+socket_t initializeRecvSocket(int port)
 {
     socket_t clientRecvSocket;
     
@@ -718,7 +718,8 @@ socket_t initializeRecvSocket()
     bzero((char *)&recv_255_addr, sizeof(recv_255_addr));
     recv_255_addr.sin_family=AF_INET;
     recv_255_addr.sin_addr.s_addr=inet_addr("192.168.168.255");
-    recv_255_addr.sin_port=htons(RECV_PORT);
+    // recv_255_addr.sin_port=htons(RECV_PORT);
+    recv_255_addr.sin_port=htons(port);
     memset(&(recv_255_addr.sin_zero), 0x00, 8);
 
     
@@ -872,7 +873,7 @@ Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params)
     {
         socket_t clientRecvSocket;
         // printf("Call sendBroadcast \r\n");
-        clientRecvSocket = initializeRecvSocket();
+        clientRecvSocket = initializeRecvSocket(port);
         iClientCount = sendWhoIsBroadcast(SEND_BROADCAST_TIMES, 0, 
             clientSendSocket, clientRecvSocket, my_addr, // recv_addr, 
             ipArrayList, 
@@ -926,7 +927,7 @@ Cell inet_UdpSocket_getBacnetDevice(SedonaVM* vm, Cell* params)
     {
         socket_t clientRecvSocket;
         // printf("Call sendBroadcast \r\n");
-        clientRecvSocket = initializeRecvSocket();
+        clientRecvSocket = initializeRecvSocket(port);
         iClientCount = sendWhoIsBroadcast(SEND_BROADCAST_TIMES, iInstanceNumber, 
             clientSendSocket, clientRecvSocket, my_addr, // recv_addr, 
             ipArrayList, 
@@ -1122,7 +1123,7 @@ Cell inet_UdpSocket_getBacnetRouterDeviceList(SedonaVM* vm, Cell* params)
     {
         socket_t clientRecvSocket;
         // printf("Call sendBroadcast \r\n");
-        clientRecvSocket = initializeRecvSocket();
+        clientRecvSocket = initializeRecvSocket(port);
         iClientCount = sendWhoIsRouterBroadcast(SEND_BROADCAST_TIMES, 0, 
             clientSendSocket, clientRecvSocket, my_addr, // recv_addr, 
             ipArrayList, 
@@ -1166,7 +1167,7 @@ Cell inet_UdpSocket_getBacnetRouterDevice(SedonaVM* vm, Cell* params)
     {
         socket_t clientRecvSocket;
         // printf("Call sendBroadcast \r\n");
-        clientRecvSocket = initializeRecvSocket();
+        clientRecvSocket = initializeRecvSocket(port);
         iClientCount = sendWhoIsRouterBroadcast(SEND_BROADCAST_TIMES, 
             iSubNetworkID, 
             clientSendSocket, clientRecvSocket, my_addr, // recv_addr, 

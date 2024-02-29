@@ -92,12 +92,13 @@ class BacnetRemDev
             return 
         }
     }
-    if (bus != null) {
-        if(bus.type.is(BacnetIP.type))
-        {
-            ((BacnetIP)bus).updateCache()
-        }
-    }
+    // if (bus != null) {
+    //     if(bus.type.is(BacnetIP.type))
+    //     {
+    //         // ((BacnetIP)bus).updateCache()
+    //         bus.notifyFlush()
+    //     }
+    // }
     log.message("BacnetRemDev update 1111 status=$status") 
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
          if(((BacNetFieldBusIO)d).device == null)
@@ -145,9 +146,10 @@ class BacnetRemDev
             }
             
             ** log.message("Setting communicationMethod with (${lastInstanceNumber.toStr()}, ${InstanceNumber.toStr()})")
-            if(lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false)
+            if((InstanceNumber.toStr().length() > 0) && (lastInstanceNumber.toStr().length() > 0) && 
+              (lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false))
             {
-               log.message("Restart with (${lastInstanceNumber.toStr()}, ${InstanceNumber.toStr()})")
+               log.message("Restart with (<${lastInstanceNumber.toStr()}>, <${InstanceNumber.toStr()}>)")
                // // closePort(0)
                // // getBacnetCurrentDevice()
                // // openPort(true)
@@ -156,7 +158,8 @@ class BacnetRemDev
                     ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
                }
             }
-            else 
+            // Omit the init case
+            else if(InstanceNumber.toStr().length() > 0)
             {
                 if(communicationMethod == COMMUNICATIONNONE)
                 {
