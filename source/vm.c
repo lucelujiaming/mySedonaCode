@@ -913,7 +913,23 @@ int vmCall(SedonaVM* vm, uint16_t method, Cell* args, int argc)
       Case Load8BitFieldU1:   sp->ival = *(uint8_t*)(((uint8_t*)sp->aval) + *(uint8_t *)(cp+1)); cp += 2; EndInstr;
       Case Load8BitFieldU2:   sp->ival = *(uint8_t*)(((uint8_t*)sp->aval) + *(uint16_t*)(cp+1)); cp += 3; EndInstr;
       Case Load8BitFieldU4:   sp->ival = *(uint8_t*)(((uint8_t*)sp->aval) + *(uint32_t*)(cp+1)); cp += 5; EndInstr;
-      Case Load8BitArray:     --sp; sp->ival = *(((uint8_t*)sp->aval) + (sp+1)->ival); ++cp; EndInstr;
+      Case Load8BitArray:   
+			--sp; 
+        int iInd = sp->ival;
+        if(iInd < 1000)
+        {
+	//    printf("11111 -- (uint8_t*)sp->aval = %d ----sp->ival = %d----(sp + 1)->ival = %d--\n", 
+	//	(uint8_t*)sp->aval, sp->ival, (sp + 1)->ival);
+	//    printf("22222 ---((uint8_t*)sp->aval) + (sp+1)->ival = %d--\n", 
+        //        ((uint8_t*)sp->aval) + (sp + 1)->ival);
+        }
+			sp->ival = *(((uint8_t*)sp->aval) + (sp+1)->ival); 
+        if(iInd < 1000)
+        {
+	//    printf("33333 ---sp->ival = %d--\n",  sp->ival);
+        }
+			++cp; 
+			EndInstr;
       Case Add8BitArray:      --sp; sp->aval = (((uint8_t*)sp->aval) + (sp+1)->ival); ++cp; EndInstr;
 
       // store 8-bit fields
