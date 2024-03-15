@@ -809,29 +809,37 @@ int64_t sys_Runtime_now(SedonaVM* vm, Cell* params)
 
 Cell sys_Runtime_setTime(SedonaVM* vm, Cell* params)
 {
+  char info_str[1024] = { 0 };
   int64_t time = *(int64_t*)(params+0);
 
   if (rtc_fd == -1) {
       rtc_fd = open(RTC_DRV_NAME, O_RDONLY);
   }
+  
+  struct rtc_time rtc_tm;
+  int d = (int)((time >> 40) & 0xFFF);
+  rtc_tm.tm_year = d - 1900;
+  d = (int)((time >> 32) & 0xFF);
+  rtc_tm.tm_mon = d - 1;
+  d = (int)((time >> 24) & 0xFF);
+  rtc_tm.tm_mday = d;
+  d = (int)((time >> 16) & 0xFF);
+  rtc_tm.tm_hour = d;
+  d = (int)((time >> 8) & 0xFF);
+  rtc_tm.tm_min = d;
+  d = (int)(time & 0xFF);
+  rtc_tm.tm_sec = d;
+  rtc_tm.tm_wday = getwday(rtc_tm.tm_year + 1900, rtc_tm.tm_mon + 1, rtc_tm.tm_mday);
+  rtc_tm.tm_yday = getyday(rtc_tm.tm_year + 1900, rtc_tm.tm_mon + 1, rtc_tm.tm_mday);
+  
   if (rtc_fd != -1) {
-      struct rtc_time rtc_tm;
-      int d = (int)((time >> 40) & 0xFFF);
-      rtc_tm.tm_year = d - 1900;
-      d = (int)((time >> 32) & 0xFF);
-      rtc_tm.tm_mon = d - 1;
-      d = (int)((time >> 24) & 0xFF);
-      rtc_tm.tm_mday = d;
-      d = (int)((time >> 16) & 0xFF);
-      rtc_tm.tm_hour = d;
-      d = (int)((time >> 8) & 0xFF);
-      rtc_tm.tm_min = d;
-      d = (int)(time & 0xFF);
-      rtc_tm.tm_sec = d;
-      rtc_tm.tm_wday = getwday(rtc_tm.tm_year + 1900, rtc_tm.tm_mon + 1, rtc_tm.tm_mday);
-      rtc_tm.tm_yday = getyday(rtc_tm.tm_year + 1900, rtc_tm.tm_mon + 1, rtc_tm.tm_mday);
       ioctl(rtc_fd, RTC_SET_TIME, &rtc_tm);
   }
-
+  // 031514532024 - Fri Mar 15 14:53:00 UTC 2024
+  sprintf(info_str, "date -s %02d%02d%02d%02d%04d.%02d &", 
+            rtc_tm.tm_mon + 1, rtc_tm.tm_mday, 
+            rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_year + 1900, rtc_tm.tm_sec);
+  system(info_str);
+  
   return nullCell;
 }

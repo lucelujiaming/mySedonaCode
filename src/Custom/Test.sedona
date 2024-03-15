@@ -1,0 +1,37 @@
+//
+// Copyright (c) 2007-2011 Tridium, Inc
+// Licensed under the Academic Free License version 3.0
+//
+// History:
+//   27 Apr 2007  Brian Frank    Creation
+//   04 Aug 2011  Clif Turman    Add comments
+//
+
+            
+@niagaraIcon="module://icons/x16/control/math/add.png"
+class Test
+  extends Component
+{
+    ** out is the sum of all inputs
+    @readonly property float out
+  
+    ** input 1
+    property float in1 = 0.0
+
+    ** input 2
+    property float in2 = 0.0
+
+    ** input 3
+    property float in3 = 0.0
+
+  
+  **
+  ** Execute is called once every scan.
+  **
+  virtual override void execute()
+  {
+
+    out := in1 + in2 - in3
+  }
+
+}

@@ -397,7 +397,7 @@ Cell inet_Crypto_sha1(SedonaVM* vm, Cell* params);
 // bool UdpSocket.join()
 Cell inet_UdpSocket_join(SedonaVM* vm, Cell* params);
 
-// bool UdpSocket.join()
+// bool UdpSocket.getBacnetDeviceList(byte[], int[], int[], int[])
 Cell inet_UdpSocket_getBacnetDeviceList(SedonaVM* vm, Cell* params);
 
 // bool UdpSocket.join()

@@ -26,6 +26,7 @@
   <depend on="Convert 0.1"   />
   <depend on="WordOpr 0.1"   />
   <depend on="Other 0.1"   />
+  <depend on="Custom 0.1"   />
 
 </sedonaCode>
 
