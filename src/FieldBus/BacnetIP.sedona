@@ -36,6 +36,9 @@ class BacnetIP
   @max = 65535
   property int port = 47808
   
+  @config
+  property bool isNeedReconnect = true
+  
   ////////////////////////////////////////////////////////////////
   // Life cycle
   ////////////////////////////////////////////////////////////////
@@ -225,12 +228,26 @@ class BacnetIP
         log.message("22222 updateCache r.name=$r.name and r.type.name=$r.type.name");
         if (r.type.is(BacnetLocDev.type)) {
           ((BacnetLocDev)r).bus = this
+          ((BacnetLocDev)r).status := BacnetLocDev.STATUSOK
+          for (Component d = Sys.app.lookup(r.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+            log.message("3434 updateCache d.name=$d.name and type.name=$d.type.name");
+            if (d.type.is(BacNetFieldBusIO.type)) {
+                 ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSOK
+            }
+          }
         }
         else if (r.type.is(BacnetRemDev.type)) {
           log.message("SetBus: 3333 updateCache r.name=$r.name and type.name=$r.type.name");
           // dev = (bacDevice)r
           ((BacnetRemDev)r).bus = this
-          ((BacnetRemDev)r).status := BacnetRemDev.STATUSREADY
+          if(((BacnetRemDev)r).communicationMethod == BacnetRemDev.COMMUNICATIONNONE)
+          {
+              ((BacnetRemDev)r).status := BacnetRemDev.STATUSREADY
+          }
+          else
+          {
+              ((BacnetRemDev)r).status := BacnetRemDev.STATUSOK
+          }
           for (Component d = Sys.app.lookup(r.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
             log.message("3434 updateCache d.name=$d.name and type.name=$d.type.name");
             if (d.type.is(BacNetFieldBusIO.type)) {
@@ -246,7 +263,14 @@ class BacnetIP
                 ((BacNetFieldBusIO)d).bus = this
                 log.message("777 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
                 // ((BacNetFieldBusIO)d).device = (bacDevice)r
-                ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
+                if(((BacnetRemDev)r).communicationMethod == BacnetRemDev.COMMUNICATIONNONE)
+                {
+                    ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
+                }
+                 else
+                {
+                    ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSOK
+                }
                 log.message("888 updateCache d.objectNodeType=${((BacNetFieldBusIO)d).objectNodeType}");
                 // When we had BacNetFieldBusIO and status == STATUSNODEV, we need to update BacnetIP
                 if(status == STATUSNODEV)
@@ -329,12 +353,21 @@ class BacnetIP
          {
             ((BacnetRemDev)d).bus = this
          }
+         ((BacnetRemDev)d).resetCommunicationMethod()
          ((BacnetRemDev)d).bacnetCurrentDeviceRet = ((BacnetRemDev)d).getBacnetCurrentDevice()
          // bacnetCurrentDeviceRet is never zero. we just call getBacnetRouterDevice for each Device
          if(((BacnetRemDev)d).bacnetCurrentDeviceRet == 0)
          {
             return 0
          }
+      }
+    }
+    
+    // Call update for all of BacnetRemDev
+    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+      log.message("Call update openPort::d.type  = $d.type.name")
+      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
+         ((BacnetRemDev)d).update()
       }
     }
   

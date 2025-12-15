@@ -148,7 +148,14 @@ class App
     platform.notify("app", "stopping")
 
     foreach (Component c : comps, compsLen)
-      if (c != null) c.stop()
+    {
+      if (c != null) {
+            log.message("stopApp::kid.name=$c.name")
+            log.message("stopApp::kid.type.name=$c.type.name")
+            c.stop()
+            
+      }
+    }
   }
 
   **
@@ -178,7 +185,8 @@ class App
         }
       }
       cnt --
-      Sys.sleep(1ms)
+      // Sys.sleep(1ms)
+      Sys.sleep(0.3ms)
     }
 
     return resumeApp()

@@ -67,6 +67,16 @@ class BacnetRemDev
     isPortOpen = false
   }
 
+  void resetCommunicationMethod()
+  {
+     communicationMethod := COMMUNICATIONNONE
+     status              := FieldBusDevice.STATUSREADY
+     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+         ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
+         ** log.message("BacnetRemDev update 22222 status=$status") 
+     } 
+  }
+
   ////////////////////////////////////////////////////////////////
   // App support
   ////////////////////////////////////////////////////////////////
@@ -99,13 +109,22 @@ class BacnetRemDev
     //         bus.notifyFlush()
     //     }
     // }
-    log.message("BacnetRemDev update 1111 status=$status") 
+      log.message("BacnetRemDev update 1111 status=$status") 
+      if(communicationMethod == BacnetRemDev.COMMUNICATIONNONE)
+      {
+          status := BacnetRemDev.STATUSREADY
+      }
+      else
+      {
+          status := BacnetRemDev.STATUSOK
+      }
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
          if(((BacNetFieldBusIO)d).device == null)
          {
             ((BacNetFieldBusIO)d).device = this
          }
-         ** log.message("BacnetRemDev update 22222 status=$status") 
+         ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSOK
+         log.message("BacnetRemDev update 22222 ((BacNetFieldBusIO)d).instanceNumber=${((BacNetFieldBusIO)d).instanceNumber}") 
     } 
     createRPMAndWPM()
     log.message("BacnetRemDev getBacLocalDevice") 
@@ -140,45 +159,51 @@ class BacnetRemDev
                    log.message("          from ${dataRecvGramAddr}")
                 //   objectIdentifier = 240012
                 //   dataRecvGramAddr = "192.168.168.241"
-
                 //   setClientAddress(dataRecvGramAddr)
                 }
             }
             
             ** log.message("Setting communicationMethod with (${lastInstanceNumber.toStr()}, ${InstanceNumber.toStr()})")
-            if((InstanceNumber.toStr().length() > 0) && (lastInstanceNumber.toStr().length() > 0) && 
-              (lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false))
+            // Lujiaming remove restart logic and replace it with isNeedReconnect flag @ 11/27/2025.
+            if(((BacnetIP)bus).isNeedReconnect)
             {
-               log.message("Restart with (<${lastInstanceNumber.toStr()}>, <${InstanceNumber.toStr()}>)")
-               // // closePort(0)
-               // // getBacnetCurrentDevice()
-               // // openPort(true)
-               if((bus != null) && (bus.type.is(BacnetIP.type)))
-               {
-                    ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
-               }
+                ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
+                ((BacnetIP)bus).isNeedReconnect := false
             }
-            // Omit the init case
-            else if(InstanceNumber.toStr().length() > 0)
-            {
-                if(communicationMethod == COMMUNICATIONNONE)
-                {
-                    long nowNanoSecond  = Sys.ticks()
-                    long nowMilliSecond = nowNanoSecond / (long)1000000
-                    if(sendInterval < nowMilliSecond) {
-                       log.message("Restart with communicationMethod == COMMUNICATIONNONE")
-                       // closePort(0)
-                       // getBacnetCurrentDevice()
-                       // openPort(true)
-                       if((bus != null) && (bus.type.is(BacnetIP.type)))
-                       {
-                            ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
-                       }
-                       // Offline timespan is 30 seconds at 08/22/23
-                       sendInterval = nowMilliSecond + (long)30000
-                    }
-                }
-            }
+            // // Omit the init case
+            // if((InstanceNumber.toStr().length() > 0) && (lastInstanceNumber.toStr().length() > 0) && 
+            //   (lastInstanceNumber.toStr().equals(InstanceNumber.toStr()) == false))
+            // {
+            //    log.message("Restart with (<${lastInstanceNumber.toStr()}>, <${InstanceNumber.toStr()}>)")
+            //    // // closePort(0)
+            //    // // getBacnetCurrentDevice()
+            //    // // openPort(true)
+            //    if((bus != null) && (bus.type.is(BacnetIP.type)))
+            //    {
+            //         ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
+            //    }
+            // }
+            // // Omit the init case
+            // else if(InstanceNumber.toStr().length() > 0)
+            // {
+            //     if(communicationMethod == COMMUNICATIONNONE)
+            //     {
+            //         long nowNanoSecond  = Sys.ticks()
+            //         long nowMilliSecond = nowNanoSecond / (long)1000000
+            //         if(sendInterval < nowMilliSecond) {
+            //            log.message("Restart with communicationMethod == COMMUNICATIONNONE")
+            //            // closePort(0)
+            //            // getBacnetCurrentDevice()
+            //            // openPort(true)
+            //            if((bus != null) && (bus.type.is(BacnetIP.type)))
+            //            {
+            //                 ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
+            //            }
+            //            // Offline timespan is 30 seconds at 08/22/23
+            //            sendInterval = nowMilliSecond + (long)30000
+            //         }
+            //     }
+            // }
         }
         else 
         {
@@ -224,13 +249,21 @@ class BacnetRemDev
             for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
                 // ((BacNetFieldBusIO)d).device = this
                 // d.execute()
-                ** log.message("READ::execute_mode = $execute_mode and execute_counter= $execute_counter ")
+                // log.message("READ::execute_mode = $execute_mode and execute_counter= $execute_counter ")
                 // if (d.type.is(BacReadPropertyVar.type))  {
                 //   ((BacReadPropertyVar)d).execute()
                 // } else 
                 if (d.type.is(BacnetNetVarIn.type))  {
-                   ** log.message("BacnetNetVarIn::alias = ${((BacnetNetVarIn)d).alias.toStr()} ")
-                   ((BacnetNetVarIn)d).execute()
+                    // log.message("BacnetNetVarIn::alias = ${((BacnetNetVarIn)d).alias.toStr()} ")
+	                if(communicationMethod == BacnetRemDev.COMMUNICATIONNONE)
+	                {
+	                    ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSREADY
+	                }
+	                 else
+	                {
+	                    ((BacNetFieldBusIO)d).status := BacNetFieldBusIO.STATUSOK
+	                }
+                    ((BacnetNetVarIn)d).execute()
                 }
                 else  if (!d.type.is(BacnetNetVarOut.type))  {
                    log.message("Only BacnetNetVarIn and BacnetNetVarOut can BACNET_PROPERTY_READ in the BacnetRemDev ")
@@ -3863,10 +3896,12 @@ class BacnetRemDev
                  
                 if((sourceNetworkAddress != 0) && (sadr != 0))
                 {
+                    log.message("communicationMethod := COMMUNICATIONBYSUBNET")
                     communicationMethod := COMMUNICATIONBYSUBNET
                 }
                 else if((sourceNetworkAddress == 0) && (sadr == 0))
                 {
+                    log.message("communicationMethod := COMMUNICATIONBYINSTANCE")
                     communicationMethod := COMMUNICATIONBYINSTANCE
                 }
             }
@@ -3951,6 +3986,11 @@ class BacnetRemDev
      log.message("-------------------------------------------------------------------------------")
      bacnetMultipleReadCount = 0
      bacnetMultipleWriteCount = 0
+     for(int i =0 ; i < 128; i++)
+     {
+         bacnetMultipleReadArray[i] = 0
+         bacnetMultipleWriteArray[i] = 0
+     }
      // Get all BacnetNetVarIn and BacnetNetVarOut
      for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(BacnetNetVarIn.type))  {
@@ -4083,6 +4123,7 @@ class BacnetRemDev
                     {
                         log.message("44444 operateOneBlock when instanceNumber=${((BacnetNetVarIn)d).instanceNumber}")
                         ((BacnetNetVarIn)d).bacnetReadMultipleCount = BACNET_READMULTIPLE_DONOTHING
+                        log.message("34343434 We set bacnetReadMultipleCount=${((BacnetNetVarIn)d).bacnetReadMultipleCount}")
                     }
                  }
                  else if (d.type.is(BacnetNetVarOut.type)
@@ -4117,10 +4158,10 @@ class BacnetRemDev
                         log.message("     ((BacnetNetVarIn)d).instanceNumber = $iCmpInstanceNumber") 
                         log.message("     ((BacnetNetVarIn)d).iObjectType    = $iCmpObjectType")
                         ((BacnetNetVarIn)d).bacnetReadMultipleCount = iLen
+                        log.message("56565656 We set bacnetReadMultipleCount=${((BacnetNetVarIn)d).bacnetReadMultipleCount}")
                         // int j = 0
                         for (int k = 0; k < iLen; k++)
                         {
-                            
                             log.message("We will send ${iData[k]} in the BacnetNetVarIn which instanceNumber=${((BacnetNetVarIn)d).instanceNumber}") 
                             ((BacnetNetVarIn)d).bacnetReadMultipleList[k] = iData[k]
                         }
@@ -4168,10 +4209,10 @@ class BacnetRemDev
   define int BACNET_PROPERTY_READ_EXECUTE_TIMES   = 3
   define int BACNET_PROPERTY_WRITE_EXECUTE_TIMES  = 9
   
-  define int BACNET_READMULTIPLE_NOTUSED    = -1
+  // define int BACNET_READMULTIPLE_NOTUSED    = -1
   define int BACNET_READMULTIPLE_DONOTHING  = 0
   
-  define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
+  // define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
   define int BACNET_WRITEMULTIPLE_DONOTHING  = 0
     
   // Send interval counter

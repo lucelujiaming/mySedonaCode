@@ -234,7 +234,7 @@ class BacnetNetVarIn
   }
 
   
-  void makeMultipleReadPropertyMultiplePacket()
+  void makeMultipleReadPropertyMultiplePacket(int startNum)
   {
     if (bus == null) {
         return 
@@ -262,7 +262,7 @@ class BacnetNetVarIn
     dataLength = 3
     // Service Choice: readPropertyMultiple (14)
     bacnetPacket[dataLength++] = 0x0E
-    for(int i = 0; i < bacnetReadMultipleCount; i++)
+    for(int i = startNum; i < bacnetReadMultipleCount; i++)
     {
         // ObjectIdentifier: analog-value, 0
         bacnetPacket[dataLength++] = 0x0C
@@ -294,6 +294,11 @@ class BacnetNetVarIn
         bacnetPacket[dataLength++] = 0x55
         // .... .111 = Named Tag: Closing Tag (7)
         bacnetPacket[dataLength++] = 0x1F
+
+        if(i >= startNum + BACNET_READMULTIPLE_SINGLE_LIMIT)
+        {
+           break
+        }
     }
     log.message("22222 makeMultipleReadPropertyMultiplePacket::bacnetPacket[$dataLength]")
     for(int i =0 ; i < dataLength; i++)
@@ -317,6 +322,8 @@ class BacnetNetVarIn
   
   void getParentBus()
   {
+    int oldStatus = STATUSEND
+    Str aliasStr = alias.toStr()
     if(device != null)
     {
         if(Sys.app.lookup(device.parent) != null)
@@ -324,10 +331,13 @@ class BacnetNetVarIn
             log.message("bacreadProperty:: get device.parent as Bus") 
             Component objBus = Sys.app.lookup(device.parent)
             if(objBus.type.is(FieldBusNet.type)) {
-                log.message("bacreadProperty:: set device.parent as Bus") 
+                log.message("bacreadProperty:: set device.parent as Bus by $aliasStr") 
                 bus = (FieldBusNet)objBus
-                bacnetReadMultipleCount = BACNET_READMULTIPLE_NOTUSED
+                // bacnetReadMultipleCount = BACNET_READMULTIPLE_NOTUSED
+                // log.message("12121212 We set bacnetReadMultipleCount=$bacnetReadMultipleCount")
+                oldStatus = status
                 update()
+                status := oldStatus
             }
         }
     }
@@ -335,6 +345,7 @@ class BacnetNetVarIn
   
   virtual override void execute()
   {
+    Str aliasStr = alias.toStr()
     ** log.message("bacreadProperty::execute 11111 status=$status") 
     int iDelayCount = 0
     if (bus == null) {
@@ -354,7 +365,7 @@ class BacnetNetVarIn
         return
 	}
     
-    ** log.message("bacreadProperty::execute 222222 status=$status") 
+    ** log.message("bacreadProperty::execute 222222 status=$status, cache=$cache") 
     if (cache != 0 && bus != null && status <= STATUSREADY) {
       if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
       {
@@ -369,7 +380,7 @@ class BacnetNetVarIn
          if(device.readPropertyMultipleSupport == FieldBusDevice.READ_PROPERTY_MULTIPLE_NOT_SUPPORT)
          {
             makeReadPropertyPacket()
-            log.message("111111 makeReadPropertyPacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+            log.message("12121212 makeReadPropertyPacket($dataLength) by $aliasStr with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
             if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
               ** log.message("device.readReg")
 			  if(device.iDeviceReadPropertyCount <= 255)
@@ -388,7 +399,7 @@ class BacnetNetVarIn
             log.message("       instanceNumber = $instanceNumber and ObjectType = $objectType")
             if(bacnetReadMultipleCount == BACNET_READMULTIPLE_NOTUSED){
               makeReadPropertyMultiplePacket()
-              log.message("111111 makeReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+              log.message("34343434 makeReadPropertyMultiplePacket($dataLength) by $aliasStr with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
               if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                 ** log.message("device.readReg")
 			    if(device.iDeviceReadPropertyCount <= 255)
@@ -404,9 +415,18 @@ class BacnetNetVarIn
             else if(bacnetReadMultipleCount == BACNET_READMULTIPLE_DONOTHING){
                log.message("ReadMultiple Disable")
             }
-            else if(bacnetReadMultipleCount > BACNET_READMULTIPLE_DONOTHING){
-              makeMultipleReadPropertyMultiplePacket()
-              log.message("111111 makeMultipleReadPropertyMultiplePacket($dataLength) with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
+            else if(bacnetReadMultipleCount > BACNET_READMULTIPLE_DONOTHING){              
+              if(bacnetReadMultipleStartIndex < bacnetReadMultipleCount)
+              {
+                   makeMultipleReadPropertyMultiplePacket(bacnetReadMultipleStartIndex)
+                   bacnetReadMultipleStartIndex = bacnetReadMultipleStartIndex + BACNET_READMULTIPLE_SINGLE_LIMIT
+              }
+              else
+              {
+                   bacnetReadMultipleStartIndex = 0
+                   makeMultipleReadPropertyMultiplePacket(bacnetReadMultipleStartIndex)
+              }
+              log.message("67676767 makeMultipleReadPropertyMultiplePacket($dataLength) by $aliasStr with sendInterval=$sendInterval and nowMilliSecond=$nowMilliSecond")
               if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
                 ** log.message("device.readReg")
 			    if(device.iDeviceReadPropertyCount <= 255)
@@ -514,6 +534,8 @@ class BacnetNetVarIn
   define int BACNET_READMULTIPLE_NOTUSED    = -1
   define int BACNET_READMULTIPLE_DONOTHING  = 0
   
+  define int BACNET_READMULTIPLE_SINGLE_LIMIT  = 20
+  
   define int SEND_INTERVAL = 30
   int arrayProperty = 5
   
@@ -529,6 +551,7 @@ class BacnetNetVarIn
   
   private inline Str(128)   strInfo
 
+  private int bacnetReadMultipleStartIndex = 0
   // -1                - We donot use ReadMultiple
   // 0                 - We use ReadMultiple and do nothing
   // Positive number   - We use ReadMultiple and use instance number list

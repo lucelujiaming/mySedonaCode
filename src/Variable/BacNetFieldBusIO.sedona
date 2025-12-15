@@ -123,7 +123,8 @@ abstract class BacNetFieldBusIO
           tmpBus.notifyFlush()
         }
     }
-          
+    // Lujiaming add at 12/09/25
+    cache = 1
     if(bus != null)
     {
        log.message("987654321 ")
