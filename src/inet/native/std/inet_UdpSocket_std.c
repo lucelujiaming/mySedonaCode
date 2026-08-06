@@ -847,10 +847,14 @@ int sendWhoIsBroadcast(int iRetryCount, int iInstanceNumber,
 				{
                    iClientCount++;
 				}
-                recvSleep(1);
+                // recvSleep(1);
+		        printf("[%s:%s:%d] ------(iClientCount = %d at 260728)------ \r\n",
+		             __FILE__, __FUNCTION__, __LINE__, iClientCount);
+                break;
             }
         }
-        printf("-------------------(%d)----------------------- \r\n", i + 1);
+        printf("[%s:%s:%d] -------------------(%d)----------------------- \r\n",
+             __FILE__, __FUNCTION__, __LINE__, i + 1);
     }
     return iClientCount;
 }

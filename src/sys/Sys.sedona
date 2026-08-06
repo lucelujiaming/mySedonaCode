@@ -238,14 +238,18 @@ class Sys
   {
     if ((result == Err.yield) || (result == Err.hibernate))
     {
+      Sys.out.print("shutdown::yield ").nl()
       // Do nothing
     }  
     else  // full shutdown  
     { 
       if (app != null)
       {                                             
+        Sys.out.print("shutdown::stopApp ").nl()
         app.stopApp()
+        Sys.out.print("shutdown::cleanApp ").nl()
         app.cleanupApp()
+        Sys.out.print("shutdown::cleanApp over").nl()
       }
     }   
     return result

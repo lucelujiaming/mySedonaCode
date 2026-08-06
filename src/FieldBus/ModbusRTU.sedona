@@ -81,12 +81,16 @@ class ModbusRTU
     //   ctx = -1
     //   busId = 0
     // }
+    log.message("stop ModbusLocDev start ")
     
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(ModbusRemDev.type)) {
           if (((ModbusRemDev)d).ctx != -1) {
               cleanCache()
+              int ctx_id = ((ModbusRemDev)d).ctx
+              log.message("stop ModbusRemDev start with ctx=$ctx_id")
               ((ModbusRemDev)d).dRtuC(((ModbusRemDev)d).ctx)
+              log.message("stop ModbusRemDev end with ctx")
               ((ModbusRemDev)d).ctx = -1
             busId = 0
           } 
@@ -94,12 +98,16 @@ class ModbusRTU
         else if (d.type.is(ModbusLocDev.type)) {
           if (((ModbusLocDev)d).ctx != -1) {
               cleanCache()
+              int ctx_id = ((ModbusLocDev)d).ctx
+              log.message("stop ModbusLocDev start with ctx=$ctx_id")
               ((ModbusLocDev)d).dRtuC(((ModbusLocDev)d).ctx)
+              log.message("stop ModbusLocDev end with ctx")
               ((ModbusLocDev)d).ctx = -1
             busId = 0
           } 
         }
     }
+    log.message("stop ModbusLocDev end ")
   }
   override void execute()
   {
@@ -133,7 +141,7 @@ class ModbusRTU
 	            ((ModbusLocDev)d).elapsedTime := (int)buffer[0]
 	            ((ModbusLocDev)d).status := ModbusLocDev.STATUSOK
           } else {
-			    log.message("7777 ModbusRTU::execute LOC_RTU modbusRTUSlaveRead")
+			    ** log.message("7777 ModbusRTU::execute LOC_RTU modbusRTUSlaveRead")
 	            ((ModbusLocDev)d).elapsedTime := -1
 	            ((ModbusLocDev)d).status := ModbusLocDev.STATUSOFFLINE
           }
@@ -173,16 +181,20 @@ class ModbusRTU
     //   ctx = -1
     //   busId = 0
     // }
-    int iRemCtxIdx = 0
+    // Lujiaming comment it at 26/07/16
+    // int iRemCtxIdx = 0
     int iLocCtxIdx = 0
     for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
         if (d.type.is(ModbusRemDev.type)) {
           // if (((ModbusRemDev)d).ctx != -1) {
                log.message("4343434 ModbusRTU ModbusRemDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
                cleanCache()
-               log.message("4343434 ModbusRTU ModbusRemDev modbusTCPClientClose")
-               ((ModbusRemDev)d).modbusRTUMasterClose(iRemCtxIdx)
-               iRemCtxIdx = iRemCtxIdx + 1
+               // Lujiaming comment it at 26/07/16
+               // ((ModbusRemDev)d).modbusRTUMasterClose(iRemCtxIdx)
+               // iRemCtxIdx = iRemCtxIdx + 1
+               // Lujiaming add it at 26/07/16
+               log.message("4343434 ModbusRTU ModbusRemDev modbusTCPClientClose by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx} ")
+               ((ModbusRemDev)d).modbusRTUMasterClose(((ModbusRemDev)d).ctx)
                ((ModbusRemDev)d).ctx = -1
                busId = 0
                log.message("11111 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
@@ -227,6 +239,7 @@ class ModbusRTU
 	            ((ModbusRemDev)d).ctx = modbus_remdev_ctx
             }
             log.message("22222 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
+            log.message("22222 flush ((ModbusRemDev)d).ctx=${((ModbusRemDev)d).ctx}")
       }
       else if (d.type.is(ModbusLocDev.type)) {
             ((ModbusLocDev)d).bus = this
@@ -241,6 +254,7 @@ class ModbusRTU
 	            ((ModbusLocDev)d).ctx = modbus_locdev_ctx
             }
             log.message("22222 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
+            log.message("22222 flush ((ModbusLocDev)d).ctx=${((ModbusLocDev)d).ctx}")
       }
     }
     

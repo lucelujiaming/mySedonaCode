@@ -1,0 +1,79 @@
+class DigitalInput
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, Busy, Ready, NoDev, NoReg, END"
+  define int STATUSOK = 0
+  define int STATUSBUSY = 1
+  define int STATUSREADY = 2
+  define int STATUSNODEV = 3
+  define int STATUSNOREG = 4
+  define int STATUSEND = 5
+  
+  
+  define Str CHANNEL_INDEX_RANGE = "Ch1, Ch2, Ch3, Ch4, END"
+  define int CHANNEL_INDEX_FIRST   = 0
+  define int CHANNEL_INDEX_SECOND  = 1
+  define int CHANNEL_INDEX_THIRD   = 2
+  define int CHANNEL_INDEX_FOURTH  = 3
+  define int CHANNEL_INDEX_END     = 4
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSOK
+
+  @config
+  @range = CHANNEL_INDEX_RANGE
+  @fieldWidth = 20
+  property int channel_index = CHANNEL_INDEX_FIRST
+  
+  @readonly
+  property float present_value = 0.0f
+  
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+  
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+  }
+  
+  override void execute()
+  {
+      
+    Component p = Sys.app.lookup(this.parent)
+    Component root = null
+    while (p != null) {
+        root = p
+        p = Sys.app.lookup(p.parent)
+    }
+    if (root != null) {
+        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            // Sync from service to play
+            if (f.type.is(Folder.type) && f.name.equals("service")) {
+                for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                    if (n.type.is(FieldBusNet.type))  {
+                        if (((FieldBusNet)n).sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_DIGITAL_BUS) {
+                            present_value := ((FieldBusNet)n).current_channel_a_readings[channel_index]
+                        }
+                    }
+                }
+            }
+        }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  // define Log log
+  private int ctx = -1
+}

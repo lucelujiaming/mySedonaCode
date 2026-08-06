@@ -1,0 +1,57 @@
+@niagaraIcon="module://icons/x16/control/util/xy.png"
+class Channel
+  extends Component
+{
+
+	** Channel condition
+	property float in = 0.0
+	
+	**input value
+	property float in0 = 0.0
+
+    ** output channel  0
+    @readonly property float out0
+	
+    ** output channel  1
+    @readonly property float out1
+
+    ** output channel  2
+    @readonly property float out2
+00000000000000000000000000000
+    ** output channel  3
+    @readonly property float out3
+
+	
+  override void start()
+  {
+  }
+
+  virtual override void execute()
+  {
+	if(in == 0.0){
+		out0 := in0
+		out1 := 0.0
+		out2 := 0.0
+		out3 := 0.0
+	}
+	else if(in == 1.0){
+		out1 := in0
+		out0 := 0.0
+		out2 := 0.0
+		out3 := 0.0
+	}
+	else if(in == 2.0){
+		out2 := in0
+		out1 := 0.0
+		out0 := 0.0
+		out3 := 0.0
+	}
+	else {
+		out3 := in0
+		out1 := 0.0
+		out2 := 0.0
+		out0 := 0.0
+	}
+	
+  }
+}

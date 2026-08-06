@@ -22,6 +22,9 @@
   <source dir="BacnetRemDev.sedona" />
   <source dir="BacnetLocDev.sedona" />
   <source dir="BacnetSchedule.sedona" />
+  <!-- Analog Source Directories  -->
+  <source dir="AnalogBus.sedona" />
+  <source dir="DigitalBus.sedona" />
   
   <!-- Modbus Natives -->
   <native qname="FieldBus::ModbusRemDev.dRtuO" id="3::0"/>
@@ -67,5 +70,13 @@
   <native qname="FieldBus::BacnetIP.eD" id="4::16"/>
   <native qname="FieldBus::BacnetIP.eF" id="4::17"/>
   <native qname="FieldBus::BacnetIP.eUI" id="4::18"/>
+  <!-- Analog Natives -->
+  <native qname="FieldBus::AnalogBus.InputInit"            id="5::1" />
+  <native qname="FieldBus::AnalogBus.SetInputChannelRange" id="5::2" />
+  <native qname="FieldBus::AnalogBus.SetInputChannelMode"  id="5::3" />
+  <!-- Digital Natives -->
+  <native qname="FieldBus::AnalogBus.ReadChannel"          id="5::4" />
+  <native qname="FieldBus::AnalogBus.ReadAllChannels"      id="5::5" />
+  <native qname="FieldBus::DigitalBus.GetDigitalValues"    id="5::8" />
   
 </sedonaKit>

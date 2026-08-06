@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include "errorcodes.h"
 
+#include "v3s_gpio_operation_wrapper.h"
+
 //needed to pass version info from gcc command line as a string value (only needed for QNX)
 #define VER1(x) #x
 #define VER(x) VER1(x)
@@ -44,9 +46,12 @@ extern NativeMethod* nativeTable[];
 // Main
 ////////////////////////////////////////////////////////////////
 
+V3S_GPIO_Operator * g_V3S_GPIO_Operator = NULL;
+pthread_mutex_t g_V3sPIOMap_mutex;
+
 int main(int argc, char *argv[])
 {
-  //int result;
+  int iResult;
   int i;
   bool runAsPlatform = FALSE;
   char* filename = NULL;
@@ -77,10 +82,37 @@ int main(int argc, char *argv[])
     }
   }
 
+  g_V3S_GPIO_Operator = (V3S_GPIO_Operator *)malloc(sizeof(V3S_GPIO_Operator));
+  g_V3S_GPIO_Operator->magicNumber = 0x00;
+  g_V3S_GPIO_Operator->enumUartMode = V3S_UART_NONE;
+  g_V3S_GPIO_Operator->objV3sPIOMap = NULL;
+  g_V3S_GPIO_Operator->objMutex = NULL;
+  
+  if (V3S_GPIO_Init(&g_V3S_GPIO_Operator->objV3sPIOMap) != 0) {
+        printf("Failed to V3S_GPIO_Init\n");
+        return 1;
+  }
+  if(g_V3S_GPIO_Operator->objV3sPIOMap == NULL) {
+        printf("Failed to V3S_GPIO_Init(g_V3S_GPIO_Operator->objV3sPIOMap) \n");
+        return 1;
+  }
+  ; // 初始化互斥锁
+  if (pthread_mutex_init(&g_V3sPIOMap_mutex, NULL) != 0) {
+        printf("Failed to initialize V3sPIOMap_mutex\n");
+        return 1;
+  }
+  printf("main::g_V3S_GPIO_Operator::PIO:0x%.8X\r\n", (unsigned int)g_V3S_GPIO_Operator->objV3sPIOMap);
+  g_V3S_GPIO_Operator->objMutex = &g_V3sPIOMap_mutex;
+  g_V3S_GPIO_Operator->enumUartMode = V3S_UART_485;
+  g_V3S_GPIO_Operator->magicNumber = 0x43;
+  
+
   printVersion();
   if (runAsPlatform)
   {
-    return runInPlatformMode();
+    iResult = runInPlatformMode();
+	V3S_GPIO_Free();
+    return iResult;
   }
   else
   {
@@ -89,7 +121,10 @@ int main(int argc, char *argv[])
       printUsage(argv[0]);
       return ERR_INPUT_FILE_NOT_FOUND;
     }
-    return runInStandaloneMode(filename, argc - (2 + optCount), argv + (2+optCount));
+    iResult = runInStandaloneMode(filename, argc - (2 + optCount), argv + (2+optCount));
+	V3S_GPIO_Free();
+    return iResult;
+	
   }
 }
 

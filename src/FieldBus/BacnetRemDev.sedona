@@ -167,6 +167,7 @@ class BacnetRemDev
             // Lujiaming remove restart logic and replace it with isNeedReconnect flag @ 11/27/2025.
             if(((BacnetIP)bus).isNeedReconnect)
             {
+                log.message("BacnetRemDev call with bacnet_open::isNeedReconnect  = ${((BacnetIP)bus).isNeedReconnect}")
                 ((BacnetIP)bus).bacnet_open(((BacnetIP)bus).port, 0, ((BacnetIP)bus).retryDelay)
                 ((BacnetIP)bus).isNeedReconnect := false
             }

@@ -612,6 +612,49 @@ NativeMethod kitNatives4[] =
   BacNet_BIP_eUI,                 // 4::18
 };
 
+
+// int AnalogIO.TPC116s4.WriteChannel(int, float)
+Cell AnalogIO_TPC116s4_WriteChannel(SedonaVM* vm, Cell* params);
+
+// int AnalogIO.InputInit(int, int[])
+Cell AnalogIO_tpafe51760_InputInit(SedonaVM* vm, Cell* params);
+
+// int AnalogIO.SetInputChannelRange(int, int[])
+Cell AnalogIO_tpafe51760_SetInputChannelRange(SedonaVM* vm, Cell* params);
+
+// int AnalogIO.SetInputChannelMode(int, int[])
+Cell AnalogIO_tpafe51760_SetInputChannelMode(SedonaVM* vm, Cell* params);
+
+// int AnalogIO.TPAfe51760.ReadChannel(int, float[])
+Cell AnalogIO_TPAfe51760_ReadChannel(SedonaVM* vm, Cell* params);
+
+// int AnalogIO.TPAfe51760.ReadAllChannels(float[])
+Cell AnalogIO_TPAfe51760_ReadAllChannels(SedonaVM* vm, Cell* params);
+
+// int DigitalIO.SetDigitalValue(int, float)
+Cell DigitalIO_SetDigitalValue(SedonaVM* vm, Cell* params);
+
+// int DigitalIO.SetDigitalValue(int, float)
+Cell DigitalIO_GetDigitalValueByChannel(SedonaVM* vm, Cell* params);
+
+// int DigitalIO.GetDigitalValues(int, float[])
+Cell DigitalIO_GetDigitalValues(SedonaVM* vm, Cell* params);
+
+// native table for kit 5
+NativeMethod kitNatives5[] = 
+{
+  AnalogIO_TPC116s4_WriteChannel,                // 5::0
+  AnalogIO_tpafe51760_InputInit,                 // 5::1
+  AnalogIO_tpafe51760_SetInputChannelRange,      // 5::2
+  AnalogIO_tpafe51760_SetInputChannelMode,       // 5::3
+  AnalogIO_TPAfe51760_ReadChannel,               // 5::4
+  AnalogIO_TPAfe51760_ReadAllChannels,           // 5::5
+  DigitalIO_SetDigitalValue,                     // 5::6
+  DigitalIO_GetDigitalValueByChannel,            // 5::7
+  DigitalIO_GetDigitalValues,                    // 5::8
+};
+
+
 ////////////////////////////////////////////////////////////////
 // PID (kitId=10)
 ////////////////////////////////////////////////////////////////
@@ -647,7 +690,7 @@ NativeMethod* nativeTable[] =
   kitNatives2,     // 2
   kitNatives3,     // 3
   kitNatives4,     // 4
-  NULL,            // 5
+  kitNatives5,     // 5
   NULL,            // 6
   NULL,            // 7
   NULL,            // 8
@@ -678,6 +721,9 @@ int isNativeIdValid(int kitId, int methodId)
       // if (methodId >= 14) return 0;
       if (methodId >= 19) return 0;
       else return kitNatives4[methodId] != NULL;
+    case 5:
+      if (methodId >= 9) return 0;
+      else return kitNatives5[methodId] != NULL;
     case 10:
       if (methodId >= 6) return 0;
       else return kitNatives10[methodId] != NULL;

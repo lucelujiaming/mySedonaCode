@@ -10,6 +10,8 @@
 #include "board.h"
 #include "list.h"
 
+#include "v3s_gpio_operation_wrapper.h"
+
 #define MODBUS_READ_BLOCK_SIZE 64
 
 //#define DEBUG_LIST
@@ -727,7 +729,7 @@ int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bi
     char uart_name[32] = { 0 };
     char parity_name[] = {'N', 'E', 'O'};
 
-    printf("[%s:%s:%d] log output\r\n",
+    printf("[%s:%s:%d] Enter rtu_master_open \r\n",
              __FILE__, __FUNCTION__, __LINE__);
 
     if (acquire_uart(ctx_idx, uart_name) >= 0) {
@@ -737,8 +739,18 @@ int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bi
             release_uart(ctx_idx);
             return -1;
         }
-
-        modbus_t* ctx = modbus_new_rtu(uart_name, band, parity_name[parity], data_bit, stop_bit);
+		modbus_t* ctx = NULL;
+		if(g_V3S_GPIO_Operator && g_V3S_GPIO_Operator->magicNumber == 0x43)
+		{
+		    printf("[%s:%s:%d] rtu_master_open call modbus_new_rtu \r\n",
+		             __FILE__, __FUNCTION__, __LINE__);
+	        ctx = modbus_new_rtu(uart_name, band, 
+	             parity_name[parity], data_bit, stop_bit, g_V3S_GPIO_Operator);
+		}
+		else {
+			printf("g_V3S_GPIO_Operator Init err !!! \n");
+            return -1;
+		}
         if (ctx == NULL) {
             printf("new rtu err !!! \n");
             release_uart(ctx_idx);
@@ -756,7 +768,7 @@ int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bi
         modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
         //modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_NONE);
         //modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_UP);
-        //modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_DOWN);
+        modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_DOWN);
         //modbus_rtu_set_rts_delay(ctx, 10000);
 
         c->ctx_modbus = ctx;

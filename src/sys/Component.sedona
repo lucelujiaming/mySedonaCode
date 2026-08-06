@@ -596,4 +596,5 @@ class Component
   @config property int meta = 0x01
   // 
   // @config property int output_type = LINK_TYPE_NONE
+  property int isUpdateOutValue = 0x01
 } 

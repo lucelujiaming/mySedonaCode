@@ -127,9 +127,13 @@ int inet_toSockaddr(struct sockaddr_storage* addr, uint32_t* ipAddr, int port, i
   paddr->sin_family = AF_INET;
 
   if (ipAddr == NULL)
-    paddr->sin_addr.s_addr = INADDR_ANY;
-  else 
-    paddr->sin_addr.s_addr = ipAddr[3];
+  {
+	  paddr->sin_addr.s_addr = INADDR_ANY;
+  }
+  else
+  {
+	  paddr->sin_addr.s_addr = ipAddr[3];
+  }
 
 #elif defined( SOCKET_FAMILY_INET6 )
 

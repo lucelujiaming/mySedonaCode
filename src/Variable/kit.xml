@@ -12,4 +12,8 @@
   <!-- Source Directories  -->
   <source dir="." />
 
+  <!-- Modbus Natives -->
+  <native qname="Variable::AnalogOutput.WriteChannel"       id="5::0" />
+  <native qname="Variable::DigitalOutput.SetDigitalValue"   id="5::6" />
+  
 </sedonaKit>

@@ -1,0 +1,70 @@
+class DigitalOutput
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, ChanError, OutOfRange, END"
+  define int STATUSOK = 0
+  define int STATUSCHANERROR  = 1
+  define int STATUSOUTOFRANGE = 2
+  define int STATUSEND = 3
+
+  define Str CHANNEL_RANGE = "Ch1, Ch2, Ch3, Ch4, END"
+  define int CHANNEL_1_BAND   = 0
+  define int CHANNEL_2_BAND   = 1
+  define int CHANNEL_3_BAND   = 2
+  define int CHANNEL_4_BAND   = 3
+  define int CHANNEL_END      = 4
+  
+  
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSOK
+  
+  @config
+  @range = CHANNEL_RANGE
+  @fieldWidth = 20
+  property int channel  = CHANNEL_1_BAND
+
+  // @readonly
+  property float present_value = 0.0f
+  
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+  
+  override void execute()
+  {
+     if((lastInValue != present_value) || (lastChannel != channel))
+     {
+        status := STATUSOK
+        if(present_value != 0.0)
+        {
+            SetDigitalValue(channel, 1.0)
+        }
+        else
+        {
+            SetDigitalValue(channel, 0.0)
+        }
+        lastInValue = present_value
+        lastChannel = channel
+     }
+  }
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  // define Log log
+  private int ctx = -1
+  private int lastChannel = CHANNEL_END
+  private float lastInValue = 0.0
+
+  native int SetDigitalValue(int iChannel, float fValue)
+}
+

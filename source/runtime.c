@@ -772,6 +772,7 @@ int64_t sys_Runtime_now(SedonaVM* vm, Cell* params)
           time = time << 32;
           time = time + (rtc_tm.tm_mday << 24) +
                   (rtc_tm.tm_hour << 16) + (rtc_tm.tm_min << 8) + (rtc_tm.tm_sec);
+		  // Sync mstp_datetime and bip_datetime
           {
               extern unsigned int *get_mstp_datetimeptr(void);
               extern unsigned int *get_bip_datetimeptr(void);

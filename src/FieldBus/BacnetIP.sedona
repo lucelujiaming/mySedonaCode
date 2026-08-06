@@ -44,7 +44,8 @@ class BacnetIP
   ////////////////////////////////////////////////////////////////
   override void loaded()
   {
-    sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_BACNET_IP
+    sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_BACNET_IP;
+    isInit = 1;
     update()
   }
   override void changed(Slot slot)
@@ -345,22 +346,29 @@ class BacnetIP
          ((BacnetRemDev)d).closePort(0)
       }
     }
-    // getBacnetCurrentDevice for each device
-    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-      log.message("getBacnetCurrentDevice::d.type  = $d.type.name")
-      if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
-         if(((BacnetRemDev)d).bus == null)
-         {
-            ((BacnetRemDev)d).bus = this
-         }
-         ((BacnetRemDev)d).resetCommunicationMethod()
-         ((BacnetRemDev)d).bacnetCurrentDeviceRet = ((BacnetRemDev)d).getBacnetCurrentDevice()
-         // bacnetCurrentDeviceRet is never zero. we just call getBacnetRouterDevice for each Device
-         if(((BacnetRemDev)d).bacnetCurrentDeviceRet == 0)
-         {
-            return 0
-         }
-      }
+
+    log.message("bacnet_open::isNeedReconnect  = $isNeedReconnect")
+    if((isNeedReconnect == true) || (isInit == 1))
+    {
+        // getBacnetCurrentDevice for each device
+        for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+          log.message("getBacnetCurrentDevice::d.type  = $d.type.name")
+          if (d.type.is(BacnetRemDev.type) && ((BacnetRemDev)d).status != BacnetRemDev.STATUSEND) {
+             if(((BacnetRemDev)d).bus == null)
+             {
+                ((BacnetRemDev)d).bus = this
+             }
+             ((BacnetRemDev)d).resetCommunicationMethod()
+             ((BacnetRemDev)d).bacnetCurrentDeviceRet = ((BacnetRemDev)d).getBacnetCurrentDevice()
+             // bacnetCurrentDeviceRet is never zero. we just call getBacnetRouterDevice for each Device
+             if(((BacnetRemDev)d).bacnetCurrentDeviceRet == 0)
+             {
+                isInit = 0;
+                return 0;
+             }
+          }
+        }
+        isInit = 0;
     }
     
     // Call update for all of BacnetRemDev
@@ -461,6 +469,7 @@ class BacnetIP
   private int ctx = -1
   inline File file 
   inline Buf(128) ipLocalAddress 
+  private int isInit = 0;
 
   native int dO(int port, int device_instance, int retry_delay)
 

@@ -141,7 +141,7 @@ class ModbusRemDev
   override int modbusRTUMasterRead(int ctx, int deviceAddr, int addr, int len, float[] buf)
   {
       if(ctx == -1){
-          log.message("ModbusRemDev::modbusRTUMasterRead failed ctx=$ctx");
+          // log.message("ModbusRemDev::modbusRTUMasterRead failed ctx=$ctx");
           return -1
       }
      // log.message("ModbusRemDev::modbusRTUMasterRead ctx=$ctx and deviceAddr=$deviceAddr and addr=$addr and len=$len");

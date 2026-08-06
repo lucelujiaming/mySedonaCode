@@ -1,0 +1,156 @@
+class AnalogInput
+  extends Component
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  define Str STATUSRANGE = "OK, Busy, Ready, NoDev, NoReg, END"
+  define int STATUSOK = 0
+  define int STATUSBUSY = 1
+  define int STATUSREADY = 2
+  define int STATUSNODEV = 3
+  define int STATUSNOREG = 4
+  define int STATUSEND = 5
+  
+  define Str CHANNEL_MODE = "Voltage, Current, Resistance, END"
+  define int CHANNEL_MODE_VOLTAGE       = 0
+  define int CHANNEL_MODE_CURRENT       = 1
+  define int CHANNEL_MODE_RESISTANCE    = 2
+  define int CHANNEL_MODE_END           = 3
+  
+  
+  define Str CHANNEL_INDEX_RANGE = "Ch1, Ch2, Ch3, Ch4, Ch5, Ch6, Ch7, Ch8, END"
+  define int CHANNEL_INDEX_FIRST   = 0
+  define int CHANNEL_INDEX_SECOND  = 1
+  define int CHANNEL_INDEX_THIRD   = 2
+  define int CHANNEL_INDEX_FOURTH  = 3
+  define int CHANNEL_INDEX_FIFTH   = 4
+  define int CHANNEL_INDEX_SIXTH   = 5
+  define int CHANNEL_INDEX_SEVENTH = 6
+  define int CHANNEL_INDEX_EIGHTH  = 7
+  define int CHANNEL_INDEX_END     = 8
+
+  ////////////////////////////////////////////////////////////////
+  // Properties
+  ////////////////////////////////////////////////////////////////
+  @readonly
+  @range = STATUSRANGE
+  @fieldWidth = 20
+  property int status = STATUSOK
+  
+  // CHANNEL MODE
+  @config
+  @range = CHANNEL_MODE
+  @fieldWidth = 20
+  property int channel_mode  = CHANNEL_MODE_VOLTAGE
+
+  @config
+  @range = CHANNEL_INDEX_RANGE
+  @fieldWidth = 20
+  property int channel_index = CHANNEL_INDEX_FIRST
+  
+  @readonly
+  property float present_value = 0.0f
+  
+  @summary=true
+  @config
+  @asStr
+  property Buf(64) alias = ""
+  
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    if((slot == AnalogInput.channel_mode)
+     || (slot == AnalogInput.channel_index))
+    {
+        log.message("AnalogInput changed slot.name=$slot.name lot.flags=$slot.flags and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+            root = p
+            p = Sys.app.lookup(p.parent)
+        }
+        log.message("AnalogInput changed 22222 status=$status")
+        if (root != null) {
+            log.message("AnalogInput changed 33333 status=$status")
+            for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+                // Sync from service to play
+                log.message("22222 AnalogInput changed cleanCache f.name=$f.name and f.type.name=$f.type.name")
+                if (f.type.is(Folder.type) && f.name.equals("service")) {
+                    for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                        log.message("33333 cleanCache n.name=$n.name and n.type.name=$n.type.name")
+                        if (n.type.is(FieldBusNet.type))  {
+                            if (((FieldBusNet)n).sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_ANALOG_BUS) {
+                                log.message("44444 cleanCache n.name=$n.name and n.type.name=$n.type.name")
+                                status := ((FieldBusNet)n).setAnalogBusChannelMode()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            log.message("AnalogInput changed 9999 status=$status")
+        }
+    }
+  }
+  
+  override void execute()
+  {
+  // log.message("AnalogInput execute 11111 status=$status") 
+    Component p = Sys.app.lookup(this.parent)
+    Component root = null
+    while (p != null) {
+        root = p
+        p = Sys.app.lookup(p.parent)
+    }
+    if (root != null) {
+        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            // Sync from service to play
+            if (f.type.is(Folder.type) && f.name.equals("service")) {
+                for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                    if (n.type.is(FieldBusNet.type))  {
+                        if (((FieldBusNet)n).sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_ANALOG_BUS) {
+                            present_value := ((FieldBusNet)n).current_channel_a_readings[channel_index]
+                            if(channel_mode  == CHANNEL_MODE_VOLTAGE)
+                            {
+                                present_value := present_value * CHANNEL_MODE_VOLTAGE_REF_VOLTAGE
+                            }
+                            else if(channel_mode  == CHANNEL_MODE_CURRENT)
+                            {
+                                // =(D2/250 ohm)*1000 = D2 * 4.0
+                                present_value := present_value * CHANNEL_MODE_CURRENT_REF_VOLTAGE * 4.0
+                            }
+                            else if(channel_mode  == CHANNEL_MODE_RESISTANCE)
+                            {
+                                // TPAFE51760_VREF is 10V, but CHANNEL_MODE_RESISTANCE used 5V
+                                present_value := present_value * CHANNEL_MODE_RESISTANCE_REF_VOLTAGE
+                                // (5000*D2)/(4.96-D2)
+                                present_value := (5000.0 * present_value) / 
+                                                 (CHANNEL_MODE_RESISTANCE_VOLTAGE - present_value)
+                            }
+                            else 
+                            {
+                                present_value := -1.0;
+                            }
+                            // log.message("AnalogInput $channel_index data = $present_value") 
+                        }
+                    }
+                }
+            }
+        }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  // define Log log
+  private int ctx = -1
+  define float CHANNEL_MODE_RESISTANCE_VOLTAGE  = 4.96
+  
+  define float CHANNEL_MODE_VOLTAGE_REF_VOLTAGE      = 10.0
+  define float CHANNEL_MODE_CURRENT_REF_VOLTAGE      = 5.0
+  define float CHANNEL_MODE_RESISTANCE_REF_VOLTAGE   = 5.0
+  
+}

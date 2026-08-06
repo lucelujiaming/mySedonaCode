@@ -18,6 +18,7 @@
 #else
 #include <termios.h>
 #endif
+#include "../v3s_gpio_operation.h"
 
 #define _MODBUS_RTU_HEADER_LENGTH      1
 #define _MODBUS_RTU_PRESET_REQ_LENGTH  6
@@ -71,6 +72,7 @@ typedef struct _modbus_rtu {
 #endif
     /* To handle many slaves on the same link */
     int confirmation_to_ignore;
+    V3S_GPIO_Operator* objV3SGPIOOperator;
 } modbus_rtu_t;
 
 #endif /* MODBUS_RTU_PRIVATE_H */

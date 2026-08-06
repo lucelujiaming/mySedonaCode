@@ -67,6 +67,8 @@ abstract class ModbusFieldBusIO
     if (bus != null) {
       bus.notifyFlush()
     }
+    log.message("ModbusFieldBusIO stop")
+    clearVariablesLinkToMe();
   }
 
   ////////////////////////////////////////////////////////////////
@@ -253,6 +255,47 @@ abstract class ModbusFieldBusIO
 
     return null
   }
+
+  private void clearVariablesLinkToMe()
+  {
+      // Get Alias
+      Str aliasStr;
+      if(this.type.is(ModbusNetVarIn.type))
+      {
+         aliasStr = ((ModbusNetVarIn)this).alias.toStr()
+      }
+      else if(this.type.is(ModbusNetVarOut.type))
+      {
+         aliasStr = ((ModbusNetVarOut)this).alias.toStr()
+      }
+      else 
+      {
+         log.message("clearVariablesLinkToMe error type");
+         return;
+      }
+      // find bus and dev
+      Component p = Sys.app.lookup(this.parent)
+      Component root = null
+      while (p != null) {
+          root = p
+          p = Sys.app.lookup(p.parent)
+      }
+      log.message("clearVariablesLinkToMe clear $aliasStr");
+      if (root != null) {
+          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if (f.type.is(Folder.type) && !f.name.equals("service")) {
+              for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
+                if (r.type.is(Variable.type) && ((Variable)r).alias.toStr().equals(aliasStr)) {
+                  log.message("clearVariablesLinkToMe clear ${((Variable)r).name} with ${((Variable)r).alias.toStr()}");
+                  ((Variable)r).referenceComponent = null
+                }
+              }
+            }
+          }
+      }
+  }
+  
   private FieldBusNet lookupNetByDeviceName(Str devName)
   {
     Component root
@@ -296,4 +339,8 @@ abstract class ModbusFieldBusIO
   int regId = 0
   int typeId = 0
   int dataLen = 0
+
+  // This property can not work because several variables can 
+  // have same alias and link to one BacNetFieldBusIO
+  // Component referenceComponent = null
 }

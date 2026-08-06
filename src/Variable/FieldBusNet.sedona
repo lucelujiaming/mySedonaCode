@@ -84,6 +84,10 @@ abstract class FieldBusNet
                   int tagNumber, byte[] data, int iLen)
   {
   }
+  virtual int setAnalogBusChannelMode()
+  {
+      return -1;
+  }
   // inline float[8] buffer
   // bacNet buffer is larger.
   inline float[1024] buffer
@@ -99,11 +103,16 @@ abstract class FieldBusNet
   // Move from FieldBusDevice
   int invokeID = 1
   
+  // Only used by SUB_FIELDBUSNET_TYPE_ANALOG_BUS
+  inline float[8] current_channel_a_readings
+  inline float[8] current_channel_b_readings
   
-  define int SUB_FIELDBUSNET_TYPE_FIELDBUSNET       = 0
+  define int SUB_FIELDBUSNET_TYPE_FIELDBUSNET        = 0
   define int SUB_FIELDBUSNET_TYPE_BACNET_IP          = 1
   define int SUB_FIELDBUSNET_TYPE_BACNET_MSTP        = 2
   define int SUB_FIELDBUSNET_TYPE_MODBUS_RTU         = 3
   define int SUB_FIELDBUSNET_TYPE_MODBUS_TCP         = 4
+  define int SUB_FIELDBUSNET_TYPE_ANALOG_BUS         = 5
+  define int SUB_FIELDBUSNET_TYPE_DIGITAL_BUS        = 6
   int sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_FIELDBUSNET
 }

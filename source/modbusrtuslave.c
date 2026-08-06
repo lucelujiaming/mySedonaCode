@@ -9,6 +9,9 @@
 #include "modbus.h"
 #include "board.h"
 #include "list.h"
+#include "modbus/modbus-private.h"
+
+#include "v3s_gpio_operation_wrapper.h"
 
 extern unsigned long long get_tick_ms(void);
 
@@ -1432,14 +1435,26 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
     char uart_name[32] = { 0 };
     char parity_name[] = {'N', 'E', 'O'};
 
+    printf("[%s:%s:%d]rtu_open with %d !!! \n",
+                 __FILE__, __FUNCTION__, __LINE__, ctx_idx);
     if (acquire_uart(ctx_idx, uart_name) >= 0) {
         context_t *c = &context_table[ctx_idx];
         if (c->ctx_modbus != NULL || c->ctx_thread_running != 0){
             release_uart(ctx_idx);
             return -1;
         }
-
-        modbus_t* ctx = modbus_new_rtu(uart_name, band, parity_name[parity], data_bit, stop_bit);
+		modbus_t* ctx = NULL;
+		if(g_V3S_GPIO_Operator && g_V3S_GPIO_Operator->magicNumber == 0x43)
+		{
+		    printf("[%s:%s:%d] rtu_open call modbus_new_rtu \r\n",
+		             __FILE__, __FUNCTION__, __LINE__);
+	        ctx = modbus_new_rtu(uart_name, band, 
+	                parity_name[parity], data_bit, stop_bit, g_V3S_GPIO_Operator);
+		}
+		else {
+			printf("g_V3S_GPIO_Operator Init err !!! \n");
+            return -1;
+		}
         if (ctx == NULL) {
             printf("new rtu err !!! \n");
             release_uart(ctx_idx);
@@ -1463,6 +1478,8 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
         //modbus_rtu_set_rts_delay(ctx, 10000);
 
         c->ctx_modbus = ctx;
+        printf("[%s:%s:%d] rtu_open::new c->ctx_modbus->slave = %d !!! \n",
+                 __FILE__, __FUNCTION__, __LINE__, c->ctx_modbus->slave);
         memset(&c->devices, 0, sizeof(list_head_t));
         memset(&c->write_queue, 0, sizeof(list_head_t));
 
@@ -1476,6 +1493,7 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
 
         return ctx_idx;
     }
+    printf("acquire_uart failed with %d !!! \n", ctx_idx);
 
     return -1;
 }
@@ -1483,10 +1501,20 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
 int rtu_close(int ctx_idx)
 {
     context_t *c = &context_table[ctx_idx];
-    if (c->ctx_modbus == NULL || c->ctx_thread_running == 0) {
+    printf("[%s:%s:%d] rtu_close with %d !!! \n",
+                 __FILE__, __FUNCTION__, __LINE__, ctx_idx);
+    if (c->ctx_modbus == NULL) {
+        release_uart(ctx_idx);
+        printf("[%s:%s:%d] c->ctx_modbus == NULL\r\n",
+                 __FILE__, __FUNCTION__, __LINE__);
         return -1;
     }
-
+    if(c->ctx_thread_running == 0) {
+        release_uart(ctx_idx);
+        printf("[%s:%s:%d] c->ctx_thread_running == 0\r\n",
+                 __FILE__, __FUNCTION__, __LINE__);
+        return -1;
+    }
     c->ctx_thread_running = 0;
     pthread_join(c->ctx_thread, NULL);
     printf("[%s:%s:%d] pthread_join\r\n",

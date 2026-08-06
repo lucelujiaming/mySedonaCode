@@ -574,7 +574,7 @@ int tcp_master_read(int ctx_idx, int device_addr, int addr, float *buf, int len)
                 } else {
                     data = (next_element->val << 16) | element->val;
                 }
-                float *p = (float *)(&data);
+                float *p = (float *)((char *)&data);
                 buf[0] = *p;
                 return 2;
             }

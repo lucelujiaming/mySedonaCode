@@ -14,7 +14,7 @@ int acquire_uart(int idx, char *name)
         return -1;
     }
     if (res_uart_table[idx] == 0) {
-        char* uart_name[MAX_MODBUSRTU_NUM] = {"6", "7"};
+        char* uart_name[MAX_MODBUSRTU_NUM] = {"1", "2"};
         strcat(name, "/");
         strcat(name, "d");
         strcat(name, "e");

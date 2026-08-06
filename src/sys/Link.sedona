@@ -35,17 +35,20 @@ class Link
     {                    
       if (toSlot.isProp())
       {
-        switch (toSlot.type.id)
-        {
-          case Type.boolId:   to.setBool  (toSlot, from.getBool(fromSlot));   break
-          case Type.byteId:   to.setInt   (toSlot, from.getInt(fromSlot));    break
-          case Type.shortId:  to.setInt   (toSlot, from.getInt(fromSlot));    break
-          case Type.intId:    to.setInt   (toSlot, from.getInt(fromSlot));    break
-          case Type.longId:   to.setLong  (toSlot, from.getLong(fromSlot));   break
-          case Type.floatId:  to.setFloat (toSlot, from.getFloat(fromSlot));  break
-          case Type.doubleId: to.setDouble(toSlot, from.getDouble(fromSlot)); break
-          // TODO: buf props
-        }
+          if(from.isUpdateOutValue != 0x00)
+          {
+              switch (toSlot.type.id)
+              {
+                case Type.boolId:   to.setBool  (toSlot, from.getBool(fromSlot));   break
+                case Type.byteId:   to.setInt   (toSlot, from.getInt(fromSlot));    break
+                case Type.shortId:  to.setInt   (toSlot, from.getInt(fromSlot));    break
+                case Type.intId:    to.setInt   (toSlot, from.getInt(fromSlot));    break
+                case Type.longId:   to.setLong  (toSlot, from.getLong(fromSlot));   break
+                case Type.floatId:  to.setFloat (toSlot, from.getFloat(fromSlot));  break
+                case Type.doubleId: to.setDouble(toSlot, from.getDouble(fromSlot)); break
+                // TODO: buf props
+              }
+         }
       }
       else
       {            

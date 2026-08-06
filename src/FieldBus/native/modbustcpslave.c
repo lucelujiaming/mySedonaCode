@@ -795,7 +795,7 @@ int tcp_add(int ctx_idx, int device_addr, int addr, int len, int refreshms)
             return -1;
         }
         // if not found, create it.
-        device = malloc(sizeof(device_t));
+        device = (device_t *)malloc(sizeof(device_t));
         if (device == NULL) {
             return -1;
         }

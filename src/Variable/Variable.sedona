@@ -39,6 +39,7 @@ class Variable
   override void changed(Slot slot)
   {
     super.changed(slot)
+    log.message("Variable changed with slot=${slot.name}")
     if (slot == Variable.inFloatValue) {
       outFloatValue := inFloatValue
       if (url.toStr().length() > 0) {
@@ -103,7 +104,6 @@ class Variable
 
   override void execute()
   {
-    bool bIsInInit = false
     if (isStatus) {
       Str urlStr = url.toStr()
       Str devStr = ""
@@ -183,8 +183,62 @@ class Variable
       outFloatValue := 0.0f
     }
     else {
+       Str aliasStr = alias.toStr()
+       if(referenceComponent == null)
+       {
+          // log.message("2222222222 Variable::execute aliasStr=$aliasStr")
+          syncValueByAlias()
+       }
+       else {
+            // log.message("333333333 Variable::execute name=$name and aliasStr=$aliasStr")
+            if (referenceComponent.type.is(BacnetNetVarIn.type) 
+                && ((BacnetNetVarIn)referenceComponent).alias.toStr().equals(aliasStr))  {
+                // log.message("BacnetNetVarIn.name=${referenceComponent.name}")
+                inFloatValue := ((BacnetNetVarIn)referenceComponent).present_value
+                outFloatValue := inFloatValue
+            }
+            else if (referenceComponent.type.is(BacnetNetVarOut.type) 
+                && ((BacnetNetVarOut)referenceComponent).alias.toStr().equals(aliasStr))  {
+                // log.message("BacnetNetVarOut.name=${referenceComponent.name}")
+                ((BacnetNetVarOut)referenceComponent).present_value := inFloatValue
+            }
+            else if (referenceComponent.type.is(BacnetLocalVar.type) 
+                && ((BacnetLocalVar)referenceComponent).alias.toStr().equals(aliasStr))  {
+                // log.message("BacnetNetVarOut.name=${referenceComponent.name}")
+                if(((BacnetLocalVar)referenceComponent).opmode == BacnetLocalVar.OPMODE_OUT)
+                {
+                    ((BacnetLocalVar)referenceComponent).present_value := inFloatValue
+                }
+                else if(((BacnetLocalVar)referenceComponent).opmode == BacnetLocalVar.OPMODE_IN)
+                {
+                    inFloatValue := ((BacnetLocalVar)referenceComponent).present_value
+                    outFloatValue := inFloatValue
+                }
+            }
+            else if (referenceComponent.type.is(ModbusNetVarIn.type) 
+                && ((ModbusNetVarIn)referenceComponent).alias.toStr().equals(aliasStr))  {
+                // log.message("ModbusNetVarIn.name=${referenceComponent.name}")
+                inFloatValue := ((ModbusNetVarIn)referenceComponent).out
+                outFloatValue := inFloatValue
+            }
+            else if (referenceComponent.type.is(ModbusNetVarOut.type)
+                && ((ModbusNetVarOut)referenceComponent).alias.toStr().equals(aliasStr))  {
+                // log.message("ModbusNetVarOut.name=${referenceComponent.name}")
+                ((ModbusNetVarOut)referenceComponent).in := inFloatValue
+            }
+            else {
+                log.message("55555555 Variable::execute aliasStr=$name")
+            }
+            // log.message("4444444444 Variable::execute name=$name and aliasStr=$aliasStr")
+       }
+    }
+  }
+
+  private void syncValueByAlias()
+  {
+      bool bIsInInit = false
       Str aliasStr = alias.toStr()
-      ** log.message("111111111 Variable name=$name")
+      // log.message("111111111 Variable::syncValueByAlias name=$name and aliasStr=$aliasStr")
       // find bus and dev
       Component p = Sys.app.lookup(this.parent)
       Component root = null
@@ -219,13 +273,15 @@ class Variable
                             if (q.type.is(BacnetNetVarIn.type) 
                                 && ((BacnetNetVarIn)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("BacnetNetVarIn.name=${q.name}")
-                                inFloatValue := ((BacnetNetVarIn)q).present_value
-                                outFloatValue := inFloatValue
+                                inFloatValue := ((BacnetNetVarIn)q).present_value;
+                                outFloatValue := inFloatValue;
+                                referenceComponent = q;
                             }
                             else if (q.type.is(BacnetNetVarOut.type) 
                                 && ((BacnetNetVarOut)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("BacnetNetVarOut.name=${q.name}")
-                                ((BacnetNetVarOut)q).present_value := inFloatValue
+                                ** log.message("BacnetNetVarOut.name=${q.name}");
+                                ((BacnetNetVarOut)q).present_value := inFloatValue;
+                                referenceComponent = q;
                             }
                             else if (q.type.is(BacnetLocalVar.type) 
                                 && ((BacnetLocalVar)q).alias.toStr().equals(aliasStr))  {
@@ -239,17 +295,20 @@ class Variable
                                     inFloatValue := ((BacnetLocalVar)q).present_value
                                     outFloatValue := inFloatValue
                                 }
+                                referenceComponent = q;
                             }
                             else if (q.type.is(ModbusNetVarIn.type) 
                                 && ((ModbusNetVarIn)q).alias.toStr().equals(aliasStr))  {
                                 ** log.message("ModbusNetVarIn.name=${q.name}")
-                                inFloatValue := ((ModbusNetVarIn)q).out
-                                outFloatValue := inFloatValue
+                                inFloatValue := ((ModbusNetVarIn)q).out;
+                                outFloatValue := inFloatValue;
+                                referenceComponent = q;
                             }
                             else if (q.type.is(ModbusNetVarOut.type)
                                 && ((ModbusNetVarOut)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("ModbusNetVarOut.name=${q.name}")
-                                ((ModbusNetVarOut)q).in := inFloatValue
+                                ** log.message("ModbusNetVarOut.name=${q.name}");
+                                ((ModbusNetVarOut)q).in := inFloatValue;
+                                referenceComponent = q;
                             }
                          }
                       }
@@ -268,7 +327,7 @@ class Variable
           }
         }
       }
-    }
+      // log.message("FFFFFFFFFFFFFFF Variable::syncValueByAlias name=$name and aliasStr=$aliasStr")
   }
 
   private void checkURLforStatus()
@@ -294,4 +353,5 @@ class Variable
   bool isStatus = false
   bool isSchedule = false
   inline float[8] buffer
+  Component referenceComponent = null
 }

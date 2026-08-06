@@ -1,0 +1,68 @@
+class DigitalBus
+  extends FieldBusNet
+{
+  ////////////////////////////////////////////////////////////////
+  // Constants
+  ////////////////////////////////////////////////////////////////
+  
+  @asStr
+  @config
+  property Buf(64) deviceName = ""
+  
+  ////////////////////////////////////////////////////////////////
+  // Life cycle
+  ////////////////////////////////////////////////////////////////
+  override void loaded()
+  {
+    sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_DIGITAL_BUS
+    update()
+    status := STATUSOK
+  }
+   
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+  }
+
+  override void stop()
+  {
+  }
+  
+  override void execute()
+  {
+    long nowNanoSecond  = Sys.ticks()
+    long nowMilliSecond = nowNanoSecond / (long)1000000
+    // log.message("AnalogBus::execute status = $status")
+    if (status == STATUSOK) {
+        if(sendInterval < nowMilliSecond) {
+            int iRet = STATUSOK
+            iRet = GetDigitalValues(dataBuf)
+            // Add at 06/08/26 by lu
+            if(iRet == STATUSNODEV)
+            {
+               log.message("execute updateConfig")
+            }
+            log.message("DigitalBus dataBuf = (${dataBuf[0]}, ${dataBuf[1]}, ${dataBuf[2]}, ${dataBuf[3]})") 
+            current_channel_a_readings[0] = dataBuf[0]
+            current_channel_a_readings[1] = dataBuf[1]
+            current_channel_a_readings[2] = dataBuf[2]
+            current_channel_a_readings[3] = dataBuf[3]
+            sendInterval = nowMilliSecond + (long)2000
+        }
+    }
+  }    
+  
+  ////////////////////////////////////////////////////////////////
+  // Fields
+  ////////////////////////////////////////////////////////////////
+  // define Log log
+  private int ctx = -1
+  
+  // 
+  private inline float[5] dataBuf
+  
+  // Send interval counter
+  long sendInterval = (long)0
+  
+  native int GetDigitalValues(float[] buf)
+}

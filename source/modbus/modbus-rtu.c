@@ -19,6 +19,8 @@
 #include "modbus-rtu.h"
 #include "modbus-rtu-private.h"
 
+#include "../v3s_gpio_operation.h"
+
 #if HAVE_DECL_TIOCSRS485 || HAVE_DECL_TIOCM_RTS
 #include <sys/ioctl.h>
 #endif
@@ -26,6 +28,7 @@
 #if HAVE_DECL_TIOCSRS485
 #include <linux/serial.h>
 #endif
+#include <pthread.h>
 
 /* Table of CRC values for high-order byte */
 static const uint8_t table_crc_hi[] = {
@@ -274,27 +277,188 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
     DWORD n_bytes = 0;
     return (WriteFile(ctx_rtu->w_ser.fd, req, req_length, &n_bytes, NULL)) ? (ssize_t)n_bytes : -1;
 #else
-#if HAVE_DECL_TIOCM_RTS
     modbus_rtu_t *ctx_rtu = ctx->backend_data;
+#if HAVE_DECL_TIOCM_RTS
     if (ctx_rtu->rts != MODBUS_RTU_RTS_NONE) {
         ssize_t size;
 
         if (ctx->debug) {
             fprintf(stderr, "Sending request using RTS signal\n");
         }
-
+		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
         ctx_rtu->set_rts(ctx, ctx_rtu->rts == MODBUS_RTU_RTS_UP);
-        usleep(ctx_rtu->rts_delay);
-
+        // 下面的三个延时时间3000, 500, 100都是根据逻辑分析仪的分析结果得到的。
+        // 1. 其中收到数据以后，可以多等一会。也就是3ms。
+        // 2. DE翻转以后，需要稍微等待一下，以便于获取数据总线，也就是0.5ms。
+        // 3. 发送完成以后，需要尽快翻转回去。
+        //    用于接收PC端在收到响应以后再次发出的数据。也就是0.1ms。
+        // 当PC端发送时间间隔为20ms的时候，数据收发没有错误。
+        // 当然如果PC端发送时间间隔过短，例如小于10ms还是会出现非常低概率的错误。
+        usleep(3000);
+        if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
+        {
+	        // UART1_RTS
+	        V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, V3S_OUT);
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
+            }
+        }
+        else if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '2')
+        {
+	        // UART2_RTS
+	        V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, V3S_OUT);
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+            }
+        }
+        printf("[%s:%s:%d] write(%d, req, %d) !!! \n",
+                         __FILE__, __FUNCTION__, __LINE__, ctx->s, req_length);
+        // 做一点延时，避免发的太快，导致电脑时序混乱。
+        usleep(500);
         size = write(ctx->s, req, req_length);
+        // 等待数据发送完成
+        tcdrain(ctx->s);
+        usleep(100);
+        if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
+        {
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
+            }
+        }
+        else if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '2')
+        {
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(V3S_PB, 2, 1);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+            }
+        }
 
         usleep(ctx_rtu->onebyte_time * req_length + ctx_rtu->rts_delay);
         ctx_rtu->set_rts(ctx, ctx_rtu->rts != MODBUS_RTU_RTS_UP);
+		pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
 
         return size;
     } else {
 #endif
-        return write(ctx->s, req, req_length);
+        ssize_t size;
+        // return write(ctx->s, req, req_length);
+		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
+        usleep(3000);
+        if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
+        {
+	        // UART1_RTS
+	        V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, V3S_OUT);
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
+            }
+        }
+        else if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '2')
+        {
+	        // UART2_RTS
+	        V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, V3S_OUT);
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+            }
+        }
+        // 做一点延时，避免发的太快，导致电脑时序混乱。
+        usleep(500);
+        size = write(ctx->s, req, req_length);
+        printf("[%s:%s:%d] write(%d, req, %d) return %d !!! \n",
+                         __FILE__, __FUNCTION__, __LINE__, ctx->s, req_length, size);
+        for(int i = 0 ; i < size; i++)
+        {
+            printf("<%02X> ", req[i]);
+        }
+        printf("\n[%s:%s:%d] write(%d, req, %d) return %d !!! \n",
+                         __FILE__, __FUNCTION__, __LINE__, ctx->s, req_length, size);
+        // 等待数据发送完成
+        tcdrain(ctx->s);
+        usleep(100);
+        if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
+        {
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
+            }
+        }
+        else if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '2')
+        {
+            if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+            }
+            else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+            {
+	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
+	                         __FILE__, __FUNCTION__, __LINE__);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+            }
+        }
+		pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
+        return size;
 #if HAVE_DECL_TIOCM_RTS
     }
 #endif
@@ -329,7 +493,18 @@ static ssize_t _modbus_rtu_recv(modbus_t *ctx, uint8_t *rsp, int rsp_length)
 #if defined(_WIN32)
     return win32_ser_read(&((modbus_rtu_t *)ctx->backend_data)->w_ser, rsp, rsp_length);
 #else
-    return read(ctx->s, rsp, rsp_length);
+    ssize_t size;
+    // return read(ctx->s, rsp, rsp_length);
+    size = read(ctx->s, rsp, rsp_length);
+    printf("\n[%s:%s:%d] read(%d, rsp, %d) return %d !!! \n",
+                     __FILE__, __FUNCTION__, __LINE__, ctx->s, rsp_length, size);
+    for(int i = 0 ; i < size; i++)
+    {
+        printf("<%02X> ", rsp[i]);
+    }
+    printf("\n[%s:%s:%d] read(%d, rsp, %d) return %d !!! \n",
+                     __FILE__, __FUNCTION__, __LINE__, ctx->s, rsp_length, size);
+    return size;
 #endif
 }
 
@@ -576,6 +751,24 @@ static int _modbus_rtu_connect(modbus_t *ctx)
         return -1;
     }
 #else
+    
+	pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
+    // 232/485 switch - RLY1 - PG5
+    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, V3S_OUT);
+    if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+    {
+	    // RLY1 - PG5 - 232
+	    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 1);
+        printf("V3S_GPIO_SetPin(V3S_PG, 5, 1) by %s\n", ctx_rtu->device);
+    }
+    else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+    {
+	    // RLY1 - PG5 - 485
+	    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 0);
+        printf("V3S_GPIO_SetPin(V3S_PG, 5, 0) by %s\n", ctx_rtu->device);
+    }
+	pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
+    
     /* The O_NOCTTY flag tells UNIX that this program doesn't want
        to be the "controlling terminal" for that port. If you
        don't specify this then any input (such as keyboard abort
@@ -589,6 +782,8 @@ static int _modbus_rtu_connect(modbus_t *ctx)
 #endif
 
     ctx->s = open(ctx_rtu->device, flags);
+    printf("[%s:%s:%d] open(%s) return %d !!! \n",
+                         __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device, ctx->s);
     if (ctx->s == -1) {
         if (ctx->debug) {
             fprintf(stderr, "ERROR Can't open the device %s (%s)\n",
@@ -730,6 +925,8 @@ static int _modbus_rtu_connect(modbus_t *ctx)
        CREAD        Enable receiver
     */
     tios.c_cflag |= (CREAD | CLOCAL);
+    // lujiaming add at 26/07/21
+    tios.c_cflag &= ~CRTSCTS;
     /* CSIZE, HUPCL, CRTSCTS (hardware flow control) */
 
     /* Set data bits (5, 6, 7, 8 bits)
@@ -1161,6 +1358,45 @@ static int _modbus_rtu_select(modbus_t *ctx, fd_set *rset,
         return -1;
     }
 #else
+    modbus_rtu_t *ctx_rtu = ctx->backend_data;
+	pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
+    if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
+    {
+	    // UART1_RTS
+	    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, V3S_OUT);
+        if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+        {
+            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) before reading request by %s!!! \n",
+                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
+        }
+        else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+        {
+            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) before reading request by %s!!! \n",
+                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
+        }
+    }
+    else if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '2')
+    {
+	    // UART2_RTS
+	    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, V3S_OUT);
+        if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+        {
+            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) before reading request by %s!!! \n",
+                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+        }
+        else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+        {
+            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) before reading request by %s!!! \n",
+                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+        }
+    }
+    usleep(5);    
+	pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
+	
     while ((s_rc = select(ctx->s+1, rset, NULL, NULL, tv)) == -1) {
         if (errno == EINTR) {
             if (ctx->debug) {
@@ -1214,7 +1450,7 @@ const modbus_backend_t _modbus_rtu_backend = {
 
 modbus_t* modbus_new_rtu(const char *device,
                          int baud, char parity, int data_bit,
-                         int stop_bit)
+                         int stop_bit, V3S_GPIO_Operator* objV3SGPIOOperator)
 {
     modbus_t *ctx;
     modbus_rtu_t *ctx_rtu;
@@ -1239,10 +1475,14 @@ modbus_t* modbus_new_rtu(const char *device,
     ctx->backend_data = (modbus_rtu_t *)malloc(sizeof(modbus_rtu_t));
     ctx_rtu = (modbus_rtu_t *)ctx->backend_data;
     ctx_rtu->device = NULL;
+	ctx_rtu->objV3SGPIOOperator = objV3SGPIOOperator;
 
     /* Device name and \0 */
     ctx_rtu->device = (char *)malloc((strlen(device) + 1) * sizeof(char));
     strcpy(ctx_rtu->device, device);
+
+    printf("[%s:%s:%d] Use modbus_new_rtu by magicNumber = %X\n",
+                 __FILE__, __FUNCTION__, __LINE__, ctx_rtu->objV3SGPIOOperator->magicNumber);
 
     ctx_rtu->baud = baud;
     if (parity == 'N' || parity == 'E' || parity == 'O') {
