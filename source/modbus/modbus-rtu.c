@@ -285,7 +285,6 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         if (ctx->debug) {
             fprintf(stderr, "Sending request using RTS signal\n");
         }
-		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
         ctx_rtu->set_rts(ctx, ctx_rtu->rts == MODBUS_RTU_RTS_UP);
         // 下面的三个延时时间3000, 500, 100都是根据逻辑分析仪的分析结果得到的。
         // 1. 其中收到数据以后，可以多等一会。也就是3ms。
@@ -295,6 +294,7 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         // 当PC端发送时间间隔为20ms的时候，数据收发没有错误。
         // 当然如果PC端发送时间间隔过短，例如小于10ms还是会出现非常低概率的错误。
         usleep(3000);
+		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
         if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
         {
 	        // UART1_RTS
@@ -358,7 +358,7 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
             {
 	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
 	                         __FILE__, __FUNCTION__, __LINE__);
-	            V3S_GPIO_SetPin(V3S_PB, 2, 1);
+	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
             }
             else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
             {
@@ -367,18 +367,18 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
 	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
             }
         }
+		pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
 
         usleep(ctx_rtu->onebyte_time * req_length + ctx_rtu->rts_delay);
         ctx_rtu->set_rts(ctx, ctx_rtu->rts != MODBUS_RTU_RTS_UP);
-		pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
 
         return size;
     } else {
 #endif
         ssize_t size;
         // return write(ctx->s, req, req_length);
-		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
         usleep(3000);
+		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
         if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
         {
 	        // UART1_RTS
@@ -751,23 +751,27 @@ static int _modbus_rtu_connect(modbus_t *ctx)
         return -1;
     }
 #else
-    
-	pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
-    // 232/485 switch - RLY1 - PG5
-    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, V3S_OUT);
-    if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
-    {
-	    // RLY1 - PG5 - 232
-	    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 1);
-        printf("V3S_GPIO_SetPin(V3S_PG, 5, 1) by %s\n", ctx_rtu->device);
+
+	
+	if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
+	{
+		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
+	    // 232/485 switch - RLY1 - PG5
+	    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, V3S_OUT);
+	    if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+	    {
+		    // RLY1 - PG5 - 232
+		    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 1);
+	        printf("V3S_GPIO_SetPin(V3S_PG, 5, 1) by %s\n", ctx_rtu->device);
+	    }
+	    else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+	    {
+		    // RLY1 - PG5 - 485
+		    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 0);
+	        printf("V3S_GPIO_SetPin(V3S_PG, 5, 0) by %s\n", ctx_rtu->device);
+	    }
+		pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
     }
-    else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
-    {
-	    // RLY1 - PG5 - 485
-	    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 0);
-        printf("V3S_GPIO_SetPin(V3S_PG, 5, 0) by %s\n", ctx_rtu->device);
-    }
-	pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
     
     /* The O_NOCTTY flag tells UNIX that this program doesn't want
        to be the "controlling terminal" for that port. If you
@@ -1394,8 +1398,8 @@ static int _modbus_rtu_select(modbus_t *ctx, fd_set *rset,
             V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
         }
     }
-    usleep(5);    
 	pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
+    usleep(5);
 	
     while ((s_rc = select(ctx->s+1, rset, NULL, NULL, tv)) == -1) {
         if (errno == EINTR) {
