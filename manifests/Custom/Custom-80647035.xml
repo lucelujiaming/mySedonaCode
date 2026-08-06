@@ -1,0 +1,35 @@
+<?xml version='1.0'?>
+<kitManifest
+   name="Custom"
+   checksum="80647035"
+   hasNatives="false"
+   doc="true"
+   isPlay="false"
+   version="0.1.0"
+   vendor="XunGaoAuto"
+   description="Custom function block library"
+   buildHost="ubuntu"
+   buildTime="2024-03-15T15:42:47.137+08:00"
+>
+
+<!-- Dependencies -->
+<depends>
+  <depend on="sys 0.1+"/>
+</depends>
+
+<!-- Custom::Test -->
+<type id="0" name="Test" sizeof="52" base="sys::Component">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/math/add.png"/>
+  </facets>
+  <slot id="0" name="out" type="float">
+    <facets>
+      <bool name="readonly" val="true"/>
+    </facets>
+  </slot>
+  <slot id="1" name="in1" type="float" default="0.0"/>
+  <slot id="2" name="in2" type="float" default="0.0"/>
+  <slot id="3" name="in3" type="float" default="0.0"/>
+</type>
+
+</kitManifest>
