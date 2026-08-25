@@ -724,7 +724,7 @@ int rtu_master_add(int ctx_idx, int device_addr, int addr, int len)
     return register_node_addr;
 }
 
-int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit)
+int rtu_master_open(int ctx_idx, int rsmode, int band, int parity, int data_bit, int stop_bit)
 {
     char uart_name[32] = { 0 };
     char parity_name[] = {'N', 'E', 'O'};
@@ -744,6 +744,14 @@ int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bi
 		{
 		    printf("[%s:%s:%d] rtu_master_open call modbus_new_rtu \r\n",
 		             __FILE__, __FUNCTION__, __LINE__);
+			if(rsmode == 0)
+			{
+			    g_V3S_GPIO_Operator->enumUartMode = V3S_UART_485;
+			}
+			else if(rsmode == 1)
+			{
+			    g_V3S_GPIO_Operator->enumUartMode = V3S_UART_232;
+			}
 	        ctx = modbus_new_rtu(uart_name, band, 
 	             parity_name[parity], data_bit, stop_bit, g_V3S_GPIO_Operator);
 		}
@@ -788,6 +796,8 @@ int rtu_master_close(int ctx_idx)
 {
     context_t *c = &context_table[ctx_idx];
     if (c->ctx_modbus == NULL || c->ctx_thread_running == 0) {
+	    printf("[%s:%s:%d] log output return with c->ctx_thread_running is %d.\r\n",
+	             __FILE__, __FUNCTION__, __LINE__, c->ctx_thread_running);
         return -1;
     }
 
@@ -796,12 +806,17 @@ int rtu_master_close(int ctx_idx)
 
     c->ctx_thread_running = 0;
     pthread_join(c->ctx_thread, NULL);
+    printf("[%s:%s:%d] pthread_join\r\n",
+             __FILE__, __FUNCTION__, __LINE__);
 
     while (c->ctx_modbus != NULL) {
         usleep(10*1000);
     }
 
     release_uart(ctx_idx);
+
+    printf("[%s:%s:%d] release_uart\r\n",
+             __FILE__, __FUNCTION__, __LINE__);
 
     return 0;
 }

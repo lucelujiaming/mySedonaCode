@@ -79,10 +79,10 @@ abstract class ModbusFieldBusIO
   {
     if(Sys.app.lookup(this.parent) != null)
     {
-        log.message("bacreadProperty:: get this.parent as Device") 
+        log.message("ModbusFieldBusIO:: get this.parent as Device") 
         Component objDevice = Sys.app.lookup(this.parent)
         if(objDevice.type.is(FieldBusDevice.type)) {
-            log.message("bacreadProperty:: set this.parent as Device") 
+            log.message("ModbusFieldBusIO:: set this.parent as Device") 
             device = (FieldBusDevice)objDevice
         }
     }
@@ -193,7 +193,7 @@ abstract class ModbusFieldBusIO
               return
             }
           }
-          log.message("33333 aLen=$aLen ")
+          log.message("33333 aLen=$aLen and device.deviceName=${device.deviceName.toStr()}")
           // find device and bus id.
           // FieldBusNet tmpBus = lookupNetByDeviceName(device_name.toStr())
           FieldBusNet tmpBus = lookupNetByDeviceName(device.deviceName.toStr())

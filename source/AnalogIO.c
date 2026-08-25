@@ -687,28 +687,34 @@ Cell DigitalIO_GetDigitalValues(SedonaVM* vm, Cell* params)
     V3S_GPIO_ConfigPin(g_V3S_GPIO_Operator,V3S_PE, 14, V3S_IN);
     // PE11	DI1	数字输入通道1
     iGetPinValue = V3S_GPIO_GetPin(g_V3S_GPIO_Operator,V3S_PE, 11);
+	// printf("NOTICE::iGetPinValue is %d from V3S_PE 11", iGetPinValue);
     if(iGetPinValue)
-        bufOutput[0] = 1.0;
-    else 
+    {
         bufOutput[0] = 0.0;
+    }
+    else 
+        bufOutput[0] = 1.0;
     // PE12	DI2	数字输入通道2
     iGetPinValue = V3S_GPIO_GetPin(g_V3S_GPIO_Operator,V3S_PE, 12);
+	// printf("NOTICE::iGetPinValue is %d from V3S_PE 12", iGetPinValue);
     if(iGetPinValue)
-        bufOutput[1] = 1.0;
-    else 
         bufOutput[1] = 0.0;
+    else 
+        bufOutput[1] = 1.0;
     // PE13	DI3	数字输入通道3
     iGetPinValue = V3S_GPIO_GetPin(g_V3S_GPIO_Operator,V3S_PE, 13);
+	// printf("NOTICE::iGetPinValue is %d from V3S_PE 13", iGetPinValue);
     if(iGetPinValue)
-        bufOutput[2] = 1.0;
-    else 
         bufOutput[2] = 0.0;
+    else 
+        bufOutput[2] = 1.0;
     // PE14	DI4	数字输入通道4
     iGetPinValue = V3S_GPIO_GetPin(g_V3S_GPIO_Operator,V3S_PE, 14);
+	// printf("NOTICE::iGetPinValue is %d from V3S_PE 14", iGetPinValue);
     if(iGetPinValue)
-        bufOutput[3] = 1.0;
-    else 
         bufOutput[3] = 0.0;
+    else 
+        bufOutput[3] = 1.0;
     // 
 	pthread_mutex_unlock(g_V3S_GPIO_Operator->objMutex); // 解锁
     ret.ival = 1;

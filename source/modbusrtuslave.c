@@ -1430,7 +1430,7 @@ int rtu_add(int ctx_idx, int device_addr, int addr, int len, int refreshms, int 
     return register_node_addr;
 }
 
-int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int retry_delay, int rto)
+int rtu_open(int ctx_idx, int rsmode, int band, int parity, int data_bit, int stop_bit, int retry_delay, int rto)
 {
     char uart_name[32] = { 0 };
     char parity_name[] = {'N', 'E', 'O'};
@@ -1448,6 +1448,14 @@ int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int 
 		{
 		    printf("[%s:%s:%d] rtu_open call modbus_new_rtu \r\n",
 		             __FILE__, __FUNCTION__, __LINE__);
+			if(rsmode == 0)
+			{
+			    g_V3S_GPIO_Operator->enumUartMode = V3S_UART_485;
+			}
+			else if(rsmode == 1)
+			{
+			    g_V3S_GPIO_Operator->enumUartMode = V3S_UART_232;
+			}
 	        ctx = modbus_new_rtu(uart_name, band, 
 	                parity_name[parity], data_bit, stop_bit, g_V3S_GPIO_Operator);
 		}

@@ -124,10 +124,10 @@ class ModbusLocDev
       }
   }
 
-  override int modbusRTUSlaveOpen(int port, int band, int parity, int dataBits, int stopBits)
+  override int modbusRTUSlaveOpen(int rsmode, int port, int band, int parity, int dataBits, int stopBits)
   {
-     log.message("ModbusRTULocDev::modbusRTUSlaveOpen port=$port");
-     return dRtuO(port, band, parity, dataBits, stopBits)
+     log.message("ModbusRTULocDev::modbusRTUSlaveOpen rsmode=$rsmode port=$port");
+     return dRtuO(port, rsmode, band, parity, dataBits, stopBits)
   }
   override int modbusRTUSlaveClose(int ctx)
   {
@@ -214,7 +214,7 @@ class ModbusLocDev
   ////////////////////////////////////////////////////////////////
   FieldBusNet bus = null
 
-  native int dRtuO(int port, int band, int parity, int dataBits, int stopBits)
+  native int dRtuO(int rsmode, int port, int band, int parity, int dataBits, int stopBits)
 
   native int dRtuC(int ctx)
 

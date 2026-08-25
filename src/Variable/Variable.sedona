@@ -97,6 +97,13 @@ class Variable
           }
         }
       }
+    } else if (slot == Variable.alias) {
+      if (alias.toStr().length() > 0) {
+         referenceComponent = null
+      }
+      else {
+         referenceComponent = null
+      }
     }
     ** log.message("Variable changed")
     
@@ -184,10 +191,14 @@ class Variable
     }
     else {
        Str aliasStr = alias.toStr()
+       if(alias.toStr().equals(""))
+       {
+           log.message("2222222222 Variable::execute aliasStr='$aliasStr'")
+           return
+       }
        if(referenceComponent == null)
        {
-          // log.message("2222222222 Variable::execute aliasStr=$aliasStr")
-          syncValueByAlias()
+           syncValueByAlias()
        }
        else {
             // log.message("333333333 Variable::execute name=$name and aliasStr=$aliasStr")

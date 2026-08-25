@@ -875,6 +875,9 @@ int tcp_open(char *ip, int port)
     int ctx_idx = -1;
     context_t *c;
 
+    printf("[%s:%s:%d] Enter tcp_open with ip:port = %s:%d \r\n",
+             __FILE__, __FUNCTION__, __LINE__, ip, port);
+
     for (i=0; i<MAX_MODBUSTCPSLAVE_NUM; i++) {
         c = &context_table[i];
         if(c->ctx_modbus == NULL && c->ctx_thread_running == 0){
@@ -909,7 +912,7 @@ int tcp_open(char *ip, int port)
     c->ctx_modbus = ctx;
     memset(&c->devices, 0, sizeof(list_head_t));
 
-    c->ctx_thread_running = 1;
+    c->ctx_thread_running = 7;
     pthread_create(&(c->ctx_thread), NULL, thread_modbus_tcp_update, c);
 
     return ctx_idx;

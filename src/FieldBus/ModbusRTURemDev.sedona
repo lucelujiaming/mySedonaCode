@@ -105,10 +105,10 @@ class ModbusRTURemDev
     }
   }
   
-  override int modbusRTUMasterOpen(int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
+  override int modbusRTUMasterOpen(int rsmode, int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
   {
      log.message("ModbusRTURemDev::modbusRTUMasterOpen ctx=$ctx");
-     return dO(port, band, parity, dataBits, stopBits, retryDelay, rto)
+     return dO(rsmode, port, band, parity, dataBits, stopBits, retryDelay, rto)
   }
   override int modbusRTUMasterClose(int ctx)
   {
@@ -152,7 +152,7 @@ class ModbusRTURemDev
   ////////////////////////////////////////////////////////////////
   FieldBusNet bus = null
   
-  native int dO(int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
+  native int dO(int rsmode, int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
   
   native int dC(int ctx)
   

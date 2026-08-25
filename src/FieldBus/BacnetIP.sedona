@@ -79,7 +79,8 @@ class BacnetIP
     ** log.message("BacnetIP::execute status = $status")
     if (status != STATUSNODEV) {
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-           d.execute()
+           d.execute();
+           Sys.sleep(1ms);
         }
     }
   }

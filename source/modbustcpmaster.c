@@ -107,14 +107,17 @@ static inline element_t* get_element(context_t *c, unsigned char devid, unsigned
     return NULL;
 }
 
+
+// I do not know why it can not work in the thread_modbus_tcp
+unsigned char query[260];
 static void* thread_modbus_tcp(void *arg)
 {
     context_t *c = (context_t *)arg;
     int idx = c->curr_idx;
     int fd = c->curr_fd;
-    unsigned char query[MODBUS_TCP_MAX_ADU_LENGTH];
     int header_length = modbus_get_header_length(c->ctx_modbus);
     c->ctx_sub_thread_last_update[idx] = get_tick_ms();
+	memset(query, 0x00, 260);
 
     if (fd > 0) {
         while (c->ctx_sub_thread_running[idx] != 0 && get_tick_ms() - c->ctx_sub_thread_last_update[idx] < MODBUS_TCP_TIMOUT) {
@@ -123,8 +126,8 @@ static void* thread_modbus_tcp(void *arg)
             fd_set rset;
             int rc = 0;
             do {
-                tv.tv_sec = 1;
-                tv.tv_usec = 0;
+                tv.tv_sec = 0;
+                tv.tv_usec = 100000;
                 FD_ZERO(&rset);
                 FD_SET(fd, &rset);
                 s_rc = select(fd+1, &rset, NULL, NULL, &tv);
@@ -342,7 +345,7 @@ static void* thread_modbus_tcp_master(void *arg)
     context_t *c = (context_t *)arg;
     int socket_fd = modbus_tcp_listen(c->ctx_modbus, 1);
 
-    // wait for added event.
+    // wait for added event.zhe
     while (c->ctx_thread_running != 0 && c->ctx_added == 0)
     {
         usleep(10*1000);
@@ -355,8 +358,8 @@ static void* thread_modbus_tcp_master(void *arg)
         struct timeval tv;
         fd_set rset;
         do {
-            tv.tv_sec = 1;
-            tv.tv_usec = 0;
+            tv.tv_sec = 0;
+            tv.tv_usec = 100000;
             FD_ZERO(&rset);
             FD_SET(socket_fd, &rset);
             s_rc = select(socket_fd+1, &rset, NULL, NULL, &tv);
@@ -367,13 +370,16 @@ static void* thread_modbus_tcp_master(void *arg)
                 }
             }
         } while (s_rc <= 0 && c->ctx_thread_running != 0);
+			
+		//	printf("[%s:%s:%d] s_rc = %d \r\n",
+		//			 __FILE__, __FUNCTION__, __LINE__, s_rc);
 
         if (s_rc > 0) {
             int i;
             int has_port = 0;
             for (i=0; i<MODBUS_MAX_CLIENT; i++) {
                 if (c->ctx_sub_thread_running[i] == 0) {
-                    c->ctx_sub_thread_running[i] = 1;
+                    c->ctx_sub_thread_running[i] = 7;
                     c->curr_idx = i;
                     c->curr_fd = s_rc;
                     pthread_create(&c->ctx_sub_thread[i], NULL, thread_modbus_tcp, c);
@@ -712,6 +718,7 @@ int tcp_master_add(int ctx_idx, int device_addr, int addr, int len)
     if (device_addr == 0 && addr == 0 && len == 0) {
         // add END.
         c->ctx_added = 1;
+	    printf("[%s:%s:%d] return 0\n",  __FILE__, __FUNCTION__, __LINE__);
         return 0;
     } else if (addr == 0 && len == 0) {
         // add device node.
@@ -727,11 +734,13 @@ int tcp_master_add(int ctx_idx, int device_addr, int addr, int len)
             dev_node = dev_node->next;
         }
         if (device != NULL) {
+	        printf("[%s:%s:%d] device != NULL\n",  __FILE__, __FUNCTION__, __LINE__);
             return -1;
         }
         // if not found, create it.
         device = malloc(sizeof(device_t));
         if (device == NULL) {
+	        printf("[%s:%s:%d] device == NULL\n",  __FILE__, __FUNCTION__, __LINE__);
             return -1;
         }
 #ifdef DEBUG_LIST
@@ -740,6 +749,7 @@ int tcp_master_add(int ctx_idx, int device_addr, int addr, int len)
         memset(device, 0, sizeof(device_t));
         device->addr = device_addr;
         list_put(&c->devices, &device->node);
+	    printf("[%s:%s:%d] return 0\n",  __FILE__, __FUNCTION__, __LINE__);
         return 0;
     }
 
@@ -757,6 +767,7 @@ int tcp_master_add(int ctx_idx, int device_addr, int addr, int len)
     }
 
     if (device == NULL) {
+	    printf("[%s:%s:%d] device == NULL\n",  __FILE__, __FUNCTION__, __LINE__);
         return 0;
     }
 
@@ -779,15 +790,19 @@ int tcp_master_add(int ctx_idx, int device_addr, int addr, int len)
             element_t *element = list_entry_safe(reg_node, element_t);
             if (element->addr == addr) {
                 register_node_addr = (int)element;
+				printf("[%s:%s:%d] get element and return register_node_addr \n",  
+				                                       __FILE__, __FUNCTION__, __LINE__);
                 is_new_node = 0;
                 break;
             }
             reg_node = reg_node->next;
         }
     }
+	printf("[%s:%s:%d] We have to create element \n", __FILE__, __FUNCTION__, __LINE__);
     if (is_new_node == 1 && reg_head != NULL) {
         element_t *element = malloc(sizeof(element_t));
         if (element == NULL) {
+	        printf("[%s:%s:%d] element == NULL\n",  __FILE__, __FUNCTION__, __LINE__);
             return 0;
         }
 #ifdef DEBUG_LIST
@@ -798,6 +813,8 @@ int tcp_master_add(int ctx_idx, int device_addr, int addr, int len)
         element->endian = (endian == 0 ? 0 : 1);
         list_ordered_put(reg_head, element);
         register_node_addr = (int)element;
+	    printf("[%s:%s:%d] create element and return register_node_addr \n", 
+				                                        __FILE__, __FUNCTION__, __LINE__);
     }
 
     return register_node_addr;
@@ -813,16 +830,19 @@ int tcp_master_open(int port)
         c = &context_table[i];
         if (c->ctx_modbus == NULL && c->ctx_thread_running == 0) {
             ctx_idx = i;
+	        printf("[%s:%s:%d] ctx_idx = %d\n",  __FILE__, __FUNCTION__, __LINE__, ctx_idx);
             break;
         }
     }
 
     if (ctx_idx < 0 || ctx_idx >= MAX_MODBUSTCPMASTER_NUM) {
+	    printf("[%s:%s:%d] return ERROR\n",  __FILE__, __FUNCTION__, __LINE__);
         return -1;
     }
 
     c = &context_table[ctx_idx];
     if (c->ctx_modbus != NULL || c->ctx_thread_running != 0) {
+	    printf("[%s:%s:%d] return ERROR\n",  __FILE__, __FUNCTION__, __LINE__);
         return -1;
     }
 
@@ -840,7 +860,8 @@ int tcp_master_open(int port)
 
     c->ctx_thread_running = 1;
     pthread_create(&c->ctx_thread, NULL, thread_modbus_tcp_master, c);
-
+	
+	printf("[%s:%s:%d] ctx_idx return %d\n",  __FILE__, __FUNCTION__, __LINE__, ctx_idx);
     return ctx_idx;
 }
 
@@ -848,6 +869,7 @@ int tcp_master_close(int ctx_idx)
 {
     context_t *c = &context_table[ctx_idx];
     if (c->ctx_modbus == NULL || c->ctx_thread_running == 0) {
+	    printf("[%s:%s:%d] return ERROR\n",  __FILE__, __FUNCTION__, __LINE__);
         return -1;
     }
 
@@ -855,8 +877,10 @@ int tcp_master_close(int ctx_idx)
     pthread_join(c->ctx_thread, NULL);
 
     while (c->ctx_modbus != NULL) {
+     	printf("[%s:%s:%d] close waiting !!! \n", __FILE__, __FUNCTION__, __LINE__);
         usleep(10*1000);
     }
+	printf("[%s:%s:%d] return zero\n",  __FILE__, __FUNCTION__, __LINE__);
 
     return 0;
 }

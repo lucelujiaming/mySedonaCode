@@ -9,17 +9,20 @@
 Cell ModBus_remDev_dRtuO(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
-    int band = params[2].ival;
-    int parity = params[3].ival;
-    int data_bit = params[4].ival;
-    int stop_bit = params[5].ival;
-    int retry_delay = params[6].ival;
-    int rto = params[7].ival;
+    int rsmode = params[2].ival;
+    int band = params[3].ival;
+    int parity = params[4].ival;
+    int data_bit = params[5].ival;
+    int stop_bit = params[6].ival;
+    int retry_delay = params[7].ival;
+    int rto = params[8].ival;
 
     Cell ret;
     {
-        extern int rtu_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit, int retry_delay, int rto);
-        ret.ival = rtu_open(ctx_idx, band, parity, data_bit, stop_bit, retry_delay, rto);
+    	printf("[%s:%s:%d] ctx_idx = %d rsmode = %d, band= %d, parity = %d\n",
+                 __FILE__, __FUNCTION__, __LINE__, ctx_idx, rsmode, band, parity);
+        extern int rtu_open(int ctx_idx, int rsmode, int band, int parity, int data_bit, int stop_bit, int retry_delay, int rto);
+        ret.ival = rtu_open(ctx_idx, rsmode, band, parity, data_bit, stop_bit, retry_delay, rto);
 		printf("[%s:%s:%d] return %d\n",
                  __FILE__, __FUNCTION__, __LINE__, ret.ival);
     }
@@ -113,15 +116,18 @@ Cell ModBus_remDev_dRtuW(SedonaVM* vm, Cell* params)
 Cell ModBus_locDev_dRtuO(SedonaVM* vm, Cell* params)
 {
     int ctx_idx = params[1].ival;
-    int band = params[2].ival;
-    int parity = params[3].ival;
-    int data_bit = params[4].ival;
-    int stop_bit = params[5].ival;
+    int rsmode = params[2].ival;
+    int band = params[3].ival;
+    int parity = params[4].ival;
+    int data_bit = params[5].ival;
+    int stop_bit = params[6].ival;
 
     Cell ret;
     {
-        extern int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit);
-        ret.ival = rtu_master_open(ctx_idx, band, parity, data_bit, stop_bit);
+    	printf("[%s:%s:%d] rsmode = %d, band= %d, parity = %d\n",
+                 __FILE__, __FUNCTION__, __LINE__, rsmode, band, parity);
+        extern int rtu_master_open(int ctx_idx, int rsmode, int band, int parity, int data_bit, int stop_bit);
+        ret.ival = rtu_master_open(ctx_idx, rsmode, band, parity, data_bit, stop_bit);
 		printf("[%s:%s:%d] return %d\n",
                  __FILE__, __FUNCTION__, __LINE__, ret.ival);
     }
@@ -358,8 +364,9 @@ Cell ModBus_locDev_dTcpA(SedonaVM* vm, Cell* params)
     {
         extern int tcp_master_add(int ctx_idx, int device_addr, int addr, int len);
         ret.ival = tcp_master_add(ctx_idx, device_addr, addr, len);
-		printf("[%s:%s:%d] return %d\n",
-                 __FILE__, __FUNCTION__, __LINE__, ret.ival);
+		// Remove ret.ival in the printf to make beyondcompare work better.
+		printf("[%s:%s:%d] return\n",
+                 __FILE__, __FUNCTION__, __LINE__);
     }
 
     return ret;

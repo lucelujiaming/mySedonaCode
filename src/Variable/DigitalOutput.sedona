@@ -39,6 +39,41 @@ class DigitalOutput
   @config
   @asStr
   property Buf(64) alias = ""
+
+  
+  override void changed(Slot slot)
+  {
+    super.changed(slot)
+    log.message("Variable changed with slot=${slot.name}")
+    if (slot == DigitalOutput.channel) {
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+          root = p
+          p = Sys.app.lookup(p.parent)
+        }
+        if (root != null) {
+          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if (f.type.is(Folder.type) && !f.name.equals("service") // && !f.name.equals("init")
+               ) {
+              for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
+                if (r.type.is(DigitalOutput.type) && r != this && ((DigitalOutput)r).channel == lastChannel) {
+                  log.message("56565 Found another DigitalOutput which channel=${((DigitalOutput)r).channel}")
+                  lastChannel = channel
+                }
+              }
+            }
+          }
+        }
+        // We do not find any DigitalOutput, so we reset lastChannel
+        log.message("reset lastChannel=$lastChannel and change to $channel")
+        SetDigitalValue(lastChannel, 0.0)
+        lastChannel = channel
+        // New Channel has been reset to 0.0
+        lastInValue = 0.0
+    } 
+  }
   
   override void execute()
   {
@@ -61,9 +96,9 @@ class DigitalOutput
   // Fields
   ////////////////////////////////////////////////////////////////
   // define Log log
-  private int ctx = -1
-  private int lastChannel = CHANNEL_END
-  private float lastInValue = 0.0
+  private int ctx = -1;
+  private int lastChannel = CHANNEL_1_BAND;
+  private float lastInValue = 0.0;
 
   native int SetDigitalValue(int iChannel, float fValue)
 }

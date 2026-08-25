@@ -318,9 +318,12 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
 	        V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, V3S_OUT);
             if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
-                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+	        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
+	        //                 __FILE__, __FUNCTION__, __LINE__);
+            //    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+                printf("[%s:%s:%d] %s do not support V3S_UART_232",
+	                         __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+			    return 0;
             }
             else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
             {
@@ -356,9 +359,12 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         {
             if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
-	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+	        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
+	        //                 __FILE__, __FUNCTION__, __LINE__);
+	        //    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+                printf("[%s:%s:%d] %s do not support V3S_UART_232",
+	                         __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+			    return 0;
             }
             else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
             {
@@ -385,14 +391,14 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
 	        V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, V3S_OUT);
             if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
+	        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
+	        //                 __FILE__, __FUNCTION__, __LINE__);
                 V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
             }
             else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
+	        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
+	        //                 __FILE__, __FUNCTION__, __LINE__);
                 V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
             }
         }
@@ -402,9 +408,12 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
 	        V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, V3S_OUT);
             if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
-                V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+	        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
+	        //                 __FILE__, __FUNCTION__, __LINE__);
+            //    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
+                printf("[%s:%s:%d] %s do not support V3S_UART_232",
+	                         __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+			    return 0;
             }
             else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
             {
@@ -416,14 +425,14 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         // 做一点延时，避免发的太快，导致电脑时序混乱。
         usleep(500);
         size = write(ctx->s, req, req_length);
-        printf("[%s:%s:%d] write(%d, req, %d) return %d !!! \n",
-                         __FILE__, __FUNCTION__, __LINE__, ctx->s, req_length, size);
-        for(int i = 0 ; i < size; i++)
-        {
-            printf("<%02X> ", req[i]);
-        }
-        printf("\n[%s:%s:%d] write(%d, req, %d) return %d !!! \n",
-                         __FILE__, __FUNCTION__, __LINE__, ctx->s, req_length, size);
+        // printf("[%s:%s:%d] write(%d, req, %d) return %d !!! \n",
+        //                 __FILE__, __FUNCTION__, __LINE__, ctx->s, req_length, size);
+        // for(int i = 0 ; i < size; i++)
+        // {
+        //     printf("<%02X> ", req[i]);
+        // }
+        // printf("\n[%s:%s:%d] write(%d, req, %d) return %d !!! \n",
+        //                  __FILE__, __FUNCTION__, __LINE__, ctx->s, req_length, size);
         // 等待数据发送完成
         tcdrain(ctx->s);
         usleep(100);
@@ -431,14 +440,14 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         {
             if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
+	            // printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) !!! \n",
+	            //             __FILE__, __FUNCTION__, __LINE__);
                 V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
             }
             else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
+	            // printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) !!! \n",
+	            //             __FILE__, __FUNCTION__, __LINE__);
 	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
             }
         }
@@ -446,14 +455,17 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         {
             if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
-	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+	        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) !!! \n",
+	        //                 __FILE__, __FUNCTION__, __LINE__);
+	        //    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+                printf("[%s:%s:%d] %s do not support V3S_UART_232",
+	                         __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+			    return 0;
             }
             else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
             {
-	            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
-	                         __FILE__, __FUNCTION__, __LINE__);
+	            // printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) !!! \n",
+	            //             __FILE__, __FUNCTION__, __LINE__);
 	            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
             }
         }
@@ -496,14 +508,14 @@ static ssize_t _modbus_rtu_recv(modbus_t *ctx, uint8_t *rsp, int rsp_length)
     ssize_t size;
     // return read(ctx->s, rsp, rsp_length);
     size = read(ctx->s, rsp, rsp_length);
-    printf("\n[%s:%s:%d] read(%d, rsp, %d) return %d !!! \n",
-                     __FILE__, __FUNCTION__, __LINE__, ctx->s, rsp_length, size);
-    for(int i = 0 ; i < size; i++)
-    {
-        printf("<%02X> ", rsp[i]);
-    }
-    printf("\n[%s:%s:%d] read(%d, rsp, %d) return %d !!! \n",
-                     __FILE__, __FUNCTION__, __LINE__, ctx->s, rsp_length, size);
+    // printf("\n[%s:%s:%d] read(%d, rsp, %d) return %d !!! \n",
+    //                 __FILE__, __FUNCTION__, __LINE__, ctx->s, rsp_length, size);
+    // for(int i = 0 ; i < size; i++)
+    // {
+    //     printf("<%02X> ", rsp[i]);
+    // }
+    // printf("\n[%s:%s:%d] read(%d, rsp, %d) return %d !!! \n",
+    //                 __FILE__, __FUNCTION__, __LINE__, ctx->s, rsp_length, size);
     return size;
 #endif
 }
@@ -752,24 +764,41 @@ static int _modbus_rtu_connect(modbus_t *ctx)
     }
 #else
 
-	
+#define NEW_485_UART1
 	if(ctx_rtu->device[strlen(ctx_rtu->device) - 1] == '1')
 	{
 		pthread_mutex_lock(ctx_rtu->objV3SGPIOOperator->objMutex); // 加锁
-	    // 232/485 switch - RLY1 - PG5
+#ifdef OLD_485_UART1
+	    // OLD-Board 232/485 switch - RLY1 - PG5
 	    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, V3S_OUT);
 	    if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
 	    {
-		    // RLY1 - PG5 - 232
+		    // OLD-Board RLY1 - PG5 - 232
 		    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 1);
 	        printf("V3S_GPIO_SetPin(V3S_PG, 5, 1) by %s\n", ctx_rtu->device);
 	    }
 	    else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
 	    {
-		    // RLY1 - PG5 - 485
+		    // OLD-Board RLY1 - PG5 - 485
 		    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PG, 5, 0);
 	        printf("V3S_GPIO_SetPin(V3S_PG, 5, 0) by %s\n", ctx_rtu->device);
 	    }
+#elif  defined(NEW_485_UART1)
+	    // NEW-Board 232/485 switch - RLY1 - PB5
+	    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 5, V3S_OUT);
+	    if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
+	    {
+		    // NEW-Board RLY1 - PB5 - 232
+		    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 5, 1);
+			printf("V3S_GPIO_SetPin(V3S_PB, 5, 1) by %s\n", ctx_rtu->device);
+	    }
+	    else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
+	    {
+		    // NEW-Board RLY1 - PG5 - 485
+		    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 5, 0);
+	        printf("V3S_GPIO_SetPin(V3S_PB, 5, 0) by %s\n", ctx_rtu->device);
+	    }
+#endif
 		pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
     }
     
@@ -1370,14 +1399,14 @@ static int _modbus_rtu_select(modbus_t *ctx, fd_set *rset,
 	    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, V3S_OUT);
         if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
         {
-            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) before reading request by %s!!! \n",
-                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 1) before reading request by %s!!! \n",
+        //             __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
             V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 1);
         }
         else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
         {
-            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) before reading request by %s!!! \n",
-                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PE, 23, 0) before reading request by %s!!! \n",
+        //             __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
             V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PE, 23, 0);
         }
     }
@@ -1387,19 +1416,22 @@ static int _modbus_rtu_select(modbus_t *ctx, fd_set *rset,
 	    V3S_GPIO_ConfigPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, V3S_OUT);
         if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_232)
         {
-            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) before reading request by %s!!! \n",
-                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
-            V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 1) before reading request by %s!!! \n",
+        //             __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+        //    V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 1);
+            printf("[%s:%s:%d] %s do not support V3S_UART_232",
+	                         __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+		    return -1;
         }
         else if(ctx_rtu->objV3SGPIOOperator->enumUartMode == V3S_UART_485)
         {
-            printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) before reading request by %s!!! \n",
-                     __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
+        //    printf("[%s:%s:%d] V3S_GPIO_SetPin(V3S_PB, 2, 0) before reading request by %s!!! \n",
+        //             __FILE__, __FUNCTION__, __LINE__, ctx_rtu->device);
             V3S_GPIO_SetPin(ctx_rtu->objV3SGPIOOperator, V3S_PB, 2, 0);
         }
     }
 	pthread_mutex_unlock(ctx_rtu->objV3SGPIOOperator->objMutex); // 解锁
-    usleep(5);
+    // usleep(5);
 	
     while ((s_rc = select(ctx->s+1, rset, NULL, NULL, tv)) == -1) {
         if (errno == EINTR) {

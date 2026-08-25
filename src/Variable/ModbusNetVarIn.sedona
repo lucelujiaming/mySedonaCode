@@ -34,10 +34,10 @@ class ModbusNetVarIn
     {
         if(Sys.app.lookup(device.parent) != null)
         {
-            log.message("bacreadProperty:: get device.parent as Bus") 
+            log.message("ModbusNetVarIn:: get device.parent as Bus") 
             Component objBus = Sys.app.lookup(device.parent)
             if(objBus.type.is(FieldBusNet.type)) {
-                log.message("bacreadProperty:: set device.parent as Bus") 
+                log.message("ModbusNetVarIn:: set device.parent as Bus") 
                 bus = (FieldBusNet)objBus
                 update()
             }

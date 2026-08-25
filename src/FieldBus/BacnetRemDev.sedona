@@ -3829,6 +3829,10 @@ class BacnetRemDev
        bool isSubNetMac = false
        Str sNetBuf = ""
        Str macBuf  = ""
+       if(InstanceNumber.toStr().length() == 0)
+       {
+          return 0
+       }
        for (int i=0; i<InstanceNumber.toStr().length(); i++) {
           int c = InstanceNumber.toStr().get(i)
           if (c == "/".get(0)) {
@@ -3836,6 +3840,10 @@ class BacnetRemDev
              sNetBuf.copyFromStr(InstanceNumber.toStr(), i+1);
              macBuf = InstanceNumber.toStr().suffix(i + 1)
              log.message("-------Get with ($sNetBuf, $macBuf)--------------")
+             if((sNetBuf.length() == 0) || (macBuf.length() == 0))
+             {
+                return 0
+             }
              break
           }
        }  

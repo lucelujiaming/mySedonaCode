@@ -113,6 +113,8 @@ static void* thread_led(void* arg)
 
 void led_blink(int led_idx)
 {
+    // printf("[%s:%s:%d] comment !!! \n", __FILE__, __FUNCTION__, __LINE__);
+    return;
     if(is_thread_init == 0){
         led_init();
         pthread_create(&ctx_thread, NULL, thread_led, 0);

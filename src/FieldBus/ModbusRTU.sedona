@@ -11,6 +11,13 @@ class ModbusRTU
   @config
   @min = 0
   @max = 1
+  @range = "RS485, RS232"
+  @fieldWidth = 10
+  property int rsmode = 0
+  
+  @config
+  @min = 0
+  @max = 1
   @range = "Port1, Port2"
   @fieldWidth = 10
   property int port = 0
@@ -63,7 +70,7 @@ class ModbusRTU
   override void changed(Slot slot)
   {
     super.changed(slot)
-    if (slot == ModbusRTU.port || slot == ModbusRTU.band || 
+    if (slot == ModbusRTU.rsmode || slot == ModbusRTU.port || slot == ModbusRTU.band || 
         slot == ModbusRTU.parity || slot == ModbusRTU.dataBits || 
         slot == ModbusRTU.stopBits || slot == ModbusRTU.retryDelay || 
         slot == ModbusRTU.responseTimeout) {
@@ -219,7 +226,7 @@ class ModbusRTU
             // } 
         }
     }
-	log.message("4343434 ModbusRTU ctx = dO(port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)")
+	log.message("4343434 ModbusRTU ctx = dO(rsmode, port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)")
     // ctx = dO(port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)
     int modbus_remdev_ctx = -1
     int modbus_locdev_ctx = -1
@@ -231,7 +238,7 @@ class ModbusRTU
             if(modbus_remdev_ctx == -1)
             {
           	    ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusRTUMasterOpen(
-                     port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)
+                     rsmode, port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)
 	            modbus_remdev_ctx = ((ModbusRemDev)d).ctx
             }
             else 
@@ -246,7 +253,7 @@ class ModbusRTU
             if(modbus_locdev_ctx == -1)
             {
             	((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusRTUSlaveOpen(
-                     port, band, parity, dataBits, stopBits)
+                     rsmode, port, band, parity, dataBits, stopBits)
 	            modbus_locdev_ctx = ((ModbusLocDev)d).ctx
             }
             else 
@@ -528,7 +535,7 @@ class ModbusRTU
   ////////////////////////////////////////////////////////////////
   //   private int ctx = -1
   // 
-  //   native int dO(int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
+  //   native int dO(int rsmode, int port, int band, int parity, int dataBits, int stopBits, int retryDelay, int rto)
   // 
   //   native int dC(int ctx)
   // 

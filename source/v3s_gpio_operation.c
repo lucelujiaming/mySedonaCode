@@ -122,7 +122,7 @@ void V3S_GPIO_SetPin(V3S_GPIO_Operator * objV3sPIOOperator, V3S_PORT port, unsig
         printf("V3S_GPIO_SetPin::objV3sPIOOperator == NULL!\r\n");
 		return;
 	}
-    int iTestValue = 0;
+    // int iTestValue = 0;
     if((port == V3S_PA) || (port == V3S_PD))
     {
         printf("The %d is wrong port!\r\n", port);
@@ -148,8 +148,8 @@ void V3S_GPIO_SetPin(V3S_GPIO_Operator * objV3sPIOOperator, V3S_PORT port, unsig
         objV3sPIOOperator->objV3sPIOMap->V3S_Pn[port].V3S_DAT &= ~(1 << pin);
     }
     
-    iTestValue = V3S_GPIO_GetPin(objV3sPIOOperator, port, pin);
-    printf("Pin %d is %d to port %d!\r\n", pin, iTestValue, port);
+    // iTestValue = V3S_GPIO_GetPin(objV3sPIOOperator, port, pin);
+    // printf("Pin %d is %d to port %d!\r\n", pin, iTestValue, port);
     
 }
 

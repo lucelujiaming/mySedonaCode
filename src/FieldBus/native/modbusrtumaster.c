@@ -722,7 +722,7 @@ int rtu_master_add(int ctx_idx, int device_addr, int addr, int len)
     return register_node_addr;
 }
 
-int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bit)
+int rtu_master_open(int ctx_idx, int rsmode, int band, int parity, int data_bit, int stop_bit)
 {
     char uart_name[32] = { 0 };
     char parity_name[] = {'N', 'E', 'O'};
@@ -738,7 +738,7 @@ int rtu_master_open(int ctx_idx, int band, int parity, int data_bit, int stop_bi
             return -1;
         }
 
-        modbus_t* ctx = modbus_new_rtu(uart_name, band, parity_name[parity], data_bit, stop_bit);
+        modbus_t* ctx = modbus_new_rtu(uart_name, rsmode, band, parity_name[parity], data_bit, stop_bit);
         if (ctx == NULL) {
             printf("new rtu err !!! \n");
             release_uart(ctx_idx);
