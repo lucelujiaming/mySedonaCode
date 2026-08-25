@@ -105,7 +105,7 @@ class ModbusTCP
         }
         if(isNeedReconnect == true)
         {
-            // I do not know why ModbusNetVarIn.changed can work, but it works.
+            // I do not know why ModbusNetVarIn.changed and ModbusNetVarOut.changed can work, but it works.
             ** log.message("isNeedReconnect == true ")
             for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
                 ** log.message("isNeedReconnect == true d.type ")
