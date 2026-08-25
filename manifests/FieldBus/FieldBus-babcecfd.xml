@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="ModBus Management"
    buildHost="ubuntu"
-   buildTime="2023-10-30T17:06:25.281+08:00"
+   buildTime="2023-10-31T18:03:06.231+08:00"
 >
 
 <!-- Dependencies -->
@@ -55,7 +55,7 @@
 </type>
 
 <!-- FieldBus::BacnetLocDev -->
-<type id="1" name="BacnetLocDev" sizeof="2496" base="Variable::FieldBusDevice">
+<type id="1" name="BacnetLocDev" sizeof="2500" base="Variable::FieldBusDevice">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/device.png"/>
   </facets>
@@ -109,7 +109,7 @@
 </type>
 
 <!-- FieldBus::BacnetRemDev -->
-<type id="3" name="BacnetRemDev" sizeof="15920" base="Variable::FieldBusDevice">
+<type id="3" name="BacnetRemDev" sizeof="15924" base="Variable::FieldBusDevice">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/device.png"/>
   </facets>
@@ -1107,7 +1107,7 @@
 </type>
 
 <!-- FieldBus::ModbusRemDev -->
-<type id="10" name="ModbusRemDev" sizeof="236" base="Variable::FieldBusDevice">
+<type id="10" name="ModbusRemDev" sizeof="240" base="Variable::FieldBusDevice">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/device.png"/>
   </facets>

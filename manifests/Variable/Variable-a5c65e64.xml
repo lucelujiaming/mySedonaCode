@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <kitManifest
    name="Variable"
-   checksum="2d964fbf"
+   checksum="a5c65e64"
    hasNatives="false"
    doc="false"
    isPlay="false"
@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="Variable"
    buildHost="ubuntu"
-   buildTime="2023-11-03T11:24:53.398+08:00"
+   buildTime="2024-01-02T14:37:21.446+08:00"
 >
 
 <!-- Dependencies -->
@@ -51,8 +51,40 @@
   </slot>
 </type>
 
+<!-- Variable::BacnetLocalInputVar -->
+<type id="1" name="BacnetLocalInputVar" sizeof="380" base="Variable::BacNetFieldBusIO">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="present_value" type="float" default="0.0"/>
+  <slot id="1" name="alias" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
+<!-- Variable::BacnetLocalOutputVar -->
+<type id="2" name="BacnetLocalOutputVar" sizeof="380" base="Variable::BacNetFieldBusIO">
+  <facets>
+    <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
+  </facets>
+  <slot id="0" name="present_value" type="float" default="0.0"/>
+  <slot id="1" name="alias" type="sys::Buf" flags="cs" default="">
+    <facets>
+      <bool name="summary" val="true"/>
+      <bool name="asStr" val="true"/>
+      <bool name="config" val="true"/>
+      <int name="max" val="64"/>
+    </facets>
+  </slot>
+</type>
+
 <!-- Variable::BacnetLocalVar -->
-<type id="1" name="BacnetLocalVar" sizeof="380" base="Variable::BacNetFieldBusIO">
+<type id="3" name="BacnetLocalVar" sizeof="380" base="Variable::BacNetFieldBusIO">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -68,7 +100,7 @@
 </type>
 
 <!-- Variable::BacnetNetVarIn -->
-<type id="2" name="BacnetNetVarIn" sizeof="4952" base="Variable::BacNetFieldBusIO">
+<type id="4" name="BacnetNetVarIn" sizeof="4952" base="Variable::BacNetFieldBusIO">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -102,7 +134,7 @@
 </type>
 
 <!-- Variable::BacnetNetVarOut -->
-<type id="3" name="BacnetNetVarOut" sizeof="4824" base="Variable::BacNetFieldBusIO">
+<type id="5" name="BacnetNetVarOut" sizeof="4824" base="Variable::BacNetFieldBusIO">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -139,7 +171,7 @@
 </type>
 
 <!-- Variable::Const -->
-<type id="4" name="Const" sizeof="44" base="sys::Component">
+<type id="6" name="Const" sizeof="44" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -156,7 +188,7 @@
 </type>
 
 <!-- Variable::DevStatus -->
-<type id="5" name="DevStatus" sizeof="52" base="sys::Component">
+<type id="7" name="DevStatus" sizeof="52" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -176,7 +208,7 @@
 </type>
 
 <!-- Variable::FieldBusDevice -->
-<type id="6" name="FieldBusDevice" sizeof="212" flags="a" base="sys::Component">
+<type id="8" name="FieldBusDevice" sizeof="216" flags="a" base="sys::Component">
   <slot id="0" name="status" type="int" default="4">
     <facets>
       <int name="fieldWidth" val="20"/>
@@ -201,7 +233,7 @@
 </type>
 
 <!-- Variable::FieldBusIO -->
-<type id="7" name="FieldBusIO" sizeof="272" flags="a" base="sys::Component">
+<type id="9" name="FieldBusIO" sizeof="272" flags="a" base="sys::Component">
   <slot id="0" name="status" type="int" default="4">
     <facets>
       <bool name="summary" val="false"/>
@@ -234,7 +266,7 @@
 </type>
 
 <!-- Variable::FieldBusNet -->
-<type id="8" name="FieldBusNet" sizeof="4148" flags="a" base="sys::Component">
+<type id="10" name="FieldBusNet" sizeof="4152" flags="a" base="sys::Component">
   <slot id="0" name="status" type="int" default="0">
     <facets>
       <int name="fieldWidth" val="20"/>
@@ -245,7 +277,7 @@
 </type>
 
 <!-- Variable::FieldBusSchedule -->
-<type id="9" name="FieldBusSchedule" sizeof="60" flags="a" base="sys::Component">
+<type id="11" name="FieldBusSchedule" sizeof="60" flags="a" base="sys::Component">
   <slot id="0" name="url" type="sys::Buf" flags="cs" default="">
     <facets>
       <bool name="asStr" val="true"/>
@@ -261,7 +293,7 @@
 </type>
 
 <!-- Variable::ModbusNetVarIn -->
-<type id="10" name="ModbusNetVarIn" sizeof="356" base="Variable::FieldBusIO">
+<type id="12" name="ModbusNetVarIn" sizeof="356" base="Variable::FieldBusIO">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -278,7 +310,7 @@
       <int name="max" val="64"/>
     </facets>
   </slot>
-  <slot id="2" name="isOutofService" type="bool" flags="c" default="false">
+  <slot id="2" name="OutOfService" type="bool" flags="c" default="false">
     <facets>
       <bool name="config" val="true"/>
     </facets>
@@ -291,7 +323,7 @@
 </type>
 
 <!-- Variable::ModbusNetVarOut -->
-<type id="11" name="ModbusNetVarOut" sizeof="360" base="Variable::FieldBusIO">
+<type id="13" name="ModbusNetVarOut" sizeof="360" base="Variable::FieldBusIO">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -309,7 +341,7 @@
       <int name="max" val="64"/>
     </facets>
   </slot>
-  <slot id="3" name="isOutofService" type="bool" flags="c" default="false">
+  <slot id="3" name="OutOfService" type="bool" flags="c" default="false">
     <facets>
       <bool name="config" val="true"/>
     </facets>
@@ -322,7 +354,7 @@
 </type>
 
 <!-- Variable::Setpoint -->
-<type id="12" name="Setpoint" sizeof="132" base="sys::Component">
+<type id="14" name="Setpoint" sizeof="132" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -349,7 +381,7 @@
 </type>
 
 <!-- Variable::SyncLabel -->
-<type id="13" name="SyncLabel" sizeof="128" base="sys::Component">
+<type id="15" name="SyncLabel" sizeof="128" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>
@@ -390,7 +422,7 @@
 </type>
 
 <!-- Variable::Variable -->
-<type id="14" name="Variable" sizeof="180" base="sys::Component">
+<type id="16" name="Variable" sizeof="180" base="sys::Component">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/control/numericPoint.png"/>
   </facets>

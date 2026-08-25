@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <kitManifest
    name="FieldBus"
-   checksum="889eea54"
+   checksum="33d778e3"
    hasNatives="true"
    doc="false"
    isPlay="false"
@@ -9,7 +9,7 @@
    vendor="XunGaoAuto"
    description="ModBus Management"
    buildHost="ubuntu"
-   buildTime="2023-10-30T17:34:29.958+08:00"
+   buildTime="2023-11-17T11:07:13.034+08:00"
 >
 
 <!-- Dependencies -->
@@ -20,7 +20,7 @@
 </depends>
 
 <!-- FieldBus::BacnetIP -->
-<type id="0" name="BacnetIP" sizeof="4236" base="Variable::FieldBusNet">
+<type id="0" name="BacnetIP" sizeof="4360" base="Variable::FieldBusNet">
   <slot id="0" name="bacpacketStatus" type="int" default="0">
     <facets>
       <int name="fieldWidth" val="20"/>
@@ -28,25 +28,13 @@
       <bool name="readonly" val="true"/>
     </facets>
   </slot>
-  <slot id="1" name="deviceInstance" type="int" flags="c" default="0">
-    <facets>
-      <bool name="config" val="true"/>
-    </facets>
-  </slot>
-  <slot id="2" name="retryDelay" type="int" flags="c" default="60">
+  <slot id="1" name="retryDelay" type="int" flags="c" default="60">
     <facets>
       <str name="unit" val="second"/>
       <bool name="config" val="true"/>
     </facets>
   </slot>
-  <slot id="3" name="ipLocalAddress" type="sys::Buf" flags="cs" default="192.168.168.2">
-    <facets>
-      <bool name="asStr" val="true"/>
-      <bool name="config" val="true"/>
-      <int name="max" val="64"/>
-    </facets>
-  </slot>
-  <slot id="4" name="port" type="int" flags="c" default="47808">
+  <slot id="2" name="port" type="int" flags="c" default="47808">
     <facets>
       <bool name="config" val="true"/>
       <int name="max" val="65535"/>
@@ -55,7 +43,7 @@
 </type>
 
 <!-- FieldBus::BacnetLocDev -->
-<type id="1" name="BacnetLocDev" sizeof="2496" base="Variable::FieldBusDevice">
+<type id="1" name="BacnetLocDev" sizeof="2500" base="Variable::FieldBusDevice">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/device.png"/>
   </facets>
@@ -109,7 +97,7 @@
 </type>
 
 <!-- FieldBus::BacnetRemDev -->
-<type id="3" name="BacnetRemDev" sizeof="15920" base="Variable::FieldBusDevice">
+<type id="3" name="BacnetRemDev" sizeof="15924" base="Variable::FieldBusDevice">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/device.png"/>
   </facets>
@@ -945,7 +933,7 @@
 </type>
 
 <!-- FieldBus::ModbusRemDev -->
-<type id="7" name="ModbusRemDev" sizeof="236" base="Variable::FieldBusDevice">
+<type id="7" name="ModbusRemDev" sizeof="240" base="Variable::FieldBusDevice">
   <facets>
     <str name="niagaraIcon" val="module://icons/x16/device.png"/>
   </facets>
