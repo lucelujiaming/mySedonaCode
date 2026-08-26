@@ -240,6 +240,7 @@ class Variable
             else {
                 log.message("55555555 Variable::execute aliasStr=$name")
             }
+            // Sys.sleep(1ms);
             // log.message("4444444444 Variable::execute name=$name and aliasStr=$aliasStr")
        }
     }

@@ -2,153 +2,163 @@
 class ModbusNetVarIn
   extends ModbusFieldBusIO
 {
-  @readonly
-  property float out = 0.0f
-
-  @summary=true
-  @config
-  @asStr
-  property Buf(64) alias = ""
-
-  @config
-  property bool OutOfService = false
-  
-  @config
-  property float outofservice_value = 0.0f
-  
-  override void changed(Slot slot)
-  {
-    ** log.message("ModbusNetVarIn::super.changed")
-    super.changed(slot)
-    // if (slot == ModbusNetVarIn.device_name ||
-    if (slot == ModbusNetVarIn.io_type || 
-        slot == ModbusNetVarIn.Address) {
-      log.message("ModbusNetVarIn::changed slot.name=$slot.name")
-      update()
-    }
-  }
-  
-  void getParentBus()
-  {
-    if(device != null)
+    @readonly
+    property float out = 0.0f
+    
+    @summary=true
+    @config
+    @asStr
+    property Buf(64) alias = ""
+    
+    @config
+    property bool OutOfService = false
+    
+    @config
+    property float outofservice_value = 0.0f
+    
+    override void changed(Slot slot)
     {
-        if(Sys.app.lookup(device.parent) != null)
+        ** log.message("ModbusNetVarIn::super.changed")
+        super.changed(slot)
+        // if (slot == ModbusNetVarIn.device_name ||
+        if (slot == ModbusNetVarIn.io_type || 
+            slot == ModbusNetVarIn.Address) {
+            log.message("ModbusNetVarIn::changed slot.name=$slot.name")
+            update()
+        }
+    }
+    
+    void getParentBus()
+    {
+        if(device != null)
         {
-            log.message("ModbusNetVarIn:: get device.parent as Bus") 
-            Component objBus = Sys.app.lookup(device.parent)
-            if(objBus.type.is(FieldBusNet.type)) {
-                log.message("ModbusNetVarIn:: set device.parent as Bus") 
-                bus = (FieldBusNet)objBus
-                update()
+            if(Sys.app.lookup(device.parent) != null)
+            {
+                log.message("ModbusNetVarIn:: get device.parent as Bus") 
+                Component objBus = Sys.app.lookup(device.parent)
+                if(objBus.type.is(FieldBusNet.type)) {
+                    log.message("ModbusNetVarIn:: set device.parent as Bus") 
+                    bus = (FieldBusNet)objBus
+                    update()
+                }
             }
         }
     }
-  }
-  
-  virtual override void execute()
-  {
-    if (bus == null) {
-        log.message("ModbusNetVarIn:: bus == null and status=$status")  // status=4 -> STATUSNODEV
-        getParentBus()
-        return 
-    }
-    if (device == null) {
-        log.message("ModbusNetVarIn:: device == null and status=$status")  // status=4 -> STATUSNODEV
-        getParentDevice()
-        return 
-    }
-    ** log.message("11111 name=$name")
-    if (bus != null) {
-        ** log.message("11111 bus.busId=$busId ")
-    }
-    if(OutOfService == true)
+    
+    virtual override void execute()
     {
-    	out := outofservice_value
-        log.message("ModbusNetVarIn:: OutOfService == true")  // status=4 -> STATUSNODEV
-        return
-    }
-    if (cache != 0 && bus != null && bus.status == FieldBusNet.STATUSOK && status <= STATUSREADY) {
-      ** log.message("22222 ModbusNetVarIn::regId=$regId typeId=$typeId")
-      if (bus.readReg(cache, regId, typeId, buf) == dataLen) {
-        out := buf[0]
-        log.message("33333 ModbusNetVarIn::out=$out")
-        status := STATUSOK
-      } else {
-        ** log.message("232323 ModbusNetVarIn::regId=$regId typeId=$typeId")
-        if((device != null) && (device.status == FieldBusDevice.STATUSOK))
-        {
-           ** log.message("242424 device.status=${device.status}")
-	       // if (device.type.is(ModbusRTURemDev.type))
-           if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV)
-           {
-               if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_RTU) {
-	           	   ** log.message("4343434 ModbusNetVarIn REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
-		           if (device.modbusRTUMasterRead(
-		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
-			           out := buf[0]
-			           ** log.message("4444 ModbusNetVarIn REM_RTU modbusRTUMasterRead ModbusNetVarIn::out=$out")
-			           status := STATUSOK
-			       } else {
-			           ** log.message("55555 ModbusNetVarIn REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
-			           out := 0.0f
-			           status := STATUSOFFLINE
-			       }
-		       }
-		       else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
-	           	  ** log.message("4343434 ModbusNetVarIn REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
-		           if (device.modbusTCPClientRead(
-		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
-			         out := buf[0]
-			         ** log.message("4444 ModbusNetVarIn REM_TCP modbusTCPClientRead ModbusNetVarIn::out=$out and dataLen = $dataLen")
-			         status := STATUSOK
-			       } else {
-			           ** log.message("55555 ModbusNetVarIn REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
-			           out := 0.0f
-			           status := STATUSOFFLINE
-			       }
-		       }
-	       }
-		   // else if (device.type.is(ModbusRTULocDev.type))
-	       else if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSLOCDEV)
-           {
-               if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_RTU) {
-	           	   ** log.message("56565656 ModbusNetVarIn LOC_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
-		           if (device.modbusRTUSlaveRead(
-		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
-			         out := buf[0]
-			         ** log.message("6666 ModbusNetVarIn LOC_RTU modbusRTUSlaveRead ModbusNetVarIn::out=$out")
-			         status := STATUSOK
-			       } else {
-			           ** log.message("7777 ModbusNetVarIn LOC_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
-			           out := 0.0f
-			           status := STATUSOFFLINE
-			       }
-		       }
-		       else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
-	           	   ** log.message("56565656 ModbusNetVarIn LOC_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
-		           if (device.modbusTCPServerRead(
-		           			device.ctx, cache, regId, typeId, buf) == dataLen) {
-			         out := buf[0]
-			         ** log.message("6666 ModbusNetVarIn LOC_TCP modbusTCPServerRead ModbusNetVarIn::out=$out")
-			         status := STATUSOK
-			       } else {
-			           ** log.message("7777 ModbusNetVarIn LOC_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
-			           out := 0.0f
-			           status := STATUSOFFLINE
-			       }
-		       }
-	       }
-           ** log.message("88888 ModbusNetVarIn::regId=$regId typeId=$typeId")
+        if (bus == null) {
+            log.message("ModbusNetVarIn:: bus == null and status=$status")  // status=4 -> STATUSNODEV
+            getParentBus()
+            return 
         }
-        else 
-        {
-           log.message("99999 ModbusNetVarIn::regId=$regId typeId=$typeId")
-           out := 0.0f
-           status := STATUSOFFLINE
+        if (device == null) {
+            log.message("ModbusNetVarIn:: device == null and status=$status")  // status=4 -> STATUSNODEV
+            getParentDevice()
+            return 
         }
-      }
+        if (bus != null) {
+            ** log.message("11111 bus.busId=$busId ")
+        }
+        long nowNanoSecond  = Sys.ticks()
+        long nowMilliSecond = nowNanoSecond / (long)1000000
+        if(sendInterval >= nowMilliSecond) {
+            return
+        }
+        else {
+            sendInterval = nowMilliSecond + (long)5000;
+        }
+        if(OutOfService == true)
+        {
+            out := outofservice_value
+            log.message("ModbusNetVarIn:: OutOfService == true")  // status=4 -> STATUSNODEV
+            return
+        }
+        // log.message("11111 name=$name")
+        if (cache != 0 && bus != null && bus.status == FieldBusNet.STATUSOK && status <= STATUSREADY) {
+            ** log.message("22222 ModbusNetVarIn::regId=$regId typeId=$typeId")
+            if (bus.readReg(cache, regId, typeId, buf) == dataLen) {
+                out := buf[0]
+                log.message("33333 ModbusNetVarIn::out=$out")
+                status := STATUSOK
+            } else {
+                ** log.message("232323 ModbusNetVarIn::regId=$regId typeId=$typeId")
+                if((device != null) && (device.status == FieldBusDevice.STATUSOK))
+                {
+                    ** log.message("242424 device.status=${device.status}")
+                    // if (device.type.is(ModbusRTURemDev.type))
+                    if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSREMDEV)
+                    {
+                        if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_RTU) {
+                            log.message("4343434 ModbusNetVarIn REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
+                            if (device.modbusRTUMasterRead(
+                                        device.ctx, cache, regId, typeId, buf) == dataLen) {
+                                out := buf[0]
+                                ** log.message("4444 ModbusNetVarIn REM_RTU modbusRTUMasterRead ModbusNetVarIn::out=$out")
+                                status := STATUSOK
+                            } else {
+                                ** log.message("55555 ModbusNetVarIn REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
+                                out := 0.0f
+                                status := STATUSOFFLINE
+                            }
+                        }
+                        else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
+                            log.message("4343434 ModbusNetVarIn REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
+                            if (device.modbusTCPClientRead(
+                                        device.ctx, cache, regId, typeId, buf) == dataLen) {
+                                out := buf[0]
+                                ** log.message("4444 ModbusNetVarIn REM_TCP modbusTCPClientRead ModbusNetVarIn::out=$out and dataLen = $dataLen")
+                                status := STATUSOK
+                            } else {
+                                ** log.message("55555 ModbusNetVarIn REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
+                                out := 0.0f
+                                status := STATUSOFFLINE
+                            }
+                        }
+                    }
+                    // else if (device.type.is(ModbusRTULocDev.type))
+                    else if (device.sub_fieldbusdevice_type_id == FieldBusDevice.SUB_FIELDBUSDEVICE_TYPE_MODBUSLOCDEV)
+                    {
+                        if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_RTU) {
+                            // log.message("56565656 ModbusNetVarIn LOC_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
+                            if (device.modbusRTUSlaveRead(
+                                        device.ctx, cache, regId, typeId, buf) == dataLen) {
+                                out := buf[0]
+                                // log.message("6666 ModbusNetVarIn LOC_RTU modbusRTUSlaveRead ModbusNetVarIn::out=$out")
+                                status := STATUSOK
+                            } else {
+                                log.message("7777 ModbusNetVarIn LOC_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
+                                out := 0.0f
+                                status := STATUSOFFLINE
+                            }
+                        }
+                        else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
+                            // log.message("56565656 ModbusNetVarIn LOC_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
+                            if (device.modbusTCPServerRead(
+                                        device.ctx, cache, regId, typeId, buf) == dataLen) {
+                                out := buf[0]
+                                // log.message("6666 ModbusNetVarIn LOC_TCP modbusTCPServerRead ModbusNetVarIn::out=$out")
+                                status := STATUSOK
+                            } else {
+                                log.message("7777 ModbusNetVarIn LOC_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
+                                out := 0.0f
+                                status := STATUSOFFLINE
+                            }
+                        }
+                    }
+                    // log.message("88888 ModbusNetVarIn::regId=$regId typeId=$typeId")
+                }
+                else 
+                {
+                    log.message("99999 ModbusNetVarIn::regId=$regId typeId=$typeId")
+                    out := 0.0f
+                    status := STATUSOFFLINE
+                }
+            }
+        }
     }
-  }
-
-  private inline float[1] buf
+    
+    private inline float[1] buf
+    // Send interval counter
+    long sendInterval = (long)0
 }

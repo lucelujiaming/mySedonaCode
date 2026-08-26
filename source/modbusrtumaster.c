@@ -125,8 +125,8 @@ static void* thread_modbus_rtu_master(void *arg)
                 struct timeval tv;
                 FD_ZERO(&rset);
                 FD_SET(modbus_get_socket(c->ctx_modbus), &rset);
-                tv.tv_sec = 1;
-                tv.tv_usec = 0;
+                tv.tv_sec = 0;
+                tv.tv_usec = 10000;
                 s_rc = select(modbus_get_socket(c->ctx_modbus)+1, &rset, NULL, NULL, &tv);
                 if (s_rc > 0) {
                     rc = modbus_receive(c->ctx_modbus, query);

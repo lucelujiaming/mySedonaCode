@@ -127,7 +127,7 @@ static void* thread_modbus_tcp(void *arg)
             int rc = 0;
             do {
                 tv.tv_sec = 0;
-                tv.tv_usec = 100000;
+                tv.tv_usec = 10000;
                 FD_ZERO(&rset);
                 FD_SET(fd, &rset);
                 s_rc = select(fd+1, &rset, NULL, NULL, &tv);
@@ -359,7 +359,7 @@ static void* thread_modbus_tcp_master(void *arg)
         fd_set rset;
         do {
             tv.tv_sec = 0;
-            tv.tv_usec = 100000;
+            tv.tv_usec = 10000;
             FD_ZERO(&rset);
             FD_SET(socket_fd, &rset);
             s_rc = select(socket_fd+1, &rset, NULL, NULL, &tv);
@@ -499,7 +499,7 @@ static void* thread_modbus_tcp_master(void *arg)
     {
         int i;
         for (i=0; i<MODBUS_MAX_CLIENT; i++) {
-            if (c->ctx_sub_thread_running[i] == 1) {
+            if (c->ctx_sub_thread_running[i] != 0) {
                 c->ctx_sub_thread_running[i] = 0;
                 pthread_join(c->ctx_sub_thread[i], NULL);
             }

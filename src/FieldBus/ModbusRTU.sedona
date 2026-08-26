@@ -122,43 +122,45 @@ class ModbusRTU
     override void execute()
     {
         if (status != STATUSNODEV && needFlush) {
-          flush()
-          needFlush = false
+            flush()
+            needFlush = false
         }
         // Read Modbus 
         if (status == STATUSOK) {
-          for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-            if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status <= ModbusRemDev.STATUSREADY) {
-                if (((ModbusRemDev)d).modbusRTUMasterRead(
-	                               ((ModbusRemDev)d).ctx, ((ModbusRemDev)d).address, 0, 1, buffer) == 3) {
-                    ((ModbusRemDev)d).elapsedTime := (int)buffer[0]
-                    ((ModbusRemDev)d).packetsTotal := (int)buffer[1]
-                    ((ModbusRemDev)d).packetsError := (int)buffer[2]
-                    ((ModbusRemDev)d).status := ModbusRemDev.STATUSOK
-                } else {
-                    ((ModbusRemDev)d).elapsedTime := -1
-                    ((ModbusRemDev)d).packetsTotal := -1
-                    ((ModbusRemDev)d).packetsError := -1
-                    ((ModbusRemDev)d).status := ModbusRemDev.STATUSOFFLINE
+            for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                if (d.type.is(ModbusRemDev.type) && ((ModbusRemDev)d).status <= ModbusRemDev.STATUSREADY) {
+                    if (((ModbusRemDev)d).modbusRTUMasterRead(
+                                       ((ModbusRemDev)d).ctx, ((ModbusRemDev)d).address, 0, 1, buffer) == 3) {
+                        ((ModbusRemDev)d).elapsedTime := (int)buffer[0]
+                        ((ModbusRemDev)d).packetsTotal := (int)buffer[1]
+                        ((ModbusRemDev)d).packetsError := (int)buffer[2]
+                        ((ModbusRemDev)d).status := ModbusRemDev.STATUSOK
+                    } else {
+                        ((ModbusRemDev)d).elapsedTime := -1
+                        ((ModbusRemDev)d).packetsTotal := -1
+                        ((ModbusRemDev)d).packetsError := -1
+                        ((ModbusRemDev)d).status := ModbusRemDev.STATUSOFFLINE
+                    }
+                    d.execute()
+                    // Sys.sleep(1ms);
                 }
-                d.execute()
-            }
-            else if (d.type.is(ModbusLocDev.type) && ((ModbusLocDev)d).status <= ModbusLocDev.STATUSREADY) {
-                ** log.message("ModbusRTU::execute ((ModbusLocDev)d).modbusRTUSlaveRead")
-                if (((ModbusLocDev)d).modbusRTUSlaveRead(
-	                       ((ModbusLocDev)d).ctx, ((ModbusLocDev)d).address, 0, 1, buffer) == 1) {
-	    		  	** log.message("6666 ModbusRTU::execute LOC_RTU modbusRTUSlaveRead buffer=${buffer[0]}")
-	                ((ModbusLocDev)d).elapsedTime := (int)buffer[0]
-	                ((ModbusLocDev)d).status := ModbusLocDev.STATUSOK
-                } else {
-	    		    ** log.message("7777 ModbusRTU::execute LOC_RTU modbusRTUSlaveRead")
-	                ((ModbusLocDev)d).elapsedTime := -1
-	                ((ModbusLocDev)d).status := ModbusLocDev.STATUSOFFLINE
+                else if (d.type.is(ModbusLocDev.type) && ((ModbusLocDev)d).status <= ModbusLocDev.STATUSREADY) {
+                    ** log.message("ModbusRTU::execute ((ModbusLocDev)d).modbusRTUSlaveRead")
+                    if (((ModbusLocDev)d).modbusRTUSlaveRead(
+                               ((ModbusLocDev)d).ctx, ((ModbusLocDev)d).address, 0, 1, buffer) == 1) {
+                        // log.message("6666 ModbusRTU::execute LOC_RTU modbusRTUSlaveRead buffer=${buffer[0]}")
+                        ((ModbusLocDev)d).elapsedTime := (int)buffer[0]
+                        ((ModbusLocDev)d).status := ModbusLocDev.STATUSOK
+                    } else {
+                        ** log.message("7777 ModbusRTU::execute LOC_RTU modbusRTUSlaveRead")
+                        ((ModbusLocDev)d).elapsedTime := -1
+                        ((ModbusLocDev)d).status := ModbusLocDev.STATUSOFFLINE
+                    }
+                    d.execute()
+                    //  Sys.sleep(1ms);
                 }
-                d.execute()
             }
-          }
-          updateVariable()
+            // updateVariable()
         }
         if(isNeedReconnect == true)
         {
@@ -170,34 +172,34 @@ class ModbusRTU
                       && ((ModbusRemDev)d).status != FieldBusDevice.STATUSOK) {
                     log.message("((ModbusRemDev)d).status = ${((ModbusRemDev)d).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
                     for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
-                       if (s.type.is(ModbusNetVarIn.type)) {
-                          log.message("((ModbusNetVarIn)s) = ${((ModbusNetVarIn)s).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
-                          ((ModbusNetVarIn)s).changed(ModbusNetVarIn.Address);
-                          // isNeedReconnect := false
-                          // return;
-                          // break;
-                       }
-                       else if (s.type.is(ModbusNetVarOut.type)) {
-                          log.message("((ModbusNetVarOut)s) = ${((ModbusNetVarOut)s).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
-                          ((ModbusNetVarOut)s).changed(ModbusNetVarOut.Address);
-                       }
+                        if (s.type.is(ModbusNetVarIn.type)) {
+                           log.message("((ModbusNetVarIn)s) = ${((ModbusNetVarIn)s).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
+                           ((ModbusNetVarIn)s).changed(ModbusNetVarIn.Address);
+                           // isNeedReconnect := false
+                           // return;
+                           // break;
+                        }
+                        else if (s.type.is(ModbusNetVarOut.type)) {
+                           log.message("((ModbusNetVarOut)s) = ${((ModbusNetVarOut)s).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
+                           ((ModbusNetVarOut)s).changed(ModbusNetVarOut.Address);
+                        }
                     }
                 }
                 else if (d.type.is(ModbusLocDev.type) 
                         && ((ModbusLocDev)d).status != FieldBusDevice.STATUSOK) {
                     log.message("((ModbusLocDev)d).status = ${((ModbusLocDev)d).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
                     for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
-                       if (s.type.is(ModbusNetVarIn.type)) {
-                          log.message("((ModbusNetVarIn)s) = ${((ModbusNetVarIn)s).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
-                          ((ModbusNetVarIn)s).changed(ModbusNetVarIn.Address);
-                          // isNeedReconnect := false
-                          // return;
-                          // break;
-                       }
-                       else if (s.type.is(ModbusNetVarOut.type)) {
-                          log.message("((ModbusNetVarOut)s) = ${((ModbusNetVarOut)s).status} with ${((ModbusLocDev)d).deviceName.toStr()}")
-                          ((ModbusNetVarOut)s).changed(ModbusNetVarOut.Address);
-                       }
+                        if (s.type.is(ModbusNetVarIn.type)) {
+                           log.message("((ModbusNetVarIn)s) = ${((ModbusNetVarIn)s).status} with ${((ModbusRemDev)d).deviceName.toStr()}")
+                           ((ModbusNetVarIn)s).changed(ModbusNetVarIn.Address);
+                           // isNeedReconnect := false
+                           // return;
+                           // break;
+                        }
+                        else if (s.type.is(ModbusNetVarOut.type)) {
+                           log.message("((ModbusNetVarOut)s) = ${((ModbusNetVarOut)s).status} with ${((ModbusLocDev)d).deviceName.toStr()}")
+                           ((ModbusNetVarOut)s).changed(ModbusNetVarOut.Address);
+                        }
                     }
                 }
             }
@@ -205,7 +207,7 @@ class ModbusRTU
         }
     }
   
- 
+/* 
     private void updateVariable()
     {
        ** log.message("Enter updateVariable name=$name")
@@ -213,21 +215,21 @@ class ModbusRTU
        for (Component f = Sys.app.lookup(children); f != null; f = Sys.app.lookup(f.nextSibling)) {
          ** log.message("children updateVariable name=$name")
             if (f.type.is(Variable.type) && !f.name.equals("service")) {
-               Str nameComponentStr = ((Variable)f).name
-               ** log.message("updateVariable nameComponentStr=$nameComponentStr and name=$name")
-               f.execute()
+                Str nameComponentStr = ((Variable)f).name
+                ** log.message("updateVariable nameComponentStr=$nameComponentStr and name=$name")
+                f.execute()
             }
        }
        ** log.message("Left updateVariable name=$name")
     }
-
+  */
  
     ////////////////////////////////////////////////////////////////
     // App support
     ////////////////////////////////////////////////////////////////
     private void flush()
     {
-	    log.message("4343434 ModbusRTU flush")
+        log.message("4343434 ModbusRTU flush")
         // if (ctx != -1) {
         //   cleanCache()
         //   dC(ctx)
@@ -239,7 +241,7 @@ class ModbusRTU
         int iLocCtxIdx = 0
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
             if (d.type.is(ModbusRemDev.type)) {
-              // if (((ModbusRemDev)d).ctx != -1) {
+                // if (((ModbusRemDev)d).ctx != -1) {
                     log.message("4343434 ModbusRTU ModbusRemDev cleanCache by ((ModbusRemDev)d).ctx = ${((ModbusRemDev)d).ctx}")
                     cleanCache()
                     // Lujiaming comment it at 26/07/16
@@ -253,7 +255,7 @@ class ModbusRTU
                     log.message("11111 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
                 // } 
                 // else {
-	    		//    log.message("ModbusRemDev)d).ctx == -1")
+                //    log.message("ModbusRemDev)d).ctx == -1")
                 // } 
             }
             else if (d.type.is(ModbusLocDev.type)) {
@@ -272,43 +274,43 @@ class ModbusRTU
                 // } 
             }
         }
-	    log.message("4343434 ModbusRTU ctx = dO(rsmode, port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)")
+        log.message("4343434 ModbusRTU ctx = dO(rsmode, port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)")
         // ctx = dO(port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)
         int modbus_remdev_ctx = -1
         int modbus_locdev_ctx = -1
         // add device node.
         bool bRet = false
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-          if (d.type.is(ModbusRemDev.type)) {
+            if (d.type.is(ModbusRemDev.type)) {
                 ((ModbusRemDev)d).bus = this
                 if(modbus_remdev_ctx == -1)
                 {
-              	    ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusRTUMasterOpen(
+                    ((ModbusRemDev)d).ctx = ((ModbusRemDev)d).modbusRTUMasterOpen(
                          rsmode, port, band, parity, dataBits, stopBits, retryDelay, responseTimeout)
-	                modbus_remdev_ctx = ((ModbusRemDev)d).ctx
+                    modbus_remdev_ctx = ((ModbusRemDev)d).ctx
                 }
                 else 
                 {
-	                ((ModbusRemDev)d).ctx = modbus_remdev_ctx
+                    ((ModbusRemDev)d).ctx = modbus_remdev_ctx
                 }
                 log.message("22222 flush ((ModbusRemDev)d).status=${((ModbusRemDev)d).status}")
                 log.message("22222 flush ((ModbusRemDev)d).ctx=${((ModbusRemDev)d).ctx}")
-          }
-          else if (d.type.is(ModbusLocDev.type)) {
+            }
+            else if (d.type.is(ModbusLocDev.type)) {
                 ((ModbusLocDev)d).bus = this
                 if(modbus_locdev_ctx == -1)
                 {
-                	((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusRTUSlaveOpen(
+                    ((ModbusLocDev)d).ctx = ((ModbusLocDev)d).modbusRTUSlaveOpen(
                          rsmode, port, band, parity, dataBits, stopBits)
-	                modbus_locdev_ctx = ((ModbusLocDev)d).ctx
+                    modbus_locdev_ctx = ((ModbusLocDev)d).ctx
                 }
                 else 
                 {
-	                ((ModbusLocDev)d).ctx = modbus_locdev_ctx
+                    ((ModbusLocDev)d).ctx = modbus_locdev_ctx
                 }
                 log.message("22222 flush ((ModbusLocDev)d).status=${((ModbusLocDev)d).status}")
                 log.message("22222 flush ((ModbusLocDev)d).ctx=${((ModbusLocDev)d).ctx}")
-          }
+            }
         }
         
         if (bRet == false) {
@@ -359,11 +361,12 @@ class ModbusRTU
         for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
             if (f.type.is(Folder.type) && !f.name.equals("service")) {
                 for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                    if (r.type.is(ModbusFieldBusIO.type)) {
-                      ((ModbusFieldBusIO)r).bus = null
-                      ((ModbusFieldBusIO)r).cache = 0
-                      ((ModbusFieldBusIO)r).busId = 0
-                      ((ModbusFieldBusIO)r).status := ModbusFieldBusIO.STATUSNODEV
+                    // if (r.type.is(ModbusFieldBusIO.type)) {
+                    if (r.type.is(ModbusFieldBusIO.type) && ((ModbusFieldBusIO)r).busId == id) {
+                        ((ModbusFieldBusIO)r).bus = null
+                        ((ModbusFieldBusIO)r).cache = 0
+                        ((ModbusFieldBusIO)r).busId = 0
+                        ((ModbusFieldBusIO)r).status := ModbusFieldBusIO.STATUSNODEV
                     }
                 }
             }
@@ -429,7 +432,7 @@ class ModbusRTU
                         dev = (ModbusRemDev)d
                         break
                     }
-                    else if (d.type.is(ModbusLocDev.type) &&                 			
+                    else if (d.type.is(ModbusLocDev.type) &&                             
                                (r.type.is(ModbusNetVarIn.type) || r.type.is(ModbusNetVarOut.type))&& 
                                ((ModbusFieldBusIO)r).devStr.equals(((ModbusLocDev)d).deviceName.toStr())) {
                         dev = (ModbusLocDev)d

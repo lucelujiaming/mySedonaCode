@@ -80,7 +80,7 @@ class BacnetIP
     if (status != STATUSNODEV) {
         for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
            d.execute();
-           Sys.sleep(1ms);
+           // Sys.sleep(1ms);
         }
     }
   }
