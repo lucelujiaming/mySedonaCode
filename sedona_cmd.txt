@@ -26,6 +26,1076 @@ fi
 
 
 
+  507  make ARCH=arm LicheePi_Zero_defconfig
+  508  make ARCH=arm menuconfig
+  509  make ARCH=arm CROSS_COMPILE=~/WORK/v3ssdk/tools/external-toolchain/bin/arm-linux-gnueabi-
+  
+ sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev libc6-dev lib32ncurses5-dev gcc-multilib x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev g++-multilib mingw32 tofrodos python-markdown libxml2-utils
+
+
+make ARCH=arm LicheePi_Zero_defconfig
+make ARCH=arm menuconfig
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+
+
+int is_need_speedup(int statusEth0, int statusEth1)
+{
+    // Both were connected.
+    if((status_eth0 != 0) && (status_eth1 != 0))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+
+
+  505  git clone https://git.openwrt.org/openwrt/openwrt.git
+  506  ls
+  507  ls -a
+  508  cd openwrt/
+  509  ls
+  510  ./scripts/feeds update -a
+  511  ./scripts/feeds install -a
+  512  make menuconfig
+  513  history | tail -10
+
+#   ./scripts/feeds update -a
+#   ./scripts/feeds install libmesa
+#   ./scripts/feeds install libwayland
+#   ./scripts/feeds install libgraphene
+#   ./scripts/feeds install python3-pysocks
+#   ./scripts/feeds install python3-unidecode
+
+
+
+
+
+', which does not exist
+WARNING: Makefile 'package/feeds/packages/onionshare-cli/Makefile' has a dependency on '', which does 
+
+
+struct spinand_info_t {              W25N01GV       W25N04KV
+	char * name;                                    
+	struct {                                        
+		uint8_t val[4];                             
+		uint8_t len;                                
+	} id;                                           
+	uint32_t page_size;             2048            2048
+	uint32_t spare_size;             64             128
+	uint32_t pages_per_block;        64             64
+	uint32_t blocks_per_die;         1024           2048
+	uint32_t planes_per_die;                        
+	uint32_t ndies;                                 
+};
+
+
+Target System (Allwinner ARM SoCs)
+Subtarget (Allwinner A20/A3x/H3/R40) 
+Target Profile (LicheePi Zero with Dock (V3s))
+
+
+xfel.exe spinand
+xfel.exe spinand erase 0x0 0x100000
+xfel.exe spinand write 0x0 u-boot-sunxi-with-spl.bin_split_exp
+
+xfel.exe spinand
+xfel.exe spinand erase 0x100000 0x20000
+xfel.exe spinand write 0x100000 sun8i-v3s-licheepi-zero.dtb
+xfel.exe spinand erase 0x120000 0x500000
+xfel.exe spinand write 0x120000 zImage
+
+xfel.exe spinand 
+xfel.exe spinand erase 0x620000 0x1F8FFFFF
+xfel.exe spinand write 0x620000 ubi.img  
+
+xfel.exe spinand
+xfel.exe spinand erase 0x0 0x20000000
+xfel.exe spinand write 0x0 flashimg.bin
+
+
+xfel.exe spinand
+xfel.exe spinand erase 0x0 0x20000000
+xfel.exe spinand write 0x0 flashimg_NoSD.bin
+
+
+
+cd ~/WORK/Lichee-Pi/make_image
+
+rm u-boot-sunxi-with-spl.bin_split_exp 
+rm u-boot-sunxi-with-spl.bin_split_exp.imgmeta
+rm sun8i-v3s-licheepi-zero.dtb  zImage 
+rm ubi.img flashimg.bin
+ls
+../gen_sunxi_spinand_onlyboot_img.sh u-boot-sunxi-with-spl.bin_split_exp \
+                  ../u-boot-2022.04/u-boot-sunxi-with-spl.bin  2048 128
+cp ../linux-zero-5.2.y/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb .
+cp ../linux-zero-5.2.y/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dts .
+cp ../linux-zero-5.2.y/arch/arm/boot/zImage .
+cp ../rootfs_from_v3s_cs/ubi.img .
+./make_flashimg_ubifs.sh
+
+Linux烧写镜像：
+cd ~/WORK/xfel-master
+sudo ./xfel spinand 
+sudo ./xfel spinand erase 0x0 0x20000000
+sudo ./xfel spinand write 0x0 ~/WORK/Lichee-Pi/make_image/flashimg.bin
+# 拔掉烧写线。
+sudo ./xfel reset
+
+Linux烧写u-boot：
+cd ~/WORK/xfel-master
+sudo ./xfel spinand 
+sudo ./xfel spinand erase 0x0 0x100000
+sudo ./xfel spinand write 0x0 ~/WORK/Lichee-Pi/make_image/u-boot-sunxi-with-spl.bin_split_exp
+# 拔掉烧写线。
+sudo ./xfel reset
+
+Linux烧写zImage和dtb：
+cd ~/WORK/xfel-master
+sudo ./xfel spinand 
+sudo ./xfel spinand erase 0x100000 0x20000
+sudo ./xfel spinand write 0x100000 ~/WORK/Lichee-Pi/make_image/sun8i-v3s-licheepi-zero.dtb
+sudo ./xfel spinand erase 0x120000 0x500000
+sudo ./xfel spinand write 0x120000 ~/WORK/Lichee-Pi/make_image/zImage
+# 拔掉烧写线。
+sudo ./xfel reset
+
+Linux烧写文件系统：
+505M = 0x1F90 0000 = 515,899,392 - 1 = 0x1F8FFFFF
+488M used the area of 505M
+cd ~/WORK/xfel-master
+sudo ./xfel spinand 
+sudo ./xfel spinand erase 0x620000 0x1F8FFFFF
+sudo ./xfel spinand write 0x620000 ~/WORK/Lichee-Pi/rootfs_from_v3s_cs/ubi.img  
+# 拔掉烧写线。
+sudo ./xfel reset
+
+
+Windows烧写镜像：
+xfel.exe spinand 
+xfel.exe spinand erase 0x0 0x20000000
+xfel.exe spinand write 0x0 flashimg.bin
+# 拔掉烧写线。
+sudo xfel.exe reset
+
+Windows烧写u-boot：
+cd c:\xfel-windows-v1.3.0
+xfel.exe spinand 
+xfel.exe spinand erase 0x0 0x100000
+xfel.exe spinand write 0x0 u-boot-sunxi-with-spl.bin_split_exp
+# xfel.exe spinand write 0x0 u-boot-sunxi-with-spl_add_eth.bin_split_exp
+# 拔掉烧写线。
+xfel.exe reset
+
+Windows烧写zImage和dtb：
+cd c:\xfel-windows-v1.3.0
+xfel.exe spinand 
+xfel.exe spinand erase 0x100000 0x20000
+xfel.exe spinand write 0x100000 sun8i-v3s-licheepi-zero.dtb
+xfel.exe spinand erase 0x120000 0x500000
+xfel.exe spinand write 0x120000 zImage_with_EB
+# 拔掉烧写线。
+sudo ./xfel reset
+
+Windows烧写文件系统：
+xfel.exe spinand 
+xfel.exe spinand erase 0x620000 0x1F8FFFFF
+xfel.exe spinand write 0x620000 ubi.img  
+
+xfel.exe spinand erase 0x620000 0x1F8FFFFF
+xfel.exe spinand write 0x620000 ubi.img  
+
+time make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi- -j8
+time make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi- dtbs
+
+cd make_image/
+cp ../linux-zero-5.2.y_ddc/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb  sun8i-v3s-licheepi-zero_ddc.dtb
+cp ../linux-zero-5.2.y_ddc/arch/arm/boot/zImage ./zImage_ddc
+
+
+mount -t debugfs debug /proc/sys/debug
+ls /proc/device-tree/
+cat /proc/sys/debug/pinctrl/1c20800.pinctrl/pinmux-pins 
+
+tftp -g -r test_ddc_uart 192.168.168.180
+./test_ddc_uart  ttyS1 485
+
+tftp -g -r svm 192.168.168.180
+tftp -g -r libmodbus.so 192.168.168.180
+mv libmodbus.so /usr/lib/
+chmod 777 /usr/lib/libmodbus.so
+ls -l /usr/lib/libmodbus.so
+
+~/WORK/Lichee-Pi/tools/libgpiod/libgpiod-2.2.x_arm
+
+/tools/svm /data/svm/app.scode /data/svm/app.sab
+
+
+/root/app/svm_bak /root/app/app.scode /root/app/app.sab
+
+/root/app/svm_down /root/app/app.scode /root/app/app.sab
+
+
+Opening /dev/ttyS1 at 19200 bauds (N, 8, 1)
+Opening /dev/ttyS1 at 19200 bauds (N, 8, 1)
+
+
+
+
+
+
+./v3s_gpio_outer G 4 1
+./v3s_gpio_outer G 4 0
+./v3s_gpio_outer F 2 1
+./v3s_gpio_outer F 2 0
+
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app_from_168_5.sab
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app_from_zhu.sab
+
+
+# echo -e -n "\7\3\2" > /dev/tpc116s4
+[ 3309.235042] tpc116s4: device_write 3 
+# 
+
+
+
+
+
+-- MESSAGE [sys::Component] ModbusRTU::slot.name=status lot.flags=0 and slot.type.id=4 and slot.type.name=int
+/root/app/svm: symbol lookup error: /usr/lib/libmodbus.so: undefined symbol: V3S_GPIO_Init
+
+
+
+# find / -name "tpc116s4"
+/sys/bus/spi/drivers/tpc116s4
+find: /proc/6816: No such file or directory
+# find / -name "tpc116s4*"
+/sys/firmware/devicetree/base/soc/spi@1c68000/tpc116s4_tr@2
+/sys/bus/spi/drivers/tpc116s4
+find: /proc/7455: No such file or directory
+
+
+
+
+
+
+
+
+spi-max-frequency = <100000>;
+
+xfel.exe spinand 
+xfel.exe spinand erase 0x0 0x100000
+xfel.exe spinand write 0x0 u-boot-sunxi-with-spl.bin_split_exp
+xfel.exe spinand erase 0x100000 0x20000
+xfel.exe spinand write 0x100000 sun8i-v3s-licheepi-zero_ddc.dtb
+xfel.exe spinand erase 0x120000 0x500000
+xfel.exe spinand write 0x120000 zImage_ddc
+# xfel.exe spinand erase 0x620000 0x1F8FFFFF
+# xfel.exe spinand write 0x620000 ubi_add_mstpd.img
+
+cp ../linux-zero-5.2.y_ddc/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dts  sun8i-v3s-licheepi-zero_ddc.dts
+cp ../linux-zero-5.2.y_ddc/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb  sun8i-v3s-licheepi-zero_ddc.dtb
+cp ../linux-zero-5.2.y_ddc/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb  sun8i-v3s-licheepi-zero_ddc.dtb
+cp ../linux-zero-5.2.y_ddc/arch/arm/boot/zImage ./zImage_ddc
+
+# tftp -g -r xungao_soft_spi_driver.ko 192.168.10.180
+# chmod 777 xungao_soft_spi_driver.ko
+
+
+/root/app/svm /root/app/app.scode /root/app/app.sab
+
+
+195161
+
+
+
+
+cp ../linux-zero-5.2.y_ddc_spidev/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb  sun8i-v3s-licheepi-zero_ddc.dtb
+cp ../linux-zero-5.2.y_ddc_spidev/arch/arm/boot/zImage zImage_ddc
+
+mount -t debugfs debug /proc/sys/debug
+cd /proc/sys/debug
+cd pinctrl/1c20800.pinctrl/
+cat pinconf-pins 
+
+cd /proc/sys/debug
+cd pinctrl/
+cat pinctrl-maps 
+
+echo 139 > /sys/class/gpio/export
+echo in > /sys/class/gpio/gpio139/direction
+echo 140 > /sys/class/gpio/export
+echo in > /sys/class/gpio/gpio140/direction
+echo 141 > /sys/class/gpio/export
+echo in > /sys/class/gpio/gpio141/direction
+echo 142 > /sys/class/gpio/export
+echo in > /sys/class/gpio/gpio142/direction
+
+cat /sys/class/gpio/gpio139/value
+cat /sys/class/gpio/gpio140/value
+cat /sys/class/gpio/gpio141/value
+cat /sys/class/gpio/gpio142/value
+
+
+echo PE16 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+echo PE0 0 >  /proc/sys/debug/sunxi_pinctrl/function
+cat /proc/sys/debug/sunxi_pinctrl/data
+
+
+mount -t debugfs debug /proc/sys/debug
+ls /proc/device-tree/
+
+echo 132 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio132/direction
+echo 1   > /sys/class/gpio/gpio132/value
+cat /sys/class/gpio/gpio132/value
+
+echo 128 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio128/direction
+echo 1   > /sys/class/gpio/gpio128/value
+cat /sys/class/gpio/gpio128/value
+
+
+// 0x80 = 128,
+0x84 = 132, 0x88 = 136, 0x8A = 138, 0x8C = 140, 0x8E = 142
+0x55 = 85 , 0x62 = 98 , 0xAA = 170   
+
+./v3s_gpio_outer E 18 1
+
+ ./v3s_gpio_outer E 16 0
+
+ ./tpafe51760_operator 132 106    // 0x6A = 106: burst mode enable, seqencer enable, OS by  4, yes status, no CRC
+ ./tpafe51760_operator 132 122    // 0x7A = 122: burst mode enable, seqencer enable, OS by 64, yes status, no CRC
+
+ ./tpafe51760_operator 132 98    // 0x62 = 98: burst mode enable, seqencer enable, no OS, yes status, no CRC
+ ./tpafe51760_operator 136 85    // ± 2.5 V。
+ ./tpafe51760_operator 138 85    // ± 2.5 V。
+ ./tpafe51760_operator 140 85    // ± 2.5 V。
+ ./tpafe51760_operator 142 85    // ± 2.5 V。
+
+ ./tpafe51760_operator 132 98    // 0x62 = 98: burst mode enable, seqencer enable, no OS, yes status, no CRC
+ ./tpafe51760_operator 136 0    // ± 10 V。
+ ./tpafe51760_operator 138 0    // ± 10 V。
+ ./tpafe51760_operator 140 0    // ± 10 V。
+ ./tpafe51760_operator 142 0    // ± 10 V。
+
+ ./tpafe51760_operator 132 98    // 0x62 = 98: burst mode enable, seqencer enable, no OS, yes status, no CRC
+ ./tpafe51760_operator 136 170   // ± 5 V。
+ ./tpafe51760_operator 138 170   // ± 5 V。
+ ./tpafe51760_operator 140 170   // ± 5 V。
+ ./tpafe51760_operator 142 170   // ± 5 V。
+
+ # Read Configuration register
+ ./tpafe51760_operator 4  0  
+ # Read Channel register  
+ ./tpafe51760_operator 6  0
+ # Read Input Range Register A1
+ ./tpafe51760_operator 8  0
+ # Read Input Range Register A2
+ ./tpafe51760_operator 10 0
+ # Read Input Range Register B1
+ ./tpafe51760_operator 12 0
+ # Read Input Range Register B2
+ ./tpafe51760_operator 14 0
+
+# CONVST LOW
+./v3s_gpio_outer B 3 0
+# CONVST HIGH
+./v3s_gpio_outer B 3 1
+
+# RESET HIGH
+./v3s_gpio_outer G 4 1
+# RESET LOW
+./v3s_gpio_outer G 4 0
+# CS_TPA
+./v3s_gpio_outer E 4 1
+./v3s_gpio_outer E 0 0
+
+
+
+
+ ./tpafe51760_operator 132 98
+  ./tpafe51760_operator 4 0
+
+ ./test_sn74hc595 0 0 0 0 0 0 0 0
+
+ ./tpafe51760_operator 130 98
+
+ ./tpafe51760_operator 6  0
+ ./tpafe51760_operator 134 119 0
+
+mount -t debugfs debug /proc/sys/debug
+cd /proc/sys/debug
+cd pinctrl/1c20800.pinctrl/
+cat pinconf-pins 
+cat pinctrl-maps 
+
+
+# C1-1和C1-2控制第1组输入
+#    # 00：电压输入  01：电流输入  10：电阻测量  11：禁止使用
+#    ./v3s_gpio_outer E 10 1
+#    ./v3s_gpio_outer E 9  0
+#    # C2-1和C2-2控制第2组输入
+#    ./v3s_gpio_outer E  8 1
+#    ./v3s_gpio_outer E  7 0
+#    # C3-1和C3-2控制第3组输入
+#    ./v3s_gpio_outer E  6 1
+#    ./v3s_gpio_outer E  5 0
+#    # C4-1和C4-2控制第4组输入
+#    ./v3s_gpio_outer E  4 1
+#    ./v3s_gpio_outer E  3 0
+#    # C5-1和C5-2控制第5组输入
+#    ./v3s_gpio_outer E  2 1
+#    ./v3s_gpio_outer E  1 0
+#    # C6-1和C6-2控制第6组输入
+#    ./v3s_gpio_outer E  0 1
+#    ./v3s_gpio_outer B  3 0
+#    # C7-1和C7-2控制第7组输入
+#    ./v3s_gpio_outer B  4 1
+#    ./v3s_gpio_outer B  5 0
+# C8-1和C8-2控制第8组输入
+./v3s_gpio_outer B  6 1
+./v3s_gpio_outer B  7 0
+
+./v3s_gpio_outer B  6 0
+./v3s_gpio_outer B  7 0
+
+./v3s_gpio_outer E  3 0
+./v3s_gpio_outer E  4 1
+
+
+
+./v3s_gpio_outer E 16 0
+usleep 1000
+./v3s_gpio_outer E 16 1
+usleep 1000
+./v3s_gpio_outer E 16 0
+usleep 1000
+./v3s_gpio_outer E 16 1
+usleep 1000
+./v3s_gpio_outer E 16 0
+usleep 1000
+./v3s_gpio_outer E 16 1
+usleep 1000
+
+
+
+./v3s_gpio_outer E 6 0
+usleep 1000
+./v3s_gpio_outer E 6 1
+usleep 1000
+./v3s_gpio_outer E 6 0
+usleep 1000
+./v3s_gpio_outer E 6 1
+usleep 1000
+./v3s_gpio_outer E 6 0
+usleep 1000
+./v3s_gpio_outer E 6 1
+usleep 1000
+
+下面是旧的板子的测试步骤：
+------------------------------------------------------------
+这个板子的地址是：192,168.10.11
+使用xShell登入以后。输入：
+./v3s_gpio_outer E 18 1
+
+./tpafe51760_operator 132 98                // 0x62 = 98: burst mode enable, seqencer enable, no OS, yes status, no CRC
+./tpafe51760_operator 136 0                // ± 10 V。
+./tpafe51760_operator 138 0                // ± 10 V。
+./tpafe51760_operator 140 0                // ± 10 V。
+./tpafe51760_operator 142 0                // ± 10 V。
+默认为电压模式。
+./v3s_gpio_outer B  6 0
+./v3s_gpio_outer B  7 0
+切换为电阻模式：
+ ./tpafe51760_operator 132 98 
+ ./tpafe51760_operator 136 170 
+ ./tpafe51760_operator 138 170 
+ ./tpafe51760_operator 140 170 
+ ./tpafe51760_operator 142 170 
+
+./v3s_gpio_outer B  6 0
+./v3s_gpio_outer B  7 1
+切换为电流模式：
+ ./tpafe51760_operator 132 98 
+ ./tpafe51760_operator 136 170 
+ ./tpafe51760_operator 138 170 
+ ./tpafe51760_operator 140 170 
+ ./tpafe51760_operator 142 170 
+
+./v3s_gpio_outer B  6 1
+./v3s_gpio_outer B  7 0
+
+开始测试：
+./test_tpafe51760_cycle
+
+此时可以把不同电阻值的电阻接上去。之后读取的电压就会发生变化。
+------------------------------------------------------------
+
+下面是新的板子的测试步骤：
+------------------------------------------------------------
+这个板子的地址是：192,168.10.31
+使用xShell登入以后。输入：
+./v3s_gpio_outer G 4 1
+
+./tpafe51760_operator 132 98 
+./tpafe51760_operator 136 0  
+./tpafe51760_operator 138 0  
+./tpafe51760_operator 140 0  
+./tpafe51760_operator 142 0  
+默认为电压模式。
+./test_sn74hc595 0 0 0 0 0 0 0 0
+切换为电阻模式：
+ ./tpafe51760_operator 132 98 
+ ./tpafe51760_operator 136 170 
+ ./tpafe51760_operator 138 170 
+ ./tpafe51760_operator 140 170 
+ ./tpafe51760_operator 142 170 
+
+./test_sn74hc595 1 1 1 1 1 1 1 1
+切换为电流模式：
+ ./tpafe51760_operator 132 98 
+ ./tpafe51760_operator 136 170 
+ ./tpafe51760_operator 138 170 
+ ./tpafe51760_operator 140 170 
+ ./tpafe51760_operator 142 170 
+
+./test_sn74hc595 2 2 2 2 2 2 2 2
+
+开始测试：
+./test_tpafe51760_cycle
+
+此时可以把不同电阻值的电阻接上去。之后读取的电压就会发生变化。
+------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+./v3s_gpio_outer B  4 1
+./v3s_gpio_outer B  5 0
+
+致态 ZHITAI TiPlus 7100
+
+
+cd source/
+make clean
+make
+cd ..
+bin/sedonac.sh src/Variable
+bin/sedonac.sh src/FieldBus
+bin/sedonac.sh source/app.xml
+ 
+
+tftp -g -r app.scode  192.168.10.180
+tftp -g -r svm 192.168.10.180
+
+-1130643456.00
+ 1000000
+
+/tools/svm /data/svm/app.scode /data/svm/app.sab
+/data/svm/svm /data/svm/app.scode /data/svm/app.sab
+
+./svm app.scode app.sab
+
+D:\SeconaDownload
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
+
+
+cp ../linux-zero-5.2.y_ddc_spidev/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb  sun8i-v3s-licheepi-zero_ddc.dtb
+cp ../linux-zero-5.2.y_ddc_spidev/arch/arm/boot/zImage zImage_ddc
+
+
+
+
+
+
+
+
+mkdir libgpio
+cd libgpio
+tftp -g -r gpiodetect   192.168.10.180
+tftp -g -r gpiofind     192.168.10.180
+tftp -g -r gpioget      192.168.10.180
+tftp -g -r gpioinfo     192.168.10.180
+tftp -g -r gpiomon      192.168.10.180
+tftp -g -r gpioset      192.168.10.180
+
+
+export C_INCLUDE_PATH=/home/lucelu/WORK/Lichee-Pi/linux-zero-5.2.y/include/:/usr/include/
+
+u32 oldbit = (!(word & (1<<(bits-1)))) << 31;
+这个宏的意思是说：
+取出这个32比特中，最低位的8个比特的最高位。之后求反。
+如果这个位为1，则结果为0x7F。
+如果这个位为0，则结果为0xFF。
+之后左移
+
+
+
+
+
+
+
+
+cd app
+tftp -g -r xungao_tpc116s4_driver.ko 192.168.10.180
+tftp -g -r test_tpc116s4_driver 192.168.10.180
+chmod 777 xungao_tpc116s4_driver.ko test_tpc116s4_driver 
+
+cd app
+insmod xungao_tpc116s4_driver.ko
+./test_tpc116s4_driver 170 43690
+
+
+cd app
+tftp -g -r xungao_tpafe51760_driver.ko 192.168.10.180
+tftp -g -r test_tpafe51760_driver 192.168.10.180
+chmod 777 xungao_tpafe51760_driver.ko test_tpafe51760_driver 
+
+
+cd app
+insmod xungao_tpafe51760_driver.ko
+./test_tpafe51760_driver 170 43690
+
+./test_tpafe51760_driver 67 8
+./test_tpafe51760_driver 4 134
+
+./test_tpafe51760_driver   134 8
+
+# cd app
+# tftp -g -r xungao_tpc116s4_driver.ko 192.168.10.180
+# tftp -g -r test_tpc116s4_driver 192.168.10.180
+# chmod 777 xungao_tpc116s4_driver.ko test_tpc116s4_driver 
+
+insmod xungao_tpafe51760_driver.ko 
+insmod xungao_tpc116s4_driver.ko 
+
+
+
+# poweroff
+
+./test_tpc116s4_driver 10 12800
+./test_tpc116s4_driver 10 25600
+./test_tpc116s4_driver 10 51200
+
+
+./test_tpc116s4 8 12800
+./test_tpc116s4 8 25600
+./test_tpc116s4 8 51200
+
+./test_tpc116s4 10 12800
+./test_tpc116s4 10 25600
+./test_tpc116s4 10 51200
+
+
+./test_tpc116s4 12 12800
+./test_tpc116s4 12 25600
+./test_tpc116s4 12 51200
+
+./test_tpc116s4 14 12800
+./test_tpc116s4 14 25600
+./test_tpc116s4 14 51200
+
+
+xfel.exe spinand 
+xfel.exe spinand erase 0x0 0x100000
+xfel.exe spinand write 0x0 u-boot-sunxi-with-spl.bin_split_exp
+xfel.exe spinand erase 0x100000 0x20000
+xfel.exe spinand write 0x100000 sun8i-v3s-licheepi-zero.dtb
+xfel.exe spinand erase 0x120000 0x500000
+xfel.exe spinand write 0x120000 zImage_with_EB
+xfel.exe spinand erase 0x620000 0x1F8FFFFF
+xfel.exe spinand write 0x620000 ubi.img
+
+pulldown-gpio = <&gpio 20 GPIO_PULL_DOWN>;
+
+// <&pio 4 15 GPIO_ACTIVE_HIGH>,        /* PE15 */
+119  /*
+120     tpafe51760:tpafe51760@0 {
+121         #address-cells = <1>;
+122         #size-cells = <1>;
+123         compatible = "tpafe51760";
+124         reg = <0>;
+125         spi-max-frequency = <50000000>;
+126         cs-gpios = <&pio 4 15 GPIO_ACTIVE_LOW>;   
+127     };
+128   */
+
+
+
+
+
+
+ 82         conv_led {
+ 83             label = "licheepi:conv:usr";
+ 84             gpios = <&pio 4 16 GPIO_ACTIVE_LOW>; /* PG2 */
+ 85         };
+
+
+
+
+
+
+
+
+./test_tpc116s4_driver 252 123
+
+# 
+# ./test_tpc116s4_driver 252 123
+PageSize:4096,PageMask:0xFFFFF000
+addr_start:01C20000,addr_offset:0x00000800
+gpio_map:B6F81000
+PIO:0xB6F81800
+[   46.346578] LULULUi SPI_MASTER_GPIO_SS let tpc116s4 spi->chip_select = 2
+[   53.014453] tpc116s4: device_write 252:0:123 
+[   53.025641] tpc116s4: device_write 3 
+[   53.029393] LULULUi __spi_validate return 0
+[   53.029397] LULULUi __spi_validate return 0
+[   53.033660] LULULUi __spi_validate return 0
+[   53.037881] LULULUi Enter let tpc116s4 spi->chip_select = 2
+[   53.042062] LULULUi SPI_MASTER_GPIO_SS let tpc116s4 spi->chip_select = 2
+[   53.047701] LULULUi Enter let tpc116s4 spi->chip_select = 2
+write return  3
+cData is   252:0:123
+unmap success!
+# 
+# 
+
+通过SPI配置TPAFE51760的寄存器，重点设置DAC输出模式、参考电压源及增益参数；
+使用逻辑分析仪抓取通信波形，
+确认SCL/SDA时序符合规格；实测输出电压在满量程范围内呈良好线性关系，
+但偏移误差约±45mV，拟通过软件校准表补偿。
+进一步优化校准算法，引入两点校准法消除偏移与增益误差；完成16点校准表烧录至EEPROM，
+
+
+These functions do not call setmosi or getmiso if respective flag (SPI_MASTER_NO_RX or SPI_MASTER_NO_TX) is set, so they are safe to call when such pin is not present or defined in the controller. A separate set of callbacks is defined to get highest possible speed in the generic case (when both MISO and MOSI lines are available), as optimiser will remove the checks when argument is constant.
+
+
+
+
+
+int g_cs_gpio      = 0;
+int g_nand_cs_gpio = 0;
+of_spi_register_master
+
+111     cs-gpios  = <&pio 2 2 GPIO_ACTIVE_LOW>,         /* PC2 */
+112                 <&pio 4 15 GPIO_ACTIVE_LOW>,        /* PE15 */
+113                 <&pio 5 0 GPIO_ACTIVE_LOW>;         /* PF0 */
+
+     cs-gpios  = <0>,                                /* PC2 */
+                 <&pio 4 15 GPIO_ACTIVE_LOW>,        /* PE15 */
+                 <&pio 5 0 GPIO_ACTIVE_LOW>;         /* PF0 */
+
+------------------------------------------------------------------------------------------
+# ifconfig br0
+br0       Link encap:Ethernet  HWaddr 02:02:66:2E:F5:05  
+          inet addr:192.168.10.41  Bcast:192.168.10.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:268 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:179 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:16070 (15.6 KiB)  TX bytes:15869 (15.4 KiB)
+
+# ls
+app.sab               current_first_ip      instrument_info       ptc310_app            svm_info.txt          www
+app_134.scode         current_second_ip     ospf_lsu_sender       ptc310_config_editor  sys_config.ini
+broadcast_sender      goahead               param_config.ini      svm                   v3s_sdc_det_operator
+# ls ../
+LittlevGL240X320             delete-tmp-start.sh          qt-env.sh                    start_ethernet.sh
+app                          delete-wifi-sta-dhcp.sh      sdcard                       traceroute_daemon.sh
+appstart.sh                  old_backup_arping_daemon.sh  sdcard2                      usb-set-devicemode.sh
+arping_daemon.sh             play.sh                      start_bridge.sh              usb-set-hostmode.sh
+# 
+------------------------------------------------------------------------------------------
+
+
+            if(current_channel_index >= 8)
+            {
+               current_channel_index = 0
+            }
+            ReadChannel(current_channel_index, data_channel_buffer)
+            log.message("current_channel_index = $current_channel_index with data_channel_buffer[0] = ${data_channel_buffer[0]} and data_channel_buffer[1] = ${data_channel_buffer[1]}") 
+            
+            current_channel_a_readings[current_channel_index] = data_channel_buffer[0]
+            current_channel_b_readings[current_channel_index] = data_channel_buffer[1]
+
+
+
+#include <linux/of_gpio.h>  // 用于从设备树解析GPIO编号
+
+int gpio_num;
+int ret;
+
+// 从设备树获取GPIO编号
+gpio_num = of_get_named_gpio(dev->of_node, "your-gpio", 0);
+if (gpio_num < 0) {
+    dev_err(dev, "Failed to get GPIO from DT\n");
+    return gpio_num;
+}
+
+// 申请GPIO
+ret = devm_gpio_request(dev, gpio_num, "your-gpio-label");
+if (ret) {
+    dev_err(dev, "Failed to request GPIO %d\n", gpio_num);
+    return ret;
+}
+
+// 设置为输出模式，并指定初始电平
+int ret = gpio_direction_output(gpio_num, 1);  // 初始输出高电平
+if (ret) {
+    dev_err(dev, "Failed to set GPIO %d as output\n", gpio_num);
+    return ret;
+}
+------------------------------------------------------------------------------------------
+
+cp ../linux-zero-5.2.y_remove_sdcard/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb ./sun8i-v3s-licheepi-zero_noSD.dtb
+cp ../linux-zero-5.2.y_remove_sdcard/arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dts ./sun8i-v3s-licheepi-zero_noSD.dts
+cp ../linux-zero-5.2.y_remove_sdcard/arch/arm/boot/zImage ./zImage_noSD
+
+
+../gen_sunxi_spinand_onlyboot_img.sh u-boot-sunxi-with-spl.bin_split_exp \
+                  ../u-boot-2022.04_remove_sdcard/u-boot-sunxi-with-spl.bin  2048 128
+../gen_sunxi_spinand_onlyboot_img.sh split.binsplit.bin ../u-boot-2022.04/u-boot-sunxi-with-spl.bin 2048 128
+
+
+../gen_sunxi_spinand_onlyboot_img.sh split_add_eth.bin ../u-boot-2022.04_remove_mmc/u-boot-sunxi-with-spl.bin 2048 128
+
+../gen_sunxi_spinand_onlyboot_img.sh u-boot-sunxi-with-spl_add_eth.bin_split_exp \
+                  ../u-boot-2022.04_remove_mmc/u-boot-sunxi-with-spl.bin 2048 128
+
+ip route add <目标网络> via <网关IP> src <物理网卡IP>
+蓄滞洪区
+
+# ip route add 192.168.10.180 dev eth1
+ip: RTNETLINK answers: File exists
+# ip route add 192.168.10.180 dev eth0
+ip: RTNETLINK answers: File exists
+# ip route del 192.168.10.180 
+# ip route add 192.168.10.180 dev eth0
+# 
+
+
+# brctl showmacs br0
+port no	mac addr		is local?	ageing timer
+  1	00:0e:c6:ab:62:2e	no		   0.01
+  2	02:01:64:27:ee:5a	yes		   0.00
+  1	8e:d9:e9:02:8d:f7	yes		   0.00
+  1	ac:95:00:22:ec:17	no		   9.65
+  1	ac:95:00:22:ec:1d	no		   0.98
+  2	ac:95:00:22:ec:27	no		  14.63
+
+
+# brctl showmacs br0
+port no	mac addr		is local?	ageing timer
+  2	00:0e:c6:ab:62:2e	no		   0.01
+  2	02:01:64:27:ee:5a	yes		   0.00
+  1	8e:d9:e9:02:8d:f7	yes		   0.00
+  2	ac:95:00:22:ec:27	no		  18.07
+  2	ac:95:00:22:ec:2d	no		   0.89
+# 
+
+
+
+
+xfel.exe spinand
+xfel.exe spinand erase 0x0 0x100000
+xfel.exe spinand write 0x0 split_add_eth.bin
+
+xfel.exe spinand
+xfel.exe spinand erase 0x0 0x100000
+xfel.exe spinand write 0x0 u-boot-sunxi-with-spl.bin_split_exp
+
+xfel.exe spinand erase 0x100000 0x20000
+xfel.exe spinand write 0x100000 sun8i-v3s-licheepi-zero_noSD.dtb
+xfel.exe spinand erase 0x120000 0x500000
+xfel.exe spinand write 0x120000 zImage_noSD
+
+xfel.exe spinand 
+xfel.exe spinand erase 0x620000 0x1F8FFFFF
+xfel.exe spinand write 0x620000 ubi.img  
+
+
+xfel.exe spinand
+xfel.exe spinand erase 0x0 0x20000000
+xfel.exe spinand write 0x0 flashimg_NoSD.bin
+
+
+mii device ethernet@1c30000
+setenv ethact ethernet@1c30000
+setenv ipaddr 192.168.168.129
+setenv gatewayip 192.168.168.255
+setenv netmask 255.255.255.0
+setenv serverip 192.168.168.180
+
+
+setenv ipaddr 192.168.147.132
+setenv gatewayip 192.168.147.2
+setenv netmask 255.255.255.0
+setenv serverip 192.168.147.130
+
+
+mii device ethernet@1c30000
+setenv ethact ethernet@1c30000
+setenv ipaddr 192.168.188.199
+setenv gatewayip 192.168.188.255
+setenv netmask 255.255.255.0
+setenv serverip 192.168.188.9
+
+cd /root/
+tftp -g -r mstpd 192.168.10.180
+tftp -g -r mstpctl 192.168.10.180
+chmod 777 mstp* 
+mv mstp* /sbin/
+sync
+
+
+reboot
+
+
+
+make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi- licheepi_zero_defconfig
+
+time make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi- -j8
+make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi- dtbs
+
+time make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi- -j8
+make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi- dtbs
+
+0x1F8FFFFF + 1 = 0x1F900000 + 0x620000 = 0x1FF20000
+
+1024 * 1024 = 1,048,576
+
+0x620000 + 0x1EC0 0000 = 1F20 0000 + 522,190,848 = 498M
+
+/sbin/ifconfig eth1 down
+/sbin/ifconfig eth1 hw ether D2:7C:4B:7A:80:AB
+/sbin/ifconfig eth1 up
+
+
+ifconfig eth1 hw ether D2:7C:4B:7A:80:AB
+ifconfig eth1 192.168.168.130 netmask 255.255.255.0
+
+--wordPos=(-1, 1) at 0-
+
+
+替换：([0-9][0-9][0-9])
+替换成：\1\n
+
+mstpctl setportrestrtcn br0 eth0 yes
+mstpctl setportrestrtcn br0 eth1 yes
+
+[11:57:13]# brctl show
+[11:57:13]bridge name     bridge id               STP enabled     interfaces
+[11:57:13]br0             8000.02016427ee5a       no              eth0
+[11:57:13]                                                        eth1
+
+
+
+第([一二三四五六七])
+\n第\1
+
+([一二三四五六七])、
+\n\1、
+
+> and <>t: <
+
+1. 首先准备使用brctrl加一个桥的脚本
+cd /root/
+vi start_bridge.sh
+
+2. 上传需要的文件
+tftp -g -r mstpd 192.168.168.180
+tftp -g -r mstpctl 192.168.168.180
+tftp -g -r brctl 192.168.168.180
+chmod 777 mstp* brctl start_bridge.sh
+cd /usr/sbin/
+ls -l brctl 
+mv  brctl  brctl_bak
+cd -
+mv brctl /usr/sbin/
+mv mstp* /sbin/
+sync
+
+3. 上传使能USB网卡的程序
+cd app
+tftp -g -r v3s_sdc_det_operator 192.168.168.180
+chmod 777 v3s_sdc_det_operator
+
+chmod 711 /var/empty
+if [ ! -e "/dev/mmcblk0" ]; then
+    /root/app/v3s_sdc_det_operator
+    sleep 5
+fi
+
+4. 启动mstpd服务并添加桥接网卡
+/root/start_bridge.sh  <YourBridgeIP>
+sleep 1
+mstpd -v 2 -d > /root/sdcard/app/mstpd_app_log.log  &
+sleep 1
+mstpctl addbridge br0
+
+
+
+# mstpd -v 10 -d > /root/sdcard/app/mstpd_app_log.log  & 
+# # rstpd -v 10 -d > /root/sdcard/app/mstpd_app_log.log  &      
+# usleep 500000                                                                        
+# while true; do                              
+#     mstpctl addbridge br0                         
+#     sleep 1                                                                            
+#     mstpctl showtreeport br0 eth0 0                                                   
+#     if [ $? -eq 0 ]; then     
+#         break                                                                        
+#     fi                      
+# done  
+
+//        emac: ethernet@1c30000 {
+//                compatible = "allwinner,sun8i-h3-emac";
+//                reg = <0x01c30000 0x104>, <0x01c00030 0x4>;
+//                reg-names = "emac", "syscon";
+//                interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_HIGH>;
+//                resets = <&ccu RST_BUS_EMAC>, <&ccu RST_BUS_EPHY>;
+//                reset-names = "ahb", "ephy";
+//                clocks = <&ccu CLK_BUS_EMAC>, <&ccu CLK_BUS_EPHY>;
+//                clock-names = "ahb", "ephy";
+//                #address-cells = <1>;
+//                #size-cells = <0>;
+//                status = "disabled";
+//        };
+
+du -h --max-depth=1
+
+echo "lujiaming start ptc310_app -----------------------------------"
+# /root/app/ptc310_app ttyS1 ttyS2 > /root/sdcard/app/ptc310_app_log.log &
+/root/app/ptc310_app udp 1234 ttyS1 > /root/sdcard/app/ptc310_app_log.log &            
+echo "lujiaming ptc310_app -----------------------------------"
+
+
+ls
+cp start_bridge.sh  start_bridge_no_stp.sh
+vi start_bridge_no_stp.sh
+
+130         partition@620000 {
+131             label = "rootfs";
+132             //  reg = <0x620000 0x79E0000>;
+133             // Change rootfs from 128M to 256M
+134             reg = <0x620000 0xF9E0000>;
+135         };
+
+1M = 1,048,576
+
+_googlecast._tcp.local: type PTR, class IN, "QM" question
+
+export PATH=${PATH}:/home/lucelu/WORK/u-boot/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/
+
+./configure --build=i686-linux --host=arm-linux-gnueabi --target=arm-linux-gnueabi  --prefix=/home/lucelu/Downloads/mstpd/mstpd/install_lsh CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ --disable-udev
+
 List list = new ArrayList(); 
 list.add(20); 
 List<String> ls = list; 
@@ -33,6 +1103,234 @@ System.out.println(ls.get(0));
 则会抛出堆污染异常
 Exception in thread "main" java.lang.ClassCastException: 
   java.lang.Integer cannot be cast to java.lang.String at Test.Test1.main(Test1.java:29)
+
+徐工您好。我在mstpd的MSTP_OUT_tx_bpdu这个函数中添加了日志打印。发现每一台设备都在不停的发送RST BPDU。
+之后我把一个交换机连接到手拉手网络中进行抓包。果然发现网络中不停的收到每一台设备发送的RST BPDU。
+每一个RST BPDU的Root Identifier和Bridge Identifier始终相等。
+例如如果一个包中的Root Identifier为02:02:66:2e:f5:05。则Bridge Identifier必然也是02:02:66:2e:f5:05。
+而Port identifier则为0x8001或0x8002。
+
+我说一下我的理解，就是难道我现在的这个手拉手网络，是没有根设备的吗？
+为什么每一个设备发出来的RST BPDU都认为自己是Root Identifier？
+
+中东几个只会念经的教士怎么能和深受儒家文化熏陶的精英相比呢。
+首先，伊朗不是波斯。中国人不要总是用那种万世一统的思想去思考世界其他国家。
+这么说吧。很多中国的外交官跑去伊朗扯什么波斯帝国和中华帝国都是文明古国的论调，是被伊朗人当成神经病看待的。
+
+说白了，现在伊朗的统治阶级早就是一群古兰经教士了。和波斯没啥关系了。
+
+
+
+xfel.exe spinand erase 0x100000 0x20000
+xfel.exe spinand write 0x100000 sun8i-v3s-licheepi-zero_noSD.dtb
+xfel.exe spinand erase 0x120000 0x500000
+xfel.exe spinand write 0x120000 zImage_noSD
+
+
+main -> KernelTask -> StartTask -> taskMSTP      ->    Task_MSTP           +-> Modbus_Slave_Analysis
+                                                                           +-> BacnetTask
+                                   taskMSTPRcv   ->    Task_MSTP_Recieve    -> MSTP_Receive_Frame_FSM
+                                   taskModbus    ->    Task_Modbus          -> Modbus_Slave_Analysis
+                                   taskActuator  ->    Task_Actuator        -> ACT_Control
+                                   taskControl   ->    Task_Control         -> VAV_ControlProc
+                                   taskIDWG      ->    IWDG_ReloadCounter   -> IWDG->KR = KR_KEY_Reload;
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   
+    
+    for(int i= 0;i<MODBUS_LIST_MAX;i++)
+    {
+        ModbusList[i].address.unit_addr = (i+1) / 2;
+        ModbusList[i].address.reg_pts = 100;
+        ModbusList[i].address.reg_addr = i + 1;
+        ModbusList[i].value32_be = 1;
+        ModbusList[i].value_type = VT_UINT32;
+        ModbusList[i].com_port = i + 1;
+    }
+
+ 40 CROSS_COMPILE=$TOP_DIR/tools/external-toolchain/bin/arm-linux-gnueabi-
+ 41 UBOOT_DIR=$TOP_DIR/u-boot-2011.09
+ 42 KERNEL_DIR=$TOP_DIR/linux-3.4
+ 43 BUILDROOT_DIR=$TOP_DIR/buildroot
+ 44 BUILDROOT_OUT_DIR=$TOP_DIR/buildroot/out
+ 45 ROOTFS_DIR=$TOP_DIR/rootfs
+
+经过调查，这几个问题都是设备的InstanceNumber问题。现在介绍一下现有的InstanceNumber逻辑。
+首先如果InstanceNumber是错误的。会重启BIP的网络连接。这既是为什么会出现延迟的原因。因为如果多个设备中，只要有一个设备的InstanceNumber是错误的。BIP的网络连接就会重启。导致所有设备都无法连接。
+因此上，现在给出的设计方案就是：
+(1)首先在添加BIP以后，首先使用错误的信息配置BIP。这里可以称为维护态。
+(2)之后添加设备和属性。之后再确认所有的信息全部正确以后，再使用正确的信息配置BIP。这里可以称为运行态。
+(3)如果使用正确的信息配置BIP以后出现问题，可以再次使用错误的信息配置BIP。也就是回到维护态。之后检查之前的设备信息和属性信息是否配置正确。
+换句话说，当上位机在持续操作的过程中，当配置信息不完整甚至是错误百出的情况下，要求设备还能根据不完整甚至是错误百出的配置信息正常运行。是没有任何必要的行为。甚至是无法做到的。
+
+mv   start_bridge.sh                  remove.start_bridge.sh              
+mv   start_bridge_no_stp.sh           remove.start_bridge_no_stp.sh
+mv   start_bridge_with_stp.sh         remove.start_bridge_with_stp.sh
+
+
+echo 1 > /sys/class/net/br0/bridge/flush
+# cat      /sys/class/net/br0/bridge/stp_state
+# echo 2 > /sys/class/net/br0/bridge/stp_state
+
+
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y$ make ARCH=arm CROSS_COMPILE=~/WORK/u-boot/
+        gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-
+  CALL    scripts/checksyscalls.sh
+  CALL    scripts/atomic/check-atomics.sh
+  CHK     include/generated/compile.h
+  Kernel: arch/arm/boot/Image is ready
+  Kernel: arch/arm/boot/zImage is ready
+  DTC     arch/arm/boot/dts/sun8i-v3s-licheepi-zero.dtb
+  DTC     arch/arm/boot/dts/sun8i-v3s-licheepi-zero-dock.dtb
+arch/arm/boot/dts/sun8i-v3s-licheepi-zero-dock.dts:119.24-128.7: Warning (i2c_bus_reg): 
+            /soc/i2c@1c2ac00/touchscreen@14: I2C bus unit address format error, expected "5d"
+  DTC     arch/arm/boot/dts/sun8i-v3s-licheepi-zero-with-480x272-lcd.dtb
+  DTC     arch/arm/boot/dts/sun8i-v3s-licheepi-zero-with-800x480-lcd.dtb
+  Building modules, stage 2.
+  MODPOST 36 modules
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y$ 
+
+mstpctl showbridge br0
+brctl show
+brctl showstp br0
+mstpctl showtree br0 0
+mstpctl showtreeport br0 eth0 0
+mstpctl showtreeport br0 eth1 0
+
+mstpctl settreeprio br0 0 2
+mstpctl settreeprio br0 0 4
+mstpctl settreeprio br0 0 6
+mstpctl settreeprio br0 0 8
+mstpctl settreeprio br0 0 10
+mstpctl setageing br0 10
+mstpctl setforcevers br0 rstp
+
+
+
+ifconfig
+
+mstpctl sethello br0 1
+mstpctl setageing br0 10
+mstpctl setmaxage br0 6
+mstpctl setfdelay br0 4
+
+
+brctl sethello br0 1
+brctl setmaxage br0 10
+brctl setfd br0 4
+
+hello、forwarddelay、maxage只在根桥上配置生效
+
+
+ 97 &i2c0 {
+ 98     status = "okay";
+ 99 
+100     ns2009: ns2009@48 {
+101         compatible = "nsiway,ns2009";
+102         reg = <0x48>;
+103     };
+104 };
+
+mstpd -v 4 -d
+
+sun8i-v3s.dtsi
+
+cd /root/
+cat traceroute_daemon.sh
+tftp -g -r traceroute_daemon.sh 192.168.10.180
+cat traceroute_daemon.sh
+ls -l traceroute_daemon.sh
+sync
+
+reboot
+
+
+https://nga.178.com/read.php?tid=35627665&page=1#pid677712003Anchor
+
+徐工您好。我把交换机的优先级改成了0，也就是最高的优先级。
+之后，把类似于消息老化时间，报文发送间隔，转发延迟都改小了。
+但是优化的效果不大。
+我有一个问题，就是我通过抓包。发现网络中不停的收到每一台设备发送的RST BPDU。
+这个包我通过查阅资料发现是RSTP的P/A机制包。
+也就是P（Proposal）/A（Agreement）机制---请求/确认机制用的数据包。
+
+鉴于这个包非常多。我认为有两种可能。
+一种可能是这个网络一直没有选出来根端口。于是不停的发PA包进行协商。但是一直协商不出来。
+一种情况是这个网络已经选出来根端口了。但是RSTP不依靠定时器来触发网络拓扑变化，而是靠不停的发PA包进行协商。
+我有一个疑问就是：
+您觉得那种可能性比较大？
+另外您那边成功的设备上，这个P（Proposal）/A（Agreement）机制的数据包收发是个什么情况。
+通过聊天记录，您那边应该是每2s会有一个报文。也就是发送不是那么频繁的，对吗？
+
+mkdir -p /usr/local/sbin
+cd /usr/local/sbin
+tftp -g -r  bgpd      192.168.10.180
+tftp -g -r  ospf6d    192.168.10.180
+tftp -g -r  ospfd     192.168.10.180
+tftp -g -r  ripd      192.168.10.180
+tftp -g -r  ripngd    192.168.10.180
+tftp -g -r  zebra     192.168.10.180
+chmod 777 bgpd    
+chmod 777 ospf6d  
+chmod 777 ospfd   
+chmod 777 ripd    
+chmod 777 ripngd  
+chmod 777 zebra   
+
+
+mkdir -p /usr/local/etc
+cd /usr/local/etc
+tftp -g -r  bgpd.conf       192.168.10.180
+tftp -g -r  ospf6d.conf     192.168.10.180
+tftp -g -r  ospfd.conf      192.168.10.180
+tftp -g -r  ripd.conf       192.168.10.180
+tftp -g -r  ripngd.conf     192.168.10.180
+tftp -g -r  zebra.conf      192.168.10.180
+chmod 777   bgpd.conf    
+chmod 777   ospf6d.conf  
+chmod 777   ospfd.conf   
+chmod 777   ripd.conf    
+chmod 777   ripngd.conf  
+chmod 777   zebra.conf   
+
+/usr/local/sbin/ripd -d
+/usr/local/sbin/zebra -d
+
+
+cd /root/app/
+tftp -g -r ospf_lsu_sender 192.168.10.180
+chmod 777 ospf_lsu_sender
+sync
+
+/root/app/ospf_lsu_sender 192.168.10.31  224.0.0.5 192.168.10.180 0.0.0.0
+/root/app/ospf_lsu_sender 192.168.10.31  224.0.0.5 192.168.10.180 0.0.0.0 -m
+/root/app/ospf_lsu_sender 192.168.10.31  224.0.0.6 192.168.10.180 0.0.0.0
+/root/app/ospf_lsu_sender 192.168.10.31  224.0.0.6 192.168.10.180 0.0.0.0 -m
+
+tftp -g -r mstpd   192.168.10.180
+tftp -g -r mstpctl 192.168.10.180
+chmod 777 mstp*
+mv mstp* /sbin/
+sync
+
+cd ../sdcard/app/
+ls -l
+tftp -p -l mstpd_app_log.log 192.168.10.180
+
+cd ../sdcard/app/
+ls -l
+
+tftp -p -l mstpd_app_log_2.log 192.168.10.180
+tftp -p -l mstpd_app_log_1.log 192.168.10.180
+
+
+
+
+sync
+
 
 第一部分 编译基础
 第1章 概述
@@ -59,6 +1357,33 @@ Exception in thread "main" java.lang.ClassCastException:
 第21章 分级存储器体系
 附录 MiniJava语言参考手册
 参考文献
+
+
+
+https://baijiahao.baidu.com/s?id=1825776712070335357&wfr=spider&for=pc
+
+https://nga.178.com/read.php?tid=40166825
+
+https://gouhuo.qq.com/games/guide/968455
+
+https://www.gamersky.com/handbook/202206/1495704_6.shtml
+
+
+
+
+  define int BACNET_PROPERTY_MULTIPLE_LIMIT = 3
+
+  define int BACNET_PROPERTY_READ  = 1
+  define int BACNET_PROPERTY_WRITE = 2
+  
+  define int BACNET_PROPERTY_READ_EXECUTE_TIMES   = 3
+  define int BACNET_PROPERTY_WRITE_EXECUTE_TIMES  = 9
+  
+  define int BACNET_READMULTIPLE_NOTUSED    = -1
+  define int BACNET_READMULTIPLE_DONOTHING  = 0
+  
+  define int BACNET_WRITEMULTIPLE_NOTUSED    = -1
+  define int BACNET_WRITEMULTIPLE_DONOTHING  = 0
 
 
         boolean errorStatus;
@@ -95,7 +1420,34 @@ Exception in thread "main" java.lang.ClassCastException:
 下界 <? super Apple>，表示Apple的所有父类，包括Fruit，一直可以追溯到老祖宗Object 。那么当我add的时候，我不能add Apple的父类，因为不能确定List里面存放的到底是哪个父类。但是我可以add Apple及其子类。因为不管我的子类是什么类型，它都可以向上转型为Apple及其所有的父类甚至转型为Object 。但是当我get的时候，Apple的父类这么多，我用什么接着呢，除了Object，其他的都接不住。
 所以，归根结底可以用一句话表示，那就是编译器可以支持向上转型，但不支持向下转型。具体来讲，我可以把Apple对象赋值给Fruit的引用，但是如果把Fruit对象赋值给Apple的引用就必须得用cast。
 		
-据上海闵行警方通报，3月26日傍晚6时许，上海一辆公交车滑入闵行区高虹路近七莘路河道内。驾驶员邓某某（男，47岁）已被救出并送医救治，车内无其他乘客。
+
+
+
+
+我很多年前在中国电信做天翼视讯业务的时候，接触过央视。
+当时温总理搞三网合一。就是固定电话网，互联网和广播电视网合一。
+具体到电信来说，其实就是机顶盒业务。
+央视其实不属于广播电视网的公司。广播电视网的公司是独立的。例如在上海叫东方有线。
+央视属于内容提供商。之后还有牌照方，就是电影和电视剧一开始那个绿龙和红仙女。
+我们电信其实是网络提供商。
+这么说吧。央视对于为中国电信提供内容源非常抗拒。
+因为央视其实有三个业务。第一个就是报道新闻。就是领导今天见了谁，去哪里开会调研一类的工作。
+这个是政治工作。必须干。而且只能央视干。
+比方说要是美国总统访华了。东莞电视台的记者是没资格去报道的。只能央视干。
+但是这个活非常耗费资金。而且没有任何收益。
+而央视除了中宣部给点拨款以外，主要的
+
+
+李敖出了名的好色，但是他没有真的和“军中乐园”里的可怜人发生关系。
+食贫道本人好不好色我不知道，但是他采访泷泽萝拉那个视频。结束以后泷泽萝拉居然有点错愕，仿佛意思是“这就结束了吗？”。
+说真的我当时就对他肃然起敬了。
+
+是《中国崩溃论》
+中国崩溃论我小时候真的认真读过...
+里面最核心的论据就一条
+“一个落后国家的人民生活水平的提升会带来政治参与度的提升，最终导致政局动荡崩溃”
+这点本身其实是没问题的... 在当时大量落后国家和殖民地都有印证
+
 
 cod 鳕鱼 
 salmon 三文鱼
@@ -113,6 +1465,55 @@ monkfish 安康鱼
 pomfret 鲳鱼
 arctic char 北极红点鲑鱼
 catfish 鲶鱼
+
+王世襄，出生于1914年，是文物鉴赏家、收藏家，美食家，被奉「京城第一玩家」，
+甚至「天下第一玩家」。老人家最喜欢吃的是肯德基的巧克力圣代。
+一次买七八个，放冰箱里慢慢吃。
+
+我之前公司的老板，曾经有机会见到已经双规的原公安部部长李东生和香港富商李嘉诚。
+于是他和李东生说我认识李嘉诚，拉了好几个单子。之后和李嘉诚说我认识李东生。
+于是从李嘉诚那边拿到四个亿的投资。建立了自己的商业帝国。
+
+人道北街花似锦，偏我硬时不逢春
+待得如今春又到，年高难复少年坤
+
+
+玉渊谭天：这是中央电视台新闻频道的马甲，因其老办公楼位于玉渊潭公园对面而得名
+陶然笔记：这是经济日报的马甲，因为经济日报社位于北京陶然亭附近
+朝阳少侠：这是外交部的马甲，因为外交部办公大楼位于北京朝阳门附近
+侠客岛：这是人民日报社/人民日报海外版编辑部的马甲
+补壹刀：这是人民日报社/环球网的马甲
+枢密院十号：这也是人民日报社/环球网的马甲
+长安街知事：这是北京日报的马甲
+政知见：这是北京青年报的马甲
+团结湖参考：这也是北京青年报的马甲
+青蜂侠：中国青年网
+市说新语：国家市场监督管理总局
+辛识平：新华社评论
+齐相平：中国气象报评论文章
+仲青平：中国青年报评论
+钟华论：新华社融媒体论证栏目
+国平：“国评”的谐音，所属是网信办下属机构。
+任平：人民日报评论
+任仲平：人民日报重要评论
+钟声：中国之声，人民日报国际评论
+柯教平：科技教育评论”，主要撰写科教方面的文章
+国纪平：有关国际的重要评论
+金社平：人民日报社经济社会部评论
+任理轩：人民日报理论宣传部
+
+
+
+西贝餐厅的铁杆粉丝是文科生脱产带娃宝妈，这群人的共同点是不工作，
+不关注社会动向，纯指望丈夫供养，自己的情绪价值是第一位的，
+和婆婆的关系是最恶劣的，婆婆做好饭让我吃是害我，
+哪有去西贝吃饭有面子。同时这群人也是冤种消费的主力军，
+不仅是西贝，李佳琦79元一只的眉笔用户有她们，
+健身房上千元一次的私教课有她们，各大银行信用卡的长期用户也是她们，
+还有护肤品、做医美，还要上蒙台梭利国际双语幼儿园、上各种辅导班、
+大包小包买儿童有机食品。在贾老板的眼里，这群人才是自己的基本盘，
+把这群大姐们伺候好了，西贝是不愁生意的，
+而且他经常做的视频号“西贝老贾爱请客”也经常找一群宝妈来给自己当群众演员，做自己的捧哏
 
 
 class SaltwaterFish    extends Fish  { ... }
@@ -158,7 +1559,6 @@ S1 = [Fish, SaltwaterFish]
 
 
 
-
 xungao@ubuntu:~/linux/sedona$ grep -Rns --binary-files=without-match "maxChildren" .
 ./src/sedona/src/sedona/offline/OfflineApp.java:192:    if (parent.kids != null && parent.kids.size() >= Component.maxChildren)
 ./src/sedona/src/sedona/Component.java:318:  public static final int maxChildren = 200;
@@ -184,9 +1584,168 @@ tftp -g -r app.sab 192.168.168.180
 这个域一直被设置为0，直到映像被绑定。当映像被绑定之后， 这个域被设置为这个DLL的日期/时间戳
 第一个转发项的索引
 
+bin/sedonac.sh src/FieldBus/
+bin/sedonac.sh src/Variable/
+bin/sedonac.sh src/FieldBus/
+bin/sedonac.sh source/app.xml
+
+
+  72 cat /proc/sys/debug/pinctrl/sunxi-pinctrl/pins
+  73 cat pinctrl/sunxi-pinctrl/pins
+
+
+
+
+
+/usr/sbin/arping -f -U -b -I br0 -s 192.168.10.71 192.168.10.180
+
+arp -d 192.168.10.180
+/usr/sbin/arping -f -b -I br0 -s 192.168.10.81 192.168.10.180
+arp -d 192.168.10.180
+/usr/sbin/arping -f -b -I br0 -s 192.168.10.81 192.168.10.180
+
+tftp -g -r start_bridge.sh  192.168.10.180
+tftp -g -r arping_daemon.sh 192.168.10.180
+chmod 777 start_bridge.sh 
+chmod 777 arping_daemon.sh
+sync
+
+cd /root/
+tftp -g -r arping_daemon.sh 192.168.10.180
+chmod 777 arping_daemon.sh
+cat arping_daemon.sh | grep "192.168.10"
+sync
+
+cd /root/
+tftp -g -r start_bridge.sh  192.168.10.180
+chmod 777 start_bridge.sh
+cat start_bridge.sh
+sync
+
+
+reboot
+
+
+cd /root/app
+cp sys_config.ini sys_config.ini.backup
+sync
+
+
+
+
+cat ../start_bridge.sh
+cat ../arping_daemon.sh
+
+
+cd ..
+cp arping_daemon.sh old_backup_arping_daemon.sh 
+ls
+
+
+tftp -g -r arping_daemon.sh 192.168.10.180
+diff arping_daemon.sh old_backup_arping_daemon.sh
+sync
+
+
+cd ..
+mv arping_daemon.sh arping_daemon.sh.bak
+mv old_backup_arping_daemon.sh arping_daemon.sh
+sync
+
+
+cd ..
+mv arping_daemon.sh old_backup_arping_daemon.sh
+mv arping_daemon.sh.bak arping_daemon.sh
+sync
+
+
+cd ..
+tftp -g -r arping_daemon.sh 192.168.10.180
+tail -3 arping_daemon.sh
+pwd
+sync
+
+cat /root/app/sys_config.ini
+rm /root/app/sys_config.ini
+sync
+
+
+
+cd /root/app
+ps | grep ptc | sed "s/ root.*//" | sed "s/^/kill -9  /" | sh
+rm sys_config.ini
+tftp -g -r ptc310_app 192.168.10.180
+
+cd /root/app
+tftp -g -r broadcast_sender 192.168.10.180
+chmod 777 broadcast_sender
+sync
+
+cat /root/app/sys_config.ini
+cd /root/app
+rm sys_config.ini
+sync
+
+cd /root/
+tftp -g -r arping_daemon.sh 192.168.10.180
+cat arping_daemon.sh
+sync
+
+
+
+cd /root/app
+ps | grep ptc | sed "s/ root.*//" | sed "s/^/kill -9  /" | sh
+tftp -g -r ptc310_app 192.168.10.180
+sync
+
+cat /root/app/sys_config.ini 
+
+/usr/sbin/arping -f -b -I eth0 -s 192.168.10.61 192.168.10.180
+
+ps | grep arping_daemon
+
+ps | grep arping_daemon | sed "s/ root.*//" | sed "s/^/kill -9  /" | sh
+
+cd /root/
+tftp -g -r arping_daemon.sh 192.168.10.180
+chmod 777 arping_daemon.sh
+cat arping_daemon.sh | grep "ARPING_SPAN"
+sync
+
+cd /root/app
+tftp -g -r broadcast_sender 192.168.10.180
+chmod 777 broadcast_sender
+sync
+
+
 			// 因为我们在coffreloc_add中，根据符号关联值是否为零，
 			// 决定是否添加一个IMAGE_SYM_UNDEFINED的符号。
 			// 这会导致对于一个值为0的变量，也会添加一个UNDEFINED的符号。
+
+
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y_ddc_spidev$ grep -Rns "rs485-" ./drivers/tty/serial/serial_core.c
+3097:	ret = device_property_read_u32_array(dev, "rs485-rts-delay",
+3115:	if (device_property_read_bool(dev, "rs485-rx-during-tx"))
+3118:	if (device_property_read_bool(dev, "linux,rs485-enabled-at-boot-time"))
+3121:	if (device_property_read_bool(dev, "rs485-rts-active-low")) {
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y_ddc_spidev$ 
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y_ddc_spidev$ grep -Rns "rs485-rts-active-high" ./drivers/tty/serial/serial_core.c
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y_ddc_spidev$ 
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y_ddc_spidev$ grep -Rns "rs485-rts-active-high" .
+./arch/arm/boot/dts/am335x-pdu001.dts:260:	rs485-rts-active-high;
+./arch/arm/boot/dts/am335x-nano.dts:171:	rs485-rts-active-high;
+./arch/arm/boot/dts/am335x-nano.dts:182:	rs485-rts-active-high;
+./scripts/dtc/include-prefixes/arm/am335x-pdu001.dts:260:	rs485-rts-active-high;
+./scripts/dtc/include-prefixes/arm/am335x-nano.dts:171:	rs485-rts-active-high;
+./scripts/dtc/include-prefixes/arm/am335x-nano.dts:182:	rs485-rts-active-high;
+./drivers/tty/serial/omap-serial.c:1615:	if (of_property_read_bool(np, "rs485-rts-active-high")) {
+./Documentation/devicetree/bindings/serial/omap_serial.txt:24:- rs485-rts-active-high: drive RTS high when sending (default is low).
+lucelu@ubuntu:~/WORK/Lichee-Pi/linux-zero-5.2.y_ddc_spidev$ 
+
+
+
+export PATH=${PATH}:/media/user1/V3SSDK_BUILDROOT/v3ssdk/buildroot/out/host/bin/
+
 
 
 (ip.src==192.168.168.2 && ip.dst==192.168.168.180  && udp) || (ip.src==192.168.168.180 && ip.dst==192.168.168.2 && udp) 
@@ -196,6 +1755,27 @@ tftp -g -r app.sab 192.168.168.180
 	/*printf_s("%s\n", receiveBuf);*/
 	cout << "发出:";
 	gets_s(sendBuf, 1024);
+
+rm /stp_packets_71_19700101_000028.pcap
+rm /stp_packets_71_19700101_004212.pcap
+rm /stp_packets_71_19700101_011045.pcap
+rm /stp_packets_71_19700101_013625.pcap
+rm /stp_packets_71_19700101_014722.pcap
+rm /stp_packets_71_19700101_075435.pcap
+
+
+tftp -g -r rstpd 192.168.10.190
+tftp -g -r rstpctl 192.168.10.190
+ls rstp*
+chmod 777 rstp*
+mv rstp* /usr/sbin/
+ls rstp*
+rstpctl
+
+
+
+
+
 
 181   **
 182   ** If authenticated, then update user field and
@@ -251,6 +1831,10 @@ tftp -g -r app.sab 192.168.168.180
 442         complog.message("slot.name=$slot.name and slot.type.id=$slot.type.id and slot.type.name=$slot.type.name")
 443     }
 
+https://www.bilibili.com/video/BV1Jf4y1Z7Bq
+https://www.bilibili.com/video/BV1Zb4y1Q7aQ
+https://search.bilibili.com/all?keyword=%E6%80%AA%E7%89%A9%E7%8C%8E%E4%BA%BA%E5%B4%9B%E8%B5%B7+%E5%A4%AA%E5%88%80+PS5
+
 
 507   define Log complog
 508 
@@ -284,7 +1868,17 @@ C0A8A802 BAC0810A 00240100 30020C0C 00000000
 
 BE = 10111110
 
+未经签名的驱动程序不能使用，这导致部分硬件出现问题，需要手动关闭Windows10的默认驱动验证。禁用驱动程序强制签名可以用CDM命令进行禁用。
+软件工具：windows10、命令提示符（管理员）
+1、右击开始菜单，选择点击“命令提示符（管理员）”。
 
+2、在CMD窗口中，输入bcdedit.exe /set nointegritychecks on 可以复制后在CDM窗口内右击选择粘贴。
+
+3、按回车键执行后提示成功就可以禁用。
+
+4、如果想再恢复验证驱动则在CMD中输入bcdedit.exe /set nointegritychecks off按回车键执行即可。
+
+注意事项：命令提示符需要以管理员身份打开才可以运行上面的命令，不然会提示“无法打开启动配置数据存储。拒绝访问。”
 
 	
 本周工作：
@@ -296,7 +1890,33 @@ BE = 10111110
   
   native int dD(double[] url, byte[] value)
   native int dF(float[] url, byte[] value)
-		
+
+全国公安系统一级英雄模范任长霞「遭遇车祸，不幸因公殉职」
+2004年，任长霞意外车祸去世。
+2008年，任长霞丈夫卫春晓突发脑梗去世。
+
+---------------------------------------------------------------------------------------------
+bin\sedonac.bat src\Arith\
+bin\sedonac.bat src\sys\
+bin\sedonac.bat platforms\src\XunGaoAuto\unix\
+bin\sedonac.bat src\inet\
+bin\sedonac.bat src\sox\
+bin\sedonac.bat src\Variable\
+bin\sedonac.bat src\FieldBus\
+bin\sedonac.bat src\PID\
+bin\sedonac.bat src\Timer\
+bin\sedonac.bat src\Math\
+bin\sedonac.bat src\BitLogic\
+bin\sedonac.bat src\Compare\
+bin\sedonac.bat src\Convert\
+bin\sedonac.bat src\WordOpr\
+bin\sedonac.bat src\Other\
+bin\sedonac.bat src\Schedule\
+---------------------------------------------------------------------------------------------
+bin\sedonac.bat source\app.xml
+---------------------------------------------------------------------------------------------
+        
+
 ./bin/sedonac.sh src/sox/
 cd source
 ../bin/sedonac.sh app.xml
@@ -307,6 +1927,11 @@ cd ..
 tftp -p -l app.sab 192.168.168.180
 C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
 
+18351	391.591809	192.168.168.241	192.168.168.180	47808	BACnet-APDU	69	Complex-ACK     readProperty[ 44] device,4194303 object-identifier device,1006 
+
+
+
+
 cd ~/linux/mySedonaCode/
 
 
@@ -316,10 +1941,10 @@ cd ~/linux/mySedonaCode/
 ./bin/sedonac.sh src/sys/
 cd source
 ../bin/sedonac.sh app.xml
-../bin/sedonac.sh app.sax
+mv app.scode app_fixlink.scode
 cd ..
 
-./bin/sedonac.sh src/ModBus/
+./bin/sedonac.sh src/FieldBus/
 ./bin/sedonac.sh src/sys/
 ./bin/sedonac.sh src/Variable/
 
@@ -339,13 +1964,26 @@ cd -
 
 
 ./bin/sedonac.sh src/inet/
+./bin/sedonac.sh src/sox/
 ./bin/sedonac.sh src/Variable/
 
 ./bin/sedonac.sh src/Math/
 
 ./bin/sedonac.sh src/Compare/
 ./bin/sedonac.sh src/Variable/
-./bin/sedonac.sh src/BacNet/
+cd source
+../bin/sedonac.sh app.xml
+cd -
+
+./bin/sedonac.sh src/inet/
+./bin/sedonac.sh src/Variable/
+./bin/sedonac.sh src/FieldBus/
+cd source
+../bin/sedonac.sh app.xml
+cd -
+
+./bin/sedonac.sh src/Timer/
+./bin/sedonac.sh src/Other/
 cd source
 ../bin/sedonac.sh app.xml
 cd -
@@ -356,12 +1994,28 @@ cd source
 ../bin/sedonac.sh app.xml
 cd -
 
-
 ./bin/sedonac.sh src/Arith/
 ./bin/sedonac.sh src/Math/
 cd source
 ../bin/sedonac.sh app.xml
 cd -
+
+./bin/sedonac.sh src/WordOpr/
+cd source
+../bin/sedonac.sh app.xml
+cd -
+
+那就是说，周六的时候，可以炒两个菜。
+一个是用于周一到周三的干锅包菜，
+一个是用于早餐的干锅藕片。
+这样一次就可以用掉两份五花肉。
+还有一个半份的芹菜。
+
+之前知乎上 有一个问题。问为什么满清组建了北洋新军。但是北洋新军却反对满清。
+其中一个最好的回答引用了当时北洋新军一个军官，也就是冯玉祥的自传。
+按照冯玉祥的说法，他们这些北洋新军的军官和士兵都是认字的。因为不认识字，根本操作不了西式枪炮。
+因为这些军官和士兵都认识字，于是大家就开始传阅《扬州十日记》和《嘉定屠城记》。
+然后的事情大家都知道了。
 
 cd source
 make
@@ -369,38 +2023,142 @@ cd -
 
 export PATH=$PATH:/opt/timesys/toolchains/armv5l-linux/bin/
 
-
-readPropertyMultiple 
-bacReadPropertyObjList.sedona (variable)	10910	2023/5/17
-
-
-
+---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------
 
 ps | grep svm
 cd /data/svm/
 
 ps | grep svm
-ps | grep svm | sed "s/ root.*//" | sed "s/^/kill -9/" | sh
+ps | grep svm | sed "s/ root.*//" | sed "s/^/kill -9  /" | sh
 sleep 1
 ps | grep svm
 
-tftp -g -r app.scode 192.168.168.180
+/tools/svm /data/svm/app.scode /data/svm/app.sab
 
+/tools/svm /data/svm/app.scode /data/svm/app_modbus.sab
+/tools/svm /data/svm/app.scode /data/svm/app_modbus_tcp.sab 
+/tools/svm /data/svm/app.scode /data/svm/app_zhu.sab 
+
+/tools/svm /data/svm/app.scode /data/svm/app_empty.sab 
+/tools/svm /data/svm/app.scode /data/svm/app.sab 
+
+./svm /data/svm/app.scode /data/svm/app.sab
+./svm /data/svm/app.scode /data/svm/app_empty.sab
+
+tftp -g -r app.scode 192.168.168.180
 tftp -g -r svm 192.168.168.180
+tftp -g -r app.sab        192.168.168.180
+tftp -g -r app_empty.sab  192.168.168.180
+tftp -p -l app_modbus.sab 192.168.168.180
+tftp -p -l app.sab 192.168.168.180
+
+tftp -g -r change_ip_address.sh 192.168.168.180
+
+tftp -p -l change_ip_address.sh 192.168.168.180
+
+
+tftp -g -r battery_info_record_unixtime_2024_07_19.txt                192.168.168.180
+tftp -g -r instrument_history_info_record_unixtime_2024_07_19.txt     192.168.168.180
+tftp -g -r  usart_info_record_unixtime_2024_07_19.txt                 192.168.168.180
+
+5A5742575C5D10 作者：im_dreamer https://www.bilibili.com/read/cv24365297/ 出处：bilibili
+5455415451475662 作者：im_dreamer https://www.bilibili.com/read/cv24365297/ 出处：bilibili
+
+nousb 是用来让
+
+sudo apt-get install libglm-dev graphviz
+sudo apt-get install  libxcb-dri3-0 libxcb-present0 
+
+sudo apt-get install libpciaccess0 cmake libpng-dev libxcb-dri3-dev libx11-dev
+
+/sbin/ifconfig eth0 down
+/sbin/ifconfig eth0 hw ether 00:E7:A3:A4:98:67
+/sbin/ifconfig eth0 up 
+
+echo %VULKAN_SDK%
+cd C:\VulkanSDK\1.3.268.0
+vulkaninfo
+git --version
+python --version
+cmake --version
+git clone git@github.com:gozfree/gear-lib.git
+
+ls -l /data/svm/www
+
+ls -l 
+
+ps  | grep svm
+ps  | grep telnet
+ps  | grep goahead
+
+
+/sbin/ifconfig eth0 
+
+
+
+rm -rf mtd
+cd /data/mtd
+
+2401/6
+
+cd /data/
 
 ./svm app.scode  app.sab
+./armv5l_test_client 12345
+
+route add -net 239.255.18.76 netmask 255.255.255.255 eth0
+route add -net 224.0.0.88 netmask 255.255.255.255 eth0
+route add -net 224.0.1.76 netmask 255.255.255.255 eth0
+
+tftp -g -r armv5l_test_server 192.168.188.9
+tftp -g -r armv5l_test_client 192.168.188.9
+
+tftp -g -r armv5l_broadcast_server 192.168.188.9
+tftp -g -r armv5l_broadcast_client 192.168.188.9
+
+tftp -g -r app.scode 192.168.188.9
+tftp -g -r svm 192.168.188.9
+tftp -g -r app_empty.sab 192.168.188.9
+
+tftp -p -l app.sab 192.168.188.9
+
+tftp -g -r armv5l_broadcast_server 192.168.168.180
+tftp -g -r armv5l_broadcast_client 192.168.168.180
+
+
+#   ./armv5l_broadcast_server 239.255.18.76 12345
+
+./armv5l_broadcast_server 224.0.1.76 12345
+
+./armv5l_broadcast_client 0.0.0.0 224.0.1.76 12345 0
 
 tftp -g -r app.sab 192.168.168.180
 tftp -g -r app.scode 192.168.168.180
 tftp -g -r svm 192.168.168.180
+tftp -g -r app_empty.sab 192.168.168.180
+
 tftp -p -l app.sab 192.168.168.180
+tftp -p -l app.scode 192.168.168.180
+
+按照在苏州高新区明基工厂上班的宿舍邻居说，厂妹都是24小时工作的。
+
+
+
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
+C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
+
+mv /data/svm/app.sab /data/svm/app_bak_1208.sab
 
 ./svm app.scode  app.sab
 
+./svm app.scode  app_empty.sab
+
 tftp -g -r test_arm51 192.168.168.180
 
-tftp -g -r app_0703.sab 192.168.168.180
+tftp -g -r app_empty.sab 192.168.168.180
+
+tftp -p -l app_empty.sab 192.168.168.180
 
 ./svm app.scode  app.sab
 
@@ -416,17 +2174,907 @@ tftp -g -r app_0703.sab 192.168.168.180
 
 tftp -g -r app_lujiaming.scode 192.168.168.180
 
+tftp -g -r app_fixlink.scode 192.168.168.180
+tftp -g -r app_fixlink.sab 192.168.168.180
+
+tftp -g -r goahead 192.168.168.180
+
+mount -t debugfs debug /proc/sys/debug
+echo PE0 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+echo PE0 0 >  /proc/sys/debug/sunxi_pinctrl/function
+cat /proc/sys/debug/sunxi_pinctrl/data
+umount /proc/sys/debug
+
+
+
+
+
+Default initialization of non-static datamembers_initialization
+
+cd /data/svm
+tftp -g -r xungaoMACdriver.ko 192.168.168.180
+
+------------- /tools/svm app_fixlink.scode app_fixlink.sab 
+代码应该可以正常编译，如果执行遇到问题，出现应用程序 无法正常启动 0xc000007b错误。
 ------------/tools/svm /data/svm/app.scode /data/svm/app.sab
+
+tftp -g -r   dogs_out.bmp           192.168.168.180
+tftp -g -r   logo.bmp               192.168.168.180   
+tftp -g -r   logo_1.bmp             192.168.168.180
+tftp -g -r   logo_new.bmp           192.168.168.180
+tftp -g -r   logo_new_output.bmp    192.168.168.180
+tftp -g -r   lolo.bmp               192.168.168.180
+tftp -g -r   star_output.bmp        192.168.168.180
+tftp -g -r   lcd_test               192.168.168.180
+
+
+[ 5039.350166] attempt to access beyond end of device
+[ 5039.355574] mmcblk0p2: rw=1, want=19402, limit=16384
+
+[ 5044.360134] attempt to access beyond end of device
+[ 5044.365543] mmcblk0p2: rw=1, want=19406, limit=16384
+
+[ 5044.372135] attempt to access beyond end of device
+[ 5044.377541] mmcblk0p2: rw=1, want=19410, limit=16384
+[ 5094.380171] attempt to access beyond end of device
+[ 5094.385579] mmcblk0p2: rw=1, want=19414, limit=16384
+[ 5094.392608] attempt to access beyond end of device
+[ 5094.398013] mmcblk0p2: rw=1, want=19418, limit=16384
+[ 5094.404412] attempt to access beyond end of device
+[ 5094.409816] mmcblk0p2: rw=1, want=19422, limit=16384
+
+
+---------------------------------------------------------------------------------------------
+readPropertyMultiple 
+bacReadPropertyObjList.sedona (variable)	10910	2023/5/17
+78704351584034
+
+1、手动删掉自己创建的data文件夹
+2、然后再管理员cmd下进入 bin 目录，移除自己的mysqld服务
+D:\Program Files\MySQL\bin>mysqld -remove MySQL
+Service successfully removed.
+3、在cmd的bin目录执行 mysqld --initialize-insecure
+程序会在动MySQL文件夹下创建data文件夹以及对应的文件
+4、bin目录下执行，mysqld --install ，安装mysqld服务
+5、在bin目录下运行net start mysql ,启动mysql服务。
+
+
+错误	3	error LNK2019: 无法解析的外部符号 _mysql_real_connect@32，该符号在函数 "void __cdecl test(void)" (?test@@YAXXZ) 中被引用	G:\360Downloads\lujiamingCode\mySoxTestTTTT\test_mysql\test_mysql\test_mysql.obj	test_mysql
+原因是系统安装的mysql是64位版本的，引用的dll及lib也是64位版本的
+
+这是一个很好的猜测，它距离真实位置不是很远，但它忽略了提供给
+我们的损失函数。我们还需要扩展我们的代码，来额外考虑至多两个的更小的光晕。让我们创建一个自动化PyMC的函数。
+
+这个问题很有趣。我来回答一下。。
+首先是我们熟悉的部分。就是我们通过编译器把高级语言编译为汇编码。而这些汇编码又被转换成机器码。之后这些字节码会被保存在可执行程序的代码段中。之后在执行这个程序的时候，代码段中的字节码会被取出，送入CPU。
+那CPU是怎么执行的呢。其实只要把字节码的01比特位送入CPU的运算单元，之后电路就会完成这条指令的工作。你可以把CPU理解为一个一个的水池子，你从一个水池子的入水口灌水进去，那么另一个水池子的出水口就会冒水。
+因此上，CPU在执行指令的时候，其实并不理解自己需要执行的指令。毕竟他只是一个电路。
+
+	52	IntelliSense:  重新声明无法将 dllexport/dllimport 添加到 "WSAUnhookBlockingHook" (已声明 所在行数:879，所属文件:"C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock.h")	c:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h	2385	1	test_libmodbus
+G:\360Downloads\lujiamingCode\mySoxTestTTTT\test_svm_win32\test_svm_win32\app_empty.sab
+
+
+
+test_designated_initializer
+
+    compile 'com.android.support:percent:24.2.1+'
+---------------------------------------------------------------------------------------------
+# lsusb
+Bus 002 Device 002: ID 0bda:8152
+Bus 001 Device 001: ID 1d6b:0002
+Bus 002 Device 001: ID 1d6b:0001
+# lsusb
+Bus 001 Device 001: ID 1d6b:0002
+Bus 002 Device 001: ID 1d6b:0001
+# 
+---------------------------------------------------------------------------------------------
+# date -s 2024.04.29-16:23
+Mon Apr 29 16:23:00 UTC 2024
+# date
+Mon Apr 29 16:23:02 UTC 2024
+
+click::datetime_str = 04.29.16-22:2024
+
+
+[modbus.c:ModBus_remDev_dRtuR:79] return 1
+[modbus.c:ModBus_remDev_dRtuR:79] return 3
+[modbus.c:ModBus_remDev_dRtuR:79] return 1
+
+assimp.exe export  Bicycle.glb             Bicycle.ply  
+assimp.exe export  Elephantlowpoly.glb     Elephantlowpoly.ply
+assimp.exe export  Pandalowpoly.glb        Pandalowpoly.ply
+assimp.exe export  Reddragon.glb           Reddragon.ply
+assimp.exe export  Reindeer.glb            Reindeer.ply
+assimp.exe export  Sedan.glb               Sedan.ply
+assimp.exe export  Unicorn.glb             Unicorn.ply
+assimp.exe export 
+assimp.exe export 
+assimp.exe export 
+assimp.exe export 
+assimp.exe export 
+
+11/20-11/24周报。
+2. 完成Modbus总线不区分Master还是Slave的代码。
+2. 调查全志V3S板子上USB转网口功能。
+
+ 2002  cd corelinux/v3ssdk/
+ 2003  ls
+ 2004  cat 执行linux_docker_build.sh
+ 2005  cat linux_docker_build.sh 
+ 2006  
+ 2007  history 
+
+
+cd /data/data/com.example.databasetest/
+
+.table
+.schema
+select * from Book;
+
+
+
+bool add_redisconn_to_map(int idx, void *ptrData);
+bool remove_redisconn_from_map(int idx);
+void * get_redisconn_data_from_map(int idx);
+
+
+Android Studio 3.2 快捷键如下：
+
+F7:进入当前方法内部。
+F8:单步调试执行。
+F9:运行到下一个断点。
+
+代码写得久了，调试也就只需要用到这三个了。备忘一下，不经常用 Android Studio。
+
+distributionUrl=https\://services.gradle.org/distributions/gradle-6.1.1-all.zip
+
+    public static final String UUID_SERVICE = "0000fff0-0000-1000-8000-00805f9b34fb";
+"0000fff0-0000-1000-8000-00805f9b34fb";
+ 6E400001-B5A3-F393-E0A9-E50E24DCCA9E
+ 0000fff3-0000-1000-8000-00805f9b34fb
+ 6E400002-B5A3-F393-E0A9-E50E24DCCA9E
+ 
+ 0000fff3-0000-1000-8000-00805f9b34fb
+ 6E400003-B5A3-F393-E0A9-E50E24DCCA9E
+ 
+    public static final String UUID_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    public static final String UUID_INDICATE = "0000000-0000-0000-8000-00805f9b0000";
+    public static final String UUID_NOTIFY = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+    public static final String UUID_WRITE = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+    public static final String UUID_READ = "3f3e3d3c-3b3a-3938-3736-353433323130";
+    
+    adapter
+----------------------------------------
+
+    // 扫描BLE蓝牙(不会扫描经典蓝牙)
+    // private void scanBle() {
+    //     isScanning = true;
+    //     // BluetoothAdapter bluetoothAdapter = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE).getDefaultAdapter();
+    //     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    //     final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+    //     // Android5.0新增的扫描API，扫描返回的结果更友好，比如BLE广播数据以前是byte[] scanRecord，而新API帮我们解析成ScanRecord类
+    //     bluetoothLeScanner.startScan(mScanCallback);
+    //     mHandler.postDelayed(new Runnable() {
+    //         @Override
+    //         public void run() {
+    //             bluetoothLeScanner.stopScan(mScanCallback); //停止扫描
+    //             isScanning = false;
+    //         }
+    //     }, 3000);
+    // }
+  style="width:50%;hight:100%;float:left;"
+
+
+drivers/usb/host/的uhci-hcd.h
+
+
+uhci_start   ---->
+	/*
+	 * 8 Interrupt queues; link all higher int queues to int1 = async
+	 */
+	for (i = SKEL_ISO + 1; i < SKEL_ASYNC; ++i)
+		uhci->skelqh[i]->link = LINK_TO_QH(uhci, uhci->skel_async_qh);
+	uhci->skel_async_qh->link = UHCI_PTR_TERM(uhci);
+	uhci->skel_term_qh->link = LINK_TO_QH(uhci, uhci->skel_term_qh);
+
+	/* This dummy TD is to work around a bug in Intel PIIX controllers */
+	uhci_fill_td(uhci, uhci->term_td, 0, uhci_explen(0) |
+			(0x7f << TD_TOKEN_DEVADDR_SHIFT) | USB_PID_IN, 0);
+	uhci->term_td->link = UHCI_PTR_TERM(uhci);
+	uhci->skel_async_qh->element = uhci->skel_term_qh->element =
+		LINK_TO_TD(uhci, uhci->term_td);
+
+usb_hcd_poll_rh_status --> uhci_hub_status_data  --> uhci_scan_schedule  -->
+	/* Go through all the QH queues and process the URBs in each one */
+	for (i = 0; i < UHCI_NUM_SKELQH - 1; ++i) {
+		uhci->next_qh = list_entry(uhci->skelqh[i]->node.next,
+				struct uhci_qh, node);
+		while ((qh = uhci->next_qh) != uhci->skelqh[i]) {
+			uhci->next_qh = list_entry(qh->node.next,
+					struct uhci_qh, node);
+
+			if (uhci_advance_check(uhci, qh)) {
+				uhci_scan_qh(uhci, qh);
+				if (qh->state == QH_STATE_ACTIVE) {
+					uhci_urbp_wants_fsbr(uhci,
+	list_entry(qh->queue.next, struct urb_priv, node));
+				}
+			}
+		}
+	}
+
+
+static void uhci_scan_schedule(struct uhci_hcd *uhci)
+{
+	int i;
+	struct uhci_qh *qh;
+
+	/* Don't allow re-entrant calls */
+	if (uhci->scan_in_progress) {
+		uhci->need_rescan = 1;
+		return;
+	}
+	uhci->scan_in_progress = 1;
+rescan:
+	uhci->need_rescan = 0;
+	uhci->fsbr_is_wanted = 0;
+
+}
+
+
+
+SCSI Commands Reference Manual
+uhci_scan_schedule  --> uhci_scan_qh  -->  uhci_result_common
+测试节点
+E6 B5 8B E8 AF 95 E8 8A 82 E7 82 B9
+开奥运会
+E5 BC 80 E5 A5 A5 E8 BF 90 E4 BC 9A
+小鹿斑比
+E5 B0 8F E9 B9 BF E6 96 91 E6 AF 94
+
+tftp -g -r battery_info_record_unixtime_2024_09_18.txt              192.168.168.180      
+tftp -g -r battery_info_switch_record_2024_09_18.txt                192.168.168.180
+tftp -g -r instrument_history_info_record_unixtime_2024_09_18.txt   192.168.168.180
+tftp -g -r usart_info_record_unixtime_2024_09_18.txt                192.168.168.180
+tftp -g -r usart_info_switch_record_2024_09_18.txt                   192.168.168.180
+
+
+var chart1 = new Chart(canvas, {
+    type: "pie",
+    data: data,
+    options: {
+         legend: {
+            display: false
+         },
+         tooltips: {
+            enabled: false
+         }
+    }
+});
+
+ 
+测试节点&开奥运会&小鹿斑比
+02 00 88 04 01 13 E8 AE AF E9 AB 98 E8 AE AF E9 AB 98 E8 AE AF E9 AB 98 00 03 00 01 A4 70 45 41 02 0D E6 B5 8B E8 AF 95 E8 8A 82 E7 82 B9 00 01 00 03 00 00 00 73 03 0D E5 BC 80 E5 A5 A5 E8 BF 90 E4 BC 9A 00 01 00 04 00 00 00 1F 04 0D E5 B0 8F E9 B9 BF E6 96 91 E6 AF 94 00 01 00 06 00 00 00 21 
+
+讯高讯高讯高
+02 00 88 04 01 13 E8 AE AF E9 AB 98 E8 AE AF E9 AB 98 E8 AE AF E9 AB 98 00 03 00 01 A4 70 45 41 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 42 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 43 44 00 01 00 06 00 00 00 21 
+
+E8 AE AF E9 AB 98 
+E8 AE AF E9 AB 98 
+E8 AE AF E9 AB 98 
+
+啊啊啊
+02 00 88 04 01 0A E5 95 8A E5 95 8A E5 95 8A 00 03 00 01 A4 70 45 41 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 42 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 43 44 00 01 00 06 00 00 00 21 
+
+E5 95 8A 
+E5 95 8A 
+E5 95 8A
+
+E8 AE AF E9 AB 98
+
+0x88 = 136
+
+UJUJUJUJ
+02 00 88 04 01 0A 55 4A 55 4A 55 4A 55 4A 00 00 03 00 01 A4 70 45 41 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 42 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 43 44 00 01 00 06 00 00 00 21 
+
+02 00 88 04 01 0A E4 B8 80 E4 B8 80 E4 B8 80 00 03 00 01 A4 70 45 41 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 42 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 43 44 00 01 00 06 00 00 00 21 
+
+02 00 88 04 01 05 6D 4B 8B D5 00 03 00 01 A4 70 45 41 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 42 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 43 44 00 01 00 06 00 00 00 21 
+
+6D4B;&#x8BD5
+
+12.34 = A4 70 45 41
+
+
+旧的枚举值的例子。
+02 00 62 02 01 0A E5 95 8A E5 95 8A E5 95 8A 00 01 00 00 00 00 00 02 02 05 41 42 43 44 00 01 00 00 00 00 00 01 
+
+
+02 00 62 02 01 0A E5 95 8A E5 95 8A E5 95 8A 00 01 00 00 00 00 00 02 02 05 41 42 43 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 41 42 43 44 00 
+
+02 00 72 04 01 0A E5 95 8A E5 95 8A E5 95 8A 00 0B 00 00 00 00 00 02 02 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 03 05 42 42 42 44 00 0B 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 04 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 
+
+
+02 00 72 04 01 0A E5 95 8A E5 95 8A E5 95 8A 00 0B 00 00 00 00 00 02 02 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 
+                                                                     03 05 42 42 42 44 00 0B 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 
+                                                                     04 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 
+
+
+
+02 00 72 04 01 0A E5 95 8A E5 95 8A E5 95 8A 00 41 00 00 00 00 00 02 02 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 03 05 42 42 42 44 00 41 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 04 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 
+
+
+02 00 72 04 01 0A E5 95 8A E5 95 8A E5 95 8A 00 01 00 00 00 00 00 02 02 05 42 42 42 44 00 41 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 03 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 04 05 42 42 42 44 00 41 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 
+
+
+
+06 00 00 02 C8 00
+
+02 00 7B 02 01 05 42 42 42 44 00 01 00 00 03 02 03 05 41 42 43 44 00 06 05 44 43 42 41 00 02 0A E5 95 8A E5 95 8A E5 95 8A 00 01 00 00 04 02 03 06 47 42 46 44 44 00 06 05 42 43 42 41 00 03 0A E5 95 8A E5 95 8A E5 95 8A 00 01 00 00 04 02 03 06 47 42 46 44 44 00 06 05 42 43 42 41 00 04 0A E5 95 8A E5 95 8A E5 95 8A 00 01 00 00 04 02 03 06 47 42 46 44 44 00 06 05 42 43 42 41 00 
+
+02 00 62 02 
+01 05                42 42 42 44 00 01 00 00 03 02 03    05 41 42 43 44 00 06 05 44 43 42 41 00 
+02 0A E5 95 8A E5 95 8A E5 95 8A 00 01 00 00 03 02 03 06 47 42 46 44 44 00 06 05 42 43 42 41 00 
+
+
+06 00 00 01 C8 00
+
+瞣痶?
+F2 6F AF 74 8A    ==》  72 6F 2F 74 0A
+騩痶?
+F2 6F AF 74 8A 
+
+B2 6F AF 74 8A   ==》    
+
+GeneticAlgorithm
+
+
+
+
+
+程序问题：App的图标不够美观，需要调整。
+程序问题：程序名称修改为FCT。
+界面问题：表格头的第一行修改为浅灰色，和表格数据区分。
+界面问题：“设备列表”改为“数据列表”。
+界面问题：“刷新列表”改为“刷新数据”。
+界面问题：表格头的第一行中的“设定值”改为“数值”。
+界面问题：可写属性显示为蓝色。。
+界面问题：点击只读属性不弹出修改框。。
+界面问题：修改框标题修改为“修改数值”。。
+界面问题：枚举变量的修改框的选择颜色太亮，改为标题的颜色。修改框的修改按钮改为“确定”。
+界面问题：在界面右上角实时显示蓝牙信号强度。用于用户判断是否因为位置移动导致蓝牙断开。
+
+
+F:\软件\darwin.iso
+F:\软件\VM软装Mac\[Mac.OSX.Mountain.Lion.操作系统].TLF-SOFT-Mac_OSX_Mountain_Lion_v10.8_REPACK_MACOSX-MONEY.iso
+
+
+02 00 44 03 
+01 05 41 42 43 44 00 01 00 01 00 00 00 01 
+02 05 41 42 43 44 00 01 00 01 00 00 00 01 
+03 05 41 42 43 44 00 01 00 01 00 00 00 01 
+
+
+02 00 88 04 01 05 41 42 43 44 00 03 00 01 94 87 45 41 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 47 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+02 00 88 04 01 05 41 42 43 44 00 03 03 07 6D 45 0A 42 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 47 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 53 44 00 01 00 06 00 00 00 21 
+03 00 88 04 06 05 41 42 43 44 00 03 00 01 A4 70 45 41 07 05 41 42 43 44 00 01 00 03 00 00 00 73 08 05 41 47 43 44 00 01 00 04 00 00 00 1F 09 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+06 00 00 03 C8 00
+
+02 00 88 04 01 05 41 42 43 44 00 03 00 01 94 87 45 41 02 05 41 42 43 44 00 01 00 03 00 00 00 73 03 05 41 47 43 44 00 01 00 04 00 00 00 1F 04 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+03 00 88 04 06 05 41 42 43 44 00 03 00 01 A4 70 45 41 07 05 41 42 43 44 00 01 00 03 00 00 00 73 08 05 41 47 43 44 00 01 00 04 00 00 00 1F 09 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+03 00 88 04 0A 05 41 42 43 44 00 03 00 01 A4 70 45 41 0B 05 41 42 43 44 00 01 00 03 00 00 00 73 0C 05 41 47 43 44 00 01 00 04 00 00 00 1F 0D 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+03 00 88 04 1A 05 41 42 43 44 00 03 00 01 A4 70 45 41 1B 05 41 42 43 44 00 01 00 03 00 00 00 73 1C 05 41 47 43 44 00 01 00 04 00 00 00 1F 1D 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+02 00 88 04 11 05 41 42 43 44 00 03 00 01 94 87 45 41 12 05 41 42 43 44 00 01 00 03 00 00 00 73 13 05 41 47 43 44 00 01 00 04 00 00 00 1F 14 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+03 00 88 04 16 05 41 42 43 44 00 03 00 01 A4 70 45 41 17 05 41 42 43 44 00 01 00 03 00 00 00 73 18 05 41 47 43 44 00 01 00 04 00 00 00 1F 19 05 41 42 53 44 00 01 00 06 00 00 00 21 
+
+
+03 00 88 04 2A 05 41 42 43 44 00 03 00 01 A4 70 45 41 2B 05 41 42 43 44 00 01 00 03 00 00 00 73 2C 05 41 47 43 44 00 01 00 04 00 00 00 1F 2D 05 41 42 53 44 00 01 00 06 00 00 00 21
+
+03 00 88 04 0A 05 41 42 43 44 00 03 00 01 A4 70 45 41 0B 05 41 42 43 44 00 01 00 03 00 00 00 73 0C 05 41 47 43 44 00 01 00 04 00 00 00 1F 0D 05 41 42 53 44 00 01 00 06 00 00 00 21 
+---------------------------------------
+cat index_cpp  | sed "s/ \([0-9]*$\)/                       \1/g"
+
+
+# mount 
+rootfs on / type rootfs (rw)
+/dev/root on / type ext4 (rw,relatime,data=ordered)
+devtmpfs on /dev type devtmpfs (rw,relatime,size=19168k,nr_inodes=4792,mode=755)
+proc on /proc type proc (rw,relatime)
+devpts on /dev/pts type devpts (rw,relatime,gid=5,mode=620,ptmxmode=666)
+tmpfs on /dev/shm type tmpfs (rw,relatime,mode=777)
+tmpfs on /tmp type tmpfs (rw,relatime)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
+sysfs on /sys type sysfs (rw,relatime)
+debug on /proc/sys/debug type debugfs (rw,relatime)
+/dev/mmcblk0p2 on /root/sdcard type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=cp437,iocharset=iso8859-1,shortname=mixed,errors=continue)
+# 
+
+usleep(1000);   --- 54 / 38400  = 0.0014
+usleep(20000);  ---  7 / 7400   = 0.0009 
+                    16 / 26727  = 0.0006 
+                    17 / 25000  = 0.00068
+                    12 / 10418  = 0.0012 
+---------------------------------------------------------------------------------------------------------------------
+
+# df -h
+Filesystem                Size      Used Available Use% Mounted on
+/dev/root               196.8M    182.5M     14.4M  93% /
+devtmpfs                 18.7M         0     18.7M   0% /dev
+tmpfs                    18.8M         0     18.8M   0% /dev/shm
+tmpfs                    18.8M    252.0K     18.6M   1% /tmp
+tmpfs                    18.8M     16.0K     18.8M   0% /run
+/dev/mmcblk0p2          127.7M      4.4M    123.3M   3% /root/sdcard
+# 
+
+---------------------------------------------------------------------------------------------------------------------
+
+
+
+# cat rcSedona 
+#!/bin/sh
+# Enable two ethernet 
+/root/usb-set-hostmode.sh 
+sleep 1
+/root/usb-set-devicemode.sh
+sleep 1
+/root/usb-set-hostmode.sh 
+sleep 1
+ifconfig eth0 192.168.168.129
+ifconfig eth1 192.168.168.130
+
+EECS：输出，串行EEPROM片选信号；
+EEDI/EEDO：双向，串行EEPROM数据输入/输出信号，为复用方式的读写数据到EEPROM；
+EESK：输出，串行EEPROM时钟信号。 
+
+
+规范详解
+
+
+Waiting for a indication...
+<11><06><00><02><03><02><AB><AB>
+Modbus_FrameAnalysis CMD_PRESET_SINGLE_REGISTER frm_len=8
+preset_single_reg reg_addr=2
+preset_single_reg value=770 and HReg[reg_addr] = 20
+preset_single_reg PARAM_Save value=770 and HReg[reg_addr] = 770
+[11][06][00][02][03][02][AB][AB][00][00]
+
+
+Waiting for a indication...
+<11><06><00><02><03><DE><AA><32>
+Modbus_FrameAnalysis CMD_PRESET_SINGLE_REGISTER frm_len=8
+preset_single_reg reg_addr=2
+preset_single_reg value=990 and HReg[reg_addr] = 20
+preset_single_reg PARAM_Save value=990 and HReg[reg_addr] = 990
+[11][06][00][02][03][DE][AA][32][00][00]
+
+
+
+CROSS_COMPILE=$TOP_DIR/tools/external-toolchain/bin/arm-linux-gnueabi-
+logicalNumber = 2
+echo CROSS_COMPILE=/home/v3s/WORK/v3ssdk/tools/external-toolchain/bin/arm-linux-gnueabi-
+INSTALL_MOD_PATH=/home/v3s/WORK/v3ssdk/rootfs
+
+PATH=/home/v3s/WORK/v3ssdk/buildroot/out/host/bin/:$PATH
+make ARCH=arm -j2 CROSS_COMPILE=/home/v3s/WORK/v3ssdk/tools/external-toolchain/bin/arm-linux-gnueabi- 
+make ARCH=arm -j2 CROSS_COMPILE=/home/v3s/WORK/v3ssdk/tools/external-toolchain/bin/arm-linux-gnueabi- uImage modules
+sudo make ARCH=arm CROSS_COMPILE=/home/v3s/WORK/v3ssdk/tools/external-toolchain/bin/arm-linux-gnueabi- INSTALL_MOD_PATH=/home/v3s/WORK/v3ssdk/rootfs modules_install
+
+/sbin/ifconfig eth1 down
+/sbin/ifconfig eth1 hw ether $SECONDMACADDR
+/sbin/ifconfig eth1 up
+
+
+# 清除所有现有的防火墙规则
+iptables -F
+ 
+# 允许本地回环接口(loopback interface)
+iptables -A INPUT -i lo -j ACCEPT
+ 
+# 允许已建立连接的数据包返回
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+ 
+# 开启端口转发
+# iptables -A FORWARD -i eth0 -o eth1 -m tcp -p tcp --dport 8080 -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth1 -m tcp -p tcp -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth0 -m tcp -p tcp -j ACCEPT
+
+ 
+# 设置端口转发
+iptables -t nat -A PREROUTING -p tcp -m tcp --dport 8080 -j DNAT --to-destination 192.168.1.100:80
+iptables -t nat -A PREROUTING -p tcp -m tcp -j DNAT --to-destination 192.168.1.129:80
+
+# 保存iptables规则
+iptables-save > /etc/iptables/rules.v4
+ 
+# 或者在不同的发行版中使用对应的命令保存规则
+# Debian/Ubuntu:
+sudo apt-get install iptables-persistent
+# CentOS/RHEL:
+sudo service iptables save
+
+
+启用 IP 转发功能后，Linux 系统将能够实现路由转发功能
+
+sysctl -w net.ipv4.ip_forward=1
+
+int append_file(char * cFileName, char * cFileContent)
+{
+	// int iRetryCount = 0;
+	// int iRet = 0;
+    char cMkdirOutput[256];
+    // char cRemountOutput[256];
+	
+    char cFilePathWithName[128];
+    char cFilePathMkdirCommand[128];
+    int   append_fd; // , send_res;
+    time_t timeNow = time(NULL);
+    struct tm*     tmNow    = localtime(&timeNow);
+	
+    sprintf(cFilePathWithName, "/root/sdcard/app/instrument_info/%d_%02d_%02d/%s",
+            tmNow->tm_year + 1900, tmNow->tm_mon + 1, tmNow->tm_mday, cFileName);
+    // 2. 打开PTC私有协议对应的串口
+    append_fd = open(cFilePathWithName, O_RDWR | O_APPEND);
+    if (append_fd < 0) {
+		// iRetryCount = 0;
+		while(1)
+		{
+			// 这里的2>&1表示将标准错误（文件描述符2）重定向到标准输出（文件描述符1）。
+		    sprintf(cFilePathMkdirCommand, "mkdir -p /root/sdcard/app/instrument_info/%d_%02d_%02d/ 2>&1",
+		            tmNow->tm_year + 1900, tmNow->tm_mon + 1, tmNow->tm_mday);
+			memset(cMkdirOutput, 0x00, 256);
+ 	        // iRet = 
+			get_cmd_printf(cFilePathMkdirCommand, cMkdirOutput, 256);
+		    // printf("get_cmd_printf(%s) return %d\n",cFilePathMkdirCommand, iRet);
+			if(strlen(cMkdirOutput) > 0)
+			{
+		        // printf("Command <%s> error: errorInfo is %s\n", cFilePathMkdirCommand, cMkdirOutput);
+				// memset(cRemountOutput, 0x00, 256);
+    			// get_cmd_printf("/root/app/remount_sdcard.sh", cRemountOutput, 256);
+		        // printf("remount_sdcard return %s\n", cRemountOutput);
+		        return -1;
+			}
+			else 
+			{
+		        // printf("mkdir error: errorInfo is empty with <%s>\n", cMkdirOutput);
+				break;
+			}
+		}
+		
+        append_fd = open(cFilePathWithName, O_RDWR | O_CREAT);
+        if (append_fd < 0) {
+	        // printf("append_file: open failed return %d\n", append_fd);
+            return -1;
+        }
+    }
+	// printf("append_file: write %s return %d\n", cFileContent, append_fd);
+	write(append_fd, cFileContent, strlen(cFileContent));
+	close(append_fd);
+    return 0;
+}
+
+做生意就老老实实做生意。非要上价值。
+说什么命运共同体啦。什么一家亲啦。
+结果被人家非洲精英把高志凯之流虚伪的画皮撕下来了吧。
+中国到了非洲就是老老实实做生意。讲究一个买卖公平。
+没钱可以用资源抵。
+
+两广李鸿章：此乱命也，粤不奉诏
+山东袁世凯：胶澳有变，徐缓奉诏
+两江刘坤一：铬守两江，暂不奉诏
+闽浙许应骙：屏护东南，暂不奉诏
+四川奎俊： 英窥卫藏，暂缓奉诏
+铁路盛宣怀：邮铁断绝，苦守待诏
+湖广张之洞：坐拥东南，死不奉诏
+
+慈禧:孩子们，我没意见
+
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/toolbarTextView"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/mediumaquamarine"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="搜索界面"
+            android:layout_weight="8"
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/versionTextView"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/mediumaquamarine"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="1.0"
+            android:layout_weight="2"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+    
+
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                outputFileName = "123.apk"
+            }
+    }
+
+
+
+/data/user/0/com.example.filepersistancetest/files/data_filepersist
+
+Shift+F9 快捷键，启动程序的调试模式。
+快捷键 F8 单步执行程序。
+快捷键 F7 单步执行程序，遇到方法时进入。
+快捷键 Alt+F9 运行到光标处。
+跳到下一个断点，step out（Shift+F8）,跳出进入的方法。
+查找引用alt + F7
+显示调用 alt + f7
+显示调用的提示框 command + alt + f7 （同上的作用）
+跳转至声明定义的地方 command + b / command + click
+跳转至实现的地方 command + alt + b
+跳转类型声明的地方 ctrl + shift + b
+
+
+犁庭扫穴
+hello
+警惕海量个案抹黑中医
+
+
+多就围住敌人，少就缠住敌人，敌人不明情况，就利用先手优势打对方个措手不及，等待主力跟上，不能因为自己人少，就放弃阵地 ，放走敌人。
+
+
+终日奔忙只为饥，才得有食又思衣。置下绫罗身上穿，抬头却嫌房屋低。
+盖了高楼并大厦，床前缺少美貌妻。娇妻美妾都娶下，忽虑出门没马骑。
+买得高头金鞍马，马前马后少跟随。招了家人数十个，有钱没势被人欺。
+---------------------------------------------------------------------------
+时来运到做知县，抱怨官小职位卑。做过尚书升阁老，朝思暮想要登基。
+一朝南面做天子，东征西讨打蛮夷。四海万国都降服，想和神仙下象棋。
+洞宾陪他把棋下，吩咐快做上天梯。上天梯子未做起，阎王发牌鬼来催。
+若非此人大限到，升到天上还嫌低。玉皇大帝让他做，定嫌天宫不华丽。
+----------------------------------------------------------------------------------------------------
+我国许多的地方猪种,大部分具有产子率高、母性遗传性能好等特点,欧美等国在繁育良种过程中,都从中国引过种:
+如约克夏（Yorkshire）猪原产于英国北部的约克郡及其邻近地区，
+其通过引用中国广东猪和含中国猪种的血液莱塞斯特猪（Leicester）
+进行长期的杂交改良而育成纯白色的优良瘦肉型猪种；
+而巴克夏（Berkshire）原产于英国中南部巴克郡一带，
+该猪种育成中，曾从广东省引进的黑猪或黑白花猪来改良。
+
+婚姻其实就是一个女性利用自己短暂的花期。套一个男性结婚，利用婚姻法对于女性的保护获得利益的过程。。社会整体不婚不育这件事情，出现的时间还不算长。极有可能在未来消失。也就是
+
+
+因为：
+女生过了30岁真的会没人要啊。。
+女性对于男性的择偶标准有很多。。有好工作的，有钱的，有权的，工作稳定的。。
+而男性对于女性的择偶标准就一条：年轻漂亮的。。
+至于女性工作好不好，
+
+
+第一，只有退潮的时候，才知道谁在裸泳。
+很多真的很好看的，性格很好的，招人喜欢的女生，在十几岁的时候，身边的追求者就是络绎不绝。但是当时所有女生都很年轻。
+所有女生都可以假装自己没人要的原因是因为年轻。
+但是过了30岁，那些真的很好看的女生，就和人结婚了。剩下的其实长得一般的就很尴尬了。
+首先女生过了30岁，就属于被别人挑剩下来的了。其次，自己没人要的原因不再是年轻了。装不下去了。
+第二，女性过了35岁就是高龄产妇了。甚至说的更加明白一点，过了28岁以后，生育能力就下降了。
+说白了，女性对于男性的一个选择条件就是生育。要是不考虑生育，嫖娼其实比找老婆省钱。
+第三，女性过了30岁以后，各项生理机能都在下降。
+按照经济学观点，属于贬值资产。或许很多人不懂经济学。但是大家都有经济学的直觉。
+
+下面两行
+
+数据范围
+这个部分书上没有说的非常清楚。
+首先讨论‘pre’, ‘post’, 因为这种折线图其实都是对于曲线的近似。因此上只有奇数位置1,3,5,7,9的点才是真正位于曲线上的点。
+而2,4,6,8,10上的点都是根据曲线上的奇数点弯折出来的。而这就涉及到先向Y方向弯折还是先向X方向弯折。
+这里规定‘pre’为先向Y方向弯折然后向X方向弯折。而‘post’则为先向X方向弯折然后向Y方向弯折。
+至于‘mid’，只有两个点之间的位置才是真正位于曲线上的点。而‘mid’规定两点之间的直线必须横向穿过真正位于曲线上的点。也就竖线的中点不一定位于曲线上。
+
+
+
+
+你说传统全是吃人的，宗教是精神鸦片，要唯物主义，要为伟大的事业做牺牲，过苦行僧一样的日子，不光要为本国人的福祉努力，还要为全世界远在千里之外，不认识你，你也不认识他的全人类努力。
+好的，我听你的，你都对。
+现在，你获得了一个对包括温良恭俭让在内的传统嗤之以鼻，对任何古今中外的宗教信仰都不了解也根本不愿意了解，不以读书为荣，笃信知识越多越反动，不以优雅风度为荣，迷信大老粗不修边幅才是真本色，觉得小年轻谈恋爱，穿得花枝招展，吃东西的时候小口慢慢吃，笑不露齿温文尔雅是小资情调，觉得所有洋的东西都是毒草，所有本土的东西包括针灸麻醉开刀都是真的。年轻人就该谈gm理想，新婚之夜抄党章，同时，坚信自己死后灰飞烟灭，没有灵魂，没有天堂，没有地狱，没有轮回，没有投胎，自己的子女以后过得好不好，是否怀念自己，感恩自己，都无法知晓。
+的这样的一个人。
+然后你叫他在乎断子绝孙。
+你实际上处心积虑几十年，各种理论框架，宣传鼓动，创造的是一群可以只活到20岁，最理想的情况是18岁在冲锋中抱着几颗手榴弹与对方的机枪手同归于尽，或者第二年复员以后在工厂大火里抢救物资烧成黑炭最后姿势还死死抱着物资的狂热年轻人，他们的生育不是为了家族的延续，因为你唾弃传统的家庭传承，说是封建遗留，也不是为了爱情，因为爱必需全部献给伟大事业，儿女私情只会干扰它的纯正，更不是为了欲望，欲望简直就像是魔鬼的呓语，提都不要提。
+他们的生育，是为了创造下一代在20岁前就为伟大事业牺牲的年轻人。
+这种人，除非你有本事让他永远狂热，否则哪一天热情退却，他不为了伟大事业生育，他能为了什么生育？你否认了全部其他的意义，他怎么会在乎断子绝孙呢？他什么都不在乎，还会在乎有没有后代吗？还是我以前就坚持的观点，旧的彻底地否定了，新的能不能竖起来？新的是否就是真新的，是否就具备了旧的所没有的生命力？
+真正讽刺的是，今天需要维持经济运转的观念，恰恰就是以前要打倒的否定的东西，比如你叫人买房，六个钱包，不就是最传统古老的家庭传承吗？如果不是，凭什么叫上两代人为第三代人的钢筋混凝土出钱呢？维持这个社会运转的东西，恰恰就是以前处心积虑要扼杀的东西，今天华人社会的发达经济体，哪一个不是“很封建，没有经历过什么什么洗礼”的反面教材？这种矛盾，自己打脸的现实，已经让年轻人彻底困惑了，不生育算什么事？这已经不是什么大事了。
+
+
+
+你这个回答在知乎不能这么说，
+你要知道知乎是什么人群的主场，
+而这部分人群喜欢什么不喜欢什么。
+不能碰到他们心中的禁区。
+你首先要明确，任何问题，只要是在墙内，都得突出我们要赢！
+能做到的自然不必多说，
+那些做不到的，或是不如其他国家的地方，一定要突出一个不是我们做不到，或是不如他们，而是我们根本不屑于去做，或是他们穷见识短，理解不了我们的幸福！
+只有这样，你才能掌握流量密码，才能不被人身攻击。才能和大家一起赢！
+
+
+
+
+
+作者：笨笨熊
+链接：https://www.zhihu.com/question/20675357/answer/648860660
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+说起这个问题，因为我在大白兔公司上班，我估计要给大家科普一下了，目前市面上的大白兔奶糖一共分两家公司生产，一家是奉贤星火开发区惠阳路的大白兔总厂，边产的糖就是大家口中所说的变硬，不太甜的大白兔，一家是上海市金山区朱林路的天山大白兔是个分厂，产的糖是软又甜，我可以很明确的告诉大家大白兔这十几年的产糖 用量 和原材料是一直都没变过的，奶粉是新西兰进口的奶粉，但是为什么口味和十几年前的不一样了呢？ 主要是工艺是变过的，因为奉贤那边的设备产量需要提升，所以换了先进的设备，但是你们知道生产大白兔奶糖需要几个工艺么，糖要软其实是比较困难的，要经过熬煮 搅拌 拉条 最后切割 包装，如果要糖变软就要奶粉的分量就要改变，这样糖是变软了，但是后面的工艺就会变得困难，拉条，切割都是不好切的，影响产量进度，所以现在那边的糖都是你们口中说的变硬了，但为什么天山那家公司的大白兔糖比较软好吃呢？说起来蛮可悲的，因为那边的设备基本还是老设备，工艺没什么变化 还是十几年的样子 所以糖是又软又甜，还是你们记忆中的那个味道。-------------------------------------------------------------------------分割线2019/4/17日  有人问我怎么区分这两家糖的，因为外包装都是一样的  我省的一个个回复评论了，就是大白兔奶糖包装袋生产日期 那个用机器打印的地方 生产日期旁边要是是M，就是分厂做的糖（软的）！！！！！如果是ASF 那就是总厂做的糖（硬的）！！！！！！！！！！！！！还有哪里可以买到软的 大白兔奶糖，旗舰店有很小概率买到软的，因为总厂产量要比分厂产量高很多，不过大白兔60周年庆礼盒那个糖100%是分厂做的！！别问我为什么，只能帮你们到这了    OVER
+
+
+
+
+
+
+
+
+float CosTheta(const Vector3D &w);
+float AbsCosTheta(const Vector3D &w);
+float SinTheta2(const Vector3D &w);
+float SinTheta(const Vector3D &w);
+float CosPhi(const Vector3D &w);
+float SinPhi(const Vector3D &w);
+bool SameHemisphere(const Vector3D &w, const Vector3D &wp);
+
+inline float Dot(const Vector3D &v1, const Vector3D &v2);
+inline float AbsDot(const Vector3D &v1, const Vector3D &v2);
+
+inline Vector3D SimpleSphericalDirection(float sintheta,
+                                 float costheta, float phi);
+inline Vector3D Vector3DSphericalDirection(float sintheta, float costheta,
+                                 float phi, const Vector3D &x,
+                                 const Vector3D &y, const Vector3D &z);
+inline float SphericalTheta(const Vector3D &v);
+inline float SphericalPhi(const Vector3D &v); 
+----------------------------------------------------------------------------------------------------
+
+香橙派orangepi R1 Plus 
+https://item.taobao.com/item.htm?id=686363873204
+
+----------------------------------------------------------------------------------------------------
+xungao@ubuntu:~/linux/mySedonaCode$ 
+xungao@ubuntu:~/linux/mySedonaCode$ lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 002 Device 002: ID 0e0f:0003 VMware, Inc. Virtual Mouse
+Bus 002 Device 003: ID 0e0f:0002 VMware, Inc. Virtual USB Hub
+xungao@ubuntu:~/linux/mySedonaCode$ 
+----------------------------------------------------------------------------------------------------
+xungao@ubuntu:~/linux/mySedonaCode$ lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 002 Device 002: ID 0e0f:0003 VMware, Inc. Virtual Mouse
+Bus 002 Device 003: ID 0e0f:0002 VMware, Inc. Virtual USB Hub
+Bus 001 Device 002: ID 0bda:8152 Realtek Semiconductor Corp. 
+xungao@ubuntu:~/linux/mySedonaCode$ 
+----------------------------------------------------------------------------------------------------
+
+fcho "192.168.168.5" > /data/svm/current_ip 
+
+mv /data/svm/current_ip /data/svm/ff_current_ip
+
+cat /data/svm/current_ip 
+
+ifconfig eth0 192.168.168.5
+
+sudo apt-get update
+sudo apt-get install gdebi-core
+sudo dpkg -i bcompare-4.3.7.25118_amd64.deb
+
+
+编译方法：
+    cd corelinux/v3ssdk/
+    easyboard@V3S:~$ cd corelinux/v3ssdk/
+    easyboard@V3S:~/corelinux/v3ssdk$ ./linux_docker_build.sh 
+
+    ......
+    ----------image is at----------
+
+    /home/easyboard/corelinux/v3ssdk/tools/pack/rootfs.img
+
+    pack finish
+    easyboard@V3S:~/corelinux/v3ssdk$ 
+修改代码方法：
+    在虚拟机中打开VSCode
+
+
+linux下所有文件中的字符串批量替换方式
+
+find ./ -type f -name "*.c"|xargs  sed -i "s/AAAAA/BBBBB/g"
+执行上述指令可以将当前目录下所有.c文件中的AAAAA批量替换为BBBBB
+
 
 tftp -g -r app.sab 192.168.168.180
 tftp -g -r app.scode 192.168.168.180
 tftp -g -r svm 192.168.168.180
 
-F:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sab
-F:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
- 
+    // Bottom
+	Rectangle rectangle_bottom_ptr = new Rectangle(
+		Point3D(0, 0, 0), Vector3D(50, 0, 0), Vector3D(0, 0, 100));
+    // Back
+	Rectangle rectangle_back_ptr = new Rectangle(
+		Point3D(0, 0, 0), Vector3D(50, 0, 0), Vector3D(0, 120, 0));
+    // Left
+	Rectangle rectangle_left_ptr = new Rectangle(
+		Point3D(0, 0, 0), Vector3D(0, 0, 100), Vector3D(0, 120, 0));
+    // Front
+	Rectangle rectangle_front_ptr = new Rectangle(
+		Point3D(0, 0, 100), Vector3D(50, 0, 100), Vector3D(0, 120, 100));
+    // Top
+	Rectangle rectangle_top_ptr = new Rectangle(
+		Point3D(0, 120, 0), Vector3D(50, 120, 0), Vector3D(0, 120, 100));
+    // Right
+	Rectangle rectangle_right_ptr = new Rectangle(
+		Point3D(50, 0, 0), Vector3D(50, 120, 0), Vector3D(50, 0, 100));
+    
+    
+    Compound * compond_ptr = new Compound();
+    compond_ptr->add_object(rectangle_bottom_ptr);
+    compond_ptr->add_object(rectangle_back_ptr);
+    compond_ptr->add_object(rectangle_left_ptr);
+    compond_ptr->add_object(rectangle_front_ptr);
+    compond_ptr->add_object(rectangle_top_ptr);
+    compond_ptr->add_object(rectangle_right_ptr);
+    compond_ptr->set_material(matte_ptr2);
+    add_object(compond_ptr);
+
+
+    const char* file_name = "Bunny69K.ply";
+    Grid* bunny_ptr=new Grid(new Mesh) ;
+    bunny_ptr->read_smooth_triangles(file_name);
+    bunny_ptr->set_material(phong_ptr);
+    bunny_ptr->setup_cells();
+    
+
+    if (bbox.inside(ray.o)) {              // does the ray start inside the grid?
+        // 起点
+        ix = clamp((ox - x0) * nx / (x1 - x0), 0, nx - 1);
+        iy = clamp((oy - y0) * ny / (y1 - y0), 0, ny - 1);
+        iz = clamp((oz - z0) * nz / (z1 - z0), 0, nz - 1);
+    }
+
+[root@ez9260 /]#      cd /data/svm
+[root@ez9260 /data/svm]# rm /data/svm/current_mac
+[root@ez9260 /data/svm]# rm /data/svm/current_ip
+[root@ez9260 /data/svm]# rm -rf /data/svm/www
+
+
+return (inv_area);
+sample_unit_square
+->sample_unit_disk
+->map_samples_to_unit_disk
+->sample_unit_square
+
+a = v0.x - v1.x, b = v0.x - v2.x, c = ray.d.x, d = v0.x - ray.o.x;
+
+
+
+F:\BaiduNetdiskDownload\新建文件夹 (2)\linux-2.6.30-9260\linux-2.6.30\include\linux\netfilter\xt_dscp.h
+F:\BaiduNetdiskDownload\新建文件夹 (2)\linux-2.6.30-9260\linux-2.6.30\include\linux\netfilter\xt_rateest.h
+F:\BaiduNetdiskDownload\新建文件夹 (2)\linux-2.6.30-9260\linux-2.6.30\include\linux\netfilter\xt_MARK.h
+F:\BaiduNetdiskDownload\新建文件夹 (2)\linux-2.6.30-9260\linux-2.6.30\include\linux\netfilter\xt_TCPMSS.h
+F:\BaiduNetdiskDownload\新建文件夹 (2)\linux-2.6.30-9260\linux-2.6.30\include\linux\netfilter_ipv6\ip6t_hl.h
+
 d:
 cd SeconaDownload
+
+1951年4月22日-6月10日
 
 /tools/svm /data/svm/app.scode /data/svm/app.sab 
 
@@ -434,13 +3082,703 @@ tftp -g -r app_0524.sab 192.168.168.180
 
 tftp -g -r app_WPM.sab 192.168.168.180
 
+tftp -p -l index.html 192.168.168.180
+
+tftp -g -r index.html 192.168.168.180
+cd pages
+tftp -g -r application_upgrade.html 192.168.168.180
+cd -
+cd pages
+tftp -g -r system_upgrade.html 192.168.168.180
+cd -
+
+ ./goahead  --verbose --home www/
+
+[root@ez9260 /data/svm]# 
+[root@ez9260 /data/svm]# /tools/svm /data/svm/app.scode /data/svm/app.sab
+
+Lujiaming Sedona VM 0.1.0
+buildDate: Aug 24 2023 15:31:38
+endian:    little
+blockSize: 4
+refSize:   4
+
+-- MESSAGE [sys::Component] setBool : false
+-- MESSAGE [sys::Component] status := STATUSNODEV
+  Error joining multicast group 239.255.18.76: No such device
+-- MESSAGE [sys::Component] DASP Discovery not enabled
+-- MESSAGE [sys::Component] Dasp.HELLO seqNum=4244
+-- MESSAGE [sys::Component] Dasp.AUTHENTICATE seqNum=4244
+
+
+
+装备坦克，伏击时迫击炮首发命中，早就做好射击诸元，只通过图上作业就能转移攻击目标，战斗力可以在cctv7套作为兵王表演的那种，还配了能一人短时间压制带观察手的狙击小组的狙击手。
+
+
+
+熊绶春，黄维，胡宗南，宋希濂，胡琏
+
+辐射能Q是电磁波能量的基本单位。
+辐射通量中定义为辐射能每秒通过物体表面的数量，Φ=dQ/dt。
+辐射通量密度定义为单位表面积内的辐射通量，记为dΦ/dA。
+入射辐射度E是指到达物体表面的通量密度，按E=dΦ/dA这个公式计算。
+出射辐射度Ｍ是指离开物体表面的通量密度。
+其单位为(W 辐射强度Ⅰ定义为每单位立体角的通量密度，且I=dΦ/dω，
+而A⊥为垂直于该方向的投影面片。
+因此上，辐射度等于使用垂直于该方向的投影面片A⊥作为微分面积的入射辐射度E 乘以 辐射强度I。
+    L = dΦ/dA⊥ * dΦ/dω = dΦ^2/(dA⊥ * dω)
+而，投影面积与物体表面积存在下列关系：
+    dA⊥=cosθ * dA
+因此上，辐射度等于：
+    L = dΦ/dA⊥ * dΦ/dω = dΦ^2/(cosθ * dA * dω)
+
+
+通过材质特性表示物体表面的反射特征是光线跟踪计算中的一种常见计算方法。
+为了实现这一方案，需要准确地描述光线与物体表面之间的反射机制。
+双向反射分布函数(BRDF) 提供了一种相对准确的描述方法。
+
+首付45万，贷款102万，利息124万，月供 6300元。
+这对每月只花1000元、工资减半不敢辞职的小夫妻，感到世界在坍塌。
+
+
+
+AI现在有三个叙事。
+一个是2c (对个人用户)，已经破产了。OpenAI已经证明了，大部分用户是不愿意付费的。收一块钱他们就转投豆包。
+另一个是2b(企业用户)，故事还在讲。2b又分两个叙事，一种是人力替代：把原来需要人做的工作用AI替了。你帮公司省十块钱的人力成本，公司花三块钱买你的token，大家都赚了，只有打工人亏了。这个叙事目前是成功的，企业各种裁员就是例证。这也是OpenAI和Anthropic都在发力代码和Agent的原因。
+但这个的想象空间不高：你能帮企业裁10个人，上限也就这十个人的工资，下限是几个模型打价格战打到电费成本。
+另一种是AGI叙事：AI达到完整人类的能力，甚至超过人类。这个叙事的想象空间是无上限的，四舍五入等于造无限个爱因斯坦。OpenAI押注通过训练模型的数学推理和科学计算能够实现。这也是支撑他能几千亿美元烧下去的底气 -- 能造出无限个爱因斯坦，几千亿不算贵。
+如果某天AGI叙事彻底破产，比如说Google研究院证明了现有的架构训练出的AI只是复读机，那整个叙事就破灭了。在此之前，是可以一直持续下去的。
+
+
+---------------------------------------------------------------------------------------------
+[root@ez9260 /]# cat /proc/cmdline
+mem=32M console=/dev/ttyS4,115200 root=/dev/mtdblock1 init=/init mtdparts=NAND:2M@0M(boot),14M@2M(root),-@16M(yaffs) ver=u-boot-v1.2_090623
+[root@ez9260 /]# 
+---------------------------------------------------------------------------------------------
+[root@ez9260 /]# uname -a
+Linux ez9260.xga.com 2.6.30 #32 Wed Aug 23 16:14:41 CST 2023 armv5tejl unknown
+---------------------------------------------------------------------------------------------
+[root@ez9260 /]# uname -s
+Linux
+[root@ez9260 /]# uname -n
+ez9260.xga.com
+[root@ez9260 /]# uname -r
+2.6.30
+[root@ez9260 /]#  uname -v
+#32 Wed Aug 23 16:14:41 CST 2023
+[root@ez9260 /]# uname -m
+armv5tejl
+[root@ez9260 /]# uname -p
+unknown
+---------------------------------------------------------------------------------------------xungao@ubuntu:~/linux/root/www$ uname --help
+Usage: uname [OPTION]...
+Print certain system information.  With no OPTION, same as -s.
+
+  -a, --all                print all information, in the following order,
+                             except omit -p and -i if unknown:
+  -s, --kernel-name        print the kernel name
+  -n, --nodename           print the network node hostname
+  -r, --kernel-release     print the kernel release
+  -v, --kernel-version     print the kernel version
+  -m, --machine            print the machine hardware name
+  -p, --processor          print the processor type or "unknown"
+  -i, --hardware-platform  print the hardware platform or "unknown"
+  -o, --operating-system   print the operating system
+      --help     display this help and exit
+      --version  output version information and exit
+
+Report uname bugs to bug-coreutils@gnu.org
+GNU coreutils home page: <http://www.gnu.org/software/coreutils/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+For complete documentation, run: info coreutils 'uname invocation'
+xungao@ubuntu:~/linux/root/www$ 
+---------------------------------------------------------------------------------------------
+
+
+  /*
+    addrSendVTS.addr.parse("192.168.168.180")
+    addrSendVTS.port = ((BIP)bus).port
+    dataVTSForwardSendGram.setSocketAddr(addrSendVTS)
+    dataVTSForwardSendGram.len = iPacketLen
+    ** log.message("send dataVTSForwardSendGram.len =${dataVTSForwardSendGram.len}")
+    dataVTSForwardSendGram.buf = bacnetRecvPacket
+    return socket.send(dataVTSForwardSendGram)?iPacketLen:0
+   */
  
+tftp -g -r ajaxbasic.js 192.168.168.180
+tftp -g -r ajaxfileupload.js 192.168.168.180
+
+mkdir   Materials
+git mv GeometricObjects/Material.* GeometricObjects/Matte.* Materials/
+cp ../Chapter14.3_linux_module/readme.txt .
+cat readme.txt | sh
+ls
+rm main
+---------------------------------------------Chapter 3 & 4------------------------------------------------
+mkdir GeometricObjects Samplers/  Tracers  Utilities  World
+mv GeometricObject.* Plane.* Sphere.* GeometricObjects/
+mv Sampler.* Samplers/
+mv MultipleObjects.* SingleSphere.* Tracer.* Tracers/
+mv Constants.* Maths.* Matrix.* Normal.* Point2D.* Point3D.* Ray.* RGBColor.* ShadeRec.* Vector3D.* Utilities/
+mv ViewPlane.* World.* World/
+cp ../Chapter3.6.1_linux_module/readme.txt .
+-----------------------------------------------Chapter 5----------------------------------------------
+mv Jittered.* MultiJittered.* Regular.* Sampler.* Samplers/
+mv NRooks.* Samplers/
+-----------------------------------------------Chapter 10----------------------------------------------
+mkdir   Lights
+mv Ambient.*  AmbientOccluder.*  AreaLight.*  EnvironmentLight.*  Light.*  PointLight.* Lights/
+cp ../Chapter3.6.1_linux_module/readme.txt .
+-----------------------------------------------Chapter 11----------------------------------------------
+mkdir   Lights
+mv Ambient.*  AmbientOccluder.*  AreaLight.*  EnvironmentLight.*  Light.*  PointLight.* Lights/
+cp ../Chapter10.3_linux_module/readme.txt .
+-----------------------------------------------Chapter 14----------------------------------------------
+mkdir   BRDFs
+mv BRDF.*  BTDF.*  FresnelReflector.*  FresnelTransmitter.*  GlossySpecular.*  Lambertian.*  PerfectSpecular.*  PerfectTransmitter.* BRDFs/
+mv BBox.*      Emissive.*          GeometricObject.*  Instance.*  Matte.*          GeometricObjects/
+mv MyRectangle.*  Plane.*       SmoothMeshTriangle.*  SphereConcave.*  Triangle.*  GeometricObjects/
+mv Compound.*  FlatMeshTriangle.*  Grid.*             Material.*  MeshTriangle.*   GeometricObjects/
+mv Phong.*        Reflective.*  SmoothTriangle.*      Sphere.*                     GeometricObjects/
+mv MultipleObjects.*  PathTrace.*  RayCast.*  Tracer.*  Whitted.*                  Tracers/
+-----------------------------------------------Chapter 22----------------------------------------------
+mv ply.* Mesh.* Utilities/
+-----------------------------------------------Chapter 25----------------------------------------------
+mkdir   Materials
+mv Dielectric.*  GlossyReflector.*  Transparent.*   Materials/
+
+
+否则你怎么理解原生态。。不就是要么
+-----------------------------------------------Clear----------------------------------------------
+find . -name "fileppm.ppm"  | grep "Chapter" | sed "s/^/rm /"
+find . -name "main" | sed "s/^/rm /" | sh
+-----------------------------------------------Clear----------------------------------------------
+
+-----------------------------------------------All----------------------------------------------
+mkdir GeometricObjects Samplers/  Tracers  Utilities  World
+mv GeometricObject.* Plane.* Sphere.* GeometricObjects/
+mv Sampler.* Samplers/
+mv MultipleObjects.* SingleSphere.* Tracer.* Tracers/
+mv Constants.* Maths.* Matrix.* Normal.* Point2D.* Point3D.* Ray.* RGBColor.* ShadeRec.* Vector3D.* Utilities/
+mv ViewPlane.* World.* World/
+mv Jittered.* MultiJittered.* Regular.* Sampler.* Samplers/
+mv NRooks.* Samplers/
+mkdir   Cameras
+mv Camera.*  FishEye.*  Pinhole.*  Spherical.*  StereoCamera.*  ThinLens.* Cameras/
+mkdir   Lights
+mv Ambient.*  AmbientOccluder.*  AreaLight.*  EnvironmentLight.*  Light.*  PointLight.* Lights/
+mkdir   BRDFs
+mv BRDF.*  BTDF.*  FresnelReflector.*  FresnelTransmitter.*  GlossySpecular.*  Lambertian.*  PerfectSpecular.*  PerfectTransmitter.* BRDFs/
+mv BBox.*      Emissive.*          GeometricObject.*  Instance.*  Matte.*          GeometricObjects/
+mv MyRectangle.*  Plane.*       SmoothMeshTriangle.*  SphereConcave.*  Triangle.*  GeometricObjects/
+mv Compound.*  FlatMeshTriangle.*  Grid.*             Material.*  MeshTriangle.*   GeometricObjects/
+mv Phong.*        Reflective.*  SmoothTriangle.*      Sphere.*                     GeometricObjects/
+mv MultipleObjects.*  PathTrace.*  RayCast.*  Tracer.*  Whitted.*                  Tracers/
+mv ply.* Mesh.* Utilities/
+mkdir   Materials
+mv Dielectric.*  GlossyReflector.*  Transparent.*   Materials/
+cp ../Chapter25.2_linux_module/readme.txt .
+ls
+cat readme.txt | sh 
+ls
+-----------------------------------------------All----------------------------------------------
+
+
+tftp -g -r stupid-ftpd.conf 192.168.168.180
+tftp -g -r stupid-ftpd.Linux6 192.168.168.180
+
+tftp -g -r goahead 192.168.168.180
+
+/bin/goahead --verbose --home /data/svm/www/
+./goahead --verbose --home /data/svm/www/
+
+tftp -g -r index.html  192.168.168.180
+
+tftp -g -r index.html  192.168.168.180
+
+tftp -g -r goahead 192.168.168.180
+
+printf("   Read_flash_cmd::nand_page_shift=%d   \n", nand_page_shift);
+printf("              Read_flash_cmd::addr=%X   \n", addr);
+printf("       Read_flash_cmd::target_addr=%X   \n", target_addr);
+printf("            Read_flash_cmd::length=%d   \n", length);
+100000
+
+tftp -p -l www.tar.gz 192.168.168.180
+
+./configure --host=armv5l-linux CC=armv5l-linux-gcc --prefix=${PREFIX} WITHOUT_XATTR=1 LDFLAGS=-L${PREFIX}/lib CFLAGS='-I${PREFIX}/include -I${PREFIX}/include/lzo -I${PREFIX}/include/uuid/ -g -O2' UUID_CFLAGS='-I${PREFIX}/include/uuid/' LZO_CFLAGS='-I${PREFIX}/include/' ZLIB_CFLAGS='-I${PREFIX}/include' --without-crypto 
+Change ubifs-utils/mkfs.ubifs/mkfs.ubifs.h as follow patch: 
+[PATCH] mkfs.ubifs: fix build without openssl 
+make -j8 
+make install
+
+---------------------------------------------------------------------------------------------
+d:
+cd D:\SeconaDownload\sedona_dev
+python makewinvm.py
+
+
+  if [ ! -e "/data/svm/www" ]; then
+    cp -r /www /data/svm/
+  fi
+首先辜鸿铭的学贯中西。是学贯中西的文学历史哲学。。。而不是学贯中西的所有学科。
+第二，你只要稍微阅读一下辜鸿铭同时代和稍早时代的哲学家。你会发现那些什么西方人本主义思想的来源是孟子。。
+就好像你跑到美国学习诗歌，发现老师交给你的全是翻译成英语的李白的诗歌。。
+因此上，他可不是
+
+少读黄巢咏菊花，不知为何起兵甲。而今公卿换名姓，周劼仍笑做题家。
+
+华东师大版《高中历史》第四分册，第11课——工业时代初期的社会矛盾，P49，练习与测评第一题：
+下面是1839年英国政府蓝皮书记载的斯皮特菲尔兹一个丝织工的证词：
+问：你有孩子吗？
+答：现在没有了，以前有两个，都死了，谢上帝开恩！
+问：你是说对孩子的死亡感到满意吗？
+答：正是这样，谢谢上帝！我因此而卸下了养育他们的重担；他们呢，可怜的东西，则免除了尘世间的许多苦难。
+你如何理解这位丝织工的回答？
+
+
+国外的一个纪录片，聚焦了布隆迪一群靠拉香蕉为生的人。
+无任何防护措施的异国小伙，骑起自行车，满载香蕉飞速前进，路过原生态村落、路过非洲绝美的夕阳和彩霞，
+小伙全然顾不上欣赏，双眼紧盯前方，躲过一个又一个障碍，这些场景让看客们置身其中，酣畅淋漓，无法自拔。
+这就是号称“男士减速带”之一的“奥德彪拉香蕉”视频。
+
+
+作为工科专业出身大佬，可能你更多的时间用在了专业上，这类社科层面的人性博弈你接触得少，看得比较表层，得出的结论也只停留在表面现象。
+首先，我并不认同你说的她们不会主动索取、不愿意麻烦别人。她们不是不会，也不是不愿，而是很清楚:当求助目标同为女性时，大概率不会成功。她们其实是在等你这个第三方出面，替她们向其他女生提出要求，这样既能避免自己求助欠下人情，也能避免和同性产生直接冲突，一切都可以推到"是老师安排的”，和自己毫无关系。
+如果你最终没插手，导致一大批人没电、考试无法进行，她们立刻就会集体甩锅，把所有责任全推到你头上，咬定是你这个老师安排不当。到时候一哭二闹三闹，你这个理论上毫无责任的人，甚至可能背处分，这一点你信不信?
+她们从一开始就笃定，最后一定会有人兜底。如果没人兜底，就集体闹到有人兜底为止，哪怕把老师拉出来背锅也无所谓。她们不敢和其他女性发生个体冲突，恰恰是为了最后能以"所有女生”的名义，搜取超额利益。
+再者，女性从来都不是天真的群体，更不是你说的需要花很多力气才能跟上节奏。
+她们心智发育更早，大多更看重个人眼前利益，很多人从幼年起，就已经在同性之间展开隐性的人际博弈。她们对现实、对自身处境看得一清二楚，只是刻意选择不付出、只收获罢了。
+而你，根本没看懂她们真正的行为逻辑。
+她们没准备插排，绝不是没看到通知，而是打心底觉得买插排要花钱，这笔支出对她们来说完全没必要，她们默认插排就该由老师或学校提供，你不提供，就是你的问题;因为你的问题导致考试无法进行，责任也该由你承担，和她们无关。
+她们理所当然地认为你会兜底，你不兜?这么多女生一起闹，让你兜底很难吗?
+核心就是:不付出任何成本，却要稳稳拿到结果。看看最终结果就明白了:
+她们没花一分钱，省下了所谓“不必要的买插排开支”；
+没向任何人求助，不欠任何人情，一切都是你自愿做的;
+顺利用上插排，考试圆满完成。
+抛开所有表象，本质就是如此。
+所谓困境?哪里有什么困境。她们的困境，不过是一边心安理得不劳而获，一边还要装作弱者，这套戏码越来越不好演了而已。
+
+
+
+
+
+cd ./Chapter27.6_linux_module/    &&  git mv GeometricObjects/Reflective.* Materials/ &&  cd -
+cd ./Chapter26.2_linux_module/    &&  git mv GeometricObjects/Reflective.* Materials/ &&  cd -
+cd ./Chapter25.2_linux_module/    &&  git mv GeometricObjects/Reflective.* Materials/ &&  cd -
+cd ./Chapter28.3_linux_module/    &&  git mv GeometricObjects/Reflective.* Materials/ &&  cd -
+cd ./Chapter24.2.2_linux_module/  &&  git mv GeometricObjects/Reflective.* Materials/ &&  cd -
+
+
+
+xungao@ubuntu:~/linux/root/mtd-utils$ cp ~/mtd-utils/mtd-utils/__install/sbin/flash_erase    .
+xungao@ubuntu:~/linux/root/mtd-utils$ cp ~/mtd-utils/mtd-utils/__install/sbin/nanddump       .
+xungao@ubuntu:~/linux/root/mtd-utils$ cp ~/mtd-utils/mtd-utils/__install/sbin/nandwrite      .
+xungao@ubuntu:~/linux/root/mtd-utils$ cp ~/mtd-utils/mtd-utils/__install/sbin/flash_eraseall .
+
+
+tftp -g -r  flash_erase     192.168.168.180
+tftp -g -r  nanddump        192.168.168.180
+tftp -g -r  nandwrite       192.168.168.180
+tftp -g -r  flash_eraseall  192.168.168.180
+ 
+tftp -g -r  rootfs.cramfs   192.168.168.180
+
+tftp -g -r  sramloader.bin   192.168.168.180
+
+tftp -g -r  u-boot.bin   192.168.168.180
+
+tftp -g -r  uImage   192.168.168.180
+
+tftp -g -r  genfirmware   192.168.168.180
+
+xungao@ubuntu:~$ find . -name "pages" 
+./Videos/export_to_xungao/linux/root/www/root/pages
+./export_to_xungao/export_to_xungao/linux/root/www/root/pages
+./Downloads/www/root/pages
+./Downloads/root/www/root/pages
+./linux/old_rootfs/root_IP_to_204/www/root/pages
+./linux/root/www/root/pages
+xungao@ubuntu:~$ 
+
+raytracegroundup.com expired on 05/22/2023 and is pending renewal or deletion.
+
+raytracegroundup.com expired on 05/22/2023 and is pending renewal or deletion.
+
+
+
+本周工作：
+完成固件升级功能。调整Sedona函数接口。增加Out of Service功能。增加查表算法模块。
+
+
+本周工作：
+发送Who-is-router-to-Network数据包，之后发送ObjectIdentifier为device, 4194303，属性为object-identifier device,1006的readProperty请求，获得另一个路由器的设备。
+修改bacNet的ReadPropertyMultiple模块的多读功能。
+添加一个本地属性模块。在收到其他设备的读请求后，返回这个属性值。
+
+---------------------------------end of update_kernel.sh--------------------------------------------
+ 
+文件系统如下：
+[lingyun@localhost fulinux]$ ls
+kernel rootfs systools u-boot
+[lingyun@localhost fulinux]$ cd rootfs/
+[lingyun@localhost rootfs]$ ls
+ramdisk-s3c2440.gz rootfs rootfs_tree.tar.bz2 tools
+[lingyun@localhost rootfs]$ cd rootfs
+[lingyun@localhost rootfs]$ pwd
+/home/lingyun/fulinux/rootfs/rootfs
+[lingyun@localhost rootfs]$
+ 
+[lingyun@localhost fulinux]$ ls
+kernel rootfs systools u-boot
+[lingyun@localhost fulinux]$ cd systools/
+[lingyun@localhost systools]$ ls
+busybox
+[lingyun@localhost systools]$ cd busybox/
+[lingyun@localhost busybox]$ ls
+build.sh busybox-1.20.2 busybox-1.20.2.tar.bz2 patch
+[lingyun@localhost busybox]$ cd busybox-1.20.2
+[lingyun@localhost busybox-1.20.2]$
+[lingyun@localhost busybox]$ ls
+build.sh busybox-1.20.2 busybox-1.20.2.tar.bz2 patch
+[lingyun@localhost busybox]$ cd busybox-1.20.2
+[lingyun@localhost busybox-1.20.2]$ vt100
+[lingyun@localhost busybox-1.20.2]$ make menuconfig
+主目录：
+Busybox Settings --->
+。。。
+Installation Options ("make install" behavior) --->
+What kind of applet links to install (as soft-links) --->
+指定文件系统的目录位置：
+(/home/lingyun/fulinux/systools/busybox/../../rootfs/rootfs) BusyBox installation prefix
+。。。
+回到主目录：
+Miscellaneous Utilities --->
+选择如下的两个程序：
+。。。
+[*] nandwrite
+。。。
+[*] flash_eraseall
+。。。
+保存退出。
+
+---------------------------------end of update_kernel.sh--------------------------------------------
+
+
+CDN提供商: 未知 独立IP26个 [复制]纠错补充更多
+ping 154.85.102.32
+ping 199.16.156.11
+ping 108.160.169.185
+ping 31.13.95.37
+ping 31.13.84.2
+ping 104.31.142.88
+ping 108.160.166.137
+ping 157.240.15.8
+ping 104.244.43.208
+ping 103.42.176.244
+
+
+
+
+
+    for(i = 0; i < ret.ival; i++)
+    {
+       bufOutput[ret.ival - i - 1] = pCharValue[i];
+    }
+    
+    printf("[%s:%s:%d] BacNet_BIP_eUI Fill [%02X:%02X:%02X:%02X]\n",
+             __FILE__, __FUNCTION__, __LINE__, 
+             bufOutput[0], bufOutput[1], bufOutput[2], bufOutput[3]);
+    
+
+		
+       if(readPropertyMultipleSupport == READ_PROPERTY_MULTIPLE_SUPPORT_NONE)
+      {
+         makeDevice4194303ProtocolServicesSupported()
+         if (device.writeReg(cache, regId, dataLength, buf) == dataLength) {
+            readPropertyMultipleSupport = READ_PROPERTY_MULTIPLE_CHECKING
+         } else {
+            log.message("makeDevice4194303ProtocolServicesSupported Error")
+         }
+         return
+      }
+      else if(readPropertyMultipleSupport == READ_PROPERTY_MULTIPLE_CHECKING)
+      {
+         log.message("readPropertyMultipleSupport is checking") 
+         return
+      }
+---------------------------------------------------------------------------------------------
+
+protocol-services-supported: (Bit String)
+    Application Tag: Bit String, Length/Value/Type: 6
+        .... 0... = Tag Class: Application Tag
+        1000 .... = Application Tag Number: Bit String (8)
+        .... .101 = Named Tag: Extended Value (5)
+        Length Value Type: 6
+    Unused bits: 0
+    acknowledgeAlarm = FALSE
+    confirmedCOVNotification = FALSE
+    confirmedEventNotification = FALSE
+    getAlarmSummary = FALSE
+    getEnrollmentSummary = FALSE
+    subscribeCOV = FALSE
+    atomicReadFile = TRUE
+    atomicWriteFile = TRUE
+    addListElement = FALSE
+    removeListElement = FALSE
+    createObject = FALSE
+    deleteObject = FALSE
+    readProperty = TRUE
+    readPropertyConditional = FALSE
+    readPropertyMultiple = TRUE
+    writeProperty = TRUE
+    writePropertyMultiple = TRUE
+    deviceCommunicationControl = TRUE
+    confirmedPrivateTransfer = FALSE
+    confirmedTextMessage = FALSE
+    reinitializeDevice = TRUE
+    vtOpen = FALSE
+    vtClose = FALSE
+    vtData = FALSE
+	
+    authenticate = FALSE
+    requestKey = FALSE
+    i-Am = TRUE
+    i-Have = FALSE
+    unconfirmedCOVNotification = FALSE
+    unconfirmedEventNotification = FALSE
+    unconfirmedPrivateTransfer = FALSE
+    unconfirmedTextMessage = FALSE
+	
+    timeSynchronization = FALSE
+    who-Has = FALSE
+    who-Is = TRUE
+    readRange = FALSE
+    utcTimeSynchronization = FALSE
+    lifeSafetyOperation = FALSE
+    subscribeCOVProperty = FALSE
+    getEventInformation = FALSE
+
+	  
+	  protocol-services-supported: (Bit String)
+    Application Tag: Bit String, Length/Value/Type: 6
+        .... 0... = Tag Class: Application Tag
+        1000 .... = Application Tag Number: Bit String (8)
+        .... .101 = Named Tag: Extended Value (5)
+        Length Value Type: 6
+    Unused bits: 0
+    acknowledgeAlarm = FALSE
+    confirmedCOVNotification = FALSE
+    confirmedEventNotification = FALSE
+    getAlarmSummary = FALSE
+    getEnrollmentSummary = FALSE
+    subscribeCOV = FALSE
+    atomicReadFile = TRUE
+    atomicWriteFile = TRUE
+    addListElement = FALSE
+    removeListElement = FALSE
+    createObject = FALSE
+    deleteObject = FALSE
+    readProperty = TRUE
+    readPropertyConditional = FALSE
+    readPropertyMultiple = TRUE
+    writeProperty = TRUE
+    writePropertyMultiple = TRUE
+    deviceCommunicationControl = TRUE
+    confirmedPrivateTransfer = FALSE
+    confirmedTextMessage = FALSE
+    reinitializeDevice = TRUE
+    vtOpen = FALSE
+    vtClose = FALSE
+    vtData = FALSE
+	
+    authenticate = FALSE
+    requestKey = FALSE
+    i-Am = TRUE
+    i-Have = FALSE
+    unconfirmedCOVNotification = FALSE
+    unconfirmedEventNotification = FALSE
+    unconfirmedPrivateTransfer = FALSE
+    unconfirmedTextMessage = FALSE
+	
+    timeSynchronization = FALSE
+    who-Has = FALSE
+    who-Is = TRUE
+    readRange = FALSE
+    utcTimeSynchronization = FALSE
+    lifeSafetyOperation = FALSE
+    subscribeCOVProperty = FALSE
+    getEventInformation = FALSE
+
 
 ---------------------------------------------------------------------------------------------
 
-PhongLightingBiquatricBezierSphereGraph
-ID_TOOLBAR_PHONG_LIGHTING_BIQUATRIC_BEZIER_SPHERE_GRAPH
 
+  /*    
+      // Lujiaming add these at 23/05/22
+      @config
+      @range = BVLCISTATUSRANGE
+      @fieldWidth = 200
+      property int typeBVLCI = BVLCISTATUSUNICAST
+
+      // NPCI
+      @config
+      property int versionNPCI = 1
+
+      // DNET/DLEN/DADR Present
+      @readonly
+      @range = NPCIRANGE
+      @fieldWidth = 200
+      property int dnetPresentNPCI = DNETENABLE
+      
+    //  @config
+    //  property int dnetNPCI = 2401
+      @config
+      property int hopCountNPCI = 255
+      
+      // SNET/SLEN/SADR Present
+      @readonly
+      @range = NPCIRANGE
+      @fieldWidth = 200
+      property int snetPresentNPCI = SNETDISABLE
+      
+    //  // Data Expecting Reply
+    //  @config
+    //  @range = NPCIRANGE
+    //  @fieldWidth = 200
+    //  property int dataExpectingReplyNPCI = DATAREPLYDISABLE
+      
+      @config
+      property int priorityNPCI = 0
+      // Lujiaming add these end at 23/05/22
+  */
+
+---------------------------------------------------------------------------------------------
+
+                int iLen = makeDevice4194303PropertyIdentifier(sNetBuf.parseInt(), macBuf.parseInt())
+                if(iLen > 0)
+                {
+                   writeReg(0, 0, iLen, buf)
+                }
+
+---------------------------------------------------------------------------------------------
+
+
+
+    dataLength = 0
+    // 0000 .... = APDU Type: Confirmed-REQ (0)
+    bacnetPacket[0] = 0x00
+    bacnetPacket[1] = device.maxAPDULength
+    
+    // invokeID: Invoke ID: 9
+    bacnetPacket[2] = device.invokeID
+    device.invokeID = device.invokeID + 1
+    if(device.invokeID == 0xFF)
+       device.invokeID = 0
+    dataLength = 3
+    // if(segmentedMsg == SEGMENTEDMSGENABLE)
+    // {
+    //     bacnetPacket[3] = sequenceNumber
+    //     bacnetPacket[4] = proposedWindowSize
+    //     dataLength = 5
+    // }
+    // Service Choice: readProperty (12)
+    bacnetPacket[dataLength++] = 0x0C
+    // Context Tag: 0, Length/Value/Type: 4
+    // .... 1... = Tag Class: Context Specific Tag
+    // 0000 .... = Context Tag Number: 0
+    // Length Value Type: 4
+    bacnetPacket[dataLength++] = 0x0C
+    if(objectNodeType > 4)
+    {
+        bacnetPacket[dataLength++] = objectNodeType / 4
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = (objectNodeType % 4) * 0x40
+    // .... .... ..00 0000 0000 0011 1110 1001 = Instance Number: 1001
+    if(instanceNumber > 0x00)
+    {
+        bacnetPacket[dataLength++] = instanceNumber / 0x100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x00
+    }
+    bacnetPacket[dataLength++] = instanceNumber % 0x100
+    log.message("BacReadPropertyVar::instanceNumber = ${instanceNumber}")
+    // Property Identifier: (374) Reserved for Use by ASHRAE (374)
+    // Property Type: access-credential (32)
+    log.message("BacReadPropertyVar::propertyIdentifier = $propertyIdentifier")
+    if(propertyIdentifier/0x1000000 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 4
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x01000000)
+        bacnetPacket[dataLength++] = (propertyIdentifier /(0x010000))%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier /   0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else if(propertyIdentifier/0x10000 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 3
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
+        bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else if(propertyIdentifier/0x100 > 0)
+    {
+        bacnetPacket[dataLength++] = 0x18 + 2
+        bacnetPacket[dataLength++] = propertyIdentifier/(0x010000)
+        bacnetPacket[dataLength++] = (propertyIdentifier/0x0100)%0x0100
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+    else 
+    {
+        bacnetPacket[dataLength++] = 0x18 + 1
+        bacnetPacket[dataLength++] = (propertyIdentifier)%0x0100
+    }
+//    // property Array Index (Unsigned) 5
+//    // Array Information
+    bacnetPacket[dataLength++] = 0x29
+    bacnetPacket[dataLength++] = arrayProperty
+
+    log.message("22222 bacnetPacket[$dataLength]")
+    for(int i =0 ; i < dataLength; i++)
+    {
+        buf[i] = (float)bacnetPacket[i]
+    }
+
+---------------------------------------------------------------------------------------------
+    log.message("bacDevice update 1111 status=$status") 
+    if (bus != null) {
+        if (bus.type.is(BIP.type)) {
+            ((BIP)bus).updateCache()
+        } 
+    }
+
+
+ObjFileCubeGraph
+ID_TOOLBAR_OBJ_FILE_CUBE_GRAPH
+
+ObjFileTeapotGraph
+ID_TOOLBAR_OBJ_FILE_TEAPOT_GRAPH
+
+
+TextureCubeGraph
+ID_TOOLBAR_TEXTURE_CUBE_GRAPH
+
+
+TextureSphereGraph
+ID_TOOLBAR_TEXTURE_SPHERE_GRAPH
+
+
+BumpTextureSphereGraph
+ID_TOOLBAR_BUMP_TEXTURE_SPHERE_GRAPH
+
+AntiAliasedBumpTextureSphereGraph
+ID_TOOLBAR_ANTIALIASED_BUMP_TEXTURE_SPHERE_GRAPH
 
 C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
 
@@ -460,7 +3798,7 @@ C:\Sedona\SedonaWorkbench-1.2.28\sedona\bin\sedonac.exe  app.sax
 		printf("        return false
 		printf("    }
 
-
+四个罪总计22年！但现在去掉一个“强迫交易罪”的6年，所以剩16年了，贿赂罪，介绍贿赂罪，诈骗罪！明天讨论！
 
 	CMainFrame *pMain=(CMainFrame *)AfxGetApp()->m_pMainWnd; // 先获取框架指针
 	CDrawFlowChartView *pView=(CDrawFlowChartView *)pMain->GetActiveView(); 
@@ -604,26 +3942,6 @@ xungao@ubuntu:/source/my_git/fstinterpreter$
 已婚有家室的就不行，她们不能全身心投入到工作中去。未婚无子女的，不够成熟，涉世未深。
 实践中不可能找到成熟的，已婚育有三个孩子，全心全意工作的女性。就是 22 条军规第一项：精神不健全可以免出勤。
 但各级部门都要从原则上赞同，只需各自讲清各部特殊情况即可。。
-
-
-
-// 这个算法的思想是这样的。就是我们在绘制一条直线的时候，
-// 会使用ROUND进行判断，也就是判断斜率是否大于0.5。
-// 我们首先假设dx > dy，斜率是否大于0.5就相当于是判断dx/dy是否大于0.5。
-// 那么就相当于判断2 * dx / dy是否大于1。
-
-/************************************************************************/
-/* 这个算法的思想其实还是没有脱离这两个原则。即：                       */
-/*     每一步。无论如何，我们都会沿递增方向每递增一个单位，             */
-/*     这会导致误差累加2 * dy。                                         */
-/*     当误差大于零的时候，我们沿递增方向的垂直方向递增一个单位，       */
-/*     这会导致误差减去2 * dx。                                         */
-/************************************************************************/
-/* 中点算法综合这两种情况，同时做了反向。就是：                         */
-/*     每一步。无论如何，我们都会沿递增方向每递增一个单位，             */
-/*     如果上一轮的误差小于零，则本轮会同时减少2 * dy和增加2 * dx。     */
-/*     如果上一轮的误差大于零，则本轮只会减少2 * dy。                   */
-/************************************************************************/
 
 
 
@@ -891,6 +4209,173 @@ bacnet.c  bacnet.c~  bip.c  mstp.c
 sedona_dev@ubuntu:~/sedona_dev$ 
 
 
+get_cmd_printf(/root/sdcard/app/instrument_info/2024_01_28/) return OK.
+Command <mkdir -p /root/sdcard/app/instrument_info/2024_01_29/ 2>&1> error: errorInfo is mkdir: can't create directory '/root/sdcard/app/instrument_info/2024_01_29/': Cannot allocate memory
+Command remount_sdcard.sh OK.
+
+
+mount -t debugfs debug /proc/sys/debug
+
+echo PB2 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+echo PB2 1  >  /proc/sys/debug/sunxi_pinctrl/function
+echo PB2 0 > /proc/sys/debug/sunxi_pinctrl/data
+# cat /proc/sys/debug/sunxi_pinctrl/sunxi_pin_configure
+
+echo PB3 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+echo PB3 1  >  /proc/sys/debug/sunxi_pinctrl/function
+echo PB3 0 > /proc/sys/debug/sunxi_pinctrl/data
+# cat /proc/sys/debug/sunxi_pinctrl/sunxi_pin_configure
+
+
+
+cat /dev/ttyS2
+
+
+#  echo PB1 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+#  echo PB1 1  >  /proc/sys/debug/sunxi_pinctrl/function
+#  echo PB1 1  >  /proc/sys/debug/sunxi_pinctrl/pull
+
+
+
+echo PB2 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+echo PB2 1  >  /proc/sys/debug/sunxi_pinctrl/function
+echo PB2 1 > /proc/sys/debug/sunxi_pinctrl/data
+# cat /proc/sys/debug/sunxi_pinctrl/sunxi_pin_configure
+
+echo PB3 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+echo PB3 1  >  /proc/sys/debug/sunxi_pinctrl/function
+echo PB3 1 > /proc/sys/debug/sunxi_pinctrl/data
+# cat /proc/sys/debug/sunxi_pinctrl/sunxi_pin_configure
+
+echo "AA" > /dev/ttyS2
+
+
+./rstpctl showbridge br0
+./rstpctl setbridgestate br0 on
+./rstpctl rstp br0 on    
+
+ip addr del 192.168.168.129/24 dev eth0
+ip addr del 192.168.168.130/24 dev eth1
+
+
+brctl addbr br0
+brctl addif br0 eth0
+brctl addif br0 eth1
+brctl stp br0 on
+ifconfig br0 192.168.168.131 netmask 255.255.255.0 up
+route add default gw 192.168.168.1
+
+ifconfig eth0 down
+ifconfig eth0 promisc down
+ifconfig eth0 up
+ifconfig eth1 down
+ifconfig eth1 promisc down
+ifconfig eth1 up
+
+head -110 start_ethernet.sh | tail -10
+
+ifconfig br0 down
+ifconfig br0 hw ether 65:3C:30:61:9F:F2
+ifconfig br0 up
+    
+    ifconfig eth1 down
+    ifconfig eth1 hw ether A8:9F:29:DB:E7:6A
+    ifconfig eth1 up
+
+
+/root/start_bridge.sh 71 A8:9F:29:DB:E7:6A
+ifconfig br0 down
+ifconfig br0 hw ether A8:9F:29:DB:E7:6A
+ifconfig br0 up
+
+ifconfig br0 down
+ifconfig br0 hw ether D9:5D:A0:5C:A6:B2
+ifconfig br0 up
+
+
+
+ip link set br0 up
+
+ifconfig br0 down
+brctl delif br0 eth0
+brctl delif br0 eth1
+brctl delbr br0
+killall rstpd
+document.oncontextmenu = null; document.onselectstart = null; document.oncopy = null;
+?
+
+ip route add 192.168.168.0 via 192.168.168.131
+
+tftp -g -r brctl 192.168.168.180
+tftp -g -r rstpd 192.168.168.180
+tftp -g -r rstpctl 192.168.168.180
+cd /usr/sbin
+mv brctl brctl_old
+cp /root/app/brctl .
+chmod 777 brctl
+cd /root/app/
+
+
+tftp -g -r brctl 192.168.10.180
+cd /usr/sbin
+mv brctl brctl_old
+mv /root/app/brctl .
+chmod 777 brctl
+cd /root/app/
+sync
+
+
+
+
+
+ip addr del 192.168.168.139/24 dev eth0
+ip addr del 192.168.168.140/24 dev eth1
+
+brctl addbr br0
+brctl addif br0 eth0
+brctl addif br0 eth1
+brctl stp br0 on
+ifconfig br0 192.168.168.111 netmask 255.255.255.0 up
+route add default gw 192.168.168.1
+
+/root/start_bridge.sh 71 76:D6:12:71:03:CE
+/root/start_bridge.sh 71 76:D6:12:71:03:CE
+
+ifconfig eth0 down
+ifconfig eth0 promisc down
+ifconfig eth0 up
+ifconfig eth1 down
+ifconfig eth1 promisc down
+ifconfig eth1 up
+
+ip route add 192.168.168.0 via 192.168.168.111
+ip route add 192.168.168.0 via 192.168.168.111
+ip route add 192.168.168.0 via 192.168.168.111
+ip route add 192.168.168.0 via 192.168.168.111
+ip route add 192.168.168.0 via 192.168.168.111
+
+
+ifconfig br0 down
+ifconfig br0 hw ether D2:7A:5B:7A:80:2B
+ifconfig br0 up
+
+
+# sh /root/start_bridge.sh 61  AA:0A:28:C2:28:D6
+
+
+
+echo PE23 > /proc/sys/debug/sunxi_pinctrl/sunxi_pin
+echo PE23 1  >  /proc/sys/debug/sunxi_pinctrl/function
+
+echo PE23 0 > /proc/sys/debug/sunxi_pinctrl/data
+# cat /proc/sys/debug/sunxi_pinctrl/sunxi_pin_configure
+cat /dev/ttyS1
+
+echo PE23 1 > /proc/sys/debug/sunxi_pinctrl/data
+# cat /proc/sys/debug/sunxi_pinctrl/sunxi_pin_configure
+echo "AAA" > /dev/ttyS1
+
+
 ---------------------------------------------------------------------------------------------
 
                     0            4            2
@@ -904,7 +4389,9 @@ sedona_dev@ubuntu:~/sedona_dev$
                     1            6            3
 
 
-gcc -D__UNIX__=1 -DSOCKET_FAMILY_INET=1 -DPLAT_BUILD_VERSION=\"0.1.0\" /home/sedona_dev/sedonadev/temp/generic-unix/*.c -O2 -o /home/sedona_dev/sedonadev/bin/svm
+gcc -D__UNIX__=1 -DSOCKET_FAMILY_INET=1 -DPLAT_BUILD_VERSION=\"0.1.0\" 
+ /home/sedona_dev/sedonadev/temp/generic-unix/*.c -O2 -o /home/sedona_dev/sedonadev/bin/svm
+
 
 xungao@ubuntu:~/linux/sedona/source$ make
 armv5l-linux-gcc -D__UNIX__ *.c -Wall -O2 -Imodbus/ -Lmodbus/ -lmodbus -lpthread -lm -o svm
@@ -940,9 +4427,64 @@ xungao@ubuntu:~/linux/sedona/source$
 				}
 			}
 
+新的系统上，系统行为和旧系统有一些差别。
+(1)首先是在新的系统上，无法为桥接网卡指定MAC地址。
 
+
+
+你千万不要觉得一个人年轻的时候是鲨臂，等他成熟了以后会改好，
+一个人如果一开始就是鲨臂，他只会随着岁月的洗礼和磨砺，
+把那种鲨臂的精髓发挥的更加淋漓尽致。
+
+你们所说的这个无法被超越的欧美文明，在中古时代与穆斯林的宗教战争里，
+被阿拉伯人称赞，“白人就像牲口一样坚韧，且能吃苦”。
+你们所说的这个无法被超越的欧美文明，在16～18世纪里，
+被当成牲口往阿拉伯世界贩卖。
+在持续了300年的白奴贸易里，约有80-120万白人奴隶被贩卖，
+直到1783年，俄国吞并了克里米亚，才终结了陆上白奴贸易。
+1830年，法国占领阿尔及尔，才终结了海上白奴贸易。
+
+有医学博主分析过大胃袋良子，高血糖高血脂导致血液根本没有办法正常流动，
+但高血压弥补了这一缺陷，然后脂肪护住血管防止爆开，属于是3个bug导致正常运行。
+你的肛门比较松弛，但是你的痔疮弥补了这一部分。
+
+
+我们把一个球面上使用两个通过圆心的圆组成的梭子形面积的图形称作球面两角形。
+根据对顶角相等，可知两个对顶的球面两角形面积相等。
+同理，把把一个球面上使用三个通过圆心的圆组成的梭子形面积的图形称作球面三角形。
+我们把三个通过圆心的圆两两组成的球面两角形和它的对顶两角形的面积加起来。
+会发现，这六个球面两角形的面积恰好等于整个球面面积加上四倍的球面三角形面积。
+因为三个通过圆心的圆两两组成的球面两角形和它的对顶两角形
+恰好覆盖了球面三角形和它的对顶球面三角形三次（三个角各一次）。
+去掉第一次覆盖的属于球面面积的一次，就多了两次。
+又因为球面三角形和它的对顶两角形面积相等。也就是四倍的球面三角形面积。即：
+     2 (L(α) + L(β) + L(γ)) = 4πr^2 + 4T     ---- (1)
+而球面两角形的面积计算可知为： 
+     (4πr^2)/2π = L(α)/α => L(α) = 2αr^2     ---- (2)
+把2式代入1式:
+     2(2αr^2 + 2βr^2 + 2γr^2) = 4πr^2 + 4T
+把4πr^2移过去，两边都消去4，就可得：
+     T = (α + β + γ - π) r^2
 
 git commit -m "Use scode magic code"
+
+
+
+因为得国不正。
+这么说吧。这个世界上，只有少数几个国家是依靠武装暴力革命建国的。
+大部分国家靠的是宗主国的施舍，或者是大国博弈建国的。
+很多国家一开始是英法的殖民地，二战独立以后，英国国力衰退，这些地方建国了。
+
+
+
+很难，看王虹的采访她可能准备终老奇才，连快船和步行者的合同她都能拒绝，
+湖人和公牛恐怕拿不出足够的实力去签下王虹。
+与其盯着王虹不如看看邓煜，我觉得等邓煜快退役巡演的时候说不定他会来掘金。
+
+
+湖人跳水，公牛牛棚
+张爱玲坐船、倪匡自称从内蒙跑到香港
+快船步行者是跑出去的，这边应该代指去港澳，公牛湖人就是留在内地的
 
 
 %:s/print /print(/
@@ -962,7 +4504,82 @@ git commit -m "Use scode magic code"
 
 	./bin/sedonac.sh src/math/
 
+飞机利用地面杂波低空突进，躲过地面防空，突入到射程范围内进行攻击。这种战术和配置，放俄乌战场不一定吃亏。
+本次战斗，印度无论从作战计划，战斗配合，还有指挥调度上来说，都堪称完美无瑕
+
+
+
+艺术来源于现实。很多人都知道时任江苏省委政法委书记兼公安厅厅长王立科看这部剧后阻挠播出，下令删除所有涉及江苏政法部门的“鸣谢”单位，严厉批评有关部门对拍摄工作的支持，强烈反映该剧的“危害性”。这部剧的出品人还是编剧在立科被查后说了一段话，大意是“坏了，有领导代入现实了”。我之前一直不理解王立科为什么会代入现实，直到我和一个在政法委的朋友聊天后才得知，立科把自己代入了高育良，觉得高育良的事例在影射他，一是立科来江苏后就和在东北老家的妻子离婚了（注：王立科的前妻叫夏娟，辽宁警察学院原党委书记，正厅级，一级警监），没有报告组织，二是立科的新欢是某美女警花，和这个年轻警花领了证，生了个孩子。剧中高育良也是省委政法委书记，也是和前妻离婚不报告，也是在外和新欢生了个大胖小子。我们代入一下立科的视角，作为政法委书记兼公安厅厅长，全省最位高权重的官员之一，江苏省内政法部门支持拍摄的一部电视剧，里面的省委政法委书记和自己妻子离婚没有报告组织，并且和新欢领了证生了个大胖小子，我想大部分人代入立科的视角，都觉得这个电视剧是在影射自己，换我我也破防，因为谎言不伤人，真相才是快刀。能让一位现实当中的省委常委、政法委书记破防的电视剧，肯定有真实的一部分。
+
+
+马克思主义者，前南斯拉夫最高领导人之一的德热拉斯出过一本神书叫《新阶级》。注意，以下文字全部针对的都是苏联这个国家，书作者德热拉斯就是因为反苏后入狱的，因此他的观点仅适用于苏联。这本书的核心思想其实总结起来也很简单，就是那些打着无产阶级旗号推翻资产阶级的新政权，并不是无产阶级取代了资产阶级，是无产阶级中的少数先锋队取代了资产阶级成为新阶级，本质上是这个"新阶级"通过垄断行政权力，实际上掌控了国有化财产的所有权、分配权和享用权，成为一个历史上前所未有的剥削阶级。为什么无产阶级的先锋队不代表无产阶级的利益？原因很简单，因为先锋队已经成为的新统治阶级，任何统治阶级存在的根本目的只有一个，就是维护自身的统治，这是最基本客观规律。按照马克思的思想，这个结合了垄断行政权力和国有资产的新阶级是最反动的剥削阶级，因为在资本主义社会资方还需要跟权力机构进行交易和勾兑,而新阶级本身就是垄断权力和国家资本结合的产物。所以，你也会明白为什么苏联能触动机关枪和毒气去农村征粮了，苏联工人罢工为什么会被铁腕镇压了，权力和资本的结合体比资本反动一万倍，所以这本书预言了苏联的垮台。一切都是相比较而言的，相比于被新阶级这种究极剥削阶级，资本家剥削都算正面案例了。
+
+不对内容负责，收集了评论区书友的评论：
+《阿里布达年代记》
+《十景缎》
+《妖刀记》
+《妻子的欲望》
+《陈皮皮的斗争》
+《妻心如刀》
+《玲珑孽缘》
+《沧澜曲》
+《浪子江湖》
+《六朝清羽记》
+逍遥小散仙，江山如此多娇，平妖传
+魅惑的谎言 骑士的血脉 红楼遗秘 海盗的悠闲生活
+夜幕下的上海滩 伊甸园之奴宠战记 武林启示录
+
+
+
+原因有三点：
+第一点是房价低。说白了。你吃的很多路边食物，售价里面一半是房租。
+上海一个门市，每一个与
+
+
+
 C0A8A802 BAC0810A 00110108 09610105 50090F91 24
+
+
+                            // We will return instrument_scale + 1 because of time revert.
+                            if(i > instrument_scale)
+                            {
+                                break;
+                            }
+
+# ls /root/sdcard/app/instrument_info/ | grep -v "2024_03_10" | grep -v "2024_03_11" | grep -v "2024_03_12" | sed "s/^/rm -rf \/root\/sdcard\/app\/instrument_info\//"
+rm -rf /root/sdcard/app/instrument_info/2024_03_07
+rm -rf /root/sdcard/app/instrument_info/2024_03_08
+rm -rf /root/sdcard/app/instrument_info/2024_03_09
+# ls /root/sdcard/app/instrument_info/ | grep -v "2024_03_10" | grep -v "2024_03_11" | grep -v "2024_03_12" | sed "s/^/rm -rf \/root\/sdcard\/app\/instrument_info\//" | sh
+# 
+# 
+# ls /root/sdcard/app/instrument_info/ | grep -v "2024_03_10" | grep -v "2024_03_11" | grep -v "2024_03_12" | sed "s/^/rm -rf \/root\/sdcard\/app\/instrument_info\//" 
+# 
+# 
+6.4.1幂函数w=z^n(n≥2且为整数)
+6.4.2指数函数ω=e^z
+
+8.2.2 δ函数的傅里叶变换
+
+5.3.1 形如∫R(cosθ, sinθ)dθ的积分
+5.3.2 形如∫R(x)dx的积分
+5.3.3 形如∫R(x)e^iaxdx(a>0)的积分一
+
+纯粹从数学物理角度的难度排行榜:
+
+   飞行器设计工程师 = AI算法工程师 = 新材料工程师 = 芯片设计工程师 等其他各种高端岗位 
+   >  图像算法工程师 (手机影像)
+   >  控制算法工程师(自动控制，调pid) 
+   >  机械工程师(复杂活动机械 ) 
+   >  射频天线工程师 
+   >  功率电子工程师 
+   >  电气工程师
+   >  硬件工程师(及嵌入式工程师) 
+   >  pcb工程师 
+   >  结构工程师 
+   >  土木工程师(基本上用不到数学)
+   >  互联网低端码农(用不到数学)
+   >  消防工程师
 
 
 810A 0015 0100 3001 0C0C 00000000 1A01763E 217B3F
@@ -973,6 +4590,70 @@ Vp(VO)-Vp(VI)
 	./bin/sedonac.sh src/math/
 	0000   62 61 63 32 31 31 76 20 31 30 30 31              bac211v 1001
 
+lucelu@ubuntu:~/Downloads/Games_101_homework$ cd Assignment
+bash: cd: Assignment: No such file or directory
+lucelu@ubuntu:~/Downloads/Games_101_homework$ cd Assignment0/
+lucelu@ubuntu:~/Downloads/Games_101_homework/Assignment0$ ls
+'Assignment  0.pdf'   Code
+lucelu@ubuntu:~/Downloads/Games_101_homework/Assignment0$ 
+lucelu@ubuntu:~/Downloads/Games_101_homework/Assignment0$ cd Code 
+lucelu@ubuntu:~/Downloads/Games_101_homework/Assignment0/Code$ ls
+CMakeLists.txt  main.cpp
+lucelu@ubuntu:~/Downloads/Games_101_homework/Assignment0/Code$ 
+  ????
+sed '/Jason/ {a 204,Jack Johnson,Engineer；i 202,Mark Smith,Sales Engineer；c 203,Joe Mason,Sysadmin}' employee.txt
+
+cd ~/Downloads/Games_101_homework/Assignment0/Code && mkdir build && cd build && cmake ../ && make
+cd ~/Downloads/Games_101_homework/Assignment1/Code && mkdir build && cd build && cmake ../ && make
+cd ~/Downloads/Games_101_homework/Assignment2/Code && mkdir build && cd build && cmake ../ && make
+cd ~/Downloads/Games_101_homework/Assignment3/Code && mkdir build && cd build && cmake ../ && make
+cd ~/Downloads/Games_101_homework/Assignment4/Code && mkdir build && cd build && cmake ../ && make
+cd ~/Downloads/Games_101_homework/Assignment5/Code && mkdir build && cd build && cmake ../ && make
+cd ~/Downloads/Games_101_homework/Assignment6/Code && mkdir build && cd build && cmake ../ && make
+cd ~/Downloads/Games_101_homework/Assignment7/Code && mkdir build && cd build && cmake ../ && make
+
+
+再说杨洁是个从延安开始的老革命，六老师一个跳脱性子的人，那点道行在老革命面前，根本不够看。杨洁父亲是华西日报主编，解放前牺牲，杨洁小姨危拱之也是老革命，叶帅前妻，杨洁表姐是聂帅妻子——张瑞华，杨洁自己是央视的第一批元老，本来资历足够当台长，甚至广电局副局长了，多次提拔在即，她只想搞业务，不想坐办公室。
+
+
+按照喻大华的说法。这个好像不是真的。
+首先光绪在庚子国变以后，身体一直不好。太医院，外国列强，包括各地督抚，都找人给光绪看过病。
+有详细的医案。很难作假。
+而且，慈禧为此还为光绪指定了太子，就是溥仪啦。命令让溥仪的爸爸做摄政王。
+而且，溥仪不是作为光绪的儿子，而是作为同治皇帝过继过来的儿子继承皇位。慈禧还是皇太后啊。
+而且，
+划重点。
+既然溥仪是作为同治皇帝过继过来的儿子继承皇位。那么
+
+就算光绪死了
+仍然要求
+光绪
+
+还是老话说得好：
+
+但凡让你顾全大局，那你一定不在大局里。
+但凡是让你不惜代价的，你就是那个代价。
+但凡是说为你好的，其实都是为他好。
+但凡是说你放心吧，下次一定考虑你，那下辈子都不会考虑你了。
+但凡有人劝你莫天真糊涂，那你最好雀食天真又糊涂。
+
+cd ~/Downloads/Games_101_homework/Assignment8/Code && mkdir build && cd build && cmake ../ && make
+
+drwxrwxrwx 3 lucelu lucelu 4096 Jul 26 22:58 Assignment0
+drwxrwxrwx 3 lucelu lucelu 4096 Jul 26 22:58 Assignment1
+drwxrwxrwx 3 lucelu lucelu 4096 Jul 26 22:58 Assignment2
+drwxrwxrwx 5 lucelu lucelu 4096 Jul 27 02:20 Assignment3
+drwxrwxrwx 3 lucelu lucelu 4096 Jul 26 22:58 Assignment4
+drwxrwxrwx 3 lucelu lucelu 4096 Jul 26 22:58 Assignment5
+drwxrwxrwx 5 lucelu lucelu 4096 Jul 27 02:20 Assignment6
+drwxrwxrwx 3 lucelu lucelu 4096 Jul 26 22:58 Assignment7
+drwxrwxrwx 4 lucelu lucelu 4096 Jul 27 18:43 Assignment8
+
+
+由于错误 2147942487“参数错误。”无法卸载 Windows 更新 (命令行:“"C:\Windows\SysNative\wusa.exe" /uninstall /kb:2999226 /quiet /norestart”)
+
+
+
 	
 被删除了。。那我就我再发一次。。
 
@@ -980,13 +4661,63 @@ Vp(VO)-Vp(VI)
 
 搞主食入菜的全是粗糙的饮食。用粉丝丸子做菜的全是穷人的饮食。下馆子吃汤汤水水灌大肚的全是糊弄事的饮食。
 你看看唐仁杰的洛阳探店。什么真不同，管记。丸子汤用的是粉丝丸子。赛熊掌其实就是四喜丸子。燕菜就是萝卜丝和蛋皮。
-还有洛阳水席。不就是切成细丝，伪装成燕窝的白萝卜；粉条合面油炸，伪装成肉丸子泡在酸辣汤里；红薯粉搓成粗条，用一丁点肉末调味，伪装成海参；勾了浓芡，吃着顶肚子的面条……一看就是中原穷苦百姓操办红白喜事，素菜荤做、大锅出品的流水席。
+还有洛阳水席。不就是切成细丝，伪装成燕窝的白萝卜；粉条合面油炸，伪装成肉丸子泡在酸辣汤里；红薯粉搓成粗条，
+用一丁点肉末调味，伪装成海参；勾了浓芡，吃着顶肚子的面条……一看就是中原穷苦百姓操办红白喜事，素菜荤做、大锅出品的流水席。
 至于什么什么鲤鱼。就更是老黄历了。。要是上世纪八十年代，还有人吃鲤鱼。这年头，谁还吃土腥味这么大的鲤鱼。。
 就这。。。洛阳酒家还竟然自称全国十佳饭店。真是坐井观天啊。。就他那个菜色，全国大部分菜市场的苍蝇馆子都比他肉多。。
 
-那可不。地方政府的城投公司借了钱不还。银行什么办法都没有。只能把城投公司列入黑名单。。然后地方政府再成立一家城投公司接着借。。银行明明知道这家城投公司和和黑名单上的前一家其实是一家公司。也只能捏着鼻子借钱。。
+那可不。地方政府的城投公司借了钱不还。银行什么办法都没有。只能把城投公司列入黑名单。。
+然后地方政府再成立一家城投公司接着借。。
+银行明明知道这家城投公司和和黑名单上的前一家其实是一家公司。也只能捏着鼻子借钱。。
 
-	
+
+在青铜时代的中国，那些长兵器往往是出身贵族的车兵戈手与出身平民的步兵使用的兵器，并非担任主将的贵族应该佩戴的。而在和平环境中，剑往往被认为是一个贵族男子的标配，戈戟之流往往被视为卫兵标配。那么，王公级别的贵族，平时的士大夫自然要用剑来标榜身份了。
+中国古代贵族男子在周代至五代时期的上古、中古时代均有不同程度的佩剑惯例，这也是欧亚大陆古典时代精英男性的普遍现象。在古代中国，佩剑甚至被视为君子标配，剑甚至与佩玉一道被赋予君子品德，甚至发展出了仙人御剑飞行的神话形象。八仙之中的吕洞宾便以宝剑为其法器，季札挂剑故事中的宝剑便被季札用来赠予友人，被视为君子守信与君子之交的象征，一代军神韩信在落魄之时哪怕被人嘲笑也要佩剑上街彰显贵族出身。在古代日本，无论是公家还是武士，只要是贵族，就需要佩剑，在古代欧洲，尤其是在中世纪，骑士与剑也成为一组堪称文化现象的固定搭配。
+秦汉唐宋元明清，无论哪个政权，都是刀剑工艺的时代佼佼者。古代的男子需要配剑，用一把军工良品，来展现地位，在秦汉之后的一统王朝中，刀剑虽然逐渐被严格管制，却也是皇权的信物（尚方宝剑与班剑）、军权的象征（高阶军官出征佩剑）、修仙的标配（御剑之术），在中国传统文化中拥有其他兵器很难睥睨的高度，或许只有斧钺可与之争锋。
+
+
+封建社会和计划经济时代的传统婚姻是这么玩的。
+首先在封建社会和计划经济时代，女性无法独立生活。
+在我生活的上世纪八十年代，很多地区的饮用水需要挑。就是用两个水桶和一个扁担去指定饮水点获取。
+这件事情还萌生了一个赵本山讲过的笑话：叫他给寡妇挑过水。
+指的是，你要是想和一个寡妇结婚。你只要给他挑水就行了。
+更别提在没有摄像头的农村。很多不务正业的小伙子还会去踹寡妇门玩。
+而城市里，就更麻烦了。在我生活的上世纪八十年代，社会治安非常差。
+女性深夜回家被杀害的情况非常多。
+例如著名的呼格吉勒图案。就是一个女的晚上七点上厕所，就被杀害了。
+
+
+在生命安全和基本生活都无法保证的时代，女性对于找老公是有强制要求的。
+没有老公真的活不下去。
+
+这种想法的潜台词是这个意思。
+我好好学习，努力工作，就是为了赚钱。我现在直接有钱了。岂不是直接到达终点。为啥还要好好学习，努力工作。
+这种想法和现代很多人想躺平的想法差不多。
+我好好学习，努力工作，就是为了过舒服日子。我现在要是能直接过舒服日子。岂不是直接到达终点。为啥还要好好学习，努力工作。
+这种想法吧。其实没错。
+主要是大部分人没法选择直接到达终点。过舒服日子。
+
+
+就是革命不彻底。。
+前段时间看过一个印度新闻。政府在一个地方修了一条柏油路。
+第二天，老百姓就趁着沥青还没完全干，就把沥青刨出来带回家了。
+这种新闻和几年前，中国某地区一个水果运输卡车在一个村子附近侧翻被村民哄抢。
+还有几年前，在山东部分农村，老百姓偷管道燃气，人人家里有一个大气包。
+有着异曲同工之妙。
+但是之后的故事却开始不一样。。
+在中国，你偷管道燃气，哄抢水果。政府真的能过来抓你。
+但是在印度，政府根本管不了。
+
+
+本周工作：
+添加一个本地属性模块。在收到其他设备的读请求后，返回这个属性值。包括：
+对于Who-IS的处理。
+对于object-list的处理。
+对于Property Identifier: required (105)的处理。
+实现用于界面连线的数据同步label。。
+
+
+
 本周工作：
 实现修改设备名称device-name的功能。在Windows平台上调查Sedona虚拟机执行报错问题和Workbanch升级问题。
 	
@@ -1024,7 +4755,11 @@ Vp(VO)-Vp(VI)
 多项式的乘法满足结合律和交换律
 
 
-三鹿将16个样品送去检测，发现在15个样品中发现了三聚氰胺的成分，并确认是人为向原料乳中掺入了三聚氰胺。 作为三鹿集团的外资股东，新西兰恒天然在获悉该情况后，要求三鹿马上召回受到三聚氰胺污染的奶粉，而且要向中国有关部门报告。 但是 三鹿集团从未向经销商说明产品有质量问题，而是以各种借口召回产品，导致受污染的奶粉迟迟未被召回。 后来，恒天然只好向新西兰政府报告，新西兰政府在得知消息后，直接向我国中央政府报告该事件，三聚氰胺的问题彻底爆发。 在2008年9月，中国国务院启动了国家安全事故的I级响应机制，也就是按照最高级别、特别重大的食品安全事故来处置三鹿奶粉三聚氰胺污染事件。
+三鹿将16个样品送去检测，发现在15个样品中发现了三聚氰胺的成分，并确认是人为向原料乳中掺入了三聚氰胺。
+作为三鹿集团的外资股东，新西兰恒天然在获悉该情况后，要求三鹿马上召回受到三聚氰胺污染的奶粉，而且要向中国有关部门报告。
+但是 三鹿集团从未向经销商说明产品有质量问题，而是以各种借口召回产品，导致受污染的奶粉迟迟未被召回。
+后来，恒天然只好向新西兰政府报告，新西兰政府在得知消息后，直接向我国中央政府报告该事件，三聚氰胺的问题彻底爆发。
+在2008年9月，中国国务院启动了国家安全事故的I级响应机制，也就是按照最高级别、特别重大的食品安全事故来处置三鹿奶粉三聚氰胺污染事件。
 
 
 习远平（1956年11月—），男，陕西富平人，中共元老习仲勋、齐心次子，是中国共产党中央委员会总书记习近平胞弟。
@@ -1048,6 +4783,65 @@ Vp(VO)-Vp(VI)
 还没等华国锋念完，王洪文突然大吼一声，挣脱警卫人员的扭缚，由五六米远的地方向叶剑英猛扑过去。
 
 在这个紧要时刻，一旁的警卫猛冲上去把他扑倒，死死地摁住，给他戴上手铐。
+
+
+
+
+领导以为的自己：
+刘亚楼，你记一下，我作如下部署调整。以四纵、十一纵，加两个独立师，强化塔山防线；二、三、七、八、九，五个纵队，加六纵十七师，包打锦州；十纵加一个师，在黑山大虎山一线，阻击廖耀湘兵团，十二纵加十二个独立师，围困长春；五纵、六纵两个师监视沈阳；一纵做总预备队！
+实际上的领导：
+徐州地方，历代大规模征战五十余次，是非曲折难以论说，但史家无不注意到，正是在这个古战场，决定了多少代王朝的盛衰兴亡、此兴彼落，所以古来就有问鼎中原之说。当年先总理令革命军分三路会合徐州，兴师北上，光复徐州的第二天，清帝见大势已去，宣告退位。民国十六年四月，也正是在徐州城郊，我有幸亲率数十万健儿征讨北洋军阀孙传芳、张宗昌，大获全胜！我不明白，为什么大家都在谈论着项羽被困垓下，仿佛这中原古战场对我们注定了凶多吉少。二十年前，我从徐州踏上征途，开始了第二次北伐，中华秋海棠叶遂归于一统。本党本军所到之处，民众竭诚欢迎，真可谓占尽天时，那种勃勃生机、万物竞发的境界，犹在眼前。短短二十年之后，这里竟至于一变而成为我们的葬身之地了么？无论怎么样，会战兵力是以八十万对六十万，优势在我！
+
+
+
+上海的猪大排主要用于
+
+
+至于这个排字，更是让人唏嘘。因为对于北方人来说的排骨。上海人叫小排。
+
+
+
+
+哎。。。猪大排三个字声声血，字字泪。承载了我多年在上海吃饭的血泪。。
+首先猪大排在很长时间里都是叫大排。后来加上这个猪字的原因令人十分尴尬。
+就是上海还有一种大排。是鸡肉做的。有很多无良商家揣着明白装糊涂，故意混淆这两种大排。。
+用猪大排的价格卖鸡大排。赚这种昧良心的钱。。我当年吃饭的时候，没少上当。
+而且因为上当的人太多，正常经营的商家也是不堪其扰，于是加上了这个猪字。。
+
+再说大这个字，在上海本地食材命名。大排中的大，有的时候指的是猪肉。而不是big的意思。
+例如很多地方和民族，说大肉，指的不是大块的肉，而是猪肉。
+上海说的大肉包子不是大个的肉包子。而是大肉的包子，也就是猪肉包子。而且一点也不大。。这一点的确让我这样的初来上海的外地人遇到过一些疑惑。。。
+当然，相对于大排来说，上海是有小排。也就是北方人说的排骨。而且非常昂贵，要三四十元一斤。
+至于那种肉很少的，十几元一斤的，叫汤小排。上海这种地方对于排骨的分类非常复杂。我到现在都搞不清楚。我买菜的时候，没少上当。
+至于排这个字，其他回答都说的很清楚了。。就是通脊。因为带一点点骨头。就干这种擦边的事情。毕竟小排太贵，不好天天吃。只能吃大排聊以慰藉、
+因此上，大排这种东西，有的时候是猪肉的，有的时候是鸡肉的。既不大，也不是什么正经的排骨。只不过是穷人吃不起正经排骨聊以慰藉的替代物。
+
+
+那可不。我南汇的同事管去浦西叫去上海。。狭义的上海基本上就是市区。
+而市区内部还有鄙视链。例如黄埔和卢湾鄙视杨浦和虹口。说他们是下只角。。静安鄙视闸北。。说他们是泥腿子。。
+
+
+简直凝练了上海这个地方的
+
+开漏输出就是不输出电压，控制输出低电平时引脚接地，控制输出高电平时引脚既不输出高电平，也不输出低电平，为高阻态。如果外接上拉电阻，则在输出高电平时电压会拉到上拉电阻的电源电压。这种方式适合在连接的外设电压比单片机电压低的时候。
+
+开漏输出无法真正输出高电平，即高电平时没有驱动能力，需要借助外部上拉电阻完成对外驱动。
+
+推挽输出的优点是输出高低电平和电源电压基本上没有压差，高低电平驱动能力强，电平切换速度快。但是，推挽输出的结构不支持线与，即不能将多个推挽输出直接连接在一起。?
+
+
+推挽输出的一个缺点是，如果当两个推挽输出结构相连在一起，一个输出高电平，即上面的MOS导通，下面的MOS闭合时；同时另一个输出低电平，即上面的MOS闭合，下面的MOS导通时。电流会从第一个引脚的VCC通过上端MOS再经过第二个引脚的下端MOS直接流向GND。整个通路上电阻很小，会发生短路，进而可能造成端口的损害。这也是为什么推挽输出不能实现" 线与"的原因。
+
+
+
+
+在苏联,退休年龄规定男子60岁,妇女55岁。领取退休金的工龄规定,男子必须具备25年的工龄,妇女具备20年工龄(5个以上孩子并把他们抚养到8岁的母亲15年工龄)。
+
+
+另一方面，是为了保护承担人口生产重担的母亲的身体健康影响。毕竟母亲主要承担家庭的各种杂务。
+
+
+
 
 
 t11=0;t12=1;t21=0;t22=2;
@@ -1224,6 +5018,30 @@ cd ..
 
 
 
+        jackOptions {
+            enabled true
+        }
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+
+Error:(87, 97) 错误: -source 1.7 中不支持方法引用
+(请使用 -source 8 或更高版本以启用方法引用)
+
+
+此时相当于我们从起点开始，遍历了从起点开始迷宫中能到达的所有位置。这些位置都不是终点。那可不是没有解答么！！！
+
+而且在我们遍历的迷宫所有位置中，而且每一个位置都被设置成了移动步数最少的方案。
+
+
+Error:Execution failed for task ':app:transformClassesWithPreJackPackagedLibrariesForDebug'.
+> java.lang.NullPointerException (no error message)
+
+
 .tran 30m
 .options plotwinsize=0
 
@@ -1319,6 +5137,178 @@ https://www.aliyundrive.com/s/R84vK3tYTR7
 
 还有从测试可以看出。作为一个网络协议，同时只可能有一个对象操作网络套接字进行收发。这就意味着，我是无法拖动多个bacReadVar和bacWriteVar收发不同的属性数据的。
 因此上，和Modbus相比，
+
+
+
+
+cp 
+
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter28.8_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter29.2_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter29.4_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter29.6_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter30.2.1_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter30.2.2_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter30.3.1_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter31.1.2_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter31.4_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter31.5_linux/Tracers/
+cp Chapter28.7_linux/Tracers/Whitted.* Chapter31.6_linux/Tracers/
+
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter28.8_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter29.2_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter29.4_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter29.6_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter30.2.1_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter30.2.2_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter30.3.1_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter31.1.2_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter31.4_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter31.5_linux_module/Tracers/
+cp Chapter28.7_linux_module/Tracers/Whitted.* Chapter31.6_linux_module/Tracers/
+
+cd Chapter28.8_linux_module/       && cat readme.txt |  sh   && cd -
+cd Chapter29.2_linux_module/       && cat readme.txt |  sh   && cd -
+cd Chapter29.4_linux_module/       && cat readme.txt |  sh   && cd -
+cd Chapter29.6_linux_module/       && cat readme.txt |  sh   && cd -
+cd Chapter30.2.1_linux_module/     && cat readme.txt |  sh   && cd -
+cd Chapter30.2.2_linux_module/     && cat readme.txt |  sh   && cd -
+cd Chapter30.3.1_linux_module/     && cat readme.txt |  sh   && cd -
+cd Chapter31.1.2_linux_module/     && cat readme.txt |  sh   && cd -
+cd Chapter31.4_linux_module/       && cat readme.txt |  sh   && cd -
+cd Chapter31.5_linux_module/       && cat readme.txt |  sh   && cd -
+cd Chapter31.6_linux_module/       && cat readme.txt |  sh   && cd -
+
+
+cp -r Chapter28.7_linux_module/*            Chapter28.7_linux/
+cp -r Chapter28.8_linux_module/*            Chapter28.8_linux/
+cp -r Chapter29.2_linux_module/*            Chapter29.2_linux/
+cp -r Chapter29.4_linux_module/*            Chapter29.4_linux/
+cp -r Chapter29.6_linux_module/*            Chapter29.6_linux/
+cp -r Chapter30.2.1_linux_module/*          Chapter30.2.1_linux/
+cp -r Chapter30.2.2_linux_module/*          Chapter30.2.2_linux/
+cp -r Chapter30.3.1_linux_module/*          Chapter30.3.1_linux/
+cp -r Chapter31.1.2_linux_module/*          Chapter31.1.2_linux/
+cp -r Chapter31.4_linux_module/*            Chapter31.4_linux/
+cp -r Chapter31.5_linux_module/*            Chapter31.5_linux/
+cp -r Chapter31.6_linux_module/*            Chapter31.6_linux/
+
+
+cd   Chapter28.8_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+g++ -w -o main *.cpp
+cd - 
+
+cd   Chapter29.2_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+g++ -w -o main *.cpp
+cd - 
+
+cd   Chapter29.4_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+cd   Chapter29.6_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+cd   Chapter30.2.1_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+cd   Chapter30.2.2_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+
+cd   Chapter30.3.1_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+
+cd   Chapter31.1.2_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+
+cd   Chapter31.4_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+
+cd   Chapter31.5_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+
+cd   Chapter31.6_linux/
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/mv \1\/* ./" | sh
+find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ls
+g++ -w -o main *.cpp
+cd - 
+
+
+
+
+
+ 2036  cat readme.txt | sh
+ 2037  cd ..
+ 2038  ls
+ 2039  mkdir Chapter28.3_linux
+ 2040  ls Chapter28.3_linux
+ 2041  cp -r Chapter28.3_linux_module/* Chapter28.3_linux/
+ 2042  ls Chapter28.3_linux
+ 2043  cd Chapter28.3_linux
+ 2044  ;s
+ 2045  ls
+ 2046  find -type d
+ 2047  find -type d | grep "\/"
+ 2048  find -type d | grep "\/" | sed "s/\.\///"
+ 2049  find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/cp \1\/* ./"
+ 2050  find -type d | grep "\/" | sed "s/\.\///" | sed "s/^\(.*\)/cp \1\/* ./" | sh
+ 2051  ls
+ 2052  find -type d | grep "\/" | sed "s/\.\///" 
+ 2053  find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/ls /" | sh
+ 2054  
+ 2055  ls
+ 2056  find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/ls /" | sh
+ 2057  find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/ls /" 
+ 2058  find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /" 
+ 2059  find -type d | grep "\/" | sed "s/\.\///" | sed "s/^/rm -r /"  | sh
+ 2060  g++ -o main *.cpp
+ 2061  g++ -w -o main *.cpp
+ 2062  ./main 
+ 2063  cd ..
+ 2064  cd Chapter27.6_linux_module/
+ 2065  cat readme.txt | sh
+ 2066  history 
 
 
 0000   12 34 5c ff 62 25 0e 87 2b 01 09 59 38 78 75 6e  .4\.b%..+..Y8xun
@@ -1452,6 +5442,7 @@ extern Operand *g_operand_top;			// 操作数栈栈顶
 		sprintf(cDigest, "\x84\x4e\x3d\x92\xc4\xe1\x80\x07\x8b\x91\x60\x77\x77\x77\x35\x45\x35\x35\x67\x83\x3b\x9e")
 mac电路模拟软件
 
+是的。。现在很多领域都是这样。。你要不是干这个行业，你没有资格发表意见，因为你不是干这个。你要是干这个行业的，你没有资格发表意见，因为你对着行业理解不深。你要是这个行业的大牛，你不会怎么说，因为你是不会砸自己的饭碗的。
 
 乌真超哈,牛录章京,固山额真
 分为
@@ -1486,6 +5477,12 @@ mac电路模拟软件
 革意大利命的是马志尼、加利包尔提；革俄国命的是列宁——
 你们要记着，假如革中国命的是孙中山，你们要小心了，不要让外国来的野鬼钻进了中山先生的棺材里去！
 
+1945年初，在重庆的陆军大学邀请廖耀湘去做报告传授缅北作战指挥得失与经验。廖耀湘讲此次缅北作战，能够打胜仗，首先是补给充分，“经我们平均计算，摧毁敌人一中队，需要炮弹一千三百发左右。所以我们得到一个最大的教训，就是打仗并不希望炮多，最重要的是炮弹多”。其次是医药卫生完备，“这次新廿二师受伤的竟有5,000多人，但是为什么还能够继续攻击呢，就是因为这些受伤的士兵，能够很快地医好，回来继续作战”。第三则是粮秣充足，“他们的营养，完全是照科学的方法……最重要的是脂肪和肉类”，对指挥经验不过寥寥几句带过。场下期盼聆听战术演说的陆大学员瞠目结舌，军令部部长徐永昌更是气愤“不知蒋先生何以要此种人在此等场合报告此等事”。
+
+作者：阋卫一戴斯诺米娅
+链接：https://www.zhihu.com/question/404595752/answer/2590982685
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 
 抛开赵九章、姚桐斌、汤飞凡、萧光琰、邓叔群、董铁宝、周寿宪、虞光裕、董坚毅、傅作恭、陈绍澧、叶渚沛、张宗燧、刘崇乐、马明德、陈焕镛、周仁、熊庆来、徐舜寿、翦伯赞、何思敬、王守融、顾毓珍、李广田、饶毓泰、刘盼遂、叶企孙、张昌绍、马特、周华章、林鸿荪、程世祜、陈天池、徐瑞云、王琎、陈寅恪、陈垣、曾昭抡、翁文灏、钱晋、翁心源、陈梦家、丰子恺、谢家荣、李璞、司幼东、詹安泰、王荣璸、吴宓、束星北、丁瓒、曹日昌、余柏年、雷宏叔、伍钦荣、许宝騄、程述铭、姚启钧、马幼源、李其琛、毛青献、毛启爽、王茂荣、吴鸿俭、殷大敏、余启运、胡先骕、吴定良、傅连暲、颜福庆、涂羽卿、黄国璋……不谈，美国就没一点责任吗？
@@ -1507,6 +5504,32 @@ mac电路模拟软件
 学医吗？？学医工作稳定，越老越吃香。。缺点是：要学很多年。5年加三年。还有就是每个期末都像高考一样。。需要背的书从地面堆到房顶。。
 学农吗？？？广阔农村，工作机会大把。。学个给牛治病的兽医。你绝对是十里八乡最靓的仔。。从来不用花钱吃午饭。每一户村民家都是你的食堂。。。老乡家里有啥土特产，随便拿。。
 学文理兼招吗？？学法学和汉语言可以考公务员。一步登天。进入体制。
+
+
+总攻击命令：一、从12月6日午后4时30分开始，全线对敌12兵团总攻击。二、陈赓、谢富治集团务歼沈庄、张庄一线之敌；陈锡联集团务歼三官庙、马围子一线之敌；王近山、杜义德集团务歼玉王庙、赵庄一线之敌。随后华野3纵、13纵加入南集团，由华野参谋长陈士渠统一指挥，突击敌人核心阵地双堆集。三、总攻发起之后，应连续进行攻击，不得以任何理由停止或请求拖延。四、各部应不惜最大牺牲完成任务并自动协助友邻夺取胜利。五、对于临阵动摇、贻误战机分子，各集团、各纵首长有严格执行纪律之权，不得姑息。
+
+
+武侠小说里，有哪些很惨的女性角色？
+
+玉女盟。
+
+六个女主角，组成了一个侠女联盟，听信谣言把男主门派灭了，就男主活了下来。结果男主开始一个一个的复仇，侠女一个比一个惨。
+
+玲珑孽缘。
+大反派把男主家灭门了，小姨，妈，姐姐，堂姐什么的都被反派抓走。
+
+男主长大后，混入反派帮派成了反派女婿和帮派二号，开始复仇，反派三个女儿，女下属，老婆，小姨子都成为复仇对象。
+
+主角那些被抓的小姨，姐姐，妈也被主角。。。。。
+
+
+
+修罗劫
+
+主角是魔子，是上代魔王强了上代圣女生下的。开始复仇正道武林。
+
+各种门派大师姐小师妹，新老圣女都是他的复仇对象。
+
 
 
 typedef struct _SOX_FILEOPEN_MESSAGE
@@ -1568,6 +5591,7 @@ tktable[50].spelling = test
 我就这么跟你说吧。首先镇元大仙抓不住猴子。猴子只要每天在镇元大仙睡觉的时候，给他一棒子。镇元大仙一个月不到就会疯。。[捂脸]
 只有蒋介石的兵才可靠……”，“蒋介石的兵是很好的，他们只需要一些政治教育……前来进犯的军队中有世世代代受压迫的中国农民，他们不是死心塌地的敌人，必须把他们争取过来”。
 
+世祖在便殿,用金柄刀子治瓜,晏在侧曰:“外间有金刀之言,恐不宜用此物。”世祖愕然。
 
 以这句为例：
     char * str1 = "AAA";
@@ -1619,6 +5643,22 @@ char * str1 = "AAAAAAAAAAAA";
 
 
 平时袖手谈心性，临危却道“水太凉”
+
+
+作者：酒醒杨柳岸
+链接：https://zhuanlan.zhihu.com/p/661756160
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+伟人事业的简单事实似乎令人难以置信：在一个拥有四亿人口的广袤土地上，28 岁的他与十几个人一起创建了一个政党，并在随后的几十年里赢得了政权，组织和改造了人民，重塑了这片土地。历史上没有比这更伟大的成就了。亚历山大、凯撒、拿破仑、俾斯麦、列宁，没有任何前辈能与伟人的成就相提并论，因为没有任何一个国家像中国这样古老而庞大。事实上，伟人的成就几乎超出了我们的理解范围"。在伟人之前，中国是一个落后的农村国家，主要由文盲农民组成，大部分土地归地主所有。在 4.5 亿居民中，有 5000 万人吸食鸦片，80% 的人不识字，预期寿命只有 35 岁。日本人杀害了 3500 万中国人，蒋介石将军抱怨说，在他招募的每 1000 名青年中，几乎没有 100 人活下来。妇女被捆绑双脚，农民将70%的农产品作为地租交给地主，绝望的母亲卖掉自己的孩子以换取食物，穷人为了不挨饿只能卖身。美国大使斯图亚特报告说，在他到那里的第二年，三个省有 1 000 万人饿死。然而，当他于 1974 年再次前往中国时，侵略者、土匪和军阀已不复存在，人口翻了一番，达到约 8 亿人，识字率达到 84%，贫富差距消失，电力通达贫困地区和农村地区。基础设施得到恢复，经济增长了 500%，吸食鸦片现象被消除，妇女获得解放，女孩接受教育，犯罪率极低，人人有房住，预期寿命达到 70 岁，从几个关键的社会和人口指标来看，中国与人均 GDP 高出五倍的中等收入国家相比毫不逊色。尽管美国在粮食、金融和技术方面对中国进行残酷封锁，但伟人在不举债的情况下，使中国经济年均增长 7.3%，而美国战后经济繁荣时期的年均增长率仅为 3.7%。伟人去世时，中国正在制造喷气式飞机、重型拖拉机、远洋轮船、核武器和远程弹道导弹。
+
+
+
+张令，明末永宁人，四川副总兵、老头当时七十余，马上用五石弩，中必洞胸，军中号“神弩将”
+是蜀中当时仅次于四川总兵秦良玉的名将。
+崇祯十三年老爷子带兵围剿张献忠，张献忠的一个义子，20岁的小将张玉儿出阵邀战，老头拨马出战，对面小将抬手一箭直接射穿老将咽喉....当场身亡....明军大溃，当年力战建州女真的白杆军此战全军覆没。
+这个张玉儿后来恢复了原名，就是李定国
+
 
 
 加入mk_pointer函数。
@@ -1716,28 +5756,48 @@ make -C src -f projects/goahead-linux-static.mk \
 export PATH=${PATH}:~/bin/timesys/toolchains/armv5l-linux/bin/
 
 
-陈云反对在上海建经济特区，不仅因为这有可能给国家既有的重工业和税收基础造成风险，还因为作为一个在1920和1930年代在那里工作过的人，他深知资本主义的罪恶和上海商人那种在他看来对洋人过分卑躬屈膝的“买办习气”。因此，陈云担心外国租界死灰复燃。
 
 rm -rf src/linux-armv5l-linux-static
 ls src
 make -C src -f projects/goahead-linux-static.mk  ARCH=armv5l-linux SHOW=1  CC=armv5l-linux-gcc LD=armv5l-linux-ld
 
-busybox tftp -g -r goahead 192.168.168.170
+tftp -g -r goahead 192.168.168.180
 
-./goahead --home www/ --verbose &
+./goahead --home www/ --verbose 
 
 killall httpdd
 
 cd /data/svm/www/root
-busybox tftp -g -r index.html 192.168.168.170
 
+tftp -g -r index.html 192.168.168.180
 cd pages
-busybox tftp -g -r system_setting.html 192.168.168.170
+tftp -g -r application_upgrade.html 192.168.168.180
+cd -
+cd pages
+tftp -g -r system_upgrade.html 192.168.168.180
+cd -
 
-busybox tftp -g -r app.sab 192.168.168.170
+tftp -g -r ip_address_setting.html 192.168.168.180
+tftp -g -r mac_address_setting.html 192.168.168.180
 
+tftp -g -r app.scode 192.168.168.180
 
-busybox tftp -g -r change_ip_address.sh 192.168.168.170
+cd /data/svm/www/
+tftp -g -r change_mac_address.sh 192.168.168.180
+
+./configure --host=armv5l-linux --prefix=/root/projects/tftp2/tftp-hpa-0.40/build/
+
+busybox tftp -g -r change_ip_address.sh 192.168.168.180
+busybox tftp -g -r stop_svm.sh 192.168.168.180
+
+tftp -g -r busybox 192.168.168.180
+
+tftp -g -r tftpd 192.168.168.180
+tftp -g -r in.tftpd 192.168.168.180
+
+tftp -g -r vsftpd 192.168.168.180
+
+busybox ipconfig
 
 grep -Rns --exclude-dir doc  --binary-files=without-match "setTimeout" .
 
@@ -1747,18 +5807,18 @@ grep -Rns --exclude-dir doc  --binary-files=without-match "uploadTmp" .
 
 grep -Rns --exclude-dir doc  --binary-files=without-match "tmp-" .
 
-busybox tftp -g -r index.html 192.168.168.170
+busybox tftp -g -r index.html 192.168.168.180
 
-busybox tftp -g -r test_upload.html 192.168.168.170
+busybox tftp -g -r test_upload.html 192.168.168.180
 test_upload.html
 
-busybox tftp -g -r system_upgrade.html 192.168.168.170
+busybox tftp -g -r system_upgrade.html 192.168.168.180
 
-busybox tftp -p -l tmp-2.tmp 192.168.168.170
-busybox tftp -p -l index.html 192.168.168.170
+busybox tftp -p -l tmp-2.tmp 192.168.168.180
+busybox tftp -p -l index.html 192.168.168.180
 
 
-busybox tftp -p -l system_upgrade.html 192.168.168.170
+busybox tftp -p -l system_upgrade.html 192.168.168.180
 
 trace(2, "[%s:%s:%d] log output: %s ", clientFilename);
 
@@ -1770,6 +5830,8 @@ trace(2, "[%s:%s:%d] log output: %d ",
          __FILE__, __FUNCTION__, __LINE__, len);
 
 		 
+printf("[%s:%s:%d] log output: %d ",
+         __FILE__, __FUNCTION__, __LINE__, len);
 		 
 typedef struct debugSectionInfo
 {
@@ -1777,7 +5839,256 @@ typedef struct debugSectionInfo
 	Section * sectionptr ;
 } debugSectionInfo;
 
+
+
+
 std::vector<debugSectionInfo> vectorDebugSectionInfo ;
+
+
+10/23-10/27周报。
+1. 多播组实现不同网段的设备发现。可以实现PC之间通信。但是PC和设备之间无法通信。怀疑是路由器的问题。需要进一步分析。
+2. Modbus总线不区分Master还是Slave。代码调试中。。
+
+
+ 15 /************************************************************************/
+ 16 /* 这个立方体的顶点表在坐标系中的示意图如下：                           */
+ 17 /*             ↑Y                                                      */
+ 18 /*           3 ｜                                                       */
+ 19 /*           ／｜-------｜2                                             */
+ 20 /*         ／  ｜     ／｜                                              */
+ 21 /*     7 ／    ｜  6／  ｜                                              */
+ 22 /*       |-----十---    ｜                                              */
+ 23 /*       |   0 十－十－－－→ X                                         */
+ 24 /*       |   ／    |  ／ 1                                              */
+ 25 /*     4 | ／      |／                                                  */
+ 26 /*       ／-------- 5                                                   */
+ 27 /*   Z ↙                                                               */
+ 28 /*                                                                      */
+ 29 /* 可以看出来，X轴向右，Y轴向上，Z轴指向我们。                          */
+ 30 /* 这个函数给出的是长宽高都为1的单位立方体。                            */
+ 31 /************************************************************************/
+
+当一个向量A在另一个向量B上进行投影的时候。有公式：
+    Aprojected = (a和b的点积) / |B| * |B| * B  
+下面是对此公式的简单推导： 
+可以知道投影向量Aprojected的方向和B的方向相同，长度是|A| * cos(cita)。 
+所以有：
+    Aprojected = Bnormalized * |A| * cos(cita)     --(1)
+其中Bnormalized是B的归一化向量，模长为1，也就是：
+    Bnormalized = B / |B|                          --(2)
+由点积的定义(A和B的点积) = |A| * |B| * cos(cita)可知：
+    cos(cita) = (A和B的点积) / |A| * |B|           --(3)
+把(2)和(3)代入(1)有：
+    Aprojected = B / |B| * |A| * (A和B的点积) / |A| * |B|
+消去|A|得到：	
+	Aprojected = (A和B的点积) / |B| * |B| * B
+
+给定入射光线向量I和平面法向量N，求反射向量R，如下图。
+                ↑ N
+        		|
+            P   | P  
+           -----+----→     
+           \   S|   ↗ R
+            \   |  /
+             \  | /
+            I ↘|/
+    -------------------------
+设入射光线向量I和反射平面的法向量N之间的夹角为theta。
+连接I的始端和R的末端，得到向量P。则有
+       R = 2P - I              （1）
+现在问题变成了如何求取P，设入射点0到P与N的交点的向量为S，那么有
+       P = I + S               （2）
+现在问题变成了如何求取向量S，向量S即向量-N
+（注意，这里是-N，因为S和N的方向相反。）在向量N上的投影，
+根据向量的投影公式有：
+       S = (I和N的点积) / |N| * |N| * N
+因为N是单位向量，则|N| = 1，简化一下得到：
+       S = - (I和N的点积) * N
+将S代入公式（2），再将P代入公式（1）得到：
+       R = I - 2 (I和N的点积) * N
+----------------------------------------------------------------------------------------------------------------------------------------
+
+1. 简单光照模型
+	着色：确定物体表面颜色。也就是物体表面上的一点投向视点的光强。
+	光照模型分为全局光照模型和局部光照模型
+	局部光照模型中最简单的一种称为简单光照模型。
+	在讨论这个模型之前，我说一点我的体会。就是后面提出的各种反射率。虽然从定义上来说，表示的是反射光的比例。
+	但是因为反射光的时候，其实是反射颜色。因此上，反射率的意思其实就是反射出来的颜色。
+	因为我们对于RGB的三个颜色分量进行反射比例运算以后，得到的其实是颜色。而不是什么百分比。
+
+2. 算法原理
+  假定：
+      光源为点光源，入射光仅由红、绿、蓝3种不同波长的光组成；
+      物体为非透明物体，物体表面所呈现的颜色仅由反射光决定，不考虑透射光的影响；
+	  反射光被细分为漫反射光(diffuse light) 和镜面反射光(specular light) 两种。
+      简单光照模型只考虑物体对直接光照的反射作用，而物体之间的反射作用，用环境光(ambientlight) 统一表示。
+  简单光照模型表示为
+      I = 环境光反射光强Ie + 漫反射光反射光强Id + 镜面反射光反射光强Is
+  这里环境光为常数。而镜面反射光的影响很小。因此上，材质的漫反射率决定物体的颜色。
+  环境光：
+    物体在没有收到光源照射的时候，表面仍然有亮度。这就是环境光。
+        Ie = 材质的环境反射率Ka * 周围环境光强Ia (a代表Ambient) 
+  漫反射光：
+    漫反射光是从一点照射，均匀地向各个方向反射，因此漫反射光与视点位置无关。
+	漫反射光遵循朗伯余弦定律。即：理想的漫反射表面的辐射强度与入射光的方向与表面法线之间的夹角cita的余弦成正比。
+        Id = 漫反射率Kd * r入射光强Ip * cos(cita)
+	而cita是光矢量L和法矢量N的夹角。则有：
+	    Id = 漫反射率Kd * r入射光强Ip * (N和L的点积)
+	当cita大于90度时，光源照射不到物体。则有：
+	    Id = 漫反射率Kd * r入射光强Ip * max((N和L的点积), 0)
+	漫反射率Kd决定了物体的颜色。
+  镜面反射光：
+    最大镜面反射光沿着反射向量R的方向。
+        Is = 材质对于镜面光的反射率Ks * 入射光强Ip * (cos(alpha)^n)
+    这里ahpha是反射向量R和视点向量V的夹角。n为镜面高光指数。对于光滑的金属表面，n越大。高光斑点较小。
+	对于比较粗糙的金属表面，n较小，高光斑点较大。
+	则有：
+        Is = 材质对于镜面光的反射率Ks * 入射光强Ip * max((R和V的点积), 0)^n
+  Blinn-Phong镜面光反射模型：
+        最大镜面反射光矢量H = L + H / |L + H|
+		Is = 材质对于镜面光的反射率Ks * 入射光强Ip * max((N和H的点积), 0)^n
+        这个计算出来的高光要小一点。但是可以通过调节n减少误差。
+
+有了上面的基础，我们给出Blinn-Phong光照模型的表示：
+	I = 环境光反射光强Ie + 漫反射光反射光强Id + 镜面反射光反射光强Is
+      = 材质的环境反射率Ka * 周围环境光强Ia (a代表Ambient) +
+	    漫反射率Kd * r入射光强Ip * max((N和L的点积), 0) +
+		材质对于镜面光的反射率Ks * 入射光强Ip * max((N和H的点积), 0)^n
+之后我们引入光强衰减：
+    f(d) = min(1, 1/(c0 + c1 * d + c2 * d^2))
+把光强衰减代入：
+	I = 环境光反射光强Ie + 漫反射光反射光强Id + 镜面反射光反射光强Is
+      = 材质的环境反射率Ka * 周围环境光强Ia (a代表Ambient) +
+	    光强衰减f(d) * (漫反射率Kd * r入射光强Ip * max((N和L的点积), 0) +
+		                材质对于镜面光的反射率Ks * 入射光强Ip * max((N和H的点积), 0)^n)
+前面的公式使用的灰度颜色。称为明暗处理。
+因此上，我们要给出RGB三个颜色分量的公式，并且还需要考虑多个点光源的情况。
+
+2. 算法设计
+	(1) 设计材质类、光源类和光照类。材质类定义材质属性、
+	    光源类定义光源属性、光照类定义光源与材质的交互作用。
+	(2) 根据视点、当前点、当前点的法矢量、材质属性，
+	    计算当前点所获得的反射光强。
+	(3) 先计算光源照射在物体上的漫反射光强、再计算镜面反射光强、
+	    并根据光源到当前点的距离，对漫反射光和镜面反射光光强进行衰减。
+		最后，叠加环境光光强，计算出当前点所获得的反射光强。
+	(4) 将反射光强规范化后，作为当前点的最终光强。
+[12:32]下面来看代码：
+//金
+//p Scene->p Material=new C Material；
+//p Scene->p Material->Set Ambient(C RGB(0.247， 0.20， 0.075) ) ； //环境反射率
+//p Scene->p Material->Set Diffuse(C RGB(0.752， 0.606， 0.226) ) ：//漫反射率
+//p Scene->pM手terial->Set Specular(C RGB(0.628， 0.556， 0.366) ) ：//镜面反射率
+//p Scene->p Material->Set Emission(C RGB(0.2， 0.2， 0.0) ) ； //自身辐射的颜色
+//p Scene->p Material->Set Exponent(50) ：//高光指数
+//银
+//p Scene->p Material=new C Material；
+//p Scene->p Material->Set Ambient(C RGB(0.892， 0.892， 0.892) ) ：//环境反射率
+//p Scene->p Material->Set Diffuse(C RGB(0.508， 0.508， 0.508) ) ； //漫反射率
+//p Scene->p Material->Set Specular(C RGB(0.508， 0.508， 0.508) ) ； //镜面反射率
+//p Scene->p Material->Set Emission(C RGB(0.2， 0.2， 0.2) ) ； //自身辐射的颜色
+//p Scene->p Material->Set Exponent(50) ； //高光指数
+//红宝石
+//p Scene->p Material=new C Material；
+//p Scene->p Material->Set Ambient(C RGB(0.175， 0.012， 0.012) ) ； //环境反射率
+//p Scene->p Material->Set Diffuse(C RGB(0.614， 0.041， 0.041) ) ：//漫反射率
+//p Scene->p Material->Set Specular(C RGB(0.728， 0.527， 0.527) ) ； //镜面反射率
+//p Scene->p Material->Set Emission(C RGB(0.0， 0.0， 0.0) ) ：//自身辐射的颜色
+//p Scene->p Material->Set Exponent(30) ：//高光指数
+//绿宝石
+//p Scene->p Material=new C Material；
+//p Scene->p Material->Set Ambient(C RGB(0.022， 0.175， 0.023) ) ：//环境反射率
+//p Scene->p Material->Set Diffuse(C RGB(0.076， 0.614， 0.075) ) ； //漫反射率
+//p Scene->p Material->Set Specular(C RGB(0.633， 0.728， 0.633) ) ：//镜面反射率
+//p Scene->p Material->Set Emission(C RGB(0.0， 0.2， 0.0) ) ； //自身辐射的颜色
+//p Scene->p Material->Set Exponent(30) ； //高光指数
+
+小结：
+4.算法小结
+	(1)简单光照模型中是经验模型；但是效果已经足够真实。因此被广泛采用。
+	(2)环境光是常数光；
+	(3)漫反射率决定材质的颜色；
+	(4)高光是白光；
+	(5)物体看上去像塑料，显示不出磨光的金属光泽；因为我们没有考虑物体表面的凸凹。
+
+
+通过学习简单光照模型，我们可以发现。物体表面的着色问题，可以转化为光照问题。
+而光照的计算结果除了取决于物体本身的各种反射率，外界入射光强以外。。
+物体不同位置的颜色，也就是光照情况，取决于这个位置的光矢量L和法矢量N。
+因此上，当物体和光源确定以后，物体的颜色取决于物体各个位置的光矢量L和法矢量N。
+如何处理这些矢量。我们就得到了不同的算法。
+
+1. Gouraud明暗处理算法：
+	用顶点法矢量计算顶点光强，多边形内的光强由顶点光强进行插值得到。通常使用线性插值。
+	对于一个周围有好几个面的点来说，首先计算这些面的法矢量。则P点的法矢量为这些面的法矢量的平均值。
+	也就是P点的法矢量等于这些法矢量的和除以这些法矢量的和的模。
+	只有这样才能保证颜色的连续性。
+2.算法设计
+	(1)计算多边形顶点的平均法矢量。
+	(2)使用点法矢量代入光照模型，计算多边形顶点的光强。
+	(3)沿着多边形的边界插值，得到边上一点的光强。
+	(4)沿着扫描线插值，得到面内一点的光强。
+[04:21]下面来看代码：
+	
+	
+4.算法小结
+	(1) Gouraud明暗处理(也称为Gouraud shader)，是对多边形的顶点进行光强的线性插值。
+	    Gouraud shader属于面元着色算法，着色的最小单位是多边形。
+	(2) Gouraud shader不能正确表示高光。
+	    高光只能在多边形周围生成，不能在多边形内部生成。
+	(3) Gouraud shader可以绘制颜色连续过渡的曲面，但是多边形边界处会出现马赫带效应。
+
+马赫带：
+    指人们在明暗变化的边界，常常在亮区看到一条更亮的光带，
+	而在暗区看到一条更暗的线条，这就是马赫带现象。
+	马赫带不是由于刺激能量的分布，而是由于神经网络对视觉信息进行加工的结果。
+
+1. Phong明暗处理算法
+	Phong(冯氏)明暗处理先对顶点法矢量进行插值，得到多边形内部每一点的法矢量；
+	然后，对多边形内的每个点都调用光照模型计算所获得的光强。
+
+特点：不对光强进行线性插值，取而代之的是对于法矢量进行线性插值。
+缺点：计算量大
+优点：有效减弱马赫带效应，并有效地改善高光效果。
+
+2.算法设计
+	(1)计算多边形顶点的平均法矢量。
+	(2)对顶点法矢量进行双线性插值，计算三维多边形内部每一点的法矢量。
+	(3)对屏幕坐标系内的三维多边形的每一点，调用光照模型计算所获得的光强。
+下面来看代码：
+    这里和我手头的代码不太一样。就是跨度使用的是Point3。并且使用深度线性插值计算深度并保存在跨度中。
+    运行结果可以看出来，高光非常光滑。
+
+4.算法小结
+	(1) Phong明暗处理也称为(Phong shader)，属于点元着色算法，
+	    对多边形内部的每个点，均调用光照模型计算所获得的光强。
+	(2) Phong shader中， 透视投影的结果是三维点，使用三维透视投影得到。
+	(3) Phong shader仅定义法矢量线性插值函数，不定义光强线性插值函数。
+	    Phong shader是先对多边形进行双线性插值，得到多边形内每个点的法矢量，
+		然后，再对每一个点调用光照模型计算该点的光强。
+	(4) Phong shader的计算量远大于Gouraud shader，
+	    但由于计算了每个点的法矢量，可以有效减弱马赫带效应，并有效地改善了高光效果。
+	(5) 这个程序使用的是球体。球体有一个特殊性在于每一点的法矢量可以直接使用该点的位置矢量代替；
+	(6) Phong shader是纹理映射的基础算法， 由于访问了每个像素点， 其材质可以来自一幅图像。
+	(7) 本算法使用的是Z Buffer消隐算法。事实上， 球体属于凸物体， 也可以使用背面除算法进行消隐。
+	
+	
+Phong和Blinn-Phong是计算镜面反射光（也叫高光反射）的两种光照模型，两者仅仅有很小的不同之处。
+Phong模型中计算反射光线的向量是一件相对比较耗时的任务，因此Blinn-Phong对这一点进行了改进。
+Phong适合模拟塑料，比"反射"材质表现出的介质更光滑一些，适合模拟玻璃、水、冰等高反光特性的介质
+BlinnPhong大多适用于金属材质。
+
+球体图像纹理映射算法：
+
+齐辰电
+如上，该电发于11月8日，早上7~9点。
+8日为齐日。
+早上7~9点为辰时。
+
+加九锡，总百揆，假黄钺，加封相国，剑履上殿，赞拜不名，开府仪同三司，都督中外诸军事
+
+2002年的时候，做程序员很赚钱。。摩托罗拉的模具工程师月薪1500。干程序员月薪轻轻松松5500。要知道当时上海的房价只有5000元。干两年程序员凭借自己的积蓄在上海买房的人大有人在。。更不要说雷军这种例子。。[捂脸]
+现在的小孩子生在移动互联网时代，只看到了移动互联网时代的赚钱机会。他们根本没有经历过在他们出生以前的电脑时代的疯狂。。[惊喜]
 
 蒸汽机车没有过夜。 正常工作是“连轴转 ‘’歇人不歇马。蒸汽机车一旦点火运转起来，就黑天白日的一汽跑下去，直到三个月“小修”（”洗罐”锅炉酸洗）停火检修。
 我干那时 是两班倒，乘务员一班12小时，歇一天一宿。
@@ -1797,9 +6108,7 @@ std::vector<debugSectionInfo> vectorDebugSectionInfo ;
 2、封公爵，加九锡，一键三连（入朝不趋，赞拜不名，剑履上殿）………
 3、进王爵，加殊礼（冕鎏十二，乘金车，驾六马，出警入跸，用天子銮仪……）
 
-
-
-都督冀、幽、青、并、兖、豫、徐、凉、益、扬、交、荆十二州诸军事。
+都督冀、幽、青、并、兖、豫、徐、凉、益、扬、交、荆各州诸军事。
 
 说件大多数国人都不知道的事情，大跃进时期，亩产万斤的浮夸风在全国推行，
 而江西进行了抵制，是少数没有饿死人的省，也是唯一一个在大跃进时期将粮食外调的省，
@@ -1810,6 +6119,12 @@ std::vector<debugSectionInfo> vectorDebugSectionInfo ;
 
 
 误也非常少。事实上， Icc的代码中大约不到15%是关于分析的， 并且这部分程序的错误率也可以忽略不计。尽管分析在理论上的地位非常突出， 但是在lec和其他编译器中只是相对较小的模块，语义分析和代码生成才是主要的模块，占了代码的大部分，而大部分错误也出现于此。
+
+起来！不愿意躺平的青年！把你们的血肉，筑成房地产市场新的长城！
+中国楼市到了最危险的时候，每个人被迫着发出最后的吼声！
+起来！起来！起来！
+我们万众一心，冒着赔本的炮火前进，
+冒着赔本的炮火前进！前进！前进！进！
 
 
 首先代码即没有像书中说的那么多，也没有那么少。。
@@ -1822,6 +6137,44 @@ x86linux/x86/alpha/sparc/mips.c
 
 “不是立场问题；立场是对的，心是好的，意思是懂得的，只是表现不好，结果反而起了坏作用。”关于动机和效果的辩证唯物主义观点，我在前面已经讲过了。现在要问：效果问题是不是立场问题？一个人做事只凭动机，不问效果，等于一个医生只顾开药方，病人吃死了多少他是不管的。又如一个党，只顾发宣言，实行不实行是不管的。试问这种立场也是正确的吗？这样的心，也是好的吗？事前顾及事后的效果，当然可能发生错误，但是已经有了事实证明效果坏，还是照老样子做，这样的心也是好的吗？我们判断一个党、一个医生，要看实践，要看效果；判断一个作家，也是这样。真正的好心，必须顾及效果，总结经验，研究方法，在创作上就叫做表现的手法。真正的好心，必须对于自己工作的缺点错误有完全诚意的自我批评，决心改正这些缺点错误。共产党人的自我批评方法，就是这样采取的。只有这种立场，才是正确的立场。同时也只有在这种严肃的负责的实践过程中，才能一步一步地懂得正确的立场是什么东西，才能一步一步地掌握正确的立场。如果不在实践中向这个方向前进，只是自以为是，说是“懂得”，其实并没有懂得。
 好心办坏事是要承认错误，进行自我批评或者接受批评的，最后改正错误的！
+
+
+一个国家能不能延续说到底就是一个字：钱。或者是另一个字：税。
+满清之前，中国有两种税制。一种叫土地税。就是你有多少地。收多少钱。穷人交不起税，就把土地卖给富人。而富人因为有官身，不用交税。但是这有一个问题。就是这些富人，有地有钱，就会搞私人武装包含自己的土地。长此以往变成藩镇。另一种叫人头税，就是一个人交一份钱。这么玩还有一个问题。就是老百姓要么不生，要么生了孩子用水盆淹死。而富人家里地多，交不了多少钱。导致贫富差距迅速拉大。
+大清有效的解决了这个问题。首先人家是
+
+
+我说三点。
+首先很多领导干部，尤其是从大学选拔的三门干部。出了家门进校门，出了校门进机关门。长时期生活在象牙塔内，享受教育系统特有的寒暑假。是无可能体会上班族的疾苦的。。甚至有的大学老师还认为早些年的五一休息七天太长，不利于工作。要求改成五天。
+其次，我国还有很多产业都是低端制造业。这种产业需要大量的劳动时间。
+第三点就是，
+
+
+
+之前张雪峰有一句话说的特别好。。
+文科都是服务业。。因此上，文科的核心技能就是
+舔。。
+就是你必须把甲方伺候明白了，让甲方彻底满意了。你才能拿到钱。。。
+那么问题来了，你是愿意做高贵的舔狗。
+
+财富不会凭空产生，只能由劳动人民一点一滴的积攒。通过房地产的超前消费营造一个盛世的假象，透支未来三十年的消费，汇集来资金没有投入到生产，没有创造出更多能创造财富的就业岗位，而是投入到了消费、旅游、服务等不创造财富而是分利的行业。一旦泡泡破裂，就只能退回到农业去，退回到农村去。
+
+
+再多说一下吧，汉末三国时代各州和地区之间的关系：
+幽州—燕地，因为先秦时代是燕国国土，幽州涿郡的张飞自称燕人张飞；
+冀州—河北，河北非河北省，指的是黄河以北，先秦时是赵国故土，和幽州并称燕赵之地；
+并州—三晋之地，先秦时是晋国故土；
+雍州—三秦、关中，先秦是秦国故土，在四关之中；
+凉州—为汉武帝开拓，更在秦国之西边，因此没有古称；
+豫州—中原，前面回复说过；河南省大部分地区
+兖州—济北地区，因在济水之北；
+青州—齐鲁之地，因先秦是齐鲁故土；
+益州—蜀地，先秦时有古蜀国；
+荆州—荆楚之地，先秦时是楚国故土；
+徐州—淮北地区，因在淮水之北；
+扬州—分为江东地区和淮南地区，因为长江过了安徽往东北方向流，因此把长江东边的地区成为江东，长江西边到淮水一带称淮南；
+交州—岭南地区，指南方五岭以南。
+已经说的那么明白了，要是你还认为徐州属于中原，那我也只能认为你在为新三国硬洗了。
 
 
 
@@ -2141,7 +6494,8 @@ class Link
     }
   }
 
-  
+  看代码时经常打指响，每隔15分钟用力打呵欠。每隔半小时伸懒腰，发出咿咿呀呀的声音。经常睡觉打呼噜。
+用硬币夹自己胡子玩，发出咯哒咯哒的声音。
   
   ////////////////////////////////////////////////////////////////
   // Constants
@@ -2241,6 +6595,8 @@ class Link
 	    }
     }
 
+    
+mkdir build && cd build && cmake ../ && make
 	
 作者：Sabrevale
 链接：https://www.zhihu.com/question/599578786/answer/3021854853
@@ -2360,4 +6716,387 @@ modbus.so
 [root@ez9260 /]# 
 
 
+如果上面的方法安装失败了，可以使用 ctrl+alt+t 调出终端，使用如下命令
+安装 Guest Additions 功能。
+sudo mkdir –p /media/cdrom
+sudo mount -t auto /dev/cdrom /media/cdrom/
+cd /media/cdrom/
+sudo sh VBoxLinuxAdditions.run
+执行完毕后，重启虚拟机系统就完成了 Guest Additions 的安装。
 
+第二步mount提示有错误：
+mount: unknown filesystem type ‘iso9660’
+搜索后发现一个相关性很高的帖子：
+http://ubuntuforums.org/showthread.php?t=1314412
+按照帖子里给出的尝试步骤，发现使用这个命令就可以解决（之前尝试了几次apt-get update & dist-upgrade，都没有解决）：
+cd /lib/modules/4.2.0-21-generic/kernel/fs/isofs
+sudo insmod ./isofs.ko
+然后就可以挂载iso文件了。
+
+
+
+突然发现使用Virtualbox虚拟的Ubuntu 15.10有点问题，于是想重新安装Virtualbox Guest Additions，但从菜单上挂载出现问题，于是尝试用命令行挂载：
+sudo mount -o loop VBoxGuestAdditions.iso tmp
+
+提示有错误：
+
+mount: unknown filesystem type ‘iso9660’
+
+这个错误非常奇怪，第一次遇见。搜索后发现一个相关性很高的帖子：
+
+http://ubuntuforums.org/showthread.php?t=1314412
+
+按照帖子里给出的尝试步骤，发现使用这个命令就可以解决（之前尝试了几次apt-get update & dist-upgrade，都没有解决）：
+
+cd /lib/modules/4.2.0-21-generic/kernel/fs/isofs
+
+sudo insmod ./isofs.ko
+
+然后就可以挂载iso文件了。
+
+使用两个lambda和两个颜色绘制曲线。
++		str	0x00aec690 "DENIED Redis is running in protected mode because protected mode is enabled and no password is set for the default user. In this mode connections are only accepted from the loopback interface. If you ...	char *
+
+print("lambda_.value =", lambda_)
+print("data_generator.value =", data_generator)
+print("data_plus_one.value =", data_plus_one)
+
+然后
+
+说萤火虫路过印度时候不会发光，因为飞过印度的时候需要捂着屁股飞。
+
+
+
+# 启动MySQL服务
+mysql.server start
+
+# 停止MySQL服务
+mysql.server stop
+
+# 连接到MySQL服务器
+mysql -uroot -p
+
+# 创建一个新的数据库
+CREATE DATABASE mydatabase;
+
+# 使用数据库
+USE mydatabase;
+
+# 创建一个新的表
+CREATE TABLE modbus_record_data (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255),
+  type INT,
+  value float
+);
+
+# 插入数据
+INSERT INTO modbus_record_data (name, type, value) VALUES ('John', 1, 12.3);
+INSERT INTO modbus_record_data (name, type, value) VALUES ('Tom',  2, 33.5);
+INSERT INTO modbus_record_data (name, type, value) VALUES ('Jean', 1, 61.3);
+INSERT INTO modbus_record_data (name, type, value) VALUES ('Leo',  3, 76.3);
+
+# 查询数据
+SELECT * FROM modbus_record_data;
+
+
+自18世纪晚期起，蒸汽机不仅在采矿业中得到广泛应用，在冶炼、纺织、机器制造等行业中也都获得迅速推广。它使英国的纺织品产量在20多年内(从1766年到1789年)增长了5倍，为市场提供了大量消费商品，加速了资金的积累，并对运输业提出了迫切要求。
+
+
+
+事情要从1764年里的一天说起。英国兰开郡有个纺织工詹姆斯·哈格里夫斯，那天晚上他回家，开门后不小心一脚踢翻了他妻子正在使用的纺纱机，当时他的第一个反应就是赶快把纺纱机扶正。但是当他弯下腰来的时候，却突然愣住了，原来他看到那被踢倒的纺纱机还在转，只是原先横着的纱锭变成直立的了。他猛然想到：如果把几个纱锭都竖着排列，用一个纺轮带动，不就可以一下子纺出更多的纱了吗？哈格里夫斯非常兴奋，马上试着干，第二天他就造出用一个纺轮带动八个竖直纱锭的新纺纱机，功效一下子提高了八倍。1764年制成以他女儿珍妮命名的纺纱机。这是最早的多锭手工纺纱机,装有8个锭子，以罗拉喂入纤维条，适用于棉、毛、麻纤维纺纱。珍妮纺纱机的出现引起当时人数很多的手工纺纱者的恐慌，他们冲进哈格里夫斯的家里捣毁机器。1768年J.哈格里夫斯在诺丁汉与别人合资开办一家纺纱作坊，用珍妮纺纱机生产针织用纱。由于当年他没能申请到专利，因此只能自己生产“珍妮机”来赚钱。“珍妮机”不但效率高，而且纺出的纱质量也比较好，因此哈格里夫斯的生意不错，“珍妮机”也渐渐流传开来了。
+这天夜晚，哈格里夫斯夫妇晚餐后正在谈论“珍妮机”给他俩带来的日渐富裕。突然一阵杂乱的脚步声出现在他家门口，然后，门被粗暴地撞开，一群怒气冲冲的男男女女冲进来。他们不由分说，将房里制作好的“珍妮机”通通捣毁：“你制作的害人机器见鬼去吧！”甚至有人还放火，点燃了哈格里夫斯的房屋。他们夫妇俩被赶出了兰开郡的小镇。
+原来，英国工业革命发生后，大量失去土地的农民涌入城市，为工场主打工谋生。当时英国占领了印度作为殖民地，印度生产的棉纺织品价廉物美，热销一时，引发了英国本土棉纺业的繁荣。但是，织布机械由于机械工人凯伊发明飞梭技术，生产率大大提高。织布需要的棉纱，却还是依靠众多家庭手工业的纺车慢慢纺出来。所以棉纱供不应求，收购价格较高。“珍妮机”的发明使棉纱产量上升，于是，织布厂收购棉纱价格下跌。那些没有使用“珍妮机”的纺纱工人不但产量低，而且棉纱又卖不出好价钱。日子久了，他们的怒气爆发，才有捣毁机器那一幕的发生。
+哈格里夫斯夫妇不得不流落诺丁汉街头，但他俩还是努力改进“珍妮机”。
+
+
+
+你想让年轻人结婚生孩子，你就得趁着他们还没被彻底异化的时候把他们给安排上，反过来，来自真挚感情的恋爱和婚姻也可以成为对抗异化的力量，令年轻人终身受益
+
+你非得剥夺人的正常需求，实在剥夺不了的就把它异化掉，用一些反社会的思想污染它，那你就会如愿以偿，得到一个高度异化的后代，他能坚持几十年不和任何人正常社交，过着没有朋友和爱人的生活，只为了有一天功成名就了可以尽情发泄
+
+——那你作为父母，除了早点亖掉爆金币之外，对他而言又有什么价值呢？你选择了异化，你就会得到异化的一切
+
+不是我说话难听，是有些父母、学校办的那个事，用实话描述出来，就是这么难听
+
+
+
+
+
+
+我的薪资，让我在摸鱼时毫无愧疚感，这叫问薪无愧。
+我每天上班的脸色都不是很好看，这叫相由薪生。
+我对工作丝毫提不起兴趣，不想干活，这叫力不从薪。
+别人问咱一个月挣多少钱，我非常害怕回答，这叫提薪吊胆。
+逛街看见哇塞的姑娘，我都不敢上前搭讪，这叫薪无旁骛。
+拿着几千的工资，受着几万块的苦，这叫千薪万苦。
+工资直接月光，心里扒凉扒凉的，这叫薪尽自然凉。
+工资索死了自己的购物欲望，这叫随薪所欲。
+工资一直不涨，我也死活不挪窝，这叫死薪塌地。
+一个人的工资，干两个人的活，这叫一薪二用。
+一个人的工资，反应他的心情，这叫薪心相映。
+旺季来临，薪薪向荣。
+淡季来临，薪急如焚。
+钱没有挣到还病倒了，这叫丧薪病狂。
+钱挣得多了心情倍爽，这叫赏薪悦目。
+工资发不出来了，这叫薪灰意冷。
+想要的生活是星辰大海，现实的生活是薪沉大海。
+入职之前承诺的工作内容和薪资，与实际签的合同不一致，这叫薪口不一。
+日常工作繁重，但是善良的老板怕我不努力特地给我开了低工资，这叫薪的善凉。
+在一家公司干久了，老板特地招新人顶替故人还给更高薪水，这叫顶故革薪。
+就那3000块的工资，日常都揭不开锅了，老板还给我降薪，这叫釜底抽薪。
+公司境况不好，老板便进行降薪处理，这叫薪随境转。
+老板随时随地，无时无刻不在画大饼，这叫薪口开河。
+最后，为什么年轻人都开始拒绝房贷、车贷、下一代？
+提薪吊胆的生活，千薪万苦的工作，丧薪病狂的资本家。
+力不从薪的我，只想苟延残喘的活。
+
+
+因为他是花果山上一个石头里面生的。。而花果山是：
+感盘古开辟，三皇治世，五帝定伦，世界之间，遂分为四大部洲：曰东胜神洲，曰西牛贺洲，曰南赡部洲，曰北俱芦洲。这部书单表东胜神洲。海外有一国土，名曰傲来国。国近大海，海中有一座山，唤为花果山。此山乃十洲之祖脉，三岛之来龙，自开清浊而立，鸿蒙判后而成。
+也就是说花果山是地球的小JJ。而猴子是这么生的呢。。
+盖自开辟以来，每受天真地秀，日精月华，感之既久，遂有灵通之意。内育仙胞，一日迸裂，产一石卵，似圆球样大。因见风，化作一个石猴，五官俱备，四肢皆全。
+也就是天地所生。。
+
+
+亚伦·布什内尔家族是三代美国空军，爷爷是越战飞行员，父亲是海湾战争空军基地的训练上校，母亲还是军队后勤保障人员。
+
+
+
+3、炸带鱼
+（1）带鱼洗干净切段，腌20分钟，腌制秘方:生姜、大葱、料酒、生抽、老抽、蚝油、糖、黑胡椒，带鱼本身自带咸味，不用放盐了；
+（2）上空气炸锅垫一层锡纸放带鱼200度20分钟，期间翻面。想要更焦一点就加长时间。
+
+第1篇：Linux那些事儿之我是USBCore
+1．引子
+2．它从哪里来
+3．PK
+4．漫漫辛酸路
+5．我型我秀
+6．我是一棵树
+7．我是谁
+8．好戏开始了
+9．不一样的Core
+10．从这里开始
+11．面纱
+12．模型，又见模型
+13．繁华落尽
+14．接口是设备的接口
+15．设置是接口的设置
+16．端点
+17．设备
+18．配置
+19．向左走，向右走
+20．设备的生命线（一）
+21．设备的生命线（二）
+22．设备的生命线（三）
+23．设备的生命线（四）
+24．设备的生命线（五）
+25．设备的生命线（六）
+26．设备的生命线（七）
+27．设备的生命线（八）
+28．设备的生命线（九）
+29．设备的生命线（十）
+30．设备的生命线（十一）
+31．驱动的生命线（一）
+32．驱动的生命线（二）
+33．驱动的生命线（三）
+34．驱动的生命线（四）
+35．字符串描述符
+36．接口的驱动
+37．还是那个match
+38．结束语
+第2篇：Linux那些事儿之我是HUB
+1．引子
+2．跟我走吧，现在就出发
+3．特别的爱给特别的RootHub
+4．一样的精灵，不一样的API
+5．那些队列，那些队列操作函数
+6．等待，只因曾经承诺
+7．最熟悉的陌生人——probe
+8．蝴蝶效应
+9．WhileYouWereSleeping（一）
+10．WhileYouWereSleeping（二）
+11．WhileYouWereSleeping（三）
+12．WhileYouWereSleeping（四）
+13．再向虎山行
+14．树，是什么样的树
+15．没完没了的判断
+16．一个都不能少
+17．盖茨家对Linux代码的影响
+18．八大重量级函数闪亮登场（一）
+19．八大重量级函数闪亮登场（二）
+20．八大重量级函数闪亮登场（三）
+21．八大重量级函数闪亮登场（四）
+22．八大重量级函数闪亮登场（五）
+23．是月亮惹的祸还是spec的错
+24．所谓的热插拔
+25．不说代码说理论
+26．看代码的理由
+27．电源管理的四大消息
+28．将suspend分析到底
+29．梦醒时分
+30．挂起自动化
+第3篇：Linux那些事儿之我是U盘
+1．小城故事
+2．Makefile
+3．变态的模块机制
+4．想到达明天现在就要启程
+5．外面的世界很精彩
+6．未曾开始却似结束
+7．狂欢是一群人的孤单
+8．总线、设备和驱动（上）
+9．总线、设备和驱动（下）
+10．我是谁的他
+11．从协议中来，到协议中去（上）
+12．从协议中来，到协议中去（中）
+13．从协议中来，到协议中去（下）
+14．梦开始的地方
+15．设备花名册
+16．冰冻三尺非一日之寒
+17．冬天来了，春天还会远吗？（一）
+18．冬天来了，春天还会远吗？（二）
+19．冬天来了，春天还会远吗？（三）
+20．冬天来了，春天还会远吗？（四）
+21．冬天来了，春天还会远吗？（五）
+22．通往春天的管道
+23．传说中的URB
+24．彼岸花的传说（一）
+25．彼岸花的传说（二）
+26．彼岸花的传说（三）
+27．彼岸花的传说（四）
+28．彼岸花的传说（五）
+29．彼岸花的传说（六）
+30．彼岸花的传说（七）
+31．彼岸花的传说（八）
+32．彼岸花的传说（TheEnd）
+33．SCSI命令之我型我秀
+34．迷雾重重的批量传输（一）
+35．迷雾重重的批量传输（二）
+36．迷雾重重的批量传输（三）
+37．迷雾重重的批量传输（四）
+38．迷雾重重的批量传输（五）
+39．迷雾重重的批量传输（六）
+40．迷雾重重的批量传输（七）
+41．跟着感觉走（一）
+42．跟着感觉走（二）
+43．有多少爱可以胡来？（一）
+44．有多少爱可以胡来？（二）
+45．当梦醒了天晴了
+46．其实世上本有路，走的人多了，也便没了路
+附录：ALinux那些事儿之我是sysfs
+附录B：学习内核和驱动的方法
+
+
+看过一篇俄罗斯军工人员回忆录。
+
+“我们每个人都期待去中国工作，不仅是因为他们给我们提供美味的食物和精美的礼品更多的是精神上的满足。中国人是最好的学生，在指导他们组装过程中哪怕是他们的高级工程师也会很谦虚的向我们工作人员请教各种问题。他们不仅想知道怎么组装，还询问了为什么这么设计，这么做的目的是什么。当遇到我们也无法解答的问题时他们会把所有的可能性都写在纸上并向我们请教。他们甚至想知道那个子系统设计师性格如何，是否酗酒，和老婆关系如何。很多年以后我们再去中国时他们依旧热情，但是问我们的问题变少了，他们做出来的俄罗斯飞机甚至连我们俄罗斯人自己都看不懂。”“
+
+而印度人则是另外一种工作态度，他们总是喜欢想当然，提出一些不切实际的指标并要我们去帮助完成他。他们在没完全弄懂的情况下对我们的设计指手画脚，飞机是一个非常精密的东西，他的每一个设计每一个螺丝都有他的作用，而印度人从来不去想为什么这么做，他们总是觉得自己很聪明对我们要求的指标随意修改，所以每次离开印度我们想都着该死的，总算结束了”。
+
+作者：奔雷手文泰来
+链接：https://www.zhihu.com/question/265883754/answer/3293061125
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+
+人们往往抱着猎奇的心态看印度的贫民窟，有意无意忽略了旁边看起来“正常”的高楼大厦，其实这是一种视角倒错：
+我们对高楼大厦习以为常所以把不正常的东西看成了“正常”，其实那些匍匐着的贫民窟，才是印度的“正常”，
+而那些看起来很正常的高楼，才是这个国家的毒瘤——买办资本。
+贫民窟里惨不忍睹的现实生活是这个国家的底色，而那些装作正常模样的高楼，才是粉饰太平涂在死人留上的油彩。
+
+现在改革到了攻坚阶段，没有政治体制改革的成功，经济体制改革不可能进行到底，已经取得的成果还有可能得而复失，社会上新产生的问题，也不能从根本上得到解决，文化大革命这样的历史悲剧还有可能重新发生。每个有责任的党员和领导干部都应该有紧迫感。
+
+
+很多人可能没有意识到特朗普已经升华了，此次特朗普奇迹般的枪口逃生以及完美的临场发挥，对他以及他的支持群体来说是神恩降临，他的支持者已经喊出了即使踏过玻璃海也要为特朗普投票，这其实是类比摩西带领犹太人踏过红海出埃及，将大选以及特朗普随后的执政上升到践行神意的高度。特朗普本人经过民主党四年的政治追杀乃至肉体消灭而不倒，他已经不止成长为一个政治家，还是一个自信负有宗教使命的先知，将他还视为一个政治商人将是致命错误，他和他的支持者已经不在乎其他群体，他们就是原教旨新教徒因信称义的践行者，世界将面对一个十字军化的美国。
+
+
+<!--html部分省略 -->
+<script type="text/javascript">
+	var selectContent = ["选项1","选项2","选项3"];
+	//如果是js，则写法如下
+	for(var i = 0 ; i < selectContent.lenght; i++){
+	
+	document.getElementById("select").append("<option value='"+selectContent[i]+"'>"+selectContent[i]+"</option>");
+	}
+</script>
+
+
+春庭雪 (DJ名龙 Mix) (原唱：橙翼) - DJ名龙  词：清彦
+庭中梨花谢又一年，立清宵，月华洒空阶
+梦里（笙）箫奏旧乐，梦醒泪染胭脂面。
+小重山 念一遍又一遍。
+
+闻更漏咽 频教前尘辞长夜
+久无眠 深坐对宫檐
+多情最是春庭雪，年年落满离人苑。
+薛涛笺 上言若如初见
+
+这一世，太漫长却止步咫尺天涯间。
+谁仍记 那梨花若雪时节。
+我心匪石不可转，我心匪席不可卷。
+空凝眸，情字深浅无解。
+
+春欲晚梨花谢又一年
+
+
+如果有一个没有任何背景希腊农民在君堡沦陷90多年后，举起义兵光复了沦陷百年的希腊，小亚细亚，北非，亚平宁半岛，沦陷千年的伊比利亚半岛，高卢，不列颠，重建了罗马帝国，我们会怎么评价这个人
+
+
+----------------------------------------------------------------------------
+ACG
+TGG
+CTC
+TCT
+AAC
+GTA
+CGT
+ACG
+TAC
+GGG
+GTT
+TAT
+ATA
+TAC
+CCT
+AGG
+ACT
+CCC
+TTT
+----------------------------------------------------------------------------
+
+
+韩国的“部队锅”值得韩国人骄傲吗？
+王伟
+王伟
+80后的尾巴
+火狼、涩谷的素素 等 3084 人赞同了该回答
+夫妻肺片：成都名吃，20世纪30年代由郭朝华、张田政夫妇创制，最初用的就是牛头皮、牛心、牛舌、牛肚等边角余料，因原料是”废料”而被称为”废片”，后改为”肺片”。
+
+盘飧市卤味：成都百年老字号，开店之初本钱少，专以大餐馆弃用的鸡翅、鸡爪、鸭翅、鹅掌、鹅翅及鸡胗、鸭胗、肝等”下脚料”作为卤菜主料。
+
+猪头肉：古代祭祀用整猪，但猪头肉本身却是猪身上最便宜的肉，批发价常年只有五花肉的六成，长期被视为”地摊卤味”难登大雅之堂。
+
+猪尾巴：八九十年代因肉少骨多被视为剩余部分，如今因富含胶原蛋白成为美容养颜热门食材。
+
+重庆麻辣火锅：最早起源于川江纤夫，以别人不要的牛羊等内脏下脚料边烫边吃而形成。川菜之所以能成为中国最大菜系，正是因为其烹饪技法能将原本不能用的下脚料去腥除味，让底层民众也能吃得起。
+
+肥肠（猪大肠）：曾是穷人解馋的美味，如今在夜市和餐馆中成为抢手货。
+
+炸鸡架/烤鸡架：90年代东北下岗潮时期的标志性食物。1998-2000年东北下岗2137万人，五毛钱一个、一块钱仨的鸡架成为下岗工人维持荤腥的”妙招”，也是下岗职工摆摊创业的首选。鸡架肉少，吃的是”对吃肉的幻想”和调料味，配啤酒下肚。
+
+酱骨架：同样是东北特色，以猪脊椎骨为主料，肉少骨多，靠长时间炖煮入味。
+
+毛蛋/旺鸡蛋/活珠子：南京特色。90年代前中国鸡蛋工业化生产之前，鸡蛋是稀缺品，"拿能孵出小鸡的蛋去煮，不是蠢就是坏"。旺鸡蛋是孵化过程中被淘汰的"残次品"——头照蛋、二照蛋、死胚蛋，原本用于处理残次品、回收成本，后成为路边摊小吃。
+
+鸭脖：1991年，下岗工人汤光山（汤腊九之兄）开始在汉口新华路体育场对面摆摊卖鸭脖。下岗工人纷纷效仿，将这条小巷变成了"鸭脖一条街"。2000年中国加入WTO后，河南潢川的华英农业集团等肉鸭出口企业主要出口鸭绒和鸭脯肉到欧美，欧美人只吃鸭脯，鸭头、鸭掌、鸭脖子被视为"边角料"便宜处理给武汉人。这与沈阳鸡架的故事如出一辙——都是外贸出口分割肉后留下的"下脚料"。
+
+高塍猪婆肉：江苏宜兴市级”非遗”，将老母猪（多次产仔后皮厚肉硬、腥膻粗糙的”废料”）通过特殊工艺烧制，厚肉皮放凉后脆爽，回温后沙沙作响，成为年节团圆的至味。
+
+撑腰糕：苏州农历二月初二传统，源于将正月里吃剩变硬的年糕切片油煎，避免浪费，后来衍生出”吃了不腰酸”的民俗传说。
+
+衢州鸭脖：上世纪50年代，衢州冷冻厂杀鸭后的鸭脖无人问津，穷人买回家烧着吃；80年代一位大妈摆摊售卖，因便宜好吃风行衢城，成为”三头一掌”名吃。
+
+卤煮火烧的穷人智慧：明清时期，北京城的苏造肉本是朝廷大员的夜宵，普通百姓吃不起。于是"有心之人把不要的猪下水剁吧剁吧按照苏造肉的做法炮制出来"，用酱油代替昂贵的洋糖上色，成就了卤煮火烧——"旧社会穷人解馋的小吃，如今已成为北京美食的一张名片"。
+
+豆汁：同样是制作绿豆淀粉和粉丝的下脚料，发酵后的灰绿色浆水。穷人饮品，后成为老北京特色。
