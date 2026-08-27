@@ -1,456 +1,457 @@
 class AnalogBus
   extends FieldBusNet
 {
-  ////////////////////////////////////////////////////////////////
-  // Constants
-  ////////////////////////////////////////////////////////////////
-  define Str CHANNEL_MODE = "Voltage, Current, Resistance, END"
-  define int CHANNEL_MODE_VOLTAGE       = 0
-  define int CHANNEL_MODE_CURRENT       = 1
-  define int CHANNEL_MODE_RESISTANCE    = 2
-  define int CHANNEL_MODE_END           = 3
-
-  define Str CHANNEL_CONFLICT_ERROR = "OK, ChErr1, ChErr2, ChErr3, ChErr4, ChErr5, ChErr6, ChErr7, ChErr8, END"
-  define int CHANNEL_NO_CONFLICT           = 0
-  define int CHANNEL_CONFLICT_AT_ONE       = 1
-  define int CHANNEL_CONFLICT_AT_TWO       = 2
-  define int CHANNEL_CONFLICT_AT_THREE     = 3
-  define int CHANNEL_CONFLICT_AT_FOUR      = 4
-  define int CHANNEL_CONFLICT_AT_FIVE      = 5
-  define int CHANNEL_CONFLICT_AT_SIX       = 6
-  define int CHANNEL_CONFLICT_AT_SEVEN     = 7
-  define int CHANNEL_CONFLICT_AT_EIGHT     = 8
-  define int CHANNEL_CONFLICT_ERROR_END    = 9
+    ////////////////////////////////////////////////////////////////
+    // Constants
+    ////////////////////////////////////////////////////////////////
+    define Str CHANNEL_MODE = "Voltage, Current, Resistance, END"
+    define int CHANNEL_MODE_VOLTAGE       = 0
+    define int CHANNEL_MODE_CURRENT       = 1
+    define int CHANNEL_MODE_RESISTANCE    = 2
+    define int CHANNEL_MODE_END           = 3
   
-  @asStr
-  @config
-  property Buf(64) deviceName = ""
-
-  // CHANNEL CONFLICT ERROR
-  @readonly
-  @range = CHANNEL_CONFLICT_ERROR
-  @fieldWidth = 200
-  property int channel_conflict_info = CHANNEL_NO_CONFLICT
+    define Str CHANNEL_CONFLICT_ERROR = "OK, ChErr1, ChErr2, ChErr3, ChErr4, ChErr5, ChErr6, ChErr7, ChErr8, END"
+    define int CHANNEL_NO_CONFLICT           = 0
+    define int CHANNEL_CONFLICT_AT_ONE       = 1
+    define int CHANNEL_CONFLICT_AT_TWO       = 2
+    define int CHANNEL_CONFLICT_AT_THREE     = 3
+    define int CHANNEL_CONFLICT_AT_FOUR      = 4
+    define int CHANNEL_CONFLICT_AT_FIVE      = 5
+    define int CHANNEL_CONFLICT_AT_SIX       = 6
+    define int CHANNEL_CONFLICT_AT_SEVEN     = 7
+    define int CHANNEL_CONFLICT_AT_EIGHT     = 8
+    define int CHANNEL_CONFLICT_ERROR_END    = 9
+    
+    @asStr
+    @config
+    property Buf(64) deviceName = ""
   
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int first_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int second_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int third_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int fourth_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int fifth_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int sixth_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int seventh_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  // CHANNEL MODE
-  @readonly
-  @range = CHANNEL_MODE
-  @fieldWidth = 200
-  property int eighth_channel_mode = CHANNEL_MODE_VOLTAGE
-  
-  ////////////////////////////////////////////////////////////////
-  // Life cycle
-  ////////////////////////////////////////////////////////////////
-  override void loaded()
-  {
-    sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_ANALOG_BUS
-    InputInit()
-    getAnalogInputSetting()
-    update()
-  }
-   
-  override void changed(Slot slot)
-  {
-    super.changed(slot)
-  }
-
-  override void stop()
-  {
-      log.message("AnalogBus stop")
-  }
-  
-  override void execute()
-  {
-    int iRet = STATUSOK
-    long nowNanoSecond  = Sys.ticks()
-    long nowMilliSecond = nowNanoSecond / (long)1000000
-    // log.message("AnalogBus::execute status = $status")
-    if (status == STATUSOK) {
-    //    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-    //       d.execute()
-    //    }
-        if(sendInterval < nowMilliSecond) {
-            iRet = getAnalogInputSetting()
-            // Add at 06/08/26 by lu
-            if(iRet == STATUSNODEV)
-            {
-               log.message("execute updateConfig")
-               updateConfig()
-            }
-            ReadAllChannels(dataBuf)
-            log.message("AnalogBus dataBuf = (${dataBuf[0]}, ${dataBuf[1]}, ${dataBuf[2]}, ${dataBuf[3]}, ${dataBuf[4]}, ${dataBuf[5]}, ${dataBuf[6]}, ${dataBuf[7]})") 
-            for(int i = 0; i <= 7; i++)
-            {
-                current_channel_a_readings[i] = dataBuf[i]
-                current_channel_b_readings[i] = 0.0
-            }
-            sendInterval = nowMilliSecond + (long)2000
-        }
+    // CHANNEL CONFLICT ERROR
+    @readonly
+    @range = CHANNEL_CONFLICT_ERROR
+    @fieldWidth = 200
+    property int channel_conflict_info = CHANNEL_NO_CONFLICT
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int first_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int second_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int third_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int fourth_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int fifth_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int sixth_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int seventh_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    // CHANNEL MODE
+    @readonly
+    @range = CHANNEL_MODE
+    @fieldWidth = 200
+    property int eighth_channel_mode = CHANNEL_MODE_VOLTAGE
+    
+    ////////////////////////////////////////////////////////////////
+    // Life cycle
+    ////////////////////////////////////////////////////////////////
+    override void loaded()
+    {
+        sub_fieldbusnet_type_id = SUB_FIELDBUSNET_TYPE_ANALOG_BUS
+        InputInit()
+        getAnalogInputSetting()
+        update()
     }
-    else {
-        if(sendInterval < nowMilliSecond) {
-             iRet = getAnalogInputSetting()
-             if(iRet == STATUSNODEV)
-             {
-                log.message("setAnalogBusChannelMode updateConfig")
-                updateConfig()
-             }
-             sendInterval = nowMilliSecond + (long)2000
-        }
-    }
-  }    
-
-
-  // STATUSOK    - ANALOG_INPUT_SETTING_NOCHANGE
-  // STATUSNODEV - ANALOG_INPUT_SETTING_CHANGED
-  // STATUSNOREG - ANALOG_INPUT_SETTING_CONFLICT
-  int getAnalogInputSetting()
-  {
-    int iRet = STATUSOK  // ANALOG_INPUT_SETTING_NOCHANGE
-    // Check whether sub component type is same as channel config
-    temp_channel_mode[0] = -1 
-    temp_channel_mode[1] = -1  
-    temp_channel_mode[2] = -1 
-    temp_channel_mode[3] = -1  
-    temp_channel_mode[4] = -1 
-    temp_channel_mode[5] = -1 
-    temp_channel_mode[6] = -1  
-    temp_channel_mode[7] = -1
      
-    Component p = Sys.app.lookup(this.parent)
-    Component root = null
-    while (p != null) {
-      root = p
-      p = Sys.app.lookup(p.parent)
+    override void changed(Slot slot)
+    {
+        super.changed(slot)
     }
-    // Reset status and channel_conflict_info
-    status                := STATUSOK
-    channel_conflict_info := CHANNEL_NO_CONFLICT
-    // 
-    if (root != null) {
-        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-            // Sync from service to play
-            if (f.type.is(Folder.type) && f.name.equals("play")) {
-                for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-                    if (n.type.is(AnalogInput.type))  {
-                       ((AnalogInput)n).status := STATUSOK;
-                       int channel_index = ((AnalogInput)n).channel_index;
-                       int channel_mode  = ((AnalogInput)n).channel_mode;
-                       if(temp_channel_mode[channel_index] != channel_mode)
-                       {
-                          if(temp_channel_mode[channel_index] == -1)
-                          {
-                              temp_channel_mode[channel_index] = channel_mode
-                              // log.message("getAnalogInputSetting check temp_channel_mode[$channel_index] = ${temp_channel_mode[channel_index]}")
-                          }
-                          else {
-                               log.message("getAnalogInputSetting status := STATUSNOREG and temp_channel_mode[$channel_index] = ${temp_channel_mode[channel_index]}")
-                               status := STATUSNOREG
-                               channel_conflict_info := channel_index + 1
-                               ((AnalogInput)n).status := STATUSNOREG
-                               iRet = STATUSNOREG // ANALOG_INPUT_SETTING_CONFLICT
-                               break
-                          }
-                       }
+  
+    override void stop()
+    {
+        log.message("AnalogBus stop")
+    }
+    
+    override void execute()
+    {
+        int iRet = STATUSOK
+        long nowNanoSecond  = Sys.ticks()
+        long nowMilliSecond = nowNanoSecond / (long)1000000
+        // log.message("AnalogBus::execute status = $status")
+        if (status == STATUSOK) {
+        //    for (Component d = Sys.app.lookup(children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+        //       d.execute()
+        //    }
+            if(sendInterval < nowMilliSecond) {
+                iRet = getAnalogInputSetting()
+                // Add at 06/08/26 by lu
+                if(iRet == STATUSNODEV)
+                {
+                   log.message("execute updateConfig")
+                   updateConfig()
+                }
+                ReadAllChannels(dataBuf)
+                log.message("AnalogBus dataBuf = (${dataBuf[0]}, ${dataBuf[1]}, ${dataBuf[2]}, ${dataBuf[3]}, ${dataBuf[4]}, ${dataBuf[5]}, ${dataBuf[6]}, ${dataBuf[7]})") 
+                for(int i = 0; i <= 7; i++)
+                {
+                    current_channel_a_readings[i] = dataBuf[i]
+                    current_channel_b_readings[i] = 0.0
+                }
+                sendInterval = nowMilliSecond + (long)2000
+            }
+        }
+        else {
+            if(sendInterval < nowMilliSecond) {
+                 iRet = getAnalogInputSetting()
+                 if(iRet == STATUSNODEV)
+                 {
+                    log.message("setAnalogBusChannelMode updateConfig")
+                    updateConfig()
+                 }
+                 sendInterval = nowMilliSecond + (long)2000
+            }
+        }
+    }    
+  
+  
+    // STATUSOK    - ANALOG_INPUT_SETTING_NOCHANGE
+    // STATUSNODEV - ANALOG_INPUT_SETTING_CHANGED
+    // STATUSNOREG - ANALOG_INPUT_SETTING_CONFLICT
+    int getAnalogInputSetting()
+    {
+        int iRet = STATUSOK  // ANALOG_INPUT_SETTING_NOCHANGE
+        // Check whether sub component type is same as channel config
+        temp_channel_mode[0] = -1 
+        temp_channel_mode[1] = -1  
+        temp_channel_mode[2] = -1 
+        temp_channel_mode[3] = -1  
+        temp_channel_mode[4] = -1 
+        temp_channel_mode[5] = -1 
+        temp_channel_mode[6] = -1  
+        temp_channel_mode[7] = -1
+         
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+            root = p
+            p = Sys.app.lookup(p.parent)
+        }
+        // Reset status and channel_conflict_info
+        status                := STATUSOK
+        channel_conflict_info := CHANNEL_NO_CONFLICT
+        // 
+        if (root != null) {
+            for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+                // Sync from service to play
+                if (f.type.is(Folder.type) && f.name.equals("play")) {
+                    for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                        if (n.type.is(AnalogInput.type))  {
+                           ((AnalogInput)n).status := STATUSOK;
+                           int channel_index = ((AnalogInput)n).channel_index;
+                           int channel_mode  = ((AnalogInput)n).channel_mode;
+                           if(temp_channel_mode[channel_index] != channel_mode)
+                           {
+                                if(temp_channel_mode[channel_index] == -1)
+                                {
+                                    temp_channel_mode[channel_index] = channel_mode
+                                    // log.message("getAnalogInputSetting check temp_channel_mode[$channel_index] = ${temp_channel_mode[channel_index]}")
+                                }
+                                else {
+                                     log.message("getAnalogInputSetting status := STATUSNOREG and temp_channel_mode[$channel_index] = ${temp_channel_mode[channel_index]}")
+                                     status := STATUSNOREG
+                                     channel_conflict_info := channel_index + 1
+                                     ((AnalogInput)n).status := STATUSNOREG
+                                     iRet = STATUSNOREG // ANALOG_INPUT_SETTING_CONFLICT
+                                     break
+                                }
+                           }
+                        }
                     }
                 }
             }
         }
-    }
-    for(int i = 0; i <= 7; i++)
-    {
-        if(temp_channel_mode[i] == -1)
-            temp_channel_mode[i] = CHANNEL_MODE_VOLTAGE
-    }
-    // log.message("getAnalogInputSetting iRet = $iRet")
-    if(first_channel_mode != temp_channel_mode[0])
-    {
-        log.message("getAnalogInputSetting first_channel_mode = $first_channel_mode")
-        if(iRet == STATUSOK)
+        for(int i = 0; i <= 7; i++)
         {
-            log.message("getAnalogInputSetting iRet is STATUSOK at first_channel_mode")
-            first_channel_mode    :=  temp_channel_mode[0]
-            iRet = STATUSNODEV
+            if(temp_channel_mode[i] == -1)
+                temp_channel_mode[i] = CHANNEL_MODE_VOLTAGE
         }
-        else 
+        // log.message("getAnalogInputSetting iRet = $iRet")
+        if(first_channel_mode != temp_channel_mode[0])
         {
-            log.message("getAnalogInputSetting iRet = $iRet")
+            log.message("getAnalogInputSetting first_channel_mode = $first_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at first_channel_mode")
+                first_channel_mode    :=  temp_channel_mode[0]
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-    }
-    if(second_channel_mode != temp_channel_mode[1])
-    {
-        log.message("getAnalogInputSetting second_channel_mode = $second_channel_mode")
-        if(iRet == STATUSOK)
+        if(second_channel_mode != temp_channel_mode[1])
         {
-            log.message("getAnalogInputSetting iRet is STATUSOK at second_channel_mode")
-            second_channel_mode   :=  temp_channel_mode[1] 
-            iRet = STATUSNODEV
+            log.message("getAnalogInputSetting second_channel_mode = $second_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at second_channel_mode")
+                second_channel_mode   :=  temp_channel_mode[1] 
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-        else 
+        if((third_channel_mode != temp_channel_mode[2]) && (iRet == STATUSOK))
         {
-            log.message("getAnalogInputSetting iRet = $iRet")
+            log.message("getAnalogInputSetting third_channel_mode = $third_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at third_channel_mode")
+                third_channel_mode    :=  temp_channel_mode[2]
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-    }
-    if((third_channel_mode != temp_channel_mode[2]) && (iRet == STATUSOK))
-    {
-        log.message("getAnalogInputSetting third_channel_mode = $third_channel_mode")
-        if(iRet == STATUSOK)
+        if((fourth_channel_mode != temp_channel_mode[3]) && (iRet == STATUSOK))
         {
-            log.message("getAnalogInputSetting iRet is STATUSOK at third_channel_mode")
-            third_channel_mode    :=  temp_channel_mode[2]
-            iRet = STATUSNODEV
+            log.message("getAnalogInputSetting fourth_channel_mode = $fourth_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at fourth_channel_mode")
+                fourth_channel_mode   :=  temp_channel_mode[3] 
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-        else 
+        if((fifth_channel_mode != temp_channel_mode[4]) && (iRet == STATUSOK))
         {
-            log.message("getAnalogInputSetting iRet = $iRet")
+            log.message("getAnalogInputSetting fifth_channel_mode = $fifth_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at fifth_channel_mode")
+                fifth_channel_mode    :=  temp_channel_mode[4]
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-    }
-    if((fourth_channel_mode != temp_channel_mode[3]) && (iRet == STATUSOK))
-    {
-        log.message("getAnalogInputSetting fourth_channel_mode = $fourth_channel_mode")
-        if(iRet == STATUSOK)
+        if((sixth_channel_mode != temp_channel_mode[5]) && (iRet == STATUSOK))
         {
-            log.message("getAnalogInputSetting iRet is STATUSOK at fourth_channel_mode")
-            fourth_channel_mode   :=  temp_channel_mode[3] 
-            iRet = STATUSNODEV
+            log.message("getAnalogInputSetting sixth_channel_mode = $sixth_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at sixth_channel_mode")
+                sixth_channel_mode    :=  temp_channel_mode[5]
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-        else 
+        if((seventh_channel_mode != temp_channel_mode[6]) && (iRet == STATUSOK))
         {
-            log.message("getAnalogInputSetting iRet = $iRet")
+            log.message("getAnalogInputSetting seventh_channel_mode = $seventh_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at seventh_channel_mode")
+                seventh_channel_mode  :=  temp_channel_mode[6] 
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-    }
-    if((fifth_channel_mode != temp_channel_mode[4]) && (iRet == STATUSOK))
-    {
-        log.message("getAnalogInputSetting fifth_channel_mode = $fifth_channel_mode")
-        if(iRet == STATUSOK)
+        if((eighth_channel_mode != temp_channel_mode[7]) && (iRet == STATUSOK))
         {
-            log.message("getAnalogInputSetting iRet is STATUSOK at fifth_channel_mode")
-            fifth_channel_mode    :=  temp_channel_mode[4]
-            iRet = STATUSNODEV
+            log.message("getAnalogInputSetting eighth_channel_mode = $eighth_channel_mode")
+            if(iRet == STATUSOK)
+            {
+                log.message("getAnalogInputSetting iRet is STATUSOK at eighth_channel_mode")
+                eighth_channel_mode   :=  temp_channel_mode[7]
+                iRet = STATUSNODEV
+            }
+            else 
+            {
+                log.message("getAnalogInputSetting iRet = $iRet")
+            }
         }
-        else 
-        {
-            log.message("getAnalogInputSetting iRet = $iRet")
-        }
-    }
-    if((sixth_channel_mode != temp_channel_mode[5]) && (iRet == STATUSOK))
-    {
-        log.message("getAnalogInputSetting sixth_channel_mode = $sixth_channel_mode")
-        if(iRet == STATUSOK)
-        {
-            log.message("getAnalogInputSetting iRet is STATUSOK at sixth_channel_mode")
-            sixth_channel_mode    :=  temp_channel_mode[5]
-            iRet = STATUSNODEV
-        }
-        else 
-        {
-            log.message("getAnalogInputSetting iRet = $iRet")
-        }
-    }
-    if((seventh_channel_mode != temp_channel_mode[6]) && (iRet == STATUSOK))
-    {
-        log.message("getAnalogInputSetting seventh_channel_mode = $seventh_channel_mode")
-        if(iRet == STATUSOK)
-        {
-            log.message("getAnalogInputSetting iRet is STATUSOK at seventh_channel_mode")
-            seventh_channel_mode  :=  temp_channel_mode[6] 
-            iRet = STATUSNODEV
-        }
-        else 
-        {
-            log.message("getAnalogInputSetting iRet = $iRet")
-        }
-    }
-    if((eighth_channel_mode != temp_channel_mode[7]) && (iRet == STATUSOK))
-    {
-        log.message("getAnalogInputSetting eighth_channel_mode = $eighth_channel_mode")
-        if(iRet == STATUSOK)
-        {
-            log.message("getAnalogInputSetting iRet is STATUSOK at eighth_channel_mode")
-            eighth_channel_mode   :=  temp_channel_mode[7]
-            iRet = STATUSNODEV
-        }
-        else 
-        {
-            log.message("getAnalogInputSetting iRet = $iRet")
-        }
+        
+        // for(int i = 0; i <= 7; i++)
+        // {
+        //     log.message("getAnalogInputSetting output temp_channel_mode[$i] = ${temp_channel_mode[i]}")
+        // }
+        return iRet
     }
     
-    // for(int i = 0; i <= 7; i++)
-    // {
-    //     log.message("getAnalogInputSetting output temp_channel_mode[$i] = ${temp_channel_mode[i]}")
-    // }
-    return iRet
-  }
-  
-  
-  override int setAnalogBusChannelMode()
-  {
-     int iRet = STATUSOK
-     iRet = getAnalogInputSetting()
-     // STATUSNODEV - ANALOG_INPUT_SETTING_CHANGED
-     if(iRet == STATUSNODEV)
-     {
-        log.message("setAnalogBusChannelMode updateConfig")
-        updateConfig()
-     }
-     return iRet;
-  }
-
-  void updateConfig()
-  {
-    log.message("AnalogBus updateConfig")
-    // Call AnalogIO_tpafe51760_SetInputChannelRange and AnalogIO_tpafe51760_SetInputChannelMode
-    channel_range[0] = 0
-    // Set V0A to 5V and 0x02 + 0x08 = 0x0A -> 0xAA
-    if((first_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(first_channel_mode == CHANNEL_MODE_RESISTANCE))
+    
+    override int setAnalogBusChannelMode()
     {
-        channel_range[0] = 0x02;
+        int iRet = STATUSOK
+        iRet = getAnalogInputSetting()
+        // STATUSNODEV - ANALOG_INPUT_SETTING_CHANGED
+        if(iRet == STATUSNODEV)
+        {
+            log.message("setAnalogBusChannelMode updateConfig")
+            updateConfig()
+        }
+        return iRet;
     }
-    SetInputChannelMode(CHANNEL_INDEX_FIRST, first_channel_mode)
-    // Set V1A
-    if((second_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(second_channel_mode == CHANNEL_MODE_RESISTANCE))
-    {
-        channel_range[0] += 0x08;
-    }
-    SetInputChannelMode(CHANNEL_INDEX_SECOND, second_channel_mode)
-    // Set V2A
-    if((third_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(third_channel_mode == CHANNEL_MODE_RESISTANCE))
-    {
-        channel_range[0] += 0x20;
-    }
-    // PE6 is used
-    // SetInputChannelMode(CHANNEL_INDEX_THIRD, third_channel_mode)
-    // Set V3A
-    if((fourth_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(fourth_channel_mode == CHANNEL_MODE_RESISTANCE))
-    {
-        channel_range[0] += 0x80;
-    }
-    SetInputChannelMode(CHANNEL_INDEX_FOURTH, fourth_channel_mode)
-    channel_range[1] = 0
-    // Set V4A
-    if((fifth_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(fifth_channel_mode == CHANNEL_MODE_RESISTANCE))
-    {
-        channel_range[1] = 0x02;
-    }
-    SetInputChannelMode(CHANNEL_INDEX_FIFTH, fifth_channel_mode)
-    // Set V5A
-    if((sixth_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(sixth_channel_mode == CHANNEL_MODE_RESISTANCE))
-    {
-        channel_range[1] += 0x08;
-    }
-    SetInputChannelMode(CHANNEL_INDEX_SIXTH, sixth_channel_mode)
-    // Set V6A
-    if((seventh_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(seventh_channel_mode == CHANNEL_MODE_RESISTANCE))
-    {
-        channel_range[1] += 0x20;
-    }
-    SetInputChannelMode(CHANNEL_INDEX_SEVENTH, seventh_channel_mode)
-    // Set V7A
-    if((eighth_channel_mode == CHANNEL_MODE_CURRENT) 
-     ||(eighth_channel_mode == CHANNEL_MODE_RESISTANCE))
-    {
-        channel_range[1] += 0x80;
-    }
-    SetInputChannelMode(CHANNEL_INDEX_EIGHTH, eighth_channel_mode)
-    // Set V*B to zero as 10V
-    channel_range[2] = 0
-    channel_range[3] = 0
-    SetInputChannelRange(INPUT_RANGE_REG_A1, channel_range[0])
-    SetInputChannelRange(INPUT_RANGE_REG_A2, channel_range[1])
-    log.message("SetInputChannelRange set 1 to ${channel_range[0]} and set 2 to ${channel_range[1]}")
-    // SetInputChannelRange(INPUT_RANGE_REG_B1, channel_range[2])
-    // SetInputChannelRange(INPUT_RANGE_REG_B2, channel_range[3])
-    // // Set status
-    // status := STATUSOK
-  }
   
-  ////////////////////////////////////////////////////////////////
-  // Fields
-  ////////////////////////////////////////////////////////////////
-  // define Log log
-  private int ctx = -1
+    void updateConfig()
+    {
+        log.message("AnalogBus updateConfig")
+        // Call AnalogIO_tpafe51760_SetInputChannelRange and AnalogIO_tpafe51760_SetInputChannelMode
+        channel_range[0] = 0
+        // Set V0A to 5V and 0x02 + 0x08 = 0x0A -> 0xAA
+        if((first_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(first_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[0] = 0x02;
+        }
+        SetInputChannelMode(CHANNEL_INDEX_FIRST, first_channel_mode)
+        // Set V1A
+        if((second_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(second_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[0] += 0x08;
+        }
+        SetInputChannelMode(CHANNEL_INDEX_SECOND, second_channel_mode)
+        // Set V2A
+        if((third_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(third_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[0] += 0x20;
+        }
+        // PE6 is used
+        // SetInputChannelMode(CHANNEL_INDEX_THIRD, third_channel_mode)
+        // Set V3A
+        if((fourth_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(fourth_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[0] += 0x80;
+        }
+        SetInputChannelMode(CHANNEL_INDEX_FOURTH, fourth_channel_mode)
+        channel_range[1] = 0
+        // Set V4A
+        if((fifth_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(fifth_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[1] = 0x02;
+        }
+        SetInputChannelMode(CHANNEL_INDEX_FIFTH, fifth_channel_mode)
+        // Set V5A
+        if((sixth_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(sixth_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[1] += 0x08;
+        }
+        SetInputChannelMode(CHANNEL_INDEX_SIXTH, sixth_channel_mode)
+        // Set V6A
+        if((seventh_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(seventh_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[1] += 0x20;
+        }
+        SetInputChannelMode(CHANNEL_INDEX_SEVENTH, seventh_channel_mode)
+        // Set V7A
+        if((eighth_channel_mode == CHANNEL_MODE_CURRENT) 
+         ||(eighth_channel_mode == CHANNEL_MODE_RESISTANCE))
+        {
+            channel_range[1] += 0x80;
+        }
+        SetInputChannelMode(CHANNEL_INDEX_EIGHTH, eighth_channel_mode)
+        // Set V*B to zero as 10V
+        channel_range[2] = 0
+        channel_range[3] = 0
+        SetInputChannelRange(INPUT_RANGE_REG_A1, channel_range[0])
+        SetInputChannelRange(INPUT_RANGE_REG_A2, channel_range[1])
+        log.message("SetInputChannelRange set 1 to ${channel_range[0]} and set 2 to ${channel_range[1]}")
+        // SetInputChannelRange(INPUT_RANGE_REG_B1, channel_range[2])
+        // SetInputChannelRange(INPUT_RANGE_REG_B2, channel_range[3])
+        // // Set status
+        // status := STATUSOK
+    }
+    
+    ////////////////////////////////////////////////////////////////
+    // Fields
+    ////////////////////////////////////////////////////////////////
+    // define Log log
+    private int ctx = -1
+    
+    define int  INPUT_RANGE_REG_A1      = 1
+    define int  INPUT_RANGE_REG_A2      = 2
+    define int  INPUT_RANGE_REG_B1      = 3
+    define int  INPUT_RANGE_REG_B2      = 4
   
-  define int  INPUT_RANGE_REG_A1      = 1
-  define int  INPUT_RANGE_REG_A2      = 2
-  define int  INPUT_RANGE_REG_B1      = 3
-  define int  INPUT_RANGE_REG_B2      = 4
-
-  define int CHANNEL_INDEX_FIRST   = 0
-  define int CHANNEL_INDEX_SECOND  = 1
-  define int CHANNEL_INDEX_THIRD   = 2
-  define int CHANNEL_INDEX_FOURTH  = 3
-  define int CHANNEL_INDEX_FIFTH   = 4
-  define int CHANNEL_INDEX_SIXTH   = 5
-  define int CHANNEL_INDEX_SEVENTH = 6
-  define int CHANNEL_INDEX_EIGHTH  = 7
-  define int CHANNEL_INDEX_END     = 8
-  
-  private int channel_index = 0
-  private int channel_mode  = 0
-  
-  private inline int[4] channel_range
-  // 
-  private inline int[8] temp_channel_mode
-  // 
-  // private int current_channel_index = 0;
-  private inline float[8] dataBuf
-  
-  // Send interval counter
-  long sendInterval = (long)0
-  
-  native int InputInit()
-  native int SetInputChannelRange(int iChannelGroup, int iValue)
-  native int SetInputChannelMode(int iChannelGroup, int iChannelMode)
-  native int ReadChannel(int iChannel, float[] buf)
-  native int ReadAllChannels(float[] buf)
+    define int CHANNEL_INDEX_FIRST   = 0
+    define int CHANNEL_INDEX_SECOND  = 1
+    define int CHANNEL_INDEX_THIRD   = 2
+    define int CHANNEL_INDEX_FOURTH  = 3
+    define int CHANNEL_INDEX_FIFTH   = 4
+    define int CHANNEL_INDEX_SIXTH   = 5
+    define int CHANNEL_INDEX_SEVENTH = 6
+    define int CHANNEL_INDEX_EIGHTH  = 7
+    define int CHANNEL_INDEX_END     = 8
+    
+    private int channel_index = 0
+    private int channel_mode  = 0
+    
+    private inline int[4] channel_range
+    // 
+    private inline int[8] temp_channel_mode
+    // 
+    // private int current_channel_index = 0;
+    private inline float[8] dataBuf
+    
+    // Send interval counter
+    long sendInterval = (long)0
+    
+    native int InputInit()
+    native int SetInputChannelRange(int iChannelGroup, int iValue)
+    native int SetInputChannelMode(int iChannelGroup, int iChannelMode)
+    native int ReadChannel(int iChannel, float[] buf)
+    native int ReadAllChannels(float[] buf)
 }
+  

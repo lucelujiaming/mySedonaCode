@@ -2,141 +2,142 @@
 class Variable
   extends Component
 {
-  define Str IO_MODE_RANGE = "Input, Output, END"
-  define int IO_MODE_INPUT                      = 0x00
-  define int IO_MODE_OUTPUT                     = 0x01
-  define int IO_MODE_END                        = 0x02
-  
-  ////////////////////////////////////////////////////////////////
-  // Properties
-  ////////////////////////////////////////////////////////////////
-  @config
-  @range = IO_MODE_RANGE
-  @fieldWidth = 200
-  property int ioMode = IO_MODE_INPUT
-  
-  @summary=true
-  @config
-  @asStr
-  property Buf(32) url = ""
-
-  @summary=true
-  @config
-  @asStr
-  property Buf(64) alias = ""
-
-  @readonly
-  property float outFloatValue = 0.0f
-
-  property float inFloatValue = 0.0f
-
-  override void start()
-  {
-    checkURLforStatus()
-    checkURLforSchedule()
-  }
-
-  override void changed(Slot slot)
-  {
-    super.changed(slot)
-    log.message("Variable changed with slot=${slot.name}")
-    if (slot == Variable.inFloatValue) {
-      outFloatValue := inFloatValue
-      if (url.toStr().length() > 0) {
-        if (isStatus) {
-          return
-        }
-        Component p = Sys.app.lookup(this.parent)
-        Component root = null
-        while (p != null) {
-          root = p
-          p = Sys.app.lookup(p.parent)
-        }
-        if (root != null) {
-          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-            if (f.type.is(Folder.type) && !f.name.equals("service") // && !f.name.equals("init")
-               ) {
-              for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
-                if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
-                  ** log.message("56565 Variable inFloatValue=$inFloatValue")
-                  ((Variable)r).inFloatValue := inFloatValue
-                }
-              }
-            }
-          }
-        }
-      }
-    } else if (slot == Variable.url) {
-      if (url.toStr().length() > 0) {
-        inFloatValue := 0.0f
-        outFloatValue := 0.0f
-        isStatus = false
-        checkURLforStatus()
-        checkURLforSchedule()
-        if (isStatus) {
-          return
-        }
-        Component p = Sys.app.lookup(this.parent)
-        Component root = null
-        while (p != null) {
-          root = p
-          p = Sys.app.lookup(p.parent)
-        }
-        if (root != null) {
-          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-            if (f.type.is(Folder.type) && !f.name.equals("service")) {
-              for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
-                  inFloatValue := ((Variable)r).inFloatValue
-                  outFloatValue := inFloatValue
-                  return
-                }
-              }
-            }
-          }
-        }
-      }
-    } else if (slot == Variable.alias) {
-      if (alias.toStr().length() > 0) {
-         referenceComponent = null
-      }
-      else {
-         referenceComponent = null
-      }
-    }
-    ** log.message("Variable changed")
+    define Str IO_MODE_RANGE = "Input, Output, END"
+    define int IO_MODE_INPUT                      = 0x00
+    define int IO_MODE_OUTPUT                     = 0x01
+    define int IO_MODE_END                        = 0x02
     
-  }
-
-  override void execute()
-  {
-    if (isStatus) {
-      Str urlStr = url.toStr()
-      Str devStr = ""
-      log.message("isStatus::urlStr=$urlStr")
-
-      devStr.copyFromStr(urlStr, 64)
-      devStr.set(urlStr.length() - 7, 0)
-
-      // find bus and dev
-      Component p = Sys.app.lookup(this.parent)
-      Component root = null
-      while (p != null) {
-        root = p
-        p = Sys.app.lookup(p.parent)
+    ////////////////////////////////////////////////////////////////
+    // Properties
+    ////////////////////////////////////////////////////////////////
+    @config
+    @range = IO_MODE_RANGE
+    @fieldWidth = 200
+    property int ioMode = IO_MODE_INPUT
+    
+    @summary=true
+    @config
+    @asStr
+    property Buf(32) url = ""
+    
+    @summary=true
+    @config
+    @asStr
+    property Buf(64) alias = ""
+    
+    @readonly
+    property float outFloatValue = 0.0f
+    
+    property float inFloatValue = 0.0f
+    
+    override void start()
+    {
+      checkURLforStatus()
+      checkURLforSchedule()
+    }
+    
+    override void changed(Slot slot)
+    {
+      super.changed(slot)
+      log.message("Variable changed with slot=${slot.name}")
+      if (slot == Variable.inFloatValue) {
+        outFloatValue := inFloatValue
+        if (url.toStr().length() > 0) {
+          if (isStatus) {
+            return
+          }
+          Component p = Sys.app.lookup(this.parent)
+          Component root = null
+          while (p != null) {
+            root = p
+            p = Sys.app.lookup(p.parent)
+          }
+          if (root != null) {
+            for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+              if (f.type.is(Folder.type) && !f.name.equals("service") // && !f.name.equals("init")
+                 ) {
+                for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                  ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
+                  if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
+                    ** log.message("56565 Variable inFloatValue=$inFloatValue")
+                    ((Variable)r).inFloatValue := inFloatValue
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else if (slot == Variable.url) {
+        if (url.toStr().length() > 0) {
+          inFloatValue := 0.0f
+          outFloatValue := 0.0f
+          isStatus = false
+          checkURLforStatus()
+          checkURLforSchedule()
+          if (isStatus) {
+            return
+          }
+          Component p = Sys.app.lookup(this.parent)
+          Component root = null
+          while (p != null) {
+            root = p
+            p = Sys.app.lookup(p.parent)
+          }
+          if (root != null) {
+            for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+              if (f.type.is(Folder.type) && !f.name.equals("service")) {
+                for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                  if (r.type.is(Variable.type) && r != this && ((Variable)r).url.toStr().equals(url.toStr())) {
+                    inFloatValue := ((Variable)r).inFloatValue
+                    outFloatValue := inFloatValue
+                    return
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else if (slot == Variable.alias) {
+        if (alias.toStr().length() > 0) {
+           referenceComponent = null
+        }
+        else {
+           referenceComponent = null
+        }
       }
-      if (root != null) {
-        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-          if (f.type.is(Folder.type) && f.name.equals("service")) {
-            for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-              if (n.type.is(FieldBusNet.type)) {
-                for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-                  if (d.type.is(FieldBusDevice.type) && ((FieldBusDevice)d).deviceName.toStr().equals(devStr)) {
-                    if (((FieldBusDevice)d).status == FieldBusDevice.STATUSOK) {
-                      inFloatValue := 1.0f
-                      outFloatValue := 1.0f
-                      return
+      ** log.message("Variable changed")
+      
+    }
+    
+    override void execute()
+    {
+      if (isStatus) {
+        Str urlStr = url.toStr()
+        Str devStr = ""
+        log.message("isStatus::urlStr=$urlStr")
+    
+        devStr.copyFromStr(urlStr, 64)
+        devStr.set(urlStr.length() - 7, 0)
+    
+        // find bus and dev
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+          root = p
+          p = Sys.app.lookup(p.parent)
+        }
+        if (root != null) {
+          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if (f.type.is(Folder.type) && f.name.equals("service")) {
+              for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                if (n.type.is(FieldBusNet.type)) {
+                  for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                    if (d.type.is(FieldBusDevice.type) && ((FieldBusDevice)d).deviceName.toStr().equals(devStr)) {
+                      if (((FieldBusDevice)d).status == FieldBusDevice.STATUSOK) {
+                        inFloatValue := 1.0f
+                        outFloatValue := 1.0f
+                        return
+                      }
                     }
                   }
                 }
@@ -144,226 +145,225 @@ class Variable
             }
           }
         }
-      }
-      inFloatValue := 0.0f
-      outFloatValue := 0.0f
-    } else if (isSchedule) {
-      Str urlStr = url.toStr()
-      Str scheduleStr = ""
-      log.message("isSchedule::urlStr=$urlStr")
-
-      int len = urlStr.length()
-      for (int i=0; i<len-9; i++) {
-          scheduleStr.set(i, urlStr.get(i+9))
-          scheduleStr.set(i+1, 0)
-      }
-
-      // find bus and dev
-      Component p = Sys.app.lookup(this.parent)
-      Component root = null
-      while (p != null) {
-        root = p
-        p = Sys.app.lookup(p.parent)
-      }
-      if (root != null) {
-        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-          if (f.type.is(Folder.type) && f.name.equals("service")) {
-            for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-              if (n.type.is(FieldBusNet.type)) {
-                for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
-                  if (d.type.is(FieldBusDevice.type)) {
-                      for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
-                          if (s.type.is(FieldBusSchedule.type) && ((FieldBusSchedule)s).url.toStr().equals(scheduleStr)) {
-                              inFloatValue := ((FieldBusSchedule)s).presentValue
-                              outFloatValue := inFloatValue
-                              return
-                          }
-                      }
+        inFloatValue := 0.0f
+        outFloatValue := 0.0f
+      } else if (isSchedule) {
+        Str urlStr = url.toStr()
+        Str scheduleStr = ""
+        log.message("isSchedule::urlStr=$urlStr")
+    
+        int len = urlStr.length()
+        for (int i=0; i<len-9; i++) {
+            scheduleStr.set(i, urlStr.get(i+9))
+            scheduleStr.set(i+1, 0)
+        }
+    
+        // find bus and dev
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+          root = p
+          p = Sys.app.lookup(p.parent)
+        }
+        if (root != null) {
+          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if (f.type.is(Folder.type) && f.name.equals("service")) {
+              for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                if (n.type.is(FieldBusNet.type)) {
+                  for (Component d = Sys.app.lookup(n.children); d != null; d = Sys.app.lookup(d.nextSibling)) {
+                    if (d.type.is(FieldBusDevice.type)) {
+                        for (Component s = Sys.app.lookup(d.children); s != null; s = Sys.app.lookup(s.nextSibling)) {
+                            if (s.type.is(FieldBusSchedule.type) && ((FieldBusSchedule)s).url.toStr().equals(scheduleStr)) {
+                                inFloatValue := ((FieldBusSchedule)s).presentValue
+                                outFloatValue := inFloatValue
+                                return
+                            }
+                        }
+                    }
                   }
                 }
               }
             }
           }
         }
+        inFloatValue := 0.0f
+        outFloatValue := 0.0f
       }
-      inFloatValue := 0.0f
-      outFloatValue := 0.0f
+      else {
+         Str aliasStr = alias.toStr()
+         if(alias.toStr().equals(""))
+         {
+             log.message("2222222222 Variable::execute aliasStr='$aliasStr'")
+             return
+         }
+         if(referenceComponent == null)
+         {
+             syncValueByAlias()
+         }
+         else {
+              // log.message("333333333 Variable::execute name=$name and aliasStr=$aliasStr")
+              if (referenceComponent.type.is(BacnetNetVarIn.type) 
+                  && ((BacnetNetVarIn)referenceComponent).alias.toStr().equals(aliasStr))  {
+                  // log.message("BacnetNetVarIn.name=${referenceComponent.name}")
+                  inFloatValue := ((BacnetNetVarIn)referenceComponent).present_value
+                  outFloatValue := inFloatValue
+              }
+              else if (referenceComponent.type.is(BacnetNetVarOut.type) 
+                  && ((BacnetNetVarOut)referenceComponent).alias.toStr().equals(aliasStr))  {
+                  // log.message("BacnetNetVarOut.name=${referenceComponent.name}")
+                  ((BacnetNetVarOut)referenceComponent).present_value := inFloatValue
+              }
+              else if (referenceComponent.type.is(BacnetLocalVar.type) 
+                  && ((BacnetLocalVar)referenceComponent).alias.toStr().equals(aliasStr))  {
+                  // log.message("BacnetNetVarOut.name=${referenceComponent.name}")
+                  if(((BacnetLocalVar)referenceComponent).opmode == BacnetLocalVar.OPMODE_OUT)
+                  {
+                      ((BacnetLocalVar)referenceComponent).present_value := inFloatValue
+                  }
+                  else if(((BacnetLocalVar)referenceComponent).opmode == BacnetLocalVar.OPMODE_IN)
+                  {
+                      inFloatValue := ((BacnetLocalVar)referenceComponent).present_value
+                      outFloatValue := inFloatValue
+                  }
+              }
+              else if (referenceComponent.type.is(ModbusNetVarIn.type) 
+                  && ((ModbusNetVarIn)referenceComponent).alias.toStr().equals(aliasStr))  {
+                  // log.message("ModbusNetVarIn.name=${referenceComponent.name}")
+                  inFloatValue := ((ModbusNetVarIn)referenceComponent).out
+                  outFloatValue := inFloatValue
+              }
+              else if (referenceComponent.type.is(ModbusNetVarOut.type)
+                  && ((ModbusNetVarOut)referenceComponent).alias.toStr().equals(aliasStr))  {
+                  // log.message("ModbusNetVarOut.name=${referenceComponent.name}")
+                  ((ModbusNetVarOut)referenceComponent).in := inFloatValue
+              }
+              else {
+                  log.message("55555555 Variable::execute aliasStr=$name")
+              }
+              // Sys.sleep(1ms);
+              // log.message("4444444444 Variable::execute name=$name and aliasStr=$aliasStr")
+         }
+      }
     }
-    else {
-       Str aliasStr = alias.toStr()
-       if(alias.toStr().equals(""))
-       {
-           log.message("2222222222 Variable::execute aliasStr='$aliasStr'")
-           return
-       }
-       if(referenceComponent == null)
-       {
-           syncValueByAlias()
-       }
-       else {
-            // log.message("333333333 Variable::execute name=$name and aliasStr=$aliasStr")
-            if (referenceComponent.type.is(BacnetNetVarIn.type) 
-                && ((BacnetNetVarIn)referenceComponent).alias.toStr().equals(aliasStr))  {
-                // log.message("BacnetNetVarIn.name=${referenceComponent.name}")
-                inFloatValue := ((BacnetNetVarIn)referenceComponent).present_value
-                outFloatValue := inFloatValue
+    
+    private void syncValueByAlias()
+    {
+        bool bIsInInit = false
+        Str aliasStr = alias.toStr()
+        // log.message("111111111 Variable::syncValueByAlias name=$name and aliasStr=$aliasStr")
+        // find bus and dev
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+            root = p
+            // **  if(p.name.equals("play"))
+            // **  {
+            // **       ** log.message("Not deal play node and return with name=$name")
+            // **       return
+            // **  }
+            if (p.type.is(Folder.type) && p.name.equals("init")) {
+                bIsInInit = true
             }
-            else if (referenceComponent.type.is(BacnetNetVarOut.type) 
-                && ((BacnetNetVarOut)referenceComponent).alias.toStr().equals(aliasStr))  {
-                // log.message("BacnetNetVarOut.name=${referenceComponent.name}")
-                ((BacnetNetVarOut)referenceComponent).present_value := inFloatValue
-            }
-            else if (referenceComponent.type.is(BacnetLocalVar.type) 
-                && ((BacnetLocalVar)referenceComponent).alias.toStr().equals(aliasStr))  {
-                // log.message("BacnetNetVarOut.name=${referenceComponent.name}")
-                if(((BacnetLocalVar)referenceComponent).opmode == BacnetLocalVar.OPMODE_OUT)
-                {
-                    ((BacnetLocalVar)referenceComponent).present_value := inFloatValue
-                }
-                else if(((BacnetLocalVar)referenceComponent).opmode == BacnetLocalVar.OPMODE_IN)
-                {
-                    inFloatValue := ((BacnetLocalVar)referenceComponent).present_value
-                    outFloatValue := inFloatValue
-                }
-            }
-            else if (referenceComponent.type.is(ModbusNetVarIn.type) 
-                && ((ModbusNetVarIn)referenceComponent).alias.toStr().equals(aliasStr))  {
-                // log.message("ModbusNetVarIn.name=${referenceComponent.name}")
-                inFloatValue := ((ModbusNetVarIn)referenceComponent).out
-                outFloatValue := inFloatValue
-            }
-            else if (referenceComponent.type.is(ModbusNetVarOut.type)
-                && ((ModbusNetVarOut)referenceComponent).alias.toStr().equals(aliasStr))  {
-                // log.message("ModbusNetVarOut.name=${referenceComponent.name}")
-                ((ModbusNetVarOut)referenceComponent).in := inFloatValue
-            }
-            else {
-                log.message("55555555 Variable::execute aliasStr=$name")
-            }
-            // Sys.sleep(1ms);
-            // log.message("4444444444 Variable::execute name=$name and aliasStr=$aliasStr")
-       }
-    }
-  }
-
-  private void syncValueByAlias()
-  {
-      bool bIsInInit = false
-      Str aliasStr = alias.toStr()
-      // log.message("111111111 Variable::syncValueByAlias name=$name and aliasStr=$aliasStr")
-      // find bus and dev
-      Component p = Sys.app.lookup(this.parent)
-      Component root = null
-      while (p != null) {
-        root = p
-        // **  if(p.name.equals("play"))
-        // **  {
-        // **       ** log.message("Not deal play node and return with name=$name")
-        // **       return
-        // **  }
-        if (p.type.is(Folder.type) && p.name.equals("init")) {
-           bIsInInit = true
+            p = Sys.app.lookup(p.parent)
         }
-        p = Sys.app.lookup(p.parent)
-      }
-      if (root != null) {
-        // log.message("root:: aliasStr=$aliasStr")
-        ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr and inFloatValue=$inFloatValue")
-        for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-          // Sync from service to play
-          if (f.type.is(Folder.type) && f.name.equals("service")) {
-             for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-                if (n.type.is(FieldBusNet.type))  {
-                   for (Component r = Sys.app.lookup(n.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                      if (r.type.is(FieldBusDevice.type))  {
-                         for (Component q = Sys.app.lookup(r.children); q != null; q = Sys.app.lookup(q.nextSibling)) {
-                            // if (q.type.is(BacReadPropertyVar.type) 
-                            //    && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
-                            //    ** log.message("BacReadPropertyVar.name=${q.name}")
-                            //    inFloatValue := ((BacReadPropertyVar)q).present_value
-                            // }  else 
-                            if (q.type.is(BacnetNetVarIn.type) 
-                                && ((BacnetNetVarIn)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("BacnetNetVarIn.name=${q.name}")
-                                inFloatValue := ((BacnetNetVarIn)q).present_value;
-                                outFloatValue := inFloatValue;
-                                referenceComponent = q;
-                            }
-                            else if (q.type.is(BacnetNetVarOut.type) 
-                                && ((BacnetNetVarOut)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("BacnetNetVarOut.name=${q.name}");
-                                ((BacnetNetVarOut)q).present_value := inFloatValue;
-                                referenceComponent = q;
-                            }
-                            else if (q.type.is(BacnetLocalVar.type) 
-                                && ((BacnetLocalVar)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("BacnetLocalVar.name=${q.name}")
-                                if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_OUT)
-                                {
-                                    ((BacnetLocalVar)q).present_value := inFloatValue
+        if (root != null) {
+            // log.message("root:: aliasStr=$aliasStr")
+            ** log.message("222222222 Variable name=$name and aliasStr]=$aliasStr and inFloatValue=$inFloatValue")
+            for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+                // Sync from service to play
+                if (f.type.is(Folder.type) && f.name.equals("service")) {
+                    for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                        if (n.type.is(FieldBusNet.type))  {
+                            for (Component r = Sys.app.lookup(n.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                                if (r.type.is(FieldBusDevice.type))  {
+                                    for (Component q = Sys.app.lookup(r.children); q != null; q = Sys.app.lookup(q.nextSibling)) {
+                                        // if (q.type.is(BacReadPropertyVar.type) 
+                                        //    && ((BacReadPropertyVar)q).alias.toStr().equals(aliasStr))  {
+                                        //    ** log.message("BacReadPropertyVar.name=${q.name}")
+                                        //    inFloatValue := ((BacReadPropertyVar)q).present_value
+                                        // }  else 
+                                        if (q.type.is(BacnetNetVarIn.type) 
+                                            && ((BacnetNetVarIn)q).alias.toStr().equals(aliasStr))  {
+                                            ** log.message("BacnetNetVarIn.name=${q.name}")
+                                            inFloatValue := ((BacnetNetVarIn)q).present_value;
+                                            outFloatValue := inFloatValue;
+                                            referenceComponent = q;
+                                        }
+                                        else if (q.type.is(BacnetNetVarOut.type) 
+                                            && ((BacnetNetVarOut)q).alias.toStr().equals(aliasStr))  {
+                                            ** log.message("BacnetNetVarOut.name=${q.name}");
+                                            ((BacnetNetVarOut)q).present_value := inFloatValue;
+                                            referenceComponent = q;
+                                        }
+                                        else if (q.type.is(BacnetLocalVar.type) 
+                                            && ((BacnetLocalVar)q).alias.toStr().equals(aliasStr))  {
+                                            ** log.message("BacnetLocalVar.name=${q.name}")
+                                            if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_OUT)
+                                            {
+                                                ((BacnetLocalVar)q).present_value := inFloatValue
+                                            }
+                                            else if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_IN)
+                                            {
+                                                inFloatValue := ((BacnetLocalVar)q).present_value
+                                                outFloatValue := inFloatValue
+                                            }
+                                            referenceComponent = q;
+                                        }
+                                        else if (q.type.is(ModbusNetVarIn.type) 
+                                            && ((ModbusNetVarIn)q).alias.toStr().equals(aliasStr))  {
+                                            ** log.message("ModbusNetVarIn.name=${q.name}")
+                                            inFloatValue := ((ModbusNetVarIn)q).out;
+                                            outFloatValue := inFloatValue;
+                                            referenceComponent = q;
+                                        }
+                                        else if (q.type.is(ModbusNetVarOut.type)
+                                            && ((ModbusNetVarOut)q).alias.toStr().equals(aliasStr))  {
+                                            ** log.message("ModbusNetVarOut.name=${q.name}");
+                                            ((ModbusNetVarOut)q).in := inFloatValue;
+                                            referenceComponent = q;
+                                        }
+                                    }
                                 }
-                                else if(((BacnetLocalVar)q).opmode == BacnetLocalVar.OPMODE_IN)
-                                {
-                                    inFloatValue := ((BacnetLocalVar)q).present_value
-                                    outFloatValue := inFloatValue
-                                }
-                                referenceComponent = q;
                             }
-                            else if (q.type.is(ModbusNetVarIn.type) 
-                                && ((ModbusNetVarIn)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("ModbusNetVarIn.name=${q.name}")
-                                inFloatValue := ((ModbusNetVarIn)q).out;
-                                outFloatValue := inFloatValue;
-                                referenceComponent = q;
-                            }
-                            else if (q.type.is(ModbusNetVarOut.type)
-                                && ((ModbusNetVarOut)q).alias.toStr().equals(aliasStr))  {
-                                ** log.message("ModbusNetVarOut.name=${q.name}");
-                                ((ModbusNetVarOut)q).in := inFloatValue;
-                                referenceComponent = q;
-                            }
-                         }
-                      }
-                   }
+                        }
+                    }
                 }
-             }
-          }
-          // Sync from init to play
-          else if (f.type.is(Folder.type) && f.name.equals("play") && bIsInInit) {
-             ** log.message("44444 Variable name=$name and aliasStr]=$aliasStr and inFloatValue=$inFloatValue")
-             for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-                if (((Variable)n).alias.toStr().equals(alias.toStr()))  {
-                    ((Variable)n).inFloatValue := inFloatValue
+                // Sync from init to play
+                else if (f.type.is(Folder.type) && f.name.equals("play") && bIsInInit) {
+                    ** log.message("44444 Variable name=$name and aliasStr]=$aliasStr and inFloatValue=$inFloatValue")
+                    for (Component n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                        if (((Variable)n).alias.toStr().equals(alias.toStr()))  {
+                            ((Variable)n).inFloatValue := inFloatValue
+                        }
+                    }
                 }
-             }
-          }
+            }
         }
-      }
-      // log.message("FFFFFFFFFFFFFFF Variable::syncValueByAlias name=$name and aliasStr=$aliasStr")
-  }
-
-  private void checkURLforStatus()
-  {
-    Str urlStr = url.toStr()
-    Str statusStr = ".status"
-    if (urlStr.length() >= 7) {
-      if (statusStr.equalsRegion(urlStr, urlStr.length() - 7, urlStr.length())) {
-        isStatus = true
-      }
+        // log.message("FFFFFFFFFFFFFFF Variable::syncValueByAlias name=$name and aliasStr=$aliasStr")
     }
-  }
-
-  private void checkURLforSchedule()
-  {
-      Str urlStr = url.toStr()
-      if (urlStr.startsWith("schedule.")) {
-          isSchedule = true
-      }
-  }
-
-  // define Log log
-  bool isStatus = false
-  bool isSchedule = false
-  inline float[8] buffer
-  Component referenceComponent = null
+    
+    private void checkURLforStatus()
+    {
+        Str urlStr = url.toStr()
+        Str statusStr = ".status"
+        if (urlStr.length() >= 7) {
+            if (statusStr.equalsRegion(urlStr, urlStr.length() - 7, urlStr.length())) {
+                isStatus = true
+            }
+        }
+    }
+    
+    private void checkURLforSchedule()
+    {
+        Str urlStr = url.toStr()
+        if (urlStr.startsWith("schedule.")) {
+            isSchedule = true
+        }
+    }
+    
+    // define Log log
+    bool isStatus = false
+    bool isSchedule = false
+    inline float[8] buffer
+    Component referenceComponent = null
 }

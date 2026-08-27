@@ -4,58 +4,58 @@ class ModbusNetVarIn
 {
     @readonly
     property float out = 0.0f
-    
+
     @summary=true
     @config
     @asStr
     property Buf(64) alias = ""
-    
+
     @config
     property bool OutOfService = false
-    
+
     @config
     property float outofservice_value = 0.0f
-    
+
     override void changed(Slot slot)
     {
         ** log.message("ModbusNetVarIn::super.changed")
         super.changed(slot)
         // if (slot == ModbusNetVarIn.device_name ||
-        if (slot == ModbusNetVarIn.io_type || 
+        if (slot == ModbusNetVarIn.io_type ||
             slot == ModbusNetVarIn.Address) {
             log.message("ModbusNetVarIn::changed slot.name=$slot.name")
             update()
         }
     }
-    
+
     void getParentBus()
     {
         if(device != null)
         {
             if(Sys.app.lookup(device.parent) != null)
             {
-                log.message("ModbusNetVarIn:: get device.parent as Bus") 
+                log.message("ModbusNetVarIn:: get device.parent as Bus")
                 Component objBus = Sys.app.lookup(device.parent)
                 if(objBus.type.is(FieldBusNet.type)) {
-                    log.message("ModbusNetVarIn:: set device.parent as Bus") 
+                    log.message("ModbusNetVarIn:: set device.parent as Bus")
                     bus = (FieldBusNet)objBus
                     update()
                 }
             }
         }
     }
-    
+
     virtual override void execute()
     {
         if (bus == null) {
             log.message("ModbusNetVarIn:: bus == null and status=$status")  // status=4 -> STATUSNODEV
             getParentBus()
-            return 
+            return
         }
         if (device == null) {
             log.message("ModbusNetVarIn:: device == null and status=$status")  // status=4 -> STATUSNODEV
             getParentDevice()
-            return 
+            return
         }
         if (bus != null) {
             ** log.message("11111 bus.busId=$busId ")
@@ -148,7 +148,7 @@ class ModbusNetVarIn
                     }
                     // log.message("88888 ModbusNetVarIn::regId=$regId typeId=$typeId")
                 }
-                else 
+                else
                 {
                     log.message("99999 ModbusNetVarIn::regId=$regId typeId=$typeId")
                     out := 0.0f
@@ -157,7 +157,7 @@ class ModbusNetVarIn
             }
         }
     }
-    
+
     private inline float[1] buf
     // Send interval counter
     long sendInterval = (long)0

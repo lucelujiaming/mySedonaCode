@@ -4,20 +4,20 @@ class ModbusNetVarOut
 {
     @readonly
     property float out = 0.0f
-    
+
     property float in = 0.0f
-    
+
     @summary=true
     @config
     @asStr
     property Buf(64) alias = ""
-    
+
     @config
     property bool OutOfService = false
-    
+
     @config
     property float outofservice_value = 0.0f
-    
+
     override void changed(Slot slot)
     {
         int iRet = -1
@@ -59,7 +59,7 @@ class ModbusNetVarOut
                     }
                 }
             }
-        } 
+        }
         // if (slot == ModbusNetVarOut.device_name ||
         if (slot == ModbusNetVarOut.io_type ||
             slot == ModbusNetVarOut.Address) {
@@ -72,10 +72,10 @@ class ModbusNetVarOut
     {
         int iRet = -1
         if (bus == null) {
-            return 
+            return
         }
         if (device == null) {
-            return 
+            return
         }
         ** log.message("11111 name=$name")
         if (bus != null) {
@@ -118,7 +118,7 @@ class ModbusNetVarOut
                                 log.message("55555 REM_RTU ModbusNetVarIn::regId=$regId typeId=$typeId")
                                 out := 0.0f
                                 status := STATUSOFFLINE
-                            } 
+                            }
                         }
                         else if (bus.sub_fieldbusnet_type_id == FieldBusNet.SUB_FIELDBUSNET_TYPE_MODBUS_TCP) {
                               ** log.message("4343434 ModbusNetVarOut REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
@@ -131,7 +131,7 @@ class ModbusNetVarOut
                                 log.message("55555 ModbusNetVarOut REM_TCP ModbusNetVarIn::regId=$regId typeId=$typeId")
                                 out := 0.0f
                                 status := STATUSOFFLINE
-                            } 
+                            }
                         }
                     }
                     // else if (device.type.is(ModbusRTULocDev.type))
@@ -164,7 +164,7 @@ class ModbusNetVarOut
                         }
                     }
                 }
-                else 
+                else
                 {
                     log.message("666666 ModbusNetVarOut::regId=$regId typeId=$typeId")
                     out := 0.0f
@@ -221,7 +221,7 @@ class ModbusNetVarOut
         }
         return false
     }
-    
+
     private inline float[1] buf
     private bool needUpdate = true
     // Send interval counter

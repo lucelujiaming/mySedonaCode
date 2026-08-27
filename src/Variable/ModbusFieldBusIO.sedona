@@ -1,346 +1,347 @@
 abstract class ModbusFieldBusIO
   extends Component
 {
-  ////////////////////////////////////////////////////////////////
-  // Constants
-  ////////////////////////////////////////////////////////////////
-  define Str STATUSRANGE = "OK, OffLine, Ready, NoNet, NoDev, AddrErr, UrlErr, END"
-  define int STATUSOK = 0
-  define int STATUSOFFLINE = 1
-  define int STATUSREADY = 2
-  define int STATUSNONET = 3
-  define int STATUSNODEV = 4
-  define int STATUSEADDR = 5 // set by net
-  define int STATUSEURL = 6
-  define int STATUSEND = 7
-
+    ////////////////////////////////////////////////////////////////
+    // Constants
+    ////////////////////////////////////////////////////////////////
+    define Str STATUSRANGE = "OK, OffLine, Ready, NoNet, NoDev, AddrErr, UrlErr, END"
+    define int STATUSOK = 0
+    define int STATUSOFFLINE = 1
+    define int STATUSREADY = 2
+    define int STATUSNONET = 3
+    define int STATUSNODEV = 4
+    define int STATUSEADDR = 5 // set by net
+    define int STATUSEURL = 6
+    define int STATUSEND = 7
   
-  // define Str IO_TYPE_RANGE = "AnalogInput, AnalogOutput, AnalogValue, BinaryIInput, BinaryIOutput, BinaryIValue, Int, Word, DInt, DWord, Real, END"
-  define Str IO_TYPE_RANGE = "Int, UInt, DInt, DUInt, Real, END"
-  // define int IO_TYPE_AI     = 0
-  // define int IO_TYPE_AO     = 1
-  // define int IO_TYPE_AV     = 2
-  // define int IO_TYPE_BI     = 3
-  // define int IO_TYPE_BO     = 4
-  // define int IO_TYPE_BV     = 5
-  // define int IO_TYPE_INT    = 6
-  // define int IO_TYPE_WORD   = 7
-  // define int IO_TYPE_DINT   = 8
-  // define int IO_TYPE_DWORD  = 9
-  // define int IO_TYPE_REAL   = 10
-  // define int IO_TYPE_END    = 11
-  define int IO_TYPE_INT    = 0
-  define int IO_TYPE_WORD   = 1
-  define int IO_TYPE_DINT   = 2
-  define int IO_TYPE_DWORD  = 3
-  define int IO_TYPE_REAL   = 4
-  define int IO_TYPE_END    = 5
-
-  ////////////////////////////////////////////////////////////////
-  // Properties
-  ////////////////////////////////////////////////////////////////
-  @summary=false
-  @readonly
-  @range = STATUSRANGE
-  @fieldWidth = 20
-  property int status = STATUSNODEV
-
-  // @asStr
-  // @config
-  // property Buf(64) device_name = ""
-
-  @range = IO_TYPE_RANGE
-  @fieldWidth = 20
-  @config
-  property int io_type = IO_TYPE_INT
+    
+    // define Str IO_TYPE_RANGE = "AnalogInput, AnalogOutput, AnalogValue, BinaryIInput, BinaryIOutput, BinaryIValue, Int, Word, DInt, DWord, Real, END"
+    define Str IO_TYPE_RANGE = "Int, UInt, DInt, DUInt, Real, END"
+    // define int IO_TYPE_AI     = 0
+    // define int IO_TYPE_AO     = 1
+    // define int IO_TYPE_AV     = 2
+    // define int IO_TYPE_BI     = 3
+    // define int IO_TYPE_BO     = 4
+    // define int IO_TYPE_BV     = 5
+    // define int IO_TYPE_INT    = 6
+    // define int IO_TYPE_WORD   = 7
+    // define int IO_TYPE_DINT   = 8
+    // define int IO_TYPE_DWORD  = 9
+    // define int IO_TYPE_REAL   = 10
+    // define int IO_TYPE_END    = 11
+    define int IO_TYPE_INT    = 0
+    define int IO_TYPE_WORD   = 1
+    define int IO_TYPE_DINT   = 2
+    define int IO_TYPE_DWORD  = 3
+    define int IO_TYPE_REAL   = 4
+    define int IO_TYPE_END    = 5
   
-  @asStr
-  @config
-  property Buf(64) Address = "" 
+    ////////////////////////////////////////////////////////////////
+    // Properties
+    ////////////////////////////////////////////////////////////////
+    @summary=false
+    @readonly
+    @range = STATUSRANGE
+    @fieldWidth = 20
+    property int status = STATUSNODEV
   
-  override void loaded()
-  {
-    update()
-  }
-  override void stop()
-  {
-    if (bus != null) {
-      bus.notifyFlush()
-    }
-    log.message("ModbusFieldBusIO stop")
-    clearVariablesLinkToMe();
-  }
-
-  ////////////////////////////////////////////////////////////////
-  // App support
-  ////////////////////////////////////////////////////////////////
+    // @asStr
+    // @config
+    // property Buf(64) device_name = ""
   
-  void getParentDevice()
-  {
-    if(Sys.app.lookup(this.parent) != null)
+    @range = IO_TYPE_RANGE
+    @fieldWidth = 20
+    @config
+    property int io_type = IO_TYPE_INT
+    
+    @asStr
+    @config
+    property Buf(64) Address = "" 
+    
+    override void loaded()
     {
-        log.message("ModbusFieldBusIO:: get this.parent as Device") 
-        Component objDevice = Sys.app.lookup(this.parent)
-        if(objDevice.type.is(FieldBusDevice.type)) {
-            log.message("ModbusFieldBusIO:: set this.parent as Device") 
-            device = (FieldBusDevice)objDevice
+        update()
+    }
+    override void stop()
+    {
+        if (bus != null) {
+          bus.notifyFlush()
+        }
+        log.message("ModbusFieldBusIO stop")
+        clearVariablesLinkToMe();
+    }
+  
+    ////////////////////////////////////////////////////////////////
+    // App support
+    ////////////////////////////////////////////////////////////////
+    
+    void getParentDevice()
+    {
+        if(Sys.app.lookup(this.parent) != null)
+        {
+            log.message("ModbusFieldBusIO:: get this.parent as Device") 
+            Component objDevice = Sys.app.lookup(this.parent)
+            if(objDevice.type.is(FieldBusDevice.type)) {
+                log.message("ModbusFieldBusIO:: set this.parent as Device") 
+                device = (FieldBusDevice)objDevice
+            }
         }
     }
-  }
-  
-  void update()
-  {
-    if (bus != null) {
-      log.message("111111 bus.notifyFlush()")
-      bus.notifyFlush()
-    }
     
-    if (device == null) {
-        getParentDevice()
-	    if (device == null) {
-	        getParentDevice()
-	        log.message("ModbusFieldBusIO::getParentDevice == null and status=$status")  // status=4 -> STATUSNODEV
-	        return 
-	    }
-    }
-    status := STATUSNODEV
-    bus = null
-    cache = 0
-    busId = 0
-    devStr.set(0, 0)
-    regId = 0
-    typeId = 0
-    dataLen = 0
-    
-    // int aLen = device_name.bytesLen
-    int aLen = device.deviceName.bytesLen
-    
-    bool isModBus = false
-
-    switch(io_type)
+    void update()
     {
-    // case IO_TYPE_AI:
-    //   typeId = 0
-    //   dataLen = 1
-    //   break
-    // case IO_TYPE_AO:
-    //   typeId = 1
-    //   dataLen = 1
-    //   break
-    // case IO_TYPE_AV:
-    //   typeId = 2
-    //   dataLen = 1
-    //   break
-    // case IO_TYPE_BI:
-    //   typeId = 3
-    //   dataLen = 1
-    //   break
-    // case IO_TYPE_BO:
-    //   typeId = 4
-    //   dataLen = 1
-    //   break
-    // case IO_TYPE_BV:
-    //   typeId = 5
-    //   dataLen = 1
-    //   break
-    case IO_TYPE_INT:
-      typeId = 1
-      dataLen = 1
-      isModBus = true
-      break
-    case IO_TYPE_WORD:
-      typeId = 2
-      dataLen = 1
-      isModBus = true
-      break
-    case IO_TYPE_DINT:
-      typeId = 3
-      dataLen = 2
-      isModBus = true
-      break
-    case IO_TYPE_DWORD:
-      typeId = 4
-      dataLen = 2
-      isModBus = true
-      break
-    case IO_TYPE_REAL:
-      typeId = 5
-      dataLen = 2
-      isModBus = true
-      break
-    default:
-    ** use IO_TYPE_AI as default
-      typeId = 0
-      dataLen = 1
-      break
-    }
-    log.message("222222 aLen=$aLen ")
-    if (aLen > 0 && Address.bytesLen > 0) {
-        int tmpInt = Address.toStr().parseInt()
-        if (tmpInt != -1) {
-          if (isModBus) {
-            if ((tmpInt == 0) ||
-                (tmpInt == 10000) ||
-                (20000 <= tmpInt && tmpInt <= 30000) ||
-                (tmpInt == 40000) ||
-                (50000 <= tmpInt) ||
-                (tmpInt < 20000 && dataLen != 1))
-            {
-              busId = 0
-              typeId = 0
-              dataLen = 0
-              status := STATUSEURL
-              return
-            }
-          }
-          log.message("33333 aLen=$aLen and device.deviceName=${device.deviceName.toStr()}")
-          // find device and bus id.
-          // FieldBusNet tmpBus = lookupNetByDeviceName(device_name.toStr())
-          FieldBusNet tmpBus = lookupNetByDeviceName(device.deviceName.toStr())
-          if (tmpBus != null) {
-            log.message("444444 aLen=$aLen ")
-            busId = tmpBus.busId
-            // trigger notify flush.
-            if (busId != 0) {
-              log.message("55555 aLen=$aLen ")
-              bus = lookupNetById(busId)
-              if (bus != null) {
-                bus.notifyFlush()
-              }
+        if (bus != null) {
+            log.message("111111 bus.notifyFlush()")
+            bus.notifyFlush()
+        }
+        
+        if (device == null) {
+            getParentDevice()
+  	        if (device == null) {
+  	            getParentDevice()
+  	            log.message("ModbusFieldBusIO::getParentDevice == null and status=$status")  // status=4 -> STATUSNODEV
+  	            return 
+  	        }
+        }
+        status := STATUSNODEV
+        bus = null
+        cache = 0
+        busId = 0
+        devStr.set(0, 0)
+        regId = 0
+        typeId = 0
+        dataLen = 0
+        
+        // int aLen = device_name.bytesLen
+        int aLen = device.deviceName.bytesLen
+        
+        bool isModBus = false
+        
+        switch(io_type)
+        {
+        // case IO_TYPE_AI:
+        //   typeId = 0
+        //   dataLen = 1
+        //   break
+        // case IO_TYPE_AO:
+        //   typeId = 1
+        //   dataLen = 1
+        //   break
+        // case IO_TYPE_AV:
+        //   typeId = 2
+        //   dataLen = 1
+        //   break
+        // case IO_TYPE_BI:
+        //   typeId = 3
+        //   dataLen = 1
+        //   break
+        // case IO_TYPE_BO:
+        //   typeId = 4
+        //   dataLen = 1
+        //   break
+        // case IO_TYPE_BV:
+        //   typeId = 5
+        //   dataLen = 1
+        //   break
+        case IO_TYPE_INT:
+          typeId = 1
+          dataLen = 1
+          isModBus = true
+          break
+        case IO_TYPE_WORD:
+          typeId = 2
+          dataLen = 1
+          isModBus = true
+          break
+        case IO_TYPE_DINT:
+          typeId = 3
+          dataLen = 2
+          isModBus = true
+          break
+        case IO_TYPE_DWORD:
+          typeId = 4
+          dataLen = 2
+          isModBus = true
+          break
+        case IO_TYPE_REAL:
+          typeId = 5
+          dataLen = 2
+          isModBus = true
+          break
+        default:
+        ** use IO_TYPE_AI as default
+          typeId = 0
+          dataLen = 1
+          break
+        }
+        log.message("222222 aLen=$aLen ")
+        if (aLen > 0 && Address.bytesLen > 0) {
+            int tmpInt = Address.toStr().parseInt()
+            if (tmpInt != -1) {
+                if (isModBus) {
+                    if ((tmpInt == 0) ||
+                        (tmpInt == 10000) ||
+                        (20000 <= tmpInt && tmpInt <= 30000) ||
+                        (tmpInt == 40000) ||
+                        (50000 <= tmpInt) ||
+                        (tmpInt < 20000 && dataLen != 1))
+                    {
+                        busId = 0
+                        typeId = 0
+                        dataLen = 0
+                        status := STATUSEURL
+                        return
+                  }
+                }
+                log.message("33333 aLen=$aLen and device.deviceName=${device.deviceName.toStr()}")
+                // find device and bus id.
+                // FieldBusNet tmpBus = lookupNetByDeviceName(device_name.toStr())
+                FieldBusNet tmpBus = lookupNetByDeviceName(device.deviceName.toStr())
+                if (tmpBus != null) {
+                    log.message("444444 aLen=$aLen ")
+                    busId = tmpBus.busId
+                    // trigger notify flush.
+                    if (busId != 0) {
+                        log.message("55555 aLen=$aLen ")
+                        bus = lookupNetById(busId)
+                        if (bus != null) {
+                          bus.notifyFlush()
+                        }
+                    } else {
+                         tmpBus.notifyFlush()
+                    }
+                    // devStr.copyFromStr(device_name.toStr(), 64)
+                    devStr.copyFromStr(device.deviceName.toStr(), 64)
+                    devStr.set(aLen, 0)
+                    regId = tmpInt
+                }
             } else {
-              tmpBus.notifyFlush()
+                log.message("10101010 aLen=$aLen ")
+                status := STATUSEURL
             }
-            // devStr.copyFromStr(device_name.toStr(), 64)
-            devStr.copyFromStr(device.deviceName.toStr(), 64)
-            devStr.set(aLen, 0)
-            regId = tmpInt
-          }
         } else {
-          log.message("10101010 aLen=$aLen ")
-          status := STATUSEURL
+            log.message("123123123 aLen=$aLen ")
+            status := STATUSEURL
         }
-    } else {
-        log.message("123123123 aLen=$aLen ")
-        status := STATUSEURL
+        if(bus != null)
+        {
+            log.message("987654321 dataLen=$dataLen ")
+        } else {
+            log.message("123456789 dataLen=$dataLen ") 
+        }
     }
-    if(bus != null)
+    private FieldBusNet lookupNetById(int id)
     {
-       log.message("987654321 dataLen=$dataLen ")
-    } else {
-       log.message("123456789 dataLen=$dataLen ") 
-    }
-  }
-  private FieldBusNet lookupNetById(int id)
-  {
-    Component root
-    Component f
-    Component n
-    Component p = this
-
-    while (Sys.app.lookup(p.parent) != null) {
-      p = Sys.app.lookup(p.parent)
-    }
-
-    root = p
-    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-      if (f.type.is(Folder.type) && f.name.equals("service")) {
-        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-          if (n.type.is(FieldBusNet.type) && ((FieldBusNet)n).busId == id) {
-             log.message("Found FieldBusNet in the lookupNetById")
-             return (FieldBusNet)n
-          }
-        }
-      }
-    }
-
-    return null
-  }
-
-  private void clearVariablesLinkToMe()
-  {
-      // Get Alias
-      Str aliasStr;
-      if(this.type.is(ModbusNetVarIn.type))
-      {
-         aliasStr = ((ModbusNetVarIn)this).alias.toStr()
-      }
-      else if(this.type.is(ModbusNetVarOut.type))
-      {
-         aliasStr = ((ModbusNetVarOut)this).alias.toStr()
-      }
-      else 
-      {
-         log.message("clearVariablesLinkToMe error type");
-         return;
-      }
-      // find bus and dev
-      Component p = Sys.app.lookup(this.parent)
-      Component root = null
-      while (p != null) {
-          root = p
+      Component root
+      Component f
+      Component n
+      Component p = this
+  
+      while (Sys.app.lookup(p.parent) != null) {
           p = Sys.app.lookup(p.parent)
       }
-      log.message("clearVariablesLinkToMe clear $aliasStr");
-      if (root != null) {
-          for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-            if (f.type.is(Folder.type) && !f.name.equals("service")) {
-              for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
-                ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
-                if (r.type.is(Variable.type) && ((Variable)r).alias.toStr().equals(aliasStr)) {
-                  log.message("clearVariablesLinkToMe clear ${((Variable)r).name} with ${((Variable)r).alias.toStr()}");
-                  ((Variable)r).referenceComponent = null
-                }
-              }
-            }
-          }
-      }
-  }
   
-  private FieldBusNet lookupNetByDeviceName(Str devName)
-  {
-    Component root
-    Component f
-    Component n
-    Component p = this
-
-    while (Sys.app.lookup(p.parent) != null) {
-      p = Sys.app.lookup(p.parent)
-    }
-
-    root = p
-    for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
-      if (f.type.is(Folder.type) && f.name.equals("service")) {
-        for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
-          if (n.type.is(FieldBusNet.type)) {
-            for (p = Sys.app.lookup(n.children); p != null; p = Sys.app.lookup(p.nextSibling)) {
-              if (p.type.is(FieldBusDevice.type) && devName.equals(((FieldBusDevice)p).deviceName.toStr())) {
-                  log.message("Found FieldBusNet in the lookupNetByDeviceName")
-                  return (FieldBusNet)n
-              }
+      root = p
+      for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+        if (f.type.is(Folder.type) && f.name.equals("service")) {
+            for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                if (n.type.is(FieldBusNet.type) && ((FieldBusNet)n).busId == id) {
+                   log.message("Found FieldBusNet in the lookupNetById")
+                   return (FieldBusNet)n
+                }
             }
-          }
         }
       }
+  
+      return null
     }
+  
+    private void clearVariablesLinkToMe()
+    {
+        // Get Alias
+        Str aliasStr;
+        if(this.type.is(ModbusNetVarIn.type))
+        {
+           aliasStr = ((ModbusNetVarIn)this).alias.toStr()
+        }
+        else if(this.type.is(ModbusNetVarOut.type))
+        {
+           aliasStr = ((ModbusNetVarOut)this).alias.toStr()
+        }
+        else 
+        {
+           log.message("clearVariablesLinkToMe error type");
+           return;
+        }
+        // find bus and dev
+        Component p = Sys.app.lookup(this.parent)
+        Component root = null
+        while (p != null) {
+            root = p
+            p = Sys.app.lookup(p.parent)
+        }
+        log.message("clearVariablesLinkToMe clear $aliasStr");
+        if (root != null) {
+            for (Component f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+                if (f.type.is(Folder.type) && !f.name.equals("service")) {
+                    for (Component r = Sys.app.lookup(f.children); r != null; r = Sys.app.lookup(r.nextSibling)) {
+                        ** log.message("666 Variable r.url=${((Variable)r).url.toStr()}")
+                        if (r.type.is(Variable.type) && ((Variable)r).alias.toStr().equals(aliasStr)) {
+                            log.message("clearVariablesLinkToMe clear ${((Variable)r).name} with ${((Variable)r).alias.toStr()}");
+                            ((Variable)r).referenceComponent = null
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private FieldBusNet lookupNetByDeviceName(Str devName)
+    {
+        Component root
+        Component f
+        Component n
+        Component p = this
+        
+        while (Sys.app.lookup(p.parent) != null) {
+            p = Sys.app.lookup(p.parent)
+        }
+        
+        root = p
+        for (f = Sys.app.lookup(root.children); f != null; f = Sys.app.lookup(f.nextSibling)) {
+            if (f.type.is(Folder.type) && f.name.equals("service")) {
+                for (n = Sys.app.lookup(f.children); n != null; n = Sys.app.lookup(n.nextSibling)) {
+                    if (n.type.is(FieldBusNet.type)) {
+                        for (p = Sys.app.lookup(n.children); p != null; p = Sys.app.lookup(p.nextSibling)) {
+                            if (p.type.is(FieldBusDevice.type) && devName.equals(((FieldBusDevice)p).deviceName.toStr())) {
+                                log.message("Found FieldBusNet in the lookupNetByDeviceName")
+                                return (FieldBusNet)n
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return null
+    }
+  
+    // define Log log
+    ////////////////////////////////////////////////////////////////
+    // Fields
+    ////////////////////////////////////////////////////////////////
+    FieldBusNet bus = null
+    FieldBusDevice device = null
+    int cache = 0
 
-    return null
-  }
+    int busId = 0
+    inline Str(64) devStr
+    int regId = 0
+    int typeId = 0
+    int dataLen = 0
 
-  // define Log log
-  ////////////////////////////////////////////////////////////////
-  // Fields
-  ////////////////////////////////////////////////////////////////
-  FieldBusNet bus = null
-  FieldBusDevice device = null
-  int cache = 0
-
-  int busId = 0
-  inline Str(64) devStr
-  int regId = 0
-  int typeId = 0
-  int dataLen = 0
-
-  // This property can not work because several variables can 
-  // have same alias and link to one BacNetFieldBusIO
-  // Component referenceComponent = null
+    // This property can not work because several variables can
+    // have same alias and link to one BacNetFieldBusIO
+    // Component referenceComponent = null
 }
+  

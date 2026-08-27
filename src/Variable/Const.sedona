@@ -2,12 +2,12 @@
 class Const
   extends Component
 {
-  @readonly property float out
+    @readonly property float out
 
-  @config property float value = 0.0
+    @config property float value = 0.0
 
-  virtual override void execute()
-  {
-    out := value
-  }
+    virtual override void execute()
+    {
+        out := value
+    }
 }

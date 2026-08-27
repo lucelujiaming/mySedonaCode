@@ -1,157 +1,156 @@
 class AnalogOutput
   extends Component
 {
-  ////////////////////////////////////////////////////////////////
-  // Constants
-  ////////////////////////////////////////////////////////////////
-  define Str STATUSRANGE = "OK, ChanError, OutOfRange, END"
-  define int STATUSOK = 0
-  define int STATUSCHANERROR  = 1
-  define int STATUSOUTOFRANGE = 2
-  define int STATUSEND = 3
+    ////////////////////////////////////////////////////////////////
+    // Constants
+    ////////////////////////////////////////////////////////////////
+    define Str STATUSRANGE = "OK, ChanError, OutOfRange, END"
+    define int STATUSOK = 0
+    define int STATUSCHANERROR  = 1
+    define int STATUSOUTOFRANGE = 2
+    define int STATUSEND = 3
 
-  define Str CHANNEL_MODE_RANGE = "Voltage, Current, END"
-  define int CHANNEL_MODE_VOLTAGE  = 0
-  define int CHANNEL_MODE_CURRENT  = 1
-  define int CHANNEL_MODE_END = 2
-  
-  define Str CHANNEL_RANGE = "A, B, C, D, END"
-  define int CHANNEL_A_BAND   = 0
-  define int CHANNEL_B_BAND   = 1
-  define int CHANNEL_C_BAND   = 2
-  define int CHANNEL_D_BAND   = 3
-  define int CHANNEL_END      = 4
-  
-  
+    define Str CHANNEL_MODE_RANGE = "Voltage, Current, END"
+    define int CHANNEL_MODE_VOLTAGE  = 0
+    define int CHANNEL_MODE_CURRENT  = 1
+    define int CHANNEL_MODE_END = 2
 
-  ////////////////////////////////////////////////////////////////
-  // Properties
-  ////////////////////////////////////////////////////////////////
-  @readonly
-  @range = STATUSRANGE
-  @fieldWidth = 20
-  property int status = STATUSOK
-  
-  @config
-  @range = CHANNEL_MODE_RANGE
-  @fieldWidth = 20
-  property int channel_mode  = CHANNEL_MODE_VOLTAGE
-  
-  @config
-  @range = CHANNEL_RANGE
-  @fieldWidth = 20
-  property int channel  = CHANNEL_A_BAND
+    define Str CHANNEL_RANGE = "A, B, C, D, END"
+    define int CHANNEL_A_BAND   = 0
+    define int CHANNEL_B_BAND   = 1
+    define int CHANNEL_C_BAND   = 2
+    define int CHANNEL_D_BAND   = 3
+    define int CHANNEL_END      = 4
 
-  // @readonly
-  property float present_value = 0.0f
-  
-  @summary=true
-  @config
-  @asStr
-  property Buf(64) alias = ""
-  
-  override void execute()
-  {
-     if((lastInValue != present_value) || (lastChannel != channel) || (lastChannelMode != channel_mode)) {
-        status := STATUSOK
-        
-        if(channel_mode == CHANNEL_MODE_VOLTAGE)
-        {
-            if(present_value > 7.76)
+
+
+    ////////////////////////////////////////////////////////////////
+    // Properties
+    ////////////////////////////////////////////////////////////////
+    @readonly
+    @range = STATUSRANGE
+    @fieldWidth = 20
+    property int status = STATUSOK
+
+    @config
+    @range = CHANNEL_MODE_RANGE
+    @fieldWidth = 20
+    property int channel_mode  = CHANNEL_MODE_VOLTAGE
+
+    @config
+    @range = CHANNEL_RANGE
+    @fieldWidth = 20
+    property int channel  = CHANNEL_A_BAND
+
+    // @readonly
+    property float present_value = 0.0f
+
+    @summary=true
+    @config
+    @asStr
+    property Buf(64) alias = ""
+
+    override void execute()
+    {
+        if((lastInValue != present_value) || (lastChannel != channel) || (lastChannelMode != channel_mode)) {
+            status := STATUSOK
+            if(channel_mode == CHANNEL_MODE_VOLTAGE)
             {
-                log.message("present_value is $present_value which is largger than 2.5V * 3.104 = 7.76.") 
-    	        status := STATUSOUTOFRANGE
+                if(present_value > 7.76)
+                {
+                    log.message("present_value is $present_value which is largger than 2.5V * 3.104 = 7.76.")
+      	          status := STATUSOUTOFRANGE
+                    return;
+                }
+                // Vin
+                fWritePercentValue = (present_value/ANALOG_IO_REF_VOLTAGE)
+                // Vout = (1+Rfb/R-in)*Vin=Vin * (1+10/(499/104.99))=Vin * 3.104
+                fWritePercentValue = (fWritePercentValue/3.104)
+                log.message("CHANNEL_MODE_VOLTAGE fWritePercentValue is $fWritePercentValue .")
+
+                if(channel == CHANNEL_A_BAND)
+                {
+                    WriteChannel(0x08, fWritePercentValue)
+                }
+                else if(channel == CHANNEL_B_BAND)
+                {
+                    WriteChannel(0x0A, fWritePercentValue)
+                }
+                else if(channel == CHANNEL_C_BAND)
+                {
+                    WriteChannel(0x0C, fWritePercentValue)
+                }
+                else if(channel == CHANNEL_D_BAND)
+                {
+                    WriteChannel(0x0E, fWritePercentValue)
+                }
+                else
+                {
+                    log.message("channel is $channel which is wrong.")
+      	            status := STATUSCHANERROR
+                    return;
+                }
+            }
+            else if(channel_mode == CHANNEL_MODE_CURRENT)
+            {
+                if(present_value > 15.52)
+                {
+                    log.message("present_value is $present_value which is largger than 7.76 / 500 * 2 = 15.52.")
+      	            status := STATUSOUTOFRANGE
+                    return;
+                }
+                fWritePercentValue = (present_value/ANALOG_IO_REF_VOLTAGE)
+                // Vout = (1+Rfb/R-in)*Vin=Vin * (1+10/(499/104.99))=Vin * 3.104
+                fWritePercentValue = (fWritePercentValue/3.104)
+                fWritePercentValue = (fWritePercentValue/2.0)
+                log.message("CHANNEL_MODE_CURRENT fWritePercentValue is $fWritePercentValue .")
+
+                if(channel == CHANNEL_A_BAND)
+                {
+                    WriteChannel(0x18, fWritePercentValue)
+                }
+                else if(channel == CHANNEL_B_BAND)
+                {
+                    WriteChannel(0x1A, fWritePercentValue)
+                }
+                else if(channel == CHANNEL_C_BAND)
+                {
+                    WriteChannel(0x1C, fWritePercentValue)
+                }
+                else if(channel == CHANNEL_D_BAND)
+                {
+                    WriteChannel(0x1E, fWritePercentValue)
+                }
+                else
+                {
+                    log.message("channel is $channel which is wrong.")
+      	            status := STATUSCHANERROR
+                    return;
+                }
+            }
+            else
+            {
+                log.message("channel_mode is $channel_mode which is wrong.")
+	            status := STATUSCHANERROR
                 return;
             }
-            // Vin
-            fWritePercentValue = (present_value/ANALOG_IO_REF_VOLTAGE)
-            // Vout = (1+Rfb/R-in)*Vin=Vin * (1+10/(499/104.99))=Vin * 3.104
-            fWritePercentValue = (fWritePercentValue/3.104)
-            log.message("CHANNEL_MODE_VOLTAGE fWritePercentValue is $fWritePercentValue .")
-            
-            if(channel == CHANNEL_A_BAND)
-            {
-                WriteChannel(0x08, fWritePercentValue)
-            }
-            else if(channel == CHANNEL_B_BAND)
-            {
-                WriteChannel(0x0A, fWritePercentValue)
-            }
-            else if(channel == CHANNEL_C_BAND)
-            {
-                WriteChannel(0x0C, fWritePercentValue)
-            }
-            else if(channel == CHANNEL_D_BAND)
-            {
-                WriteChannel(0x0E, fWritePercentValue)
-            }
-            else 
-            {
-                log.message("channel is $channel which is wrong.") 
-    	        status := STATUSCHANERROR
-                return;
-            }
+            lastInValue     = present_value
+            lastChannel     = channel
+            lastChannelMode = channel_mode
         }
-        else if(channel_mode == CHANNEL_MODE_CURRENT)
-        {
-            if(present_value > 15.52)
-            {
-                log.message("present_value is $present_value which is largger than 7.76 / 500 * 2 = 15.52.") 
-    	        status := STATUSOUTOFRANGE
-                return;
-            }
-            fWritePercentValue = (present_value/ANALOG_IO_REF_VOLTAGE)
-            // Vout = (1+Rfb/R-in)*Vin=Vin * (1+10/(499/104.99))=Vin * 3.104
-            fWritePercentValue = (fWritePercentValue/3.104)
-            fWritePercentValue = (fWritePercentValue/2.0)
-            log.message("CHANNEL_MODE_CURRENT fWritePercentValue is $fWritePercentValue .")
-            
-            if(channel == CHANNEL_A_BAND)
-            {
-                WriteChannel(0x18, fWritePercentValue)
-            }
-            else if(channel == CHANNEL_B_BAND)
-            {
-                WriteChannel(0x1A, fWritePercentValue)
-            }
-            else if(channel == CHANNEL_C_BAND)
-            {
-                WriteChannel(0x1C, fWritePercentValue)
-            }
-            else if(channel == CHANNEL_D_BAND)
-            {
-                WriteChannel(0x1E, fWritePercentValue)
-            }
-            else 
-            {
-                log.message("channel is $channel which is wrong.") 
-    	        status := STATUSCHANERROR
-                return;
-            }
-        }
-        else 
-        {
-            log.message("channel_mode is $channel_mode which is wrong.") 
-	        status := STATUSCHANERROR
-            return;
-        }
-        lastInValue     = present_value
-        lastChannel     = channel
-        lastChannelMode = channel_mode
-     }
-  }
-  ////////////////////////////////////////////////////////////////
-  // Fields
-  ////////////////////////////////////////////////////////////////
-  define float ANALOG_IO_REF_VOLTAGE    = 3.3
-  // define Log log
-  private int ctx = -1
-  private float fWritePercentValue = 0.0f
-  
-  private int lastChannel     = CHANNEL_END
-  private int lastChannelMode = CHANNEL_MODE_END
-  private float lastInValue = 0.0
+    }
+    ////////////////////////////////////////////////////////////////
+    // Fields
+    ////////////////////////////////////////////////////////////////
+    define float ANALOG_IO_REF_VOLTAGE    = 3.3
+    // define Log log
+    private int ctx = -1
+    private float fWritePercentValue = 0.0f
 
-  native int WriteChannel(int iChannel, float fPercentValue)
+    private int lastChannel     = CHANNEL_END
+    private int lastChannelMode = CHANNEL_MODE_END
+    private float lastInValue = 0.0
+
+    native int WriteChannel(int iChannel, float fPercentValue)
 }
 
